@@ -35,6 +35,20 @@ npm i
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
+**Deploy on dev with Github pages : SP**
+```sh
+# Step 1: checkout the deploying branch.
+git checkout dev-deploy
+
+# Step 2: Get the changes.
+git pull origin dev-deploy
+
+# Step 3: Create build for deploy.
+npm run build:dev
+
+# Step 4: Deploy this branch.
+npm run deploy:dev
+```
 
 **Edit a file directly in GitHub**
 
