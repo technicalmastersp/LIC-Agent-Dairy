@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Professional Government/Corporate Design System - Life Insurance Theme */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 220 20% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
+
+    /* Professional blue-green theme inspired by government forms */
+    --primary: 195 85% 25%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 195 85% 35%;
+
+    --secondary: 210 30% 96%;
+    --secondary-foreground: 220 20% 15%;
+
+    --muted: 210 20% 96%;
+    --muted-foreground: 220 15% 55%;
+
+    --accent: 195 75% 92%;
+    --accent-foreground: 195 85% 25%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 45 93% 47%;
+    --warning-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 20% 88%;
+    --input: 220 20% 95%;
+    --ring: 195 85% 25%;
+
+    /* Form specific colors */
+    --form-header: 195 90% 15%;
+    --form-subheader: 195 70% 30%;
+    --table-border: 220 15% 75%;
+    --table-header: 210 25% 92%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 25% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 20% 12%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 20% 12%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 195 85% 65%;
+    --primary-foreground: 220 25% 8%;
+    --primary-light: 195 85% 75%;
+
+    --secondary: 220 15% 20%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 220 15% 18%;
+    --muted-foreground: 220 10% 65%;
+
+    --accent: 195 50% 25%;
+    --accent-foreground: 195 85% 65%;
+
+    --success: 142 76% 46%;
+    --success-foreground: 220 25% 8%;
+
+    --warning: 45 93% 57%;
+    --warning-foreground: 220 25% 8%;
+
+    --destructive: 0 84% 70%;
+    --destructive-foreground: 220 25% 8%;
+
+    --border: 220 15% 25%;
+    --input: 220 15% 22%;
+    --ring: 195 85% 65%;
+
+    --form-header: 195 85% 65%;
+    --form-subheader: 195 70% 70%;
+    --table-border: 220 15% 35%;
+    --table-header: 220 15% 18%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
