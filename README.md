@@ -1,8 +1,9 @@
-# Welcome to your Lovable project
+<!-- # Welcome to your LIC-Agent-Dairy project
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/315d1141-1177-45ce-91ac-a3796c1f65fa
+
 
 ## How can I edit this code?
 
@@ -84,4 +85,45 @@ Yes, you can!
 
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide) -->
+
+
+
+
+<!-- ---------------------------- writen by sp ------------------------------------------------------- -->
+
+# LIC Management System (Life Insurance Records)
+
+A web application for managing Life Insurance Corporation (LIC) agent/insurance records — set up to track policies, agents, and related data in an organized way.
+
+[Live Demo ›](https://lic-agent-dairy.vercel.app/)
+
+---
+
+## Table of Contents
+
+- [Features](#features)  
+- [Tech Stack](#tech-stack)  
+
+---
+
+## Features
+
+- Agent / Policy Management — Create, Read, Update, Delete (CRUD) operations for agent and policy records.  
+- Dashboard / overview of key LIC data.  
+- Search, filtering and/or sorting of records.  
+- Responsive UI for both desktop and mobile devices.  
+- Secure form validations.  
+
+---
+
+## Tech Stack
+
+
+- **Frontend**: React / Next.js (or the framework you used)  
+- **Backend**: Node.js / Express (if separate) or API routes via Next.js  
+- **Database**: MongoDB / PostgreSQL / any other persistent storage  
+- **Styling**: CSS / Tailwind CSS / Material‐UI / etc.  
+- **Hosting / Deployment**: Vercel  
+
+---

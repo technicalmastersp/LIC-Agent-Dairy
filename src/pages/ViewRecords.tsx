@@ -6,8 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
-import { Search, Eye, Trash2, ArrowUpDown, Plus } from "lucide-react";
+import EditRecordModal from "@/components/EditRecordModal";
+import { Search, Eye, Trash2, ArrowUpDown, Plus, Edit } from "lucide-react";
 import { getCurrentUser, isAuthenticated, getUserRecords, deleteUserRecord } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
@@ -41,6 +43,8 @@ const ViewRecords = () => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<Record | null>(null);
   const [records, setRecords] = useState<Record[]>([]);
 
   useEffect(() => {
@@ -107,6 +111,15 @@ const ViewRecords = () => {
     }
   };
 
+  const handleEditRecord = (record: Record) => {
+    setEditingRecord(record);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateRecord = () => {
+    setRecords(getUserRecords(currentUser.id));
+  };
+
   const SortableHeader = ({ field, children }: { field: keyof Record; children: React.ReactNode }) => (
     <TableHead 
       className="cursor-pointer hover:bg-table-header/50 border border-table-border"
@@ -120,10 +133,10 @@ const ViewRecords = () => {
   );
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-muted/30 flex flex-col">
       <Navigation />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -234,8 +247,18 @@ const ViewRecords = () => {
                                 variant="outline"
                                 onClick={() => handleViewRecord(record)}
                                 className="h-8 w-8 p-0"
+                                title="View Record"
                               >
                                 <Eye className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEditRecord(record)}
+                                className="h-8 w-8 p-0"
+                                title="Edit Record"
+                              >
+                                <Edit className="w-4 h-4" />
                               </Button>
                               <Button
                                 size="sm"
@@ -243,6 +266,7 @@ const ViewRecords = () => {
                                 onClick={() => handleDeleteRecord(record.id)}
                                 disabled
                                 className="h-8 w-8 p-0 opacity-50 cursor-not-allowed"
+                                title="Delete Record (Disabled)"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
@@ -265,6 +289,16 @@ const ViewRecords = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
+
+      {/* Edit Record Modal */}
+      <EditRecordModal
+        record={editingRecord}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onUpdate={handleUpdateRecord}
+      />
+
+      <Footer />
     </div>
   );
 };
