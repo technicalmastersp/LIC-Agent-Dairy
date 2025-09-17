@@ -320,6 +320,13 @@ const SignUp = () => {
                   {t('login')}
                 </Link>
               </p>
+              <p className="text-sm text-muted-foreground">
+                {/* {t('dontHaveAccount')}{" "} */}Explore &nbsp;  
+                <Link to="/our-plans" className="text-primary hover:underline">
+                  {/* {t('signup')} */}
+                  Our Plans
+                </Link>
+              </p>
             </div>
           </CardContent>
         </Card>

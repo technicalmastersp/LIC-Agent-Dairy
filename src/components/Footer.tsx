@@ -1,9 +1,11 @@
 import { useLanguage } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Globe } from "lucide-react";
+import { isAuthenticated } from "@/utils/auth";
 
 const Footer = () => {
   const { t } = useLanguage();
+  const authenticated = isAuthenticated();
 
   return (
     <footer className="bg-primary text-white mt-auto">
@@ -12,21 +14,35 @@ const Footer = () => {
           {/* Quick Links */}
           <div>
             <h3 className="text-lg font-semibold mb-4 text-accent">Quick Links</h3>
+            {authenticated ? (
+              <div className="space-y-2">
+                <Link to="/" className="block hover:text-accent transition-colors">
+                  {t('home')}
+                </Link>
+                <Link to="/add-record" className="block hover:text-accent transition-colors">
+                  {t('addRecord')}
+                </Link>
+                <Link to="/view-records" className="block hover:text-accent transition-colors">
+                  {t('viewRecords')}
+                </Link>
+                <Link to="/profile" className="block hover:text-accent transition-colors">
+                  Profile
+                </Link>
+              </div>
+            // ) : (
+            ) : (
+              <div className="space-y-2">
+                <Link to="/Login" className="block hover:text-accent transition-colors">
+                  Log in
+                </Link>
+                <Link to="/signup" className="block hover:text-accent transition-colors">
+                  Sign Up
+                </Link>
+              </div>
+            )}
             <div className="space-y-2">
-              <Link to="/" className="block hover:text-accent transition-colors">
-                {t('home')}
-              </Link>
-              <Link to="/add-record" className="block hover:text-accent transition-colors">
-                {t('addRecord')}
-              </Link>
-              <Link to="/view-records" className="block hover:text-accent transition-colors">
-                {t('viewRecords')}
-              </Link>
-              <Link to="/about" className="block hover:text-accent transition-colors">
+              <Link to="/about" className="block hover:text-accent transition-colors mt-2">
                 About Us
-              </Link>
-              <Link to="/profile" className="block hover:text-accent transition-colors">
-                Profile
               </Link>
               <Link to="/our-plans" className="block hover:text-accent transition-colors">
                 Our Plans
