@@ -177,3 +177,19 @@ export const deleteUserRecord = (userId: string, recordId: string): boolean => {
     return false;
   }
 };
+
+// Update user record
+export const updateUserRecord = (userId: string, recordId: string, updatedData: any): boolean => {
+  try {
+    const userRecordsKey = `customers-record-lists-${userId}`;
+    const existingRecords = JSON.parse(localStorage.getItem(userRecordsKey) || '[]');
+    const updatedRecords = existingRecords.map((record: any) => 
+      record.id === recordId ? { ...record, ...updatedData } : record
+    );
+    localStorage.setItem(userRecordsKey, JSON.stringify(updatedRecords));
+    return true;
+  } catch (error) {
+    console.error('Error updating user record:', error);
+    return false;
+  }
+};

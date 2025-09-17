@@ -70,6 +70,29 @@ const Navigation = () => {
                   <Table className="w-4 h-4" />
                   <span>{t('viewRecords')}</span>
                 </Link>
+                <Link
+                  to="/about"
+                  className={cn(
+                    "flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                    location.pathname === "/about"
+                      ? "bg-primary-light text-primary-foreground"
+                      : "text-primary-foreground/80 hover:bg-primary-light/50 hover:text-primary-foreground"
+                  )}
+                >
+                  <span>About Us</span>
+                </Link>
+                {/* <Link
+                  to="/profile"
+                  className={cn(
+                    "flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                    location.pathname === "/profile"
+                      ? "bg-primary-light text-primary-foreground"
+                      : "text-primary-foreground/80 hover:bg-primary-light/50 hover:text-primary-foreground"
+                  )}
+                >
+                  <User className="w-4 h-4" />
+                  <span>Profile</span>
+                </Link> */}
               </div>
             )}
             
@@ -77,7 +100,17 @@ const Navigation = () => {
             
             {authenticated ? (
               <div className="flex items-center space-x-2">
-                <div className="hidden md:flex items-center space-x-2 text-sm text-primary-foreground/80">
+                {/* className="hidden md:flex items-center space-x-2 text-sm text-primary-foreground/80" */}
+                <div
+                  className={cn(
+                    "flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                    location.pathname === "/profile"
+                      ? "bg-primary-light text-primary-foreground"
+                      : "text-primary-foreground/80 hover:bg-primary-light/50 hover:text-primary-foreground"
+                  )} 
+                  onClick={() => navigate('/profile')}
+                  style={{ cursor: 'pointer' }}
+                >
                   <User className="w-4 h-4" />
                   <span>{currentUser?.name}</span>
                 </div>

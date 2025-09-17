@@ -7,6 +7,8 @@ import { LanguageProvider } from "@/hooks/useLanguage";
 import Home from "./pages/Home";
 import AddRecord from "./pages/AddRecord";
 import ViewRecords from "./pages/ViewRecords";
+import About from "./pages/About";
+import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
@@ -26,6 +28,8 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/add-record" element={<AddRecord />} />
             <Route path="/view-records" element={<ViewRecords />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
