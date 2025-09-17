@@ -10,6 +10,7 @@ import Navigation from "@/components/Navigation";
 import { Save, Plus, Trash2 } from "lucide-react";
 import { getCurrentUser, isAuthenticated, saveUserRecord } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
+import Footer from "@/components/Footer";
 
 interface FamilyMember {
   relationship: string;
@@ -602,6 +603,8 @@ const AddRecord = () => {
           </div>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 };

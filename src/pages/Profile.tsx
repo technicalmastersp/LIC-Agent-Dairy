@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Save, X, User as UserIcon } from "lucide-react";
+import { Edit, Save, X, Users, User as UserIcon } from "lucide-react";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -21,6 +21,7 @@ const Profile = () => {
   const authenticated = isAuthenticated();
   
   const [isEditing, setIsEditing] = useState(false);
+  const [isReferral, setIsReferral] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     fullAddress: "",
@@ -43,7 +44,8 @@ const Profile = () => {
       designation: currentUser.designation,
       email: currentUser.email
     });
-  }, [authenticated, currentUser, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authenticated, navigate]);
 
   if (!authenticated || !currentUser) {
     return null;
@@ -107,37 +109,62 @@ const Profile = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-form-header">User Profile</h1>
+              <h1 className="text-3xl font-bold text-form-header">{formData.name} Profile</h1>
               <p className="text-muted-foreground">
                 View and update your profile information
               </p>
             </div>
-            {!isEditing ? (
-              <Button 
-                onClick={() => setIsEditing(true)}
-                className="bg-primary hover:bg-primary-light"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Profile
-              </Button>
-            ) : (
-              <div className="flex space-x-2">
+
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              {!isReferral ? (
                 <Button 
-                  onClick={handleSave}
+                  onClick={() => setIsReferral(true)}
+                  className="bg-primary hover:bg-primary-light"
+                  disabled={true}
+                >
+                  <Users className="w-4 h-4 mr-2" />
+                  Refferal Program
+                </Button>
+              ) : (
+                <div className="flex space-x-2">
+                  <Button 
+                    // onClick={handleSave}
+                    onClick={() => setIsReferral(false)}
+                    className="bg-primary hover:bg-primary-light"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Close
+                  </Button>
+                </div>
+              )}
+
+              {!isEditing ? (
+                <Button 
+                  onClick={() => setIsEditing(true)}
                   className="bg-primary hover:bg-primary-light"
                 >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Changes
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Profile
                 </Button>
-                <Button 
-                  onClick={handleCancel}
-                  variant="outline"
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Cancel
-                </Button>
-              </div>
-            )}
+              ) : (
+                <div className="flex space-x-2">
+                  <Button 
+                    onClick={handleSave}
+                    className="bg-primary hover:bg-primary-light"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </Button>
+                  <Button 
+                    onClick={handleCancel}
+                    variant="outline"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Cancel
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Profile Information */}
@@ -153,14 +180,14 @@ const Profile = () => {
               <CardContent className="space-y-4">
                 <div>
                   <Label className="text-sm font-medium text-muted-foreground">
-                    Auto-generated User ID
+                    Auto-generated User ID 
                   </Label>
                   <Badge variant="secondary" className="mt-1 font-mono">
                     {currentUser.id}
                   </Badge>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">
+                  <Label className="text-base font-medium text-muted-foreground">
                     Easy-to-remember User ID
                   </Label>
                   <Badge variant="outline" className="mt-1 font-mono">
@@ -173,6 +200,36 @@ const Profile = () => {
                   </Label>
                   <p className="text-sm">
                     {new Date(currentUser.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">
+                    Current Plan
+                  </Label>
+                  {currentUser.subscription ? (
+                    <p className="text-sm">
+                      {currentUser.subscription.duration} — ₹{currentUser.subscription.price} ({currentUser.subscription.status})
+                    </p>
+                  ) : (
+                    <Badge variant="secondary" className="mt-1">No active plan</Badge>
+                  )}
+                </div>
+                {currentUser.subscription && (
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      Plan Ends On
+                    </Label>
+                    <p className="text-sm">
+                      {new Date(currentUser.subscription.endDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                )}
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground">
+                    Your Referral Code
+                  </Label>
+                  <p className="text-sm">
+                    {currentUser.referralCode || "N/A"}
                   </p>
                 </div>
               </CardContent>
@@ -192,8 +249,8 @@ const Profile = () => {
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      disabled={!isEditing}
-                      className={!isEditing ? "bg-muted" : ""}
+                      disabled={true}
+                      className="bg-muted"
                     />
                   </div>
 
@@ -244,7 +301,7 @@ const Profile = () => {
                     onChange={handleInputChange}
                     disabled={!isEditing}
                     className={!isEditing ? "bg-muted" : ""}
-                    rows={3}
+                    rows={4}
                   />
                 </div>
 

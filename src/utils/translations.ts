@@ -1,6 +1,10 @@
 // Multilingual support for English and Hindi
 
 export interface Translations {
+  // Project Lable
+  title: string,
+  LIC: string,
+
   // Navigation
   home: string;
   addRecord: string;
@@ -15,6 +19,9 @@ export interface Translations {
   email: string;
   password: string;
   confirmPassword: string;
+  SelectSubscriptionPlan: string;
+  ReferralCode: string;
+  Optional: string;
   submit: string;
   cancel: string;
   save: string;
@@ -62,6 +69,10 @@ export interface Translations {
 
 export const translations: Record<string, Translations> = {
   en: {
+    // Project Lable
+    title: "LIC Agent Dairy",
+    LIC: "Life Insurance Corporation of India",
+
     // Navigation
     home: "Home",
     addRecord: "Add Record",
@@ -76,6 +87,9 @@ export const translations: Record<string, Translations> = {
     email: "Email ID",
     password: "Password",
     confirmPassword: "Confirm Password",
+    SelectSubscriptionPlan: "Select Subscription Plan",
+    ReferralCode: "Referral Code",
+    Optional: "Optional",
     submit: "Submit",
     cancel: "Cancel",
     save: "Save",
@@ -122,12 +136,18 @@ export const translations: Record<string, Translations> = {
   },
   
   hi: {
+    // Project Lable
+    // title: "एलआईसी एजेंट डायरी",
+    title: "एलआईसी अभिकर्ता डायरी",
+    LIC: "भारतीय जीवन बीमा निगम",
+
     // Navigation
     home: "मुख्य पृष्ठ",
     addRecord: "रिकॉर्ड जोड़ें",
     viewRecords: "रिकॉर्ड देखें",
     login: "लॉग इन",
-    signup: "साइन अप",
+    // signup: "साइन अप",
+    signup: "खाता बनाएं",
     logout: "लॉग आउट",
     
     // Common
@@ -136,6 +156,9 @@ export const translations: Record<string, Translations> = {
     email: "ईमेल आईडी",
     password: "पासवर्ड",
     confirmPassword: "पासवर्ड की पुष्टि करें",
+    SelectSubscriptionPlan:"सदस्यता योजना चुनें",
+    ReferralCode:"रेफरल कोड",
+    Optional:"वैकल्पिक",
     submit: "जमा करें",
     cancel: "रद्द करें",
     save: "सेव करें",

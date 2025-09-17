@@ -28,6 +28,12 @@ const Footer = () => {
               <Link to="/profile" className="block hover:text-accent transition-colors">
                 Profile
               </Link>
+              <Link to="/our-plans" className="block hover:text-accent transition-colors">
+                Our Plans
+              </Link>
+              <Link to="/lic-info-hub" className="block hover:text-accent transition-colors">
+                LIC Info Hub
+              </Link>
             </div>
           </div>
 

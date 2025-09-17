@@ -11,7 +11,9 @@ import About from "./pages/About";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import OurPlans from "./pages/OurPlans";
 import NotFound from "./pages/NotFound";
+import LicInfoHub from "./pages/LicInfoHub";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +32,8 @@ const App = () => (
             <Route path="/view-records" element={<ViewRecords />} />
             <Route path="/about" element={<About />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/our-plans" element={<OurPlans />} />
+            <Route path="/lic-info-hub" element={<LicInfoHub />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

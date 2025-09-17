@@ -47,7 +47,7 @@ const ViewRecords = () => {
   const [editingRecord, setEditingRecord] = useState<Record | null>(null);
   const [records, setRecords] = useState<Record[]>([]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (!authenticated || !currentUser) {
       navigate("/login");
       return;
@@ -55,7 +55,24 @@ const ViewRecords = () => {
     
     const userRecords = getUserRecords(currentUser.id);
     setRecords(userRecords);
+  }, [authenticated, currentUser, navigate]); */
+  useEffect(() => {
+    // console.log("Effect ran with:", { authenticated, currentUser });
+
+    if (!authenticated || !currentUser) {
+      navigate("/login");
+      return;
+    }
+
+    const userRecords = getUserRecords(currentUser.id);
+
+    setRecords((prevRecords) =>
+      JSON.stringify(prevRecords) !== JSON.stringify(userRecords)
+        ? userRecords
+        : prevRecords
+    );
   }, [authenticated, currentUser, navigate]);
+
 
   if (!authenticated || !currentUser) {
     return null;
