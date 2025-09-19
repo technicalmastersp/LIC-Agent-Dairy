@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, User, MapPin, Briefcase, Phone, CreditCard } from "lucide-react";
+import { Calendar, User, MapPin, Briefcase, Phone, CreditCard, HomeIcon } from "lucide-react";
+import siteConfig from "@/config/siteConfig";
 
 interface RecordDetailsModalProps {
   record: any;
@@ -45,15 +46,30 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
             <CardHeader>
               <CardTitle className="text-lg text-form-header flex items-center space-x-2">
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-sm">LIC</span>
+                  <img src={siteConfig.logo_medium_size} alt="site-logo" />
                 </div>
-                <span>Bharatiya Jeevan Bima Nigam</span>
+                &nbsp;{siteConfig.title}
               </CardTitle>
               <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                 <span>Record ID: {record.id}</span>
                 <span>Created: {new Date(record.createdAt).toLocaleDateString()}</span>
               </div>
             </CardHeader>
+          </Card>
+
+          {/* Basic Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-form-header">Basic Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoItem icon={User} label="Date" value={new Date(record.date).toLocaleDateString()} />
+                <InfoItem icon={Calendar} label="Aadhaar Number" value={record.aadhaarNumber} />
+                <InfoItem icon={MapPin} label="Pan Number" value={record.panNumber} />
+                <InfoItem icon={User} label="E Mail" value={record.email} />
+              </div>
+            </CardContent>
           </Card>
 
           {/* Personal Information */}
@@ -64,27 +80,33 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoItem icon={User} label="Full Name" value={record.name} />
-                <InfoItem icon={Calendar} label="Date of Birth" value={record.dateOfBirth} />
                 <InfoItem icon={MapPin} label="Birth Place" value={record.birthPlace} />
-                <InfoItem icon={User} label="Age" value={record.age} />
                 <InfoItem icon={User} label="Father's Name" value={record.fatherName} />
                 <InfoItem icon={User} label="Mother's Name" value={record.motherName} />
                 <InfoItem icon={User} label="Spouse's Name" value={record.spouseName} />
-                <InfoItem icon={Briefcase} label="Occupation" value={record.occupation} />
+                <InfoItem icon={MapPin} label="Address" value={record.address} />
+                <InfoItem icon={Calendar} label="Date of Birth" value={record.dateOfBirth} />
+                <InfoItem icon={User} label="Age" value={record.age} />
+                <InfoItem icon={Phone} label="Aadhaar Liked Mobile Number" value={record.aadhaarLikedMobileNumber} />
+                <InfoItem icon={User} label="Name of Nominee" value={record.nameOfNominee} />
+                <InfoItem icon={User} label="Age of Nominee" value={record.ageOfNominee} />
+                <InfoItem icon={User} label="Relation Name" value={record.relationName} />
               </div>
             </CardContent>
           </Card>
 
-          {/* Contact & Address */}
+          {/* Education & Occupation */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">Contact & Address</CardTitle>
+              <CardTitle className="text-form-header">Education & Occupation</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InfoItem icon={MapPin} label="Address" value={record.address} />
                 <InfoItem icon={Briefcase} label="Educational Qualification" value={record.educationalQualification} />
-                <InfoItem icon={Briefcase} label="Service Details" value={record.serviceDetails} />
+                <InfoItem icon={Briefcase} label="Occupation" value={record.occupation} />
+                <InfoItem icon={Briefcase} label="Designation" value={record.designationOfPolicyHolder} />
+                <InfoItem icon={Briefcase} label="Income Detail" value={record.incomeDetail} />
+                <InfoItem icon={Briefcase} label="Period of Service" value={record.periodOfService} />
                 <InfoItem icon={Briefcase} label="Employer Name" value={record.employerName} />
               </div>
             </CardContent>
@@ -113,7 +135,8 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoItem icon={CreditCard} label="Bank Account Number" value={record.bankAccountNumber} />
                 <InfoItem icon={CreditCard} label="IFSC Code" value={record.ifscCode} />
-                <InfoItem icon={CreditCard} label="Bank Name/Branch" value={record.bankName} />
+                <InfoItem icon={HomeIcon} label="Bank Name" value={record.bankName} />
+                <InfoItem icon={MapPin} label="Branch Name" value={record.branchName} />
               </div>
             </CardContent>
           </Card>
@@ -176,9 +199,9 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                       <TableRow className="bg-table-header">
                         <TableHead className="border border-table-border">Policy Number</TableHead>
                         <TableHead className="border border-table-border">Issue Date</TableHead>
-                        <TableHead className="border border-table-border">Premium</TableHead>
-                        <TableHead className="border border-table-border">Installment Date</TableHead>
-                        <TableHead className="border border-table-border">Amount</TableHead>
+                        <TableHead className="border border-table-border">Sum Assured</TableHead>
+                        <TableHead className="border border-table-border">Mode of Installment</TableHead>
+                        <TableHead className="border border-table-border">Branch</TableHead>
                         <TableHead className="border border-table-border">Last Payment</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -193,13 +216,13 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                           {record.currentPolicy.issueDate || "-"}
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          ₹{record.currentPolicy.premium || "0"}
+                          ₹{record.currentPolicy.sumAssured || "0"}
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          {record.currentPolicy.installmentDate || "-"}
+                          {record.currentPolicy.modeOfInstallment || "-"}
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          ₹{record.currentPolicy.amount || "0"}
+                          {record.currentPolicy.branch || "-"}
                         </TableCell>
                         <TableCell className="border border-table-border">
                           {record.currentPolicy.lastPaymentDate || "-"}
@@ -225,9 +248,9 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                       <TableRow className="bg-table-header">
                         <TableHead className="border border-table-border">Policy Number</TableHead>
                         <TableHead className="border border-table-border">Issue Date</TableHead>
-                        <TableHead className="border border-table-border">Premium</TableHead>
-                        <TableHead className="border border-table-border">Installment Date</TableHead>
-                        <TableHead className="border border-table-border">Amount</TableHead>
+                        <TableHead className="border border-table-border">Sum Assured</TableHead>
+                        <TableHead className="border border-table-border">Mode of Installment</TableHead>
+                        <TableHead className="border border-table-border">Branch</TableHead>
                         <TableHead className="border border-table-border">Last Payment</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -242,13 +265,13 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                           {record.previousPolicy.issueDate || "-"}
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          ₹{record.previousPolicy.premium || "0"}
+                          ₹{record.previousPolicy.sumAssured || "0"}
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          {record.previousPolicy.installmentDate || "-"}
+                          {record.previousPolicy.modeOfInstallment || "-"}
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          ₹{record.previousPolicy.amount || "0"}
+                          {record.previousPolicy.branch || "-"}
                         </TableCell>
                         <TableCell className="border border-table-border">
                           {record.previousPolicy.lastPaymentDate || "-"}

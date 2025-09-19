@@ -11,6 +11,7 @@ import { Save, Plus, Trash2 } from "lucide-react";
 import { getCurrentUser, isAuthenticated, saveUserRecord } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import Footer from "@/components/Footer";
+import siteConfig from "@/config/siteConfig";
 
 interface FamilyMember {
   relationship: string;
@@ -23,9 +24,9 @@ interface FamilyMember {
 interface PolicyDetail {
   policyNumber: string;
   issueDate: string;
-  premium: string;
-  installmentDate: string;
-  amount: string;
+  sumAssured: string;
+  modeOfInstallment: string;
+  branch: string;
   lastPaymentDate: string;
 }
 
@@ -48,6 +49,11 @@ const AddRecord = () => {
 
   // Basic Information
   const [formData, setFormData] = useState({
+    date: new Date().toISOString(),
+    aadhaarNumber: "",
+    panNumber: "",
+    email: "",
+
     name: "",
     birthPlace: "",
     fatherName: "",
@@ -58,16 +64,22 @@ const AddRecord = () => {
     age: "",
     occupation: "",
     educationalQualification: "",
-    serviceDetails: "",
+    designationOfPolicyHolder: "",
+    incomeDetail: "",
+    periodOfService: "",
     employerName: "",
-    employerAge: "",
-    relationship: "",
+    aadhaarLikedMobileNumber: "",
+    nameOfNominee: "",
+    ageOfNominee: "",
+    relationName: "",
+    // relationship: "",
     childrenBirthDate: "",
     height: "",
     weight: "",
     bankAccountNumber: "",
     ifscCode: "",
     bankName: "",
+    branchName: "",
   });
 
   // Family Details Table
@@ -83,18 +95,18 @@ const AddRecord = () => {
   const [currentPolicy, setCurrentPolicy] = useState<PolicyDetail>({
     policyNumber: "",
     issueDate: "",
-    premium: "",
-    installmentDate: "",
-    amount: "",
+    sumAssured: "",
+    modeOfInstallment: "",
+    branch: "",
     lastPaymentDate: "",
   });
 
   const [previousPolicy, setPreviousPolicy] = useState<PolicyDetail>({
     policyNumber: "",
     issueDate: "",
-    premium: "",
-    installmentDate: "",
-    amount: "",
+    sumAssured: "",
+    modeOfInstallment: "",
+    branch: "",
     lastPaymentDate: "",
   });
 
@@ -163,159 +175,238 @@ const AddRecord = () => {
             <CardHeader className="text-center">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-                  <span className="text-form-header font-bold">LIC</span>
+                  {/* <span className="text-form-header font-bold">LIC</span> */}
+                  <img src={siteConfig.logo_medium_size} alt="site-logo" />
                 </div>
               </div>
               <CardTitle className="text-2xl font-bold">
-                Bharatiya Jeevan Bima Nigam
+                {siteConfig.title}
               </CardTitle>
-              <p className="text-white/90">Development Officer</p>
-              <p className="text-white/80 text-sm">Mobile: 9123456789</p>
+              <p className="text-white/90">{t("addRecord")}</p>
+              {/* <p className="text-white/80 text-sm">Mobile: 9123456789</p> */}
             </CardHeader>
           </Card>
 
           {/* Basic Information Form */}
           <Card>
             <CardHeader>
+              <CardTitle className="text-form-header">Basic Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="date">Date</Label>
+                  <Input 
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => handleInputChange("date", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="aadhaarNumber">Aadhaar Number</Label>
+                  <Input 
+                    id="aadhaarNumber" 
+                    value={formData.aadhaarNumber}
+                    onChange={(e) => handleInputChange("aadhaarNumber", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="panNumber">Pan Number</Label>
+                  <Input 
+                    id="panNumber" 
+                    value={formData.panNumber}
+                    onChange={(e) => handleInputChange("panNumber", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email ID</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Personal Information Form */}
+          <Card>
+            <CardHeader>
               <CardTitle className="text-form-header">Personal Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Column 1 */}
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="date">Date</Label>
-                    <Input 
-                      id="date" 
-                      type="date"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="name">1. Name</Label>
-                    <Input 
-                      id="name" 
-                      value={formData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="fatherName">2. Father's Name</Label>
-                    <Input 
-                      id="fatherName" 
-                      value={formData.fatherName}
-                      onChange={(e) => handleInputChange("fatherName", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="motherName">3. Mother's Name</Label>
-                    <Input 
-                      id="motherName" 
-                      value={formData.motherName}
-                      onChange={(e) => handleInputChange("motherName", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="spouseName">4. Spouse's Name</Label>
-                    <Input 
-                      id="spouseName" 
-                      value={formData.spouseName}
-                      onChange={(e) => handleInputChange("spouseName", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                  <Label htmlFor="name">1. Name</Label>
+                  <Input 
+                    id="name" 
+                    value={formData.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    className="mt-1"
+                  />
                 </div>
-
-                {/* Column 2 */}
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="baseNumber">Base No.</Label>
-                    <Input id="baseNumber" className="mt-1" />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email ID</Label>
-                    <Input id="email" type="email" className="mt-1" />
-                  </div>
-                  <div>
-                    <Label htmlFor="birthPlace">Birth Place</Label>
-                    <Input 
-                      id="birthPlace" 
-                      value={formData.birthPlace}
-                      onChange={(e) => handleInputChange("birthPlace", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="dateOfBirth">6. Date of Birth</Label>
-                    <Input 
-                      id="dateOfBirth" 
-                      type="date"
-                      value={formData.dateOfBirth}
-                      onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="age">Age</Label>
-                    <Input 
-                      id="age" 
-                      value={formData.age}
-                      onChange={(e) => handleInputChange("age", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="birthPlace">1a. Birth Place</Label>
+                  <Input 
+                    id="birthPlace" 
+                    value={formData.birthPlace}
+                    onChange={(e) => handleInputChange("birthPlace", e.target.value)}
+                    className="mt-1"
+                  />
                 </div>
-
-                {/* Column 3 */}
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="address">5. Address</Label>
-                    <Input 
-                      id="address" 
-                      value={formData.address}
-                      onChange={(e) => handleInputChange("address", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="occupation">7. Occupation</Label>
-                    <Input 
-                      id="occupation" 
-                      value={formData.occupation}
-                      onChange={(e) => handleInputChange("occupation", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="education">Educational Qualification</Label>
-                    <Input 
-                      id="education" 
-                      value={formData.educationalQualification}
-                      onChange={(e) => handleInputChange("educationalQualification", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="service">Service Details</Label>
-                    <Input 
-                      id="service" 
-                      value={formData.serviceDetails}
-                      onChange={(e) => handleInputChange("serviceDetails", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="employer">8. Employer's Name</Label>
-                    <Input 
-                      id="employer" 
-                      value={formData.employerName}
-                      onChange={(e) => handleInputChange("employerName", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="fatherName">2. Father's Name</Label>
+                  <Input 
+                    id="fatherName" 
+                    value={formData.fatherName}
+                    onChange={(e) => handleInputChange("fatherName", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="motherName">3. Mother's Name</Label>
+                  <Input 
+                    id="motherName" 
+                    value={formData.motherName}
+                    onChange={(e) => handleInputChange("motherName", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="spouseName">4. Spouse's Name</Label>
+                  <Input 
+                    id="spouseName" 
+                    value={formData.spouseName}
+                    onChange={(e) => handleInputChange("spouseName", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="address">5. Address</Label>
+                  <Input 
+                    id="address" 
+                    value={formData.address}
+                    onChange={(e) => handleInputChange("address", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                {/* <div>
+                  <Label htmlFor="baseNumber">Base No.</Label>
+                  <Input id="baseNumber" className="mt-1" />
+                </div> */}
+                <div>
+                  <Label htmlFor="dateOfBirth">6. Date of Birth</Label>
+                  <Input 
+                    id="dateOfBirth" 
+                    type="date"
+                    value={formData.dateOfBirth}
+                    onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="age">6a. Age</Label>
+                  <Input 
+                    id="age" 
+                    value={formData.age}
+                    onChange={(e) => handleInputChange("age", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="occupation">7. Occupation</Label>
+                  <Input 
+                    id="occupation" 
+                    value={formData.occupation}
+                    onChange={(e) => handleInputChange("occupation", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="education">7a. Educational Qualification</Label>
+                  <Input 
+                    id="education" 
+                    value={formData.educationalQualification}
+                    onChange={(e) => handleInputChange("educationalQualification", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="DesignationName">7b. Designation</Label>
+                  <Input 
+                    id="DesignationName" 
+                    value={formData.designationOfPolicyHolder}
+                    onChange={(e) => handleInputChange("designationOfPolicyHolder", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="income">7c. Income Detail</Label>
+                  <Input 
+                    id="income" 
+                    value={formData.incomeDetail}
+                    onChange={(e) => handleInputChange("incomeDetail", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="servicePeriod">7d. Period Of Service</Label>
+                  <Input 
+                    id="servicePeriod" 
+                    value={formData.periodOfService}
+                    onChange={(e) => handleInputChange("periodOfService", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="employer">7e. Employer's Name</Label>
+                  <Input 
+                    id="employer" 
+                    value={formData.employerName}
+                    onChange={(e) => handleInputChange("employerName", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="mobileNumberLinkedAadhaar">7f. Aadhaar liked Mobile Number </Label>
+                  <Input 
+                    id="mobileNumberLinkedAadhaar" 
+                    value={formData.aadhaarLikedMobileNumber}
+                    onChange={(e) => handleInputChange("aadhaarLikedMobileNumber", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="nominee">8. Name of Nominee</Label>
+                  <Input 
+                    id="nominee" 
+                    value={formData.nameOfNominee}
+                    onChange={(e) => handleInputChange("nameOfNominee", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="nomineeAge">8a. Age of Nominee</Label>
+                  <Input 
+                    id="nomineeAge" 
+                    value={formData.ageOfNominee}
+                    onChange={(e) => handleInputChange("ageOfNominee", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="relation">8b. Relation</Label>
+                  <Input 
+                    id="relation" 
+                    value={formData.relationName}
+                    onChange={(e) => handleInputChange("relationName", e.target.value)}
+                    className="mt-1"
+                  />
                 </div>
               </div>
             </CardContent>
@@ -383,65 +474,70 @@ const AddRecord = () => {
           {/* Additional Fields */}
           <Card>
             <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="height">Height</Label>
-                    <Input 
-                      id="height" 
-                      value={formData.height}
-                      onChange={(e) => handleInputChange("height", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="weight">Weight</Label>
-                    <Input 
-                      id="weight" 
-                      value={formData.weight}
-                      onChange={(e) => handleInputChange("weight", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="bankAccount">10. Bank Account Number</Label>
-                    <Input 
-                      id="bankAccount" 
-                      value={formData.bankAccountNumber}
-                      onChange={(e) => handleInputChange("bankAccountNumber", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                  <Label htmlFor="height">10. Height</Label>
+                  <Input 
+                    id="height" 
+                    value={formData.height}
+                    onChange={(e) => handleInputChange("height", e.target.value)}
+                    className="mt-1"
+                  />
                 </div>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="childrenDate">9. Children's Birth Date</Label>
-                    <Input 
-                      id="childrenDate" 
-                      type="date"
-                      value={formData.childrenBirthDate}
-                      onChange={(e) => handleInputChange("childrenBirthDate", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="ifsc">IFSC Code</Label>
-                    <Input 
-                      id="ifsc" 
-                      value={formData.ifscCode}
-                      onChange={(e) => handleInputChange("ifscCode", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="bankName">Bank Name/Branch</Label>
-                    <Input 
-                      id="bankName" 
-                      value={formData.bankName}
-                      onChange={(e) => handleInputChange("bankName", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="weight">10a. Weight</Label>
+                  <Input 
+                    id="weight" 
+                    value={formData.weight}
+                    onChange={(e) => handleInputChange("weight", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="childrenDate">11. Children's Birth Date</Label>
+                  <Input 
+                    id="childrenDate" 
+                    type="date"
+                    value={formData.childrenBirthDate}
+                    onChange={(e) => handleInputChange("childrenBirthDate", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="bankAccount">12. Bank Account Number</Label>
+                  <Input 
+                    id="bankAccount" 
+                    value={formData.bankAccountNumber}
+                    onChange={(e) => handleInputChange("bankAccountNumber", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="ifsc">12a. IFSC Code</Label>
+                  <Input 
+                    id="ifsc" 
+                    value={formData.ifscCode}
+                    onChange={(e) => handleInputChange("ifscCode", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="bankName">12b. Bank Name</Label>
+                  <Input 
+                    id="bankName" 
+                    value={formData.bankName}
+                    onChange={(e) => handleInputChange("bankName", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="branchName">12c. Branch Name</Label>
+                  <Input 
+                    id="branchName" 
+                    value={formData.branchName}
+                    onChange={(e) => handleInputChange("branchName", e.target.value)}
+                    className="mt-1"
+                  />
                 </div>
               </div>
             </CardContent>
@@ -458,9 +554,9 @@ const AddRecord = () => {
                   <TableRow className="bg-table-header">
                     <TableHead className="border border-table-border">Policy Number</TableHead>
                     <TableHead className="border border-table-border">Issue Date</TableHead>
-                    <TableHead className="border border-table-border">Premium</TableHead>
-                    <TableHead className="border border-table-border">Installment Date</TableHead>
-                    <TableHead className="border border-table-border">Amount</TableHead>
+                    <TableHead className="border border-table-border">Sum Assured</TableHead>
+                    <TableHead className="border border-table-border">Mode of Installment</TableHead>
+                    <TableHead className="border border-table-border">Branch</TableHead>
                     <TableHead className="border border-table-border">Last Payment Date</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -483,23 +579,23 @@ const AddRecord = () => {
                     </TableCell>
                     <TableCell className="border border-table-border">
                       <Input 
-                        value={currentPolicy.premium}
-                        onChange={(e) => handlePolicyChange("current", "premium", e.target.value)}
+                        value={currentPolicy.sumAssured}
+                        onChange={(e) => handlePolicyChange("current", "sumAssured", e.target.value)}
                         className="border-0 bg-transparent"
                       />
                     </TableCell>
                     <TableCell className="border border-table-border">
                       <Input 
-                        type="date"
-                        value={currentPolicy.installmentDate}
-                        onChange={(e) => handlePolicyChange("current", "installmentDate", e.target.value)}
+                        // type="date"
+                        value={currentPolicy.modeOfInstallment}
+                        onChange={(e) => handlePolicyChange("current", "modeOfInstallment", e.target.value)}
                         className="border-0 bg-transparent"
                       />
                     </TableCell>
                     <TableCell className="border border-table-border">
                       <Input 
-                        value={currentPolicy.amount}
-                        onChange={(e) => handlePolicyChange("current", "amount", e.target.value)}
+                        value={currentPolicy.branch}
+                        onChange={(e) => handlePolicyChange("current", "branch", e.target.value)}
                         className="border-0 bg-transparent"
                       />
                     </TableCell>
@@ -528,9 +624,9 @@ const AddRecord = () => {
                   <TableRow className="bg-table-header">
                     <TableHead className="border border-table-border">Policy Number</TableHead>
                     <TableHead className="border border-table-border">Issue Date</TableHead>
-                    <TableHead className="border border-table-border">Premium</TableHead>
-                    <TableHead className="border border-table-border">Installment Date</TableHead>
-                    <TableHead className="border border-table-border">Amount</TableHead>
+                    <TableHead className="border border-table-border">Sum Assured</TableHead>
+                    <TableHead className="border border-table-border">Mode of Installment</TableHead>
+                    <TableHead className="border border-table-border">Branch</TableHead>
                     <TableHead className="border border-table-border">Last Payment Date</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -553,23 +649,23 @@ const AddRecord = () => {
                     </TableCell>
                     <TableCell className="border border-table-border">
                       <Input 
-                        value={previousPolicy.premium}
-                        onChange={(e) => handlePolicyChange("previous", "premium", e.target.value)}
+                        value={previousPolicy.sumAssured}
+                        onChange={(e) => handlePolicyChange("previous", "sumAssured", e.target.value)}
                         className="border-0 bg-transparent"
                       />
                     </TableCell>
                     <TableCell className="border border-table-border">
                       <Input 
-                        type="date"
-                        value={previousPolicy.installmentDate}
-                        onChange={(e) => handlePolicyChange("previous", "installmentDate", e.target.value)}
+                        // type="date"
+                        value={previousPolicy.modeOfInstallment}
+                        onChange={(e) => handlePolicyChange("previous", "modeOfInstallment", e.target.value)}
                         className="border-0 bg-transparent"
                       />
                     </TableCell>
                     <TableCell className="border border-table-border">
                       <Input 
-                        value={previousPolicy.amount}
-                        onChange={(e) => handlePolicyChange("previous", "amount", e.target.value)}
+                        value={previousPolicy.branch}
+                        onChange={(e) => handlePolicyChange("previous", "branch", e.target.value)}
                         className="border-0 bg-transparent"
                       />
                     </TableCell>

@@ -3,7 +3,7 @@
 export interface Translations {
   // Project Lable
   title: string,
-  LIC: string,
+  // LIC: string,
 
   // Navigation
   home: string;
@@ -15,6 +15,7 @@ export interface Translations {
   
   // Common
   welcome: string;
+  welcomeBack: string;
   name: string;
   email: string;
   password: string;
@@ -71,7 +72,7 @@ export const translations: Record<string, Translations> = {
   en: {
     // Project Lable
     title: "LIC Agent Dairy",
-    LIC: "Life Insurance Corporation of India",
+    // LIC: "Life Insurance Corporation of India",
 
     // Navigation
     home: "Home",
@@ -83,6 +84,7 @@ export const translations: Record<string, Translations> = {
     
     // Common
     welcome: "Welcome",
+    welcomeBack: "Welcome Back",
     name: "Name",
     email: "Email ID",
     password: "Password",
@@ -139,7 +141,7 @@ export const translations: Record<string, Translations> = {
     // Project Lable
     // title: "एलआईसी एजेंट डायरी",
     title: "एलआईसी अभिकर्ता डायरी",
-    LIC: "भारतीय जीवन बीमा निगम",
+    // LIC: "भारतीय जीवन बीमा निगम",
 
     // Navigation
     home: "मुख्य पृष्ठ",
@@ -152,6 +154,7 @@ export const translations: Record<string, Translations> = {
     
     // Common
     welcome: "स्वागत",
+    welcomeBack: "फिर से स्वागत है",
     name: "नाम",
     email: "ईमेल आईडी",
     password: "पासवर्ड",

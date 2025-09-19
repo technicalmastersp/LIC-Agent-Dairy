@@ -17,6 +17,7 @@ import {
   MapPin,
   Globe
 } from "lucide-react";
+import siteConfig from "@/config/siteConfig";
 
 const About = () => {
   const { t } = useLanguage();
@@ -144,18 +145,18 @@ const About = () => {
                 <div className="space-y-6">
                   <h3 className="text-xl font-semibold text-form-header">Get in Touch</h3>
                   <div className="space-y-4">
-                    <div className="flex items-center space-x-3">
+                    {/* <div className="flex items-center space-x-3">
                       <Phone className="w-5 h-5 text-primary" />
                       <div>
                         <p className="font-medium">Phone</p>
                         <p className="text-muted-foreground">+91 9876543210</p>
                       </div>
-                    </div>
+                    </div> */}
                     <div className="flex items-center space-x-3">
                       <Mail className="w-5 h-5 text-primary" />
                       <div>
                         <p className="font-medium">Email</p>
-                        <p className="text-muted-foreground">support@policyrecords.com</p>
+                        <p className="text-muted-foreground">{siteConfig.supportEmail}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
@@ -172,7 +173,7 @@ const About = () => {
                       <Globe className="w-5 h-5 text-primary" />
                       <div>
                         <p className="font-medium">Website</p>
-                        <p className="text-muted-foreground">www.policyrecords.com</p>
+                        <p className="text-muted-foreground">{siteConfig.productionUrl}</p>
                       </div>
                     </div>
                   </div>
@@ -191,7 +192,7 @@ const About = () => {
                     <p className="text-muted-foreground">
                       24/7 emergency support available for critical issues
                     </p>
-                    <p className="text-primary font-medium">+91 9876543211</p>
+                    {/* <p className="text-primary font-medium">+91 9876543211</p> */}
                   </div>
                 </div>
               </div>

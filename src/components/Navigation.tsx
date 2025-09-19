@@ -6,6 +6,7 @@ import { getCurrentUser, logout, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { cn } from "@/lib/utils";
+import siteConfig from "@/config/siteConfig";
 
 const Navigation = () => {
   const location = useLocation();
@@ -31,10 +32,11 @@ const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary-foreground rounded-full flex items-center justify-center">
-              <span className="text-primary font-bold text-sm">LIC</span>
+              {/* <span className="text-primary font-bold text-sm">LIC</span> */}
+              <img src={siteConfig.logo_medium_size} alt="site-logo" />
             </div>
             <span className="text-primary-foreground font-semibold text-lg">
-              Life Insurance Records
+              {siteConfig.title}
             </span>
           </Link>
 
