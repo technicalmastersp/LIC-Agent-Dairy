@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -116,7 +116,7 @@ const Profile = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              {!isReferral ? (
+              {/* {!isReferral ? (
                 <Button 
                   onClick={() => setIsReferral(true)}
                   className="bg-primary hover:bg-primary-light"
@@ -136,7 +136,15 @@ const Profile = () => {
                     Close
                   </Button>
                 </div>
-              )}
+              )} */}
+              <Button
+                asChild
+                className="bg-primary hover:bg-primary-light"
+              >
+                <Link to="/referral-program">
+                <span>Referral Program</span>
+              </Link>
+              </Button>
 
               {!isEditing ? (
                 <Button 

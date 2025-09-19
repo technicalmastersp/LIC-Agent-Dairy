@@ -42,6 +42,14 @@ const Footer = () => {
               </div>
             )}
             <div className="space-y-2">
+              <Link to="/referral-program" className="block hover:text-accent transition-colors mt-2"
+              /* className={cn("flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors", 
+                location.pathname === "/referral-program" ? "bg-primary-light text-primary-foreground"
+                : "text-primary-foreground/80 hover:bg-primary-light/50 hover:text-primary-foreground"
+                )} */
+              >
+                <span>Referral</span>
+              </Link>
               <Link to="/about" className="block hover:text-accent transition-colors mt-2">
                 About Us
               </Link>

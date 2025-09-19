@@ -7,11 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
-import { Save, Plus, Trash2 } from "lucide-react";
+import { Save, Plus, Trash2, Minus  } from "lucide-react";
 import { getCurrentUser, isAuthenticated, saveUserRecord } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import Footer from "@/components/Footer";
 import siteConfig from "@/config/siteConfig";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface FamilyMember {
   relationship: string;
@@ -23,9 +24,9 @@ interface FamilyMember {
 
 interface PolicyDetail {
   policyNumber: string;
-  issueDate: string;
+  planAndTerm: string;
   sumAssured: string;
-  modeOfInstallment: string;
+  modeOfPayment: string;
   branch: string;
   lastPaymentDate: string;
 }
@@ -65,15 +66,15 @@ const AddRecord = () => {
     occupation: "",
     educationalQualification: "",
     designationOfPolicyHolder: "",
-    incomeDetail: "",
+    annualIncome: "",
     periodOfService: "",
     employerName: "",
-    aadhaarLikedMobileNumber: "",
+    aadhaarLinkedMobileNumber: "",
     nameOfNominee: "",
     ageOfNominee: "",
     relationName: "",
     // relationship: "",
-    childrenBirthDate: "",
+    lastChildBirthDate: "",
     height: "",
     weight: "",
     bankAccountNumber: "",
@@ -83,29 +84,29 @@ const AddRecord = () => {
   });
 
   // Family Details Table
-  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([
-    { relationship: "Father", currentAge: "", health: "", deathAge: "", reason: "" },
-    { relationship: "Mother", currentAge: "", health: "", deathAge: "", reason: "" },
-    { relationship: "Brother", currentAge: "", health: "", deathAge: "", reason: "" },
-    { relationship: "Sister", currentAge: "", health: "", deathAge: "", reason: "" },
-    { relationship: "Children", currentAge: "", health: "", deathAge: "", reason: "" },
-  ]);
+  // const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([
+  //   { relationship: "Father", currentAge: "", health: "", deathAge: "", reason: "" },
+  //   { relationship: "Mother", currentAge: "", health: "", deathAge: "", reason: "" },
+  //   { relationship: "Brother", currentAge: "", health: "", deathAge: "", reason: "" },
+  //   { relationship: "Sister", currentAge: "", health: "", deathAge: "", reason: "" },
+  //   { relationship: "Children", currentAge: "", health: "", deathAge: "", reason: "" },
+  // ]);
 
   // Policy Details Tables
   const [currentPolicy, setCurrentPolicy] = useState<PolicyDetail>({
     policyNumber: "",
-    issueDate: "",
+    planAndTerm: "",
     sumAssured: "",
-    modeOfInstallment: "",
+    modeOfPayment: "",
     branch: "",
     lastPaymentDate: "",
   });
 
   const [previousPolicy, setPreviousPolicy] = useState<PolicyDetail>({
     policyNumber: "",
-    issueDate: "",
+    planAndTerm: "",
     sumAssured: "",
-    modeOfInstallment: "",
+    modeOfPayment: "",
     branch: "",
     lastPaymentDate: "",
   });
@@ -114,13 +115,13 @@ const AddRecord = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFamilyMemberChange = (index: number, field: keyof FamilyMember, value: string) => {
+  /* const handleFamilyMemberChange = (index: number, field: keyof FamilyMember, value: string) => {
     setFamilyMembers(prev => 
       prev.map((member, i) => 
         i === index ? { ...member, [field]: value } : member
       )
     );
-  };
+  }; */
 
   const handlePolicyChange = (type: 'current' | 'previous', field: keyof PolicyDetail, value: string) => {
     if (type === 'current') {
@@ -129,6 +130,48 @@ const AddRecord = () => {
       setPreviousPolicy(prev => ({ ...prev, [field]: value }));
     }
   };
+
+
+  // -----------------------------------------------------------------------------------------------------------------------------------------------
+
+  const [familyMembers, setFamilyMembers] = useState([
+    // { name: "", relation: "spouse" }
+    { relationship: "Father", currentAge: "", health: "", deathAge: "", reason: "" },
+  ]);
+
+  const relationOptions = [
+    // "spouse", "son", "daughter", "father", "mother", "brother", "sister", "grandfather", "grandmother", "uncle", "aunt", "cousin", "nephew", "niece", "son-in-law", "daughter-in-law", "father-in-law", "mother-in-law", "brother-in-law", "sister-in-law"
+    "Spouse", "Son", "Daughter", "Father", "Bother", "Brother", "Sister", "Grandfather", "Grandmother"
+  ];
+
+  const addFamilyMember = () => {
+    // setFamilyMembers([...familyMembers, { name: "", relation: "spouse" }]);
+    setFamilyMembers([...familyMembers, { relationship: "father", currentAge: "", health: "", deathAge: "", reason: "" }]);
+  };
+
+  const removeFamilyMember = (index: number) => {
+    if (familyMembers.length > 1) {
+      setFamilyMembers(familyMembers.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleFamilyMemberChange = (index: number, field: string, value: string) => {
+    const updatedMembers = [...familyMembers];
+    updatedMembers[index] = { ...updatedMembers[index], [field]: value };
+    setFamilyMembers(updatedMembers);
+  };
+
+  /* const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }; */
+
+  // -----------------------------------------------------------------------------------------------------------------------------------------------
+
+
 
   const handleSubmit = () => {
     if (!formData.name.trim()) {
@@ -319,20 +362,20 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="occupation">7. Occupation</Label>
-                  <Input 
-                    id="occupation" 
-                    value={formData.occupation}
-                    onChange={(e) => handleInputChange("occupation", e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="education">7a. Educational Qualification</Label>
+                  <Label htmlFor="education">7. Educational Qualification</Label>
                   <Input 
                     id="education" 
                     value={formData.educationalQualification}
                     onChange={(e) => handleInputChange("educationalQualification", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="occupation">7a. Occupation</Label>
+                  <Input 
+                    id="occupation" 
+                    value={formData.occupation || ""}
+                    onChange={(e) => handleInputChange("occupation", e.target.value)}
                     className="mt-1"
                   />
                 </div>
@@ -346,11 +389,11 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="income">7c. Income Detail</Label>
+                  <Label htmlFor="income">7c. Annual Income</Label>
                   <Input 
                     id="income" 
-                    value={formData.incomeDetail}
-                    onChange={(e) => handleInputChange("incomeDetail", e.target.value)}
+                    value={formData.annualIncome || ""}
+                    onChange={(e) => handleInputChange("annualIncome", e.target.value)}
                     className="mt-1"
                   />
                 </div>
@@ -373,11 +416,11 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="mobileNumberLinkedAadhaar">7f. Aadhaar liked Mobile Number </Label>
+                  <Label htmlFor="mobileNumberLinkedAadhaar">7f. Aadhaar Linked Mobile Number </Label>
                   <Input 
                     id="mobileNumberLinkedAadhaar" 
-                    value={formData.aadhaarLikedMobileNumber}
-                    onChange={(e) => handleInputChange("aadhaarLikedMobileNumber", e.target.value)}
+                    value={formData.aadhaarLinkedMobileNumber || ""}
+                    onChange={(e) => handleInputChange("aadhaarLinkedMobileNumber", e.target.value)}
                     className="mt-1"
                   />
                 </div>
@@ -413,9 +456,16 @@ const AddRecord = () => {
           </Card>
 
           {/* Family Details Table */}
-          <Card>
+          {<Card>
             <CardHeader>
-              <CardTitle className="text-form-header">9. Family Details</CardTitle>
+              {/* <CardTitle className="text-form-header">9. Family Details</CardTitle> */}
+              <CardTitle className="text-form-header flex items-center justify-between">
+                  9. Family Information
+                  <Button type="button" onClick={addFamilyMember} size="sm" variant="outline">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Member
+                  </Button>
+                </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -425,15 +475,28 @@ const AddRecord = () => {
                       <TableHead className="border border-table-border font-semibold">Relationship</TableHead>
                       <TableHead className="border border-table-border font-semibold">Current Age</TableHead>
                       <TableHead className="border border-table-border font-semibold">Health</TableHead>
-                      <TableHead className="border border-table-border font-semibold">Age at Death/Cause</TableHead>
+                      <TableHead className="border border-table-border font-semibold">Age at Death/Year</TableHead>
                       <TableHead className="border border-table-border font-semibold">Reason</TableHead>
+                      <TableHead className="border border-table-border font-semibold">Delete</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {familyMembers.map((member, index) => (
                       <TableRow key={index}>
                         <TableCell className="border border-table-border font-medium">
-                          {member.relationship}
+                          {/* {member.relationship} */}
+                          <Select value={member.relationship || ""} onValueChange={(value) => handleFamilyMemberChange(index, 'relationship', value)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select relationship" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {relationOptions.map((relationship) => (
+                                <SelectItem key={relationship} value={relationship || ""}>
+                                  {relationship.charAt(0).toUpperCase() + relationship.slice(1)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Input 
@@ -443,11 +506,20 @@ const AddRecord = () => {
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          <Input 
+                          {/* <Input 
                             value={member.health}
                             onChange={(e) => handleFamilyMemberChange(index, "health", e.target.value)}
                             className="w-full border-0 bg-transparent"
-                          />
+                          /> */}
+                          {<Select value={member.health} onValueChange={(value) => handleFamilyMemberChange(index, 'health', value)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Health" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem key="Good" value="Good">Good</SelectItem>
+                                <SelectItem key="Not Good" value="Not Good">Not Good</SelectItem>
+                            </SelectContent>
+                          </Select>}
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Input 
@@ -463,13 +535,96 @@ const AddRecord = () => {
                             className="w-full border-0 bg-transparent"
                           />
                         </TableCell>
+                        <TableCell className="border border-table-border">
+                          {familyMembers.length > 1 && (
+                            <div className="flex items-end">
+                              <Button 
+                                type="button" 
+                                onClick={() => removeFamilyMember(index)} 
+                                variant="destructive" 
+                                size="sm"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                              </Button>
+                            </div>
+                          )}
+                          {familyMembers.length <= 1 && (
+                            <div className="flex items-end">
+                              <Button 
+                                type="button" 
+                                onClick={() => removeFamilyMember(index)} 
+                                variant="destructive" 
+                                size="sm"
+                                disabled={true}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </div>
             </CardContent>
-          </Card>
+          </Card>}
+
+          {/* Family Information */}
+          {/* <Card>
+            <CardHeader>
+              <CardTitle className="text-form-header flex items-center justify-between">
+                Family Information
+                <Button type="button" onClick={addFamilyMember} size="sm" variant="outline">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Member
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {familyMembers.map((member, index) => (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg relative">
+                  <div className="space-y-2">
+                    <Label htmlFor={`familyName${index}`}>Name</Label>
+                    <Input 
+                      id={`familyName${index}`} 
+                      value={member.name} 
+                      onChange={(e) => handleFamilyMemberChange(index, 'name', e.target.value)}
+                      placeholder="Enter family member name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`relation${index}`}>Relation</Label>
+                    <Select value={member.relation} onValueChange={(value) => handleFamilyMemberChange(index, 'relation', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select relation" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {relationOptions.map((relation) => (
+                          <SelectItem key={relation} value={relation}>
+                            {relation.charAt(0).toUpperCase() + relation.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {familyMembers.length > 1 && (
+                    <div className="flex items-end">
+                      <Button 
+                        type="button" 
+                        onClick={() => removeFamilyMember(index)} 
+                        variant="destructive" 
+                        size="sm"
+                      >
+                        <Minus className="h-4 w-4 mr-2" />
+                        Remove
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </CardContent>
+          </Card> */}
 
           {/* Additional Fields */}
           <Card>
@@ -494,12 +649,12 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="childrenDate">11. Children's Birth Date</Label>
+                  <Label htmlFor="childrenDate">11. Children's Birth Date &#40;Only for Women&#41;</Label>
                   <Input 
                     id="childrenDate" 
                     type="date"
-                    value={formData.childrenBirthDate}
-                    onChange={(e) => handleInputChange("childrenBirthDate", e.target.value)}
+                    value={formData.lastChildBirthDate}
+                    onChange={(e) => handleInputChange("lastChildBirthDate", e.target.value)}
                     className="mt-1"
                   />
                 </div>
@@ -553,9 +708,9 @@ const AddRecord = () => {
                 <TableHeader>
                   <TableRow className="bg-table-header">
                     <TableHead className="border border-table-border">Policy Number</TableHead>
-                    <TableHead className="border border-table-border">Issue Date</TableHead>
+                    <TableHead className="border border-table-border">Plan & Term</TableHead>
                     <TableHead className="border border-table-border">Sum Assured</TableHead>
-                    <TableHead className="border border-table-border">Mode of Installment</TableHead>
+                    <TableHead className="border border-table-border">Mode of Payment</TableHead>
                     <TableHead className="border border-table-border">Branch</TableHead>
                     <TableHead className="border border-table-border">Last Payment Date</TableHead>
                   </TableRow>
@@ -571,9 +726,8 @@ const AddRecord = () => {
                     </TableCell>
                     <TableCell className="border border-table-border">
                       <Input 
-                        type="date"
-                        value={currentPolicy.issueDate}
-                        onChange={(e) => handlePolicyChange("current", "issueDate", e.target.value)}
+                        value={currentPolicy.planAndTerm}
+                        onChange={(e) => handlePolicyChange("current", "planAndTerm", e.target.value)}
                         className="border-0 bg-transparent"
                       />
                     </TableCell>
@@ -585,12 +739,25 @@ const AddRecord = () => {
                       />
                     </TableCell>
                     <TableCell className="border border-table-border">
-                      <Input 
-                        // type="date"
-                        value={currentPolicy.modeOfInstallment}
-                        onChange={(e) => handlePolicyChange("current", "modeOfInstallment", e.target.value)}
+                      {/* <Input 
+                        value={currentPolicy.modeOfPayment}
+                        onChange={(e) => handlePolicyChange("current", "modeOfPayment", e.target.value)}
                         className="border-0 bg-transparent"
-                      />
+                      /> */}
+                      <Select
+                        value={currentPolicy.modeOfPayment}
+                        onValueChange={(value) => handlePolicyChange("current","modeOfPayment", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Payment Mode" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Monthly or e-NACH">Monthly or e-NACH</SelectItem>
+                          <SelectItem value="Quarterly">Quarterly</SelectItem>
+                          <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
+                          <SelectItem value="Yearly">Yearly</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell className="border border-table-border">
                       <Input 
@@ -623,9 +790,9 @@ const AddRecord = () => {
                 <TableHeader>
                   <TableRow className="bg-table-header">
                     <TableHead className="border border-table-border">Policy Number</TableHead>
-                    <TableHead className="border border-table-border">Issue Date</TableHead>
+                    <TableHead className="border border-table-border">Plan & Term</TableHead>
                     <TableHead className="border border-table-border">Sum Assured</TableHead>
-                    <TableHead className="border border-table-border">Mode of Installment</TableHead>
+                    <TableHead className="border border-table-border">Mode of Payment</TableHead>
                     <TableHead className="border border-table-border">Branch</TableHead>
                     <TableHead className="border border-table-border">Last Payment Date</TableHead>
                   </TableRow>
@@ -641,9 +808,8 @@ const AddRecord = () => {
                     </TableCell>
                     <TableCell className="border border-table-border">
                       <Input 
-                        type="date"
-                        value={previousPolicy.issueDate}
-                        onChange={(e) => handlePolicyChange("previous", "issueDate", e.target.value)}
+                        value={previousPolicy.planAndTerm}
+                        onChange={(e) => handlePolicyChange("previous", "planAndTerm", e.target.value)}
                         className="border-0 bg-transparent"
                       />
                     </TableCell>
@@ -655,12 +821,25 @@ const AddRecord = () => {
                       />
                     </TableCell>
                     <TableCell className="border border-table-border">
-                      <Input 
-                        // type="date"
-                        value={previousPolicy.modeOfInstallment}
-                        onChange={(e) => handlePolicyChange("previous", "modeOfInstallment", e.target.value)}
+                      {/* <Input 
+                        value={previousPolicy.modeOfPayment}
+                        onChange={(e) => handlePolicyChange("previous", "modeOfPayment", e.target.value)}
                         className="border-0 bg-transparent"
-                      />
+                      /> */}
+                      <Select
+                        value={previousPolicy.modeOfPayment}
+                        onValueChange={(value) => handlePolicyChange("previous","modeOfPayment", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Payment Mode" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Monthly or e-NACH">Monthly or e-NACH</SelectItem>
+                          <SelectItem value="Quarterly">Quarterly</SelectItem>
+                          <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
+                          <SelectItem value="Yearly">Yearly</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell className="border border-table-border">
                       <Input 
