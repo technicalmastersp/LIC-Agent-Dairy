@@ -10,6 +10,18 @@ export interface User {
   email: string;
   password: string;
   createdAt: string;
+  subscription?: UserSubscription;
+  referralCode?: string;
+  referredBy?: string;
+}
+
+export interface UserSubscription {
+  planId: string;
+  duration: string;
+  price: number;
+  startDate: string;
+  endDate: string;
+  status: 'active' | 'expired' | 'cancelled';
 }
 
 export interface LoginCredentials {
@@ -192,4 +204,33 @@ export const updateUserRecord = (userId: string, recordId: string, updatedData: 
     console.error('Error updating user record:', error);
     return false;
   }
+};
+
+// Update user subscription
+export const updateUserSubscription = (userId: string, subscription: UserSubscription): boolean => {
+  try {
+    const customersList = getCustomersList();
+    const updatedCustomers = customersList.map(user => 
+      user.id === userId ? { ...user, subscription } : user
+    );
+    localStorage.setItem('customers-list', JSON.stringify(updatedCustomers));
+    
+    // Update current user session if it's the same user
+    const currentUser = getCurrentUser();
+    if (currentUser && currentUser.id === userId) {
+      setCurrentUser({ ...currentUser, subscription });
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating user subscription:', error);
+    return false;
+  }
+};
+
+// Generate referral code
+export const generateReferralCode = (name: string, userId: string): string => {
+  const nameClean = name.toLowerCase().replace(/[^a-z]/g, '').slice(0, 4);
+  const userIdEnd = userId.slice(-4);
+  return `${nameClean}${userIdEnd}`.toUpperCase();
 };
