@@ -142,7 +142,7 @@ const SignUp = () => {
             </div>
             <CardTitle className="text-2xl text-form-header">{t('signupTitle')}</CardTitle>
             <CardDescription>
-              Life Insurance Corporation - {t('createAccount')}
+              {t('welcome')} Sir - {t('createAccount')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

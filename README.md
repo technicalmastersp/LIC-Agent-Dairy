@@ -94,7 +94,7 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 
 # LIC Management System (Life Insurance Records)
 
-A web application for managing Life Insurance Corporation (LIC) agent/insurance records — set up to track policies, agents, and related data in an organized way.
+A web application for managing Life Insurance Records, agent/insurance records — set up to track policies, agents, and related data in an organized way.
 
 [Live Demo ›](https://lic-agent-dairy.vercel.app/)
 

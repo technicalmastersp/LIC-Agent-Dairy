@@ -65,7 +65,7 @@ const Login = () => {
             </div>
             <CardTitle className="text-2xl text-form-header">{t('loginTitle')}</CardTitle>
             <CardDescription>
-              {t('welcome')} - Life Insurance Corporation
+              {t('welcomeBack')} Sir
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

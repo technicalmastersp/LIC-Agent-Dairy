@@ -2,6 +2,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Globe } from "lucide-react";
 import { isAuthenticated } from "@/utils/auth";
+import siteConfig from "@/config/siteConfig";
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -48,7 +49,7 @@ const Footer = () => {
                 Our Plans
               </Link>
               <Link to="/lic-info-hub" className="block hover:text-accent transition-colors">
-                LIC Info Hub
+                Best Info Hub
               </Link>
             </div>
           </div>
@@ -57,13 +58,13 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4 text-accent">Contact Info</h3>
             <div className="space-y-3">
-              <div className="flex items-center space-x-2">
+              {/* <div className="flex items-center space-x-2">
                 <Phone className="w-4 h-4" />
                 <span>+91 9876543210</span>
-              </div>
+              </div> */}
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4" />
-                <span>support@policyrecords.com</span>
+                <span>{siteConfig.supportEmail}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4" />
@@ -71,7 +72,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Globe className="w-4 h-4" />
-                <span>www.policyrecords.com</span>
+                <span>{siteConfig.productionUrl}</span>
               </div>
             </div>
           </div>

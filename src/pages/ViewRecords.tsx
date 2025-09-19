@@ -15,7 +15,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 
 interface Record {
-  id: string;
+  /* id: string;
   name: string;
   fatherName: string;
   motherName: string;
@@ -25,10 +25,47 @@ interface Record {
   address: string;
   currentPolicy: {
     policyNumber: string;
-    premium: string;
-    amount: string;
+    sumAssured: string;
+    branch: string;
+  };
+  createdAt: string; */
+  currentPolicy: {
+    policyNumber: string;
+    sumAssured: string;
+    branch: string;
   };
   createdAt: string;
+
+  id: string;
+  date: string;
+  aadhaarNumber: string;
+  panNumber: string;
+  email: string;
+  name: string;
+  birthPlace: string;
+  fatherName: string;
+  motherName: string;
+  spouseName: string;
+  address: string;
+  dateOfBirth: string;
+  age: string;
+  occupation: string;
+  educationalQualification: string;
+  designationOfPolicyHolder: string;
+  incomeDetail: string;
+  periodOfService: string;
+  employerName: string;
+  aadhaarLikedMobileNumber: string;
+  nameOfNominee: string;
+  ageOfNominee: string;
+  relationName: string;
+  childrenBirthDate: string;
+  height: string;
+  weight: string;
+  bankAccountNumber: string;
+  ifscCode: string;
+  bankName: string;
+  branchName: string;
 }
 
 const ViewRecords = () => {
@@ -220,10 +257,10 @@ const ViewRecords = () => {
                         <SortableHeader field="name">Name</SortableHeader>
                         <SortableHeader field="fatherName">Father's Name</SortableHeader>
                         <SortableHeader field="age">Age</SortableHeader>
-                        <SortableHeader field="occupation">Occupation</SortableHeader>
+                        {/* <SortableHeader field="occupation">Occupation</SortableHeader> */}
                         <TableHead className="border border-table-border">Policy Number</TableHead>
-                        <TableHead className="border border-table-border">Premium</TableHead>
-                        <TableHead className="border border-table-border">Coverage</TableHead>
+                        <TableHead className="border border-table-border">Sum Assured</TableHead>
+                        <TableHead className="border border-table-border">Branch</TableHead>
                         <SortableHeader field="createdAt">Created</SortableHeader>
                         <TableHead className="border border-table-border">Actions</TableHead>
                       </TableRow>
@@ -240,19 +277,19 @@ const ViewRecords = () => {
                           <TableCell className="border border-table-border">
                             {record.age}
                           </TableCell>
-                          <TableCell className="border border-table-border">
+                          {/* <TableCell className="border border-table-border">
                             {record.occupation}
-                          </TableCell>
+                          </TableCell> */}
                           <TableCell className="border border-table-border">
                             <Badge variant="outline" className="font-mono text-xs">
                               {record.currentPolicy.policyNumber || "N/A"}
                             </Badge>
                           </TableCell>
                           <TableCell className="border border-table-border">
-                            ₹{record.currentPolicy.premium || "0"}
+                            ₹{record.currentPolicy.sumAssured || "0"}
                           </TableCell>
                           <TableCell className="border border-table-border">
-                            ₹{record.currentPolicy.amount || "0"}
+                            {record.currentPolicy.branch || "-"}
                           </TableCell>
                           <TableCell className="border border-table-border text-sm text-muted-foreground">
                             {new Date(record.createdAt).toLocaleDateString()}
