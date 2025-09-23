@@ -23,6 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-#API
+#APIs
 .env
 .env.local
