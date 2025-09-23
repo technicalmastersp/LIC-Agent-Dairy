@@ -1,5 +1,6 @@
 const siteConfig = {
   title: "Life Insurance Records",
+  buyUrl: "policyegleman.com",
 
   // on root location
   logo_basic_size: "/logos/logo_basic_size.png",
