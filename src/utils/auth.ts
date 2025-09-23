@@ -1,4 +1,5 @@
 // Authentication utilities and user management
+import { processReferral } from "./referral";
 
 export interface User {
   id: string;
@@ -219,6 +220,19 @@ export const updateUserSubscription = (userId: string, subscription: UserSubscri
     const currentUser = getCurrentUser();
     if (currentUser && currentUser.id === userId) {
       setCurrentUser({ ...currentUser, subscription });
+    }
+    
+    // Process referral reward if plan was purchased
+    if (subscription.status === 'active') {
+      const planPrices: Record<string, number> = {
+        'plan-6': 599,
+        'plan-12': 1099,
+        'plan-24': 2099
+      };
+      const planPrice = planPrices[subscription.planId];
+      if (planPrice) {
+        processReferral(userId, planPrice);
+      }
     }
     
     return true;

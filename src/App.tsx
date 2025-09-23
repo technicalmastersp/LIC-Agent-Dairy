@@ -14,6 +14,8 @@ import SignUp from "./pages/SignUp";
 import OurPlans from "./pages/OurPlans";
 import NotFound from "./pages/NotFound";
 import LicInfoHub from "./pages/LicInfoHub";
+import ReferralProgram from "./pages/ReferralProgram";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +26,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
@@ -34,6 +37,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/our-plans" element={<OurPlans />} />
             <Route path="/lic-info-hub" element={<LicInfoHub />} />
+            <Route path="/referral-program" element={<ReferralProgram />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

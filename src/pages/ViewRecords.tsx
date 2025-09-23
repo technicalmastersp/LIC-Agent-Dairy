@@ -15,27 +15,6 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 
 interface Record {
-  /* id: string;
-  name: string;
-  fatherName: string;
-  motherName: string;
-  dateOfBirth: string;
-  age: string;
-  occupation: string;
-  address: string;
-  currentPolicy: {
-    policyNumber: string;
-    sumAssured: string;
-    branch: string;
-  };
-  createdAt: string; */
-  currentPolicy: {
-    policyNumber: string;
-    sumAssured: string;
-    branch: string;
-  };
-  createdAt: string;
-
   id: string;
   date: string;
   aadhaarNumber: string;
@@ -52,20 +31,39 @@ interface Record {
   occupation: string;
   educationalQualification: string;
   designationOfPolicyHolder: string;
-  incomeDetail: string;
+  annualIncome: string;
   periodOfService: string;
   employerName: string;
-  aadhaarLikedMobileNumber: string;
+  aadhaarLinkedMobileNumber: string;
   nameOfNominee: string;
   ageOfNominee: string;
   relationName: string;
-  childrenBirthDate: string;
+  lastChildBirthDate: string;
   height: string;
   weight: string;
   bankAccountNumber: string;
   ifscCode: string;
   bankName: string;
   branchName: string;
+
+  currentPolicy : {
+    policyNumber: string;
+    planAndTerm: string;
+    sumAssured: string;
+    modeOfPayment: string;
+    branch: string;
+    lastPaymentDate: string;
+  }
+
+  previousPolicy : {
+    policyNumber: string;
+    planAndTerm: string;
+    sumAssured: string;
+    modeOfPayment: string;
+    branch: string;
+    lastPaymentDate: string;
+  }
+  createdAt: string;
 }
 
 const ViewRecords = () => {

@@ -127,6 +127,24 @@ const Navigation = () => {
                   asChild
                   className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/20"
                 >
+                  <Link
+                  to="/referral-program"
+                  className={cn(
+                    "flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                    location.pathname === "/referral-program"
+                      ? "bg-primary-light text-primary-foreground"
+                      : "text-primary-foreground/80 hover:bg-primary-light/50 hover:text-primary-foreground"
+                  )}
+                >
+                  <span>Referral</span>
+                </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/20"
+                >
                   <Link to="/login">{t("login")}</Link>
                 </Button>
                 <Button
@@ -217,6 +235,24 @@ const Navigation = () => {
               </div>
             ) : (
               <div className="flex flex-col space-y-2 mt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="w-full bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/20"
+                >
+                  <Link
+                  to="/referral-program"
+                  className={cn(
+                    "flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                    location.pathname === "/referral-program"
+                      ? "bg-primary-light text-primary-foreground"
+                      : "text-primary-foreground/80 hover:bg-primary-light/50 hover:text-primary-foreground"
+                  )}
+                >
+                  <span>Referral</span>
+                </Link>
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"

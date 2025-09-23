@@ -7,22 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentUser, getUserRecords } from "@/utils/auth";
 import { Save, User, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Record {
-  /* id: string;
-  name: string;
-  fatherName: string;
-  motherName: string;
-  dateOfBirth: string;
-  age: string;
-  occupation: string;
-  address: string;
-  currentPolicy: {
-    policyNumber: string;
-    sumAssured: string;
-    branch: string;
-  };
-  createdAt: string; */
   id: string;
   date: string;
   aadhaarNumber: string;
@@ -39,14 +26,14 @@ interface Record {
   occupation: string;
   educationalQualification: string;
   designationOfPolicyHolder: string;
-  incomeDetail: string;
+  annualIncome: string;
   periodOfService: string;
   employerName: string;
-  aadhaarLikedMobileNumber: string;
+  aadhaarLinkedMobileNumber: string;
   nameOfNominee: string;
   ageOfNominee: string;
   relationName: string;
-  childrenBirthDate: string;
+  lastChildBirthDate: string;
   height: string;
   weight: string;
   bankAccountNumber: string;
@@ -56,18 +43,18 @@ interface Record {
 
   currentPolicy : {
     policyNumber: string;
-    issueDate: string;
+    planAndTerm: string;
     sumAssured: string;
-    modeOfInstallment: string;
+    modeOfPayment: string;
     branch: string;
     lastPaymentDate: string;
   }
 
   previousPolicy : {
     policyNumber: string;
-    issueDate: string;
+    planAndTerm: string;
     sumAssured: string;
-    modeOfInstallment: string;
+    modeOfPayment: string;
     branch: string;
     lastPaymentDate: string;
   }
@@ -101,14 +88,14 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     occupation: "",
     educationalQualification: "",
     designationOfPolicyHolder: "",
-    incomeDetail: "",
+    annualIncome: "",
     periodOfService: "",
     employerName: "",
-    aadhaarLikedMobileNumber: "",
+    aadhaarLinkedMobileNumber: "",
     nameOfNominee: "",
     ageOfNominee: "",
     relationName: "",
-    childrenBirthDate: "",
+    lastChildBirthDate: "",
     height: "",
     weight: "",
     bankAccountNumber: "",
@@ -118,15 +105,15 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
 
     // currentPolicy 
     policyNumber: "",
-    issueDate: "",
+    planAndTerm: "",
     sumAssured: "",
-    modeOfInstallment: "",
+    modeOfPayment: "",
     branch: "",
     lastPaymentDate: "",
 
     // previousPolicy 
     policyNumber_previousPolicy: "",
-    issueDate_previousPolicy: "",
+    planAndTerm_previousPolicy: "",
     sumAssured_previousPolicy: "",
     modeOfInstallment_previousPolicy: "",
     branch_previousPolicy: "",
@@ -151,14 +138,14 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
         occupation: record.occupation,
         educationalQualification: record.educationalQualification,
         designationOfPolicyHolder: record.designationOfPolicyHolder,
-        incomeDetail: record.incomeDetail,
+        annualIncome: record.annualIncome,
         periodOfService: record.periodOfService,
         employerName: record.employerName,
-        aadhaarLikedMobileNumber: record.aadhaarLikedMobileNumber,
+        aadhaarLinkedMobileNumber: record.aadhaarLinkedMobileNumber,
         nameOfNominee: record.nameOfNominee,
         ageOfNominee: record.ageOfNominee,
         relationName: record.relationName,
-        childrenBirthDate: record.childrenBirthDate,
+        lastChildBirthDate: record.lastChildBirthDate,
         height: record.height,
         weight: record.weight,
         bankAccountNumber: record.bankAccountNumber,
@@ -168,17 +155,17 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
 
         // currentPolicy
         policyNumber: record.currentPolicy.policyNumber,
-        issueDate: record.currentPolicy.issueDate,
+        planAndTerm: record.currentPolicy.planAndTerm,
         sumAssured: record.currentPolicy.sumAssured,
-        modeOfInstallment: record.currentPolicy.modeOfInstallment,
+        modeOfPayment: record.currentPolicy.modeOfPayment,
         branch: record.currentPolicy.branch,
         lastPaymentDate: record.currentPolicy.lastPaymentDate,
 
         // previousPolicy
         policyNumber_previousPolicy: record.previousPolicy.policyNumber,
-        issueDate_previousPolicy: record.previousPolicy.issueDate,
+        planAndTerm_previousPolicy: record.previousPolicy.planAndTerm,
         sumAssured_previousPolicy: record.previousPolicy.sumAssured,
-        modeOfInstallment_previousPolicy: record.previousPolicy.modeOfInstallment,
+        modeOfInstallment_previousPolicy: record.previousPolicy.modeOfPayment,
         branch_previousPolicy: record.previousPolicy.branch,
         lastPaymentDate_previousPolicy: record.previousPolicy.lastPaymentDate,
       });
@@ -219,14 +206,14 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
               occupation: formData.occupation,
               educationalQualification: formData.educationalQualification,
               designationOfPolicyHolder: formData.designationOfPolicyHolder,
-              incomeDetail: formData.incomeDetail,
+              annualIncome: formData.annualIncome,
               periodOfService: formData.periodOfService,
               employerName: formData.employerName,
-              aadhaarLikedMobileNumber: formData.aadhaarLikedMobileNumber,
+              aadhaarLinkedMobileNumber: formData.aadhaarLinkedMobileNumber,
               nameOfNominee: formData.nameOfNominee,
               ageOfNominee: formData.ageOfNominee,
               relationName: formData.relationName,
-              childrenBirthDate: formData.childrenBirthDate,
+              lastChildBirthDate: formData.lastChildBirthDate,
               height: formData.height,
               weight: formData.weight,
               bankAccountNumber: formData.bankAccountNumber,
@@ -236,18 +223,18 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
 
               currentPolicy : {
                 policyNumber: formData.policyNumber,
-                issueDate: formData.issueDate,
+                planAndTerm: formData.planAndTerm,
                 sumAssured: formData.sumAssured,
-                modeOfInstallment: formData.modeOfInstallment,
+                modeOfPayment: formData.modeOfPayment,
                 branch: formData.branch,
                 lastPaymentDate: formData.lastPaymentDate,
               },
 
               previousPolicy : {
                 policyNumber: formData.policyNumber_previousPolicy,
-                issueDate: formData.issueDate_previousPolicy,
+                planAndTerm: formData.planAndTerm_previousPolicy,
                 sumAssured: formData.sumAssured_previousPolicy,
-                modeOfInstallment: formData.modeOfInstallment_previousPolicy,
+                modeOfPayment: formData.modeOfInstallment_previousPolicy,
                 branch: formData.branch_previousPolicy,
                 lastPaymentDate: formData.lastPaymentDate_previousPolicy,
               }
@@ -412,20 +399,20 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="occupation">7. Occupation</Label>
+                  <Label htmlFor="educationalQualification">7. Educational Qualification</Label>
                   <Input 
-                    id="occupation" 
-                    name="occupation" 
-                    value={formData.occupation}
+                    id="educationalQualification" 
+                    name="educationalQualification" 
+                    value={formData.educationalQualification || ""}
                     onChange={handleInputChange}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="educationalQualification">7a. Educational Qualification</Label>
+                  <Label htmlFor="occupation">7a. Occupation</Label>
                   <Input 
-                    id="educationalQualification" 
-                    name="educationalQualification" 
-                    value={formData.educationalQualification}
+                    id="occupation" 
+                    name="occupation" 
+                    value={formData.occupation}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -439,11 +426,11 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="incomeDetail">7c. Income Detail</Label>
+                  <Label htmlFor="annualIncome">7c. Annual Income</Label>
                   <Input 
-                    id="incomeDetail" 
-                    name="incomeDetail" 
-                    value={formData.incomeDetail}
+                    id="annualIncome" 
+                    name="annualIncome" 
+                    value={formData.annualIncome|| ""}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -466,11 +453,11 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="aadhaarLikedMobileNumber">7f. Aadhaar liked Mobile Number </Label>
+                  <Label htmlFor="aadhaarLinkedMobileNumber">7f. Aadhaar Linked Mobile Number </Label>
                   <Input 
-                    id="aadhaarLikedMobileNumber" 
-                    name="aadhaarLikedMobileNumber" 
-                    value={formData.aadhaarLikedMobileNumber}
+                    id="aadhaarLinkedMobileNumber" 
+                    name="aadhaarLinkedMobileNumber" 
+                    value={formData.aadhaarLinkedMobileNumber || ""}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -528,12 +515,12 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="childrenBirthDate">11. Children's Birth Date</Label>
+                  <Label htmlFor="lastChildBirthDate">11. Last Child Birth Date &#40;Only for Women&#41;</Label>
                   <Input 
-                    id="childrenBirthDate" 
-                    name="childrenBirthDate" 
+                    id="lastChildBirthDate" 
+                    name="lastChildBirthDate" 
                     type="date"
-                    value={formData.childrenBirthDate}
+                    value={formData.lastChildBirthDate || ""}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -595,11 +582,11 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="issueDate">Issue Date</Label>
+                  <Label htmlFor="planAndTerm">Plan & Term</Label>
                   <Input
-                    id="issueDate"
-                    name="issueDate"
-                    value={formData.issueDate}
+                    id="planAndTerm"
+                    name="planAndTerm"
+                    value={formData.planAndTerm || ""}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -615,13 +602,28 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="modeOfInstallment">Mode of Installment</Label>
-                  <Input
-                    id="modeOfInstallment"
-                    name="modeOfInstallment"
-                    value={formData.modeOfInstallment}
+                  <Label htmlFor="modeOfPayment">Mode of Payment</Label>
+                  {/* <Input
+                    id="modeOfPayment"
+                    name="modeOfPayment"
+                    value={formData.modeOfPayment}
                     onChange={handleInputChange}
-                  />
+                    /> */}
+                  <Select
+                    name="modeOfPayment"
+                    value={formData.modeOfPayment || ""}
+                    onValueChange={(value) => handleInputChange({ target: { name: "modeOfPayment", value } } as React.ChangeEvent<HTMLInputElement>)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Payment Mode" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Monthly or e-NACH">Monthly or e-NACH</SelectItem>
+                      <SelectItem value="Quarterly">Quarterly</SelectItem>
+                      <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
+                      <SelectItem value="Yearly">Yearly</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div className="space-y-2">
@@ -666,11 +668,11 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="issueDate_previousPolicy">Issue Date</Label>
+                  <Label htmlFor="planAndTerm_previousPolicy">Plan & Term</Label>
                   <Input
-                    id="issueDate_previousPolicy"
-                    name="issueDate_previousPolicy"
-                    value={formData.issueDate_previousPolicy}
+                    id="planAndTerm_previousPolicy"
+                    name="planAndTerm_previousPolicy"
+                    value={formData.planAndTerm_previousPolicy || ""}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -686,13 +688,28 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="modeOfInstallment_previousPolicy">Mode of Installment</Label>
-                  <Input
+                  <Label htmlFor="modeOfInstallment_previousPolicy">Mode of Payment</Label>
+                  {/* <Input
                     id="modeOfInstallment_previousPolicy"
                     name="modeOfInstallment_previousPolicy"
                     value={formData.modeOfInstallment_previousPolicy}
                     onChange={handleInputChange}
-                  />
+                  /> */}
+                  <Select
+                    name="modeOfInstallment_previousPolicy"
+                    value={formData.modeOfInstallment_previousPolicy || ""}
+                    onValueChange={(value) => handleInputChange({ target: { name: "modeOfInstallment_previousPolicy", value } } as React.ChangeEvent<HTMLInputElement>)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Payment Mode" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Monthly or e-NACH">Monthly or e-NACH</SelectItem>
+                      <SelectItem value="Quarterly">Quarterly</SelectItem>
+                      <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
+                      <SelectItem value="Yearly">Yearly</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div className="space-y-2">

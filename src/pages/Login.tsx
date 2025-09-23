@@ -77,7 +77,7 @@ const Login = () => {
                   type="text"
                   placeholder={t('userId')}
                   value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
+                  onChange={(e) => setUserId(e.target.value.trim())}
                   required
                 />
               </div>
