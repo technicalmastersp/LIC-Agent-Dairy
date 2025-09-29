@@ -4,10 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentUser, getUserRecords } from "@/utils/auth";
-import { Save, User, X } from "lucide-react";
+import { Save, Plus, Trash2, User, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+interface FamilyMember {
+  relationship: string;
+  currentAge: string;
+  health: string;
+  deathAge: string;
+  reason: string;
+}
 
 interface Record {
   id: string;
@@ -40,6 +49,8 @@ interface Record {
   ifscCode: string;
   bankName: string;
   branchName: string;
+
+  familyMembers?: FamilyMember[];
 
   currentPolicy : {
     policyNumber: string;
@@ -169,8 +180,41 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
         branch_previousPolicy: record.previousPolicy.branch,
         lastPaymentDate_previousPolicy: record.previousPolicy.lastPaymentDate,
       });
+
+      setFamilyMembers(record.familyMembers || [
+        { relationship: "Father", currentAge: "", health: "", deathAge: "", reason: "" }
+      ]);
     }
   }, [record]);
+
+  // -----------------------------------------------------------------------------------------------------------------------------------------------
+  const [familyMembers, setFamilyMembers] = useState([
+    // { name: "", relation: "spouse" }
+    { relationship: "Father", currentAge: "", health: "", deathAge: "", reason: "" },
+  ]);
+
+  const relationOptions = [
+    // "spouse", "son", "daughter", "father", "mother", "brother", "sister", "grandfather", "grandmother", "uncle", "aunt", "cousin", "nephew", "niece", "son-in-law", "daughter-in-law", "father-in-law", "mother-in-law", "brother-in-law", "sister-in-law"
+    "Spouse", "Son", "Daughter", "Father", "Bother", "Brother", "Sister", "Grandfather", "Grandmother"
+  ];
+
+  const addFamilyMember = () => {
+    // setFamilyMembers([...familyMembers, { name: "", relation: "spouse" }]);
+    setFamilyMembers([...familyMembers, { relationship: "father", currentAge: "", health: "", deathAge: "", reason: "" }]);
+  };
+
+  const removeFamilyMember = (index: number) => {
+    if (familyMembers.length > 1) {
+      setFamilyMembers(familyMembers.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleFamilyMemberChange = (index: number, field: string, value: string) => {
+    const updatedMembers = [...familyMembers];
+    updatedMembers[index] = { ...updatedMembers[index], [field]: value };
+    setFamilyMembers(updatedMembers);
+  };
+  // -----------------------------------------------------------------------------------------------------------------------------------------------
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -220,6 +264,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
               ifscCode: formData.ifscCode,
               bankName: formData.bankName,
               branchName: formData.branchName,
+
+              familyMembers,
 
               currentPolicy : {
                 policyNumber: formData.policyNumber,
@@ -488,6 +534,115 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     onChange={handleInputChange}
                   />
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Family details */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base text-form-header flex items-center justify-between">
+                  9. Family Information
+                  <Button type="button" onClick={addFamilyMember} size="sm" variant="outline" className="text-sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Member
+                  </Button>
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-table-header">
+                      <TableHead className="border border-table-border font-semibold">Relationship</TableHead>
+                      <TableHead className="border border-table-border font-semibold">Current Age</TableHead>
+                      <TableHead className="border border-table-border font-semibold">Health</TableHead>
+                      <TableHead className="border border-table-border font-semibold">Age at Death/Year</TableHead>
+                      <TableHead className="border border-table-border font-semibold">Reason</TableHead>
+                      <TableHead className="border border-table-border font-semibold">Delete</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {familyMembers.map((member, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="border border-table-border font-medium">
+                          {/* {member.relationship} */}
+                          <Select value={member.relationship || ""} onValueChange={(value) => handleFamilyMemberChange(index, 'relationship', value)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select relationship" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {relationOptions.map((relationship) => (
+                                <SelectItem key={relationship} value={relationship || ""}>
+                                  {relationship.charAt(0).toUpperCase() + relationship.slice(1)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell className="border border-table-border">
+                          <Input 
+                            value={member.currentAge}
+                            onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
+                            className="w-full border-0 bg-transparent"
+                          />
+                        </TableCell>
+                        <TableCell className="border border-table-border">
+                          {<Select value={member.health} onValueChange={(value) => handleFamilyMemberChange(index, 'health', value)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Health" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem key="Good" value="Good">Good</SelectItem>
+                                <SelectItem key="Not Good" value="Not Good">Not Good</SelectItem>
+                            </SelectContent>
+                          </Select>}
+                        </TableCell>
+                        <TableCell className="border border-table-border">
+                          <Input 
+                            value={member.deathAge}
+                            onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
+                            className="w-full border-0 bg-transparent"
+                          />
+                        </TableCell>
+                        <TableCell className="border border-table-border">
+                          <Input 
+                            value={member.reason}
+                            onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
+                            className="w-full border-0 bg-transparent"
+                          />
+                        </TableCell>
+                        <TableCell className="border border-table-border">
+                          {familyMembers.length > 1 && (
+                            <div className="flex items-end">
+                              <Button 
+                                type="button" 
+                                onClick={() => removeFamilyMember(index)} 
+                                variant="destructive" 
+                                size="sm"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                              </Button>
+                            </div>
+                          )}
+                          {familyMembers.length <= 1 && (
+                            <div className="flex items-end">
+                              <Button 
+                                type="button" 
+                                onClick={() => removeFamilyMember(index)} 
+                                variant="destructive" 
+                                size="sm"
+                                disabled={true}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>

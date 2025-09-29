@@ -10,6 +10,7 @@ import { validateLogin, setCurrentUser, initializeTestUser } from "@/utils/auth"
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { login, getProfile } from "../../services/userService";
 
 const Login = () => {
   const [userId, setUserId] = useState("");
@@ -20,6 +21,8 @@ const Login = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { toast } = useToast();
+
+  const userNamelocaStorage = localStorage.getItem('userName')
 
   // Initialize test user on component mount
   useState(() => {
@@ -32,9 +35,11 @@ const Login = () => {
     setError("");
 
     try {
-      const user = validateLogin({ userId, password });
+      // const user = validateLogin({ userId, password });
+      let user = await login({ userId, password });
       
       if (user) {
+        user = await getProfile()
         setCurrentUser(user);
         toast({
           title: t('loginSuccess'),
@@ -65,7 +70,7 @@ const Login = () => {
             </div>
             <CardTitle className="text-2xl text-form-header">{t('loginTitle')}</CardTitle>
             <CardDescription>
-              {t('welcomeBack')} Sir
+              {t('welcomeBack')} {userNamelocaStorage != 'undefined' ? userNamelocaStorage : ''} Sir
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

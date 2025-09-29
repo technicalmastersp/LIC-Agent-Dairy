@@ -1,5 +1,6 @@
 // Authentication utilities and user management
 import { processReferral } from "./referral";
+import { clearToken } from '../../utils/localStorageHelper.js'
 
 export interface User {
   id: string;
@@ -23,6 +24,7 @@ export interface UserSubscription {
   startDate: string;
   endDate: string;
   status: 'active' | 'expired' | 'cancelled';
+  planType: string;
 }
 
 export interface LoginCredentials {
@@ -112,7 +114,10 @@ export const getCurrentUser = (): User | null => {
 
 // Logout user
 export const logout = (): void => {
+  const user = JSON.parse(localStorage.getItem('currentUser'))
+  localStorage.setItem('userName', user.name)
   localStorage.removeItem('currentUser');
+  clearToken()
 };
 
 // Check if user is authenticated
