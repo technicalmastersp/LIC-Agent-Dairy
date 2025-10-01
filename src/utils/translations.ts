@@ -22,6 +22,7 @@ export interface Translations {
   confirmPassword: string;
   SelectSubscriptionPlan: string;
   ReferralCode: string;
+  validate: string;
   Optional: string;
   submit: string;
   cancel: string;
@@ -91,6 +92,7 @@ export const translations: Record<string, Translations> = {
     confirmPassword: "Confirm Password",
     SelectSubscriptionPlan: "Select Subscription Plan",
     ReferralCode: "Referral Code",
+    validate: "Validate",
     Optional: "Optional",
     submit: "Submit",
     cancel: "Cancel",
@@ -108,7 +110,8 @@ export const translations: Record<string, Translations> = {
     fullAddress: "Full Address",
     mobileNumber: "Mobile Number",
     designation: "Designation",
-    createAccount: "Create Account",
+    // createAccount: "Create Account",
+    createAccount: "Make Payment & Create Account",
     alreadyHaveAccount: "Already have an account?",
     dontHaveAccount: "Don't have an account?",
     loginSuccess: "Login successful!",
@@ -161,6 +164,7 @@ export const translations: Record<string, Translations> = {
     confirmPassword: "पासवर्ड की पुष्टि करें",
     SelectSubscriptionPlan:"सदस्यता योजना चुनें",
     ReferralCode:"रेफरल कोड",
+    validate:"सत्यापित करें",
     Optional:"वैकल्पिक",
     submit: "जमा करें",
     cancel: "रद्द करें",
@@ -178,7 +182,8 @@ export const translations: Record<string, Translations> = {
     fullAddress: "पूरा पता",
     mobileNumber: "मोबाइल नंबर",
     designation: "पदनाम",
-    createAccount: "खाता बनाएं",
+    // createAccount: "खाता बनाएं",
+    createAccount: "भुगतान करें और खाता बनाएं",
     alreadyHaveAccount: "पहले से खाता है?",
     dontHaveAccount: "खाता नहीं है?",
     loginSuccess: "लॉग इन सफल!",

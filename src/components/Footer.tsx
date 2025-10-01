@@ -11,12 +11,14 @@ const Footer = () => {
   return (
     <footer className="bg-primary text-white mt-auto">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        {/* <div className="grid ro grid-cols-1 md:grid-cols-5 gap-4"> */}
+        {/* <div className="grid ro grid-cols-1 md:grid-cols-5 gap-4"> */}
+        <div className="flex flex-col md:flex-row md:justify-between gap-8">
           {/* Quick Links */}
           <div>
             <h3 className="text-lg font-semibold mb-4 text-accent">Quick Links</h3>
             {authenticated ? (
-              <div className="space-y-2">
+              <div className="text-sm space-y-2">
                 <Link to="/" className="block hover:text-accent transition-colors">
                   {t('home')}
                 </Link>
@@ -32,7 +34,7 @@ const Footer = () => {
               </div>
             // ) : (
             ) : (
-              <div className="space-y-2">
+              <div className="text-sm space-y-2">
                 <Link to="/Login" className="block hover:text-accent transition-colors">
                   Log in
                 </Link>
@@ -41,7 +43,7 @@ const Footer = () => {
                 </Link>
               </div>
             )}
-            <div className="space-y-2">
+            <div className="text-sm space-y-2">
               <Link to="/referral-program" className="block hover:text-accent transition-colors mt-2"
               /* className={cn("flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors", 
                 location.pathname === "/referral-program" ? "bg-primary-light text-primary-foreground"
@@ -53,7 +55,31 @@ const Footer = () => {
               <Link to="/about" className="block hover:text-accent transition-colors mt-2">
                 About Us
               </Link>
-              <Link to="/our-plans" className="block hover:text-accent transition-colors">
+            </div>
+          </div>
+
+          {/* Other Links */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4 text-accent">Other Links</h3>
+            {authenticated ? (
+              <div className="text-sm space-y-2">
+                <Link to="/" className="block hover:text-accent transition-colors">
+                  {/* {t('home')} */}
+                  Current Months Due
+                </Link>
+              </div>
+            ) : (
+              <div className="text-sm space-y-2">
+                <Link to="/Login" className="block hover:text-accent transition-colors">
+                  Log in
+                </Link>
+                <Link to="/signup" className="block hover:text-accent transition-colors">
+                  Sign Up
+                </Link>
+              </div>
+            )}
+            <div className="text-sm space-y-2">
+              <Link to="/our-plans" className="block hover:text-accent transition-colors mt-2">
                 Our Plans
               </Link>
               <Link to="/lic-info-hub" className="block hover:text-accent transition-colors">
@@ -65,7 +91,7 @@ const Footer = () => {
           {/* Contact Information */}
           <div>
             <h3 className="text-lg font-semibold mb-4 text-accent">Contact Info</h3>
-            <div className="space-y-3">
+            <div className="text-sm space-y-3">
               {/* <div className="flex items-center space-x-2">
                 <Phone className="w-4 h-4" />
                 <span>+91 9876543210</span>
@@ -88,7 +114,7 @@ const Footer = () => {
           {/* Features */}
           <div>
             <h3 className="text-lg font-semibold mb-4 text-accent">Features</h3>
-            <div className="space-y-2 text-sm">
+            <div className="text-sm space-y-2">
               <p>✓ Secure Policy Management</p>
               <p>✓ Multi-language Support</p>
               <p>✓ User Authentication</p>
@@ -99,14 +125,14 @@ const Footer = () => {
           </div>
 
           {/* Company Info */}
-          <div>
+          <div className="md:max-w-44">
             <h3 className="text-lg font-semibold mb-4 text-accent">About Company</h3>
             <p className="text-sm mb-4">
-              Your trusted partner for life insurance policy management. 
+              Your trusted partner for all type insurance policy management. 
               Secure, reliable, and user-friendly platform for all your policy needs.
             </p>
             <div className="text-xs text-gray-300">
-              <p>© 2024 Policy Records Management</p>
+              <p>© 2025 Policy Eagle Man</p>
               <p>All Rights Reserved</p>
             </div>
           </div>
