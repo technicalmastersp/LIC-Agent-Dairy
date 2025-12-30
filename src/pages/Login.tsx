@@ -127,7 +127,7 @@ const Login = () => {
             </div>
 
             {/* Test Credentials */}
-            <Card className="bg-accent/50">
+            {/* <Card className="bg-accent/50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-form-subheader">{t('testCredentials')}</CardTitle>
               </CardHeader>
@@ -135,7 +135,7 @@ const Login = () => {
                 <p>{t('testUserId')}</p>
                 <p>{t('testPassword')}</p>
               </CardContent>
-            </Card>
+            </Card> */}
           </CardContent>
         </Card>
       </div>

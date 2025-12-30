@@ -35,7 +35,7 @@ const Home = () => {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Welcome Section */}
           <div className="space-y-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-form-header">
+            <h1 className="text-4xl md:text-[3.15rem] font-bold text-form-header">
               {t('welcome')}, {currentUser?.name || 'User'}!
             </h1>
             <p className="text-xl text-muted-foreground">

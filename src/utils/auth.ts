@@ -3,12 +3,12 @@ import { processReferral } from "./referral";
 import { clearToken } from '../../utils/localStorageHelper.js'
 
 export interface User {
-  id: string;
-  easyId: string;
+  id?: string;
+  easyId?: string;
   name: string;
   fullAddress: string;
   mobileNumber: string;
-  designation: string;
+  // designation: string;
   email: string;
   password: string;
   createdAt: string;
@@ -33,7 +33,7 @@ export interface LoginCredentials {
 }
 
 // Generate auto User ID
-export const generateAutoUserId = (): string => {
+/* export const generateAutoUserId = (): string => {
   const timestamp = Date.now().toString().slice(-6);
   const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
   return `UID${timestamp}${random}`;
@@ -68,7 +68,7 @@ export const saveUser = (user: User): boolean => {
     console.error('Error saving user:', error);
     return false;
   }
-};
+}; */
 
 // Get all customers
 export const getCustomersList = (): User[] => {
@@ -133,7 +133,7 @@ export const initializeTestUser = (): void => {
     name: 'Test User',
     fullAddress: '123 Demo Street, Test City, Demo State - 123456',
     mobileNumber: '9876543210',
-    designation: 'Software Developer',
+    // designation: 'Software Developer',
     email: 'test@demo.com',
     password: 'test123',
     createdAt: new Date().toISOString()
@@ -248,8 +248,8 @@ export const updateUserSubscription = (userId: string, subscription: UserSubscri
 };
 
 // Generate referral code
-export const generateReferralCode = (name: string, userId: string): string => {
+/* export const generateReferralCode = (name: string, userId: string): string => {
   const nameClean = name.toLowerCase().replace(/[^a-z]/g, '').slice(0, 4);
   const userIdEnd = userId.slice(-4);
   return `${nameClean}${userIdEnd}`.toUpperCase();
-};
+}; */

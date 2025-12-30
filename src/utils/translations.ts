@@ -41,6 +41,7 @@ export interface Translations {
   mobileNumber: string;
   designation: string;
   createAccount: string;
+  makePaymentCreateAccount: string;
   alreadyHaveAccount: string;
   dontHaveAccount: string;
   loginSuccess: string;
@@ -110,8 +111,8 @@ export const translations: Record<string, Translations> = {
     fullAddress: "Full Address",
     mobileNumber: "Mobile Number",
     designation: "Designation",
-    // createAccount: "Create Account",
-    createAccount: "Make Payment & Create Account",
+    createAccount: "Create Account",
+    makePaymentCreateAccount: "Make Payment & Create Account",
     alreadyHaveAccount: "Already have an account?",
     dontHaveAccount: "Don't have an account?",
     loginSuccess: "Login successful!",
@@ -182,8 +183,8 @@ export const translations: Record<string, Translations> = {
     fullAddress: "पूरा पता",
     mobileNumber: "मोबाइल नंबर",
     designation: "पदनाम",
-    // createAccount: "खाता बनाएं",
-    createAccount: "भुगतान करें और खाता बनाएं",
+    createAccount: "खाता बनाएं",
+    makePaymentCreateAccount: "भुगतान करें और खाता बनाएं",
     alreadyHaveAccount: "पहले से खाता है?",
     dontHaveAccount: "खाता नहीं है?",
     loginSuccess: "लॉग इन सफल!",
