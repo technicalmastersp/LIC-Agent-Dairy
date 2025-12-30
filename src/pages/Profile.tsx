@@ -345,7 +345,7 @@ const Profile = () => {
                   <p className="text-sm text-muted-foreground">Days Active</p>
                 </div>
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <p className="text-2xl font-bold text-primary">Premium</p>
+                  <p className="text-2xl font-bold text-primary">{currentUser.subscription.planType || 'Premium'}</p>
                   <p className="text-sm text-muted-foreground">Account Type</p>
                 </div>
               </div>
