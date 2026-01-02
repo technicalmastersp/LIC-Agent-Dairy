@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { getCurrentUser, getUserRecords } from "@/utils/auth";
+// import { getCurrentUser, getUserRecords } from "@/utils/auth";
+import { getCurrentUser } from "@/utils/auth";
 import { Save, Plus, Trash2, User, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { updateRecord } from "../../services/recordService";
 
 interface FamilyMember {
   relationship: string;
@@ -49,6 +51,7 @@ interface Record {
   ifscCode: string;
   bankName: string;
   branchName: string;
+  recordId?: string;
 
   familyMembers?: FamilyMember[];
 
@@ -224,11 +227,18 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!currentUser || !record) return;
 
     try {
-      const userRecordsKey = `customers-record-lists-${currentUser.id}`;
+      const res = await updateRecord(formData, record.recordId); 
+      // const res = await apiClient.put('/user/updatePolicyRecord', formData, {
+      //   params: {
+      //     recordId: record.recordId, // query param
+      //   },
+      // });
+      // console.log("Update response:", formData);
+      /* const userRecordsKey = `customers-record-lists-${currentUser.id}`;
       const existingRecords = JSON.parse(localStorage.getItem(userRecordsKey) || '[]');
       
       const updatedRecords = existingRecords.map((r: Record) => 
@@ -288,7 +298,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
           : r
       );
       
-      localStorage.setItem(userRecordsKey, JSON.stringify(updatedRecords));
+      localStorage.setItem(userRecordsKey, JSON.stringify(updatedRecords)); */
       
       toast({
         title: "Success",

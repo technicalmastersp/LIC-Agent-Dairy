@@ -6,7 +6,7 @@ import { Plus, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { getCurrentUser, isAuthenticated, getUserRecords } from "@/utils/auth";
+import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 
 const Home = () => {
@@ -24,8 +24,6 @@ const Home = () => {
   if (!authenticated || !currentUser) {
     return null;
   }
-
-  const userRecords = getUserRecords(currentUser.id);
 
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
@@ -116,13 +114,13 @@ const Home = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                <div>
+                <div onClick={()=>navigate("/view-records")} style={{ cursor: 'pointer' }}>
                   <p className="text-3xl font-bold text-primary">
-                    {JSON.parse(localStorage.getItem(`customers-record-lists-${currentUser?.id}`) || '[]').length}
+                    {currentUser?.totalRecords }
                   </p>
                   <p className="text-muted-foreground">Total Records</p>
                 </div>
-                <div>
+                <div onClick={()=>navigate("/profile")} style={{ cursor: 'pointer' }}>
                   <p className="text-3xl font-bold text-primary">
                     {currentUser ? Math.floor((Date.now() - new Date(currentUser.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 0}
                   </p>

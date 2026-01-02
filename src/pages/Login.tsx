@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LogIn, User } from "lucide-react";
-import { validateLogin, setCurrentUser, initializeTestUser } from "@/utils/auth";
+// import { validateLogin, setCurrentUser, initializeTestUser } from "@/utils/auth";
+import { setCurrentUser } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -25,9 +26,9 @@ const Login = () => {
   const userNamelocaStorage = localStorage.getItem('userName')
 
   // Initialize test user on component mount
-  useState(() => {
-    initializeTestUser();
-  });
+  // useState(() => {
+  //   initializeTestUser();
+  // });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +39,7 @@ const Login = () => {
       // const user = validateLogin({ userId, password });
       let user = await login({ userId, password });
       
-      if (user) {
+      if (user.status !== 'error') {
         user = await getProfile()
         setCurrentUser(user);
         toast({

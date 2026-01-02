@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Edit, Save, X, Users, User as UserIcon } from "lucide-react";
+import { updateProfile } from "../../services/userService.js";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -26,7 +27,6 @@ const Profile = () => {
     name: "",
     fullAddress: "",
     mobileNumber: "",
-    designation: "",
     email: ""
   });
 
@@ -41,7 +41,6 @@ const Profile = () => {
       name: currentUser.name,
       fullAddress: currentUser.fullAddress,
       mobileNumber: currentUser.mobileNumber,
-      designation: currentUser.designation,
       email: currentUser.email
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -59,20 +58,9 @@ const Profile = () => {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      // Update user in customers list
-      const customersList = getCustomersList();
-      const updatedCustomers = customersList.map(user => 
-        user.id === currentUser.id 
-          ? { ...user, ...formData }
-          : user
-      );
-      
-      localStorage.setItem('customers-list', JSON.stringify(updatedCustomers));
-      
-      // Update current user session
-      const updatedUser = { ...currentUser, ...formData };
+      const updatedUser = await updateProfile(formData);
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       
       setIsEditing(false);
@@ -94,7 +82,6 @@ const Profile = () => {
       name: currentUser.name,
       fullAddress: currentUser.fullAddress,
       mobileNumber: currentUser.mobileNumber,
-      designation: currentUser.designation,
       email: currentUser.email
     });
     setIsEditing(false);
@@ -109,7 +96,7 @@ const Profile = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-form-header">{formData.name} Profile</h1>
+              <h1 className="text-3xl font-bold text-form-header">{formData.name}</h1>
               <p className="text-muted-foreground">
                 View and update your profile information
               </p>
@@ -178,7 +165,7 @@ const Profile = () => {
           {/* Profile Information */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* User IDs Card */}
-            <Card>
+            <Card className="order-2 lg:order-1">
               <CardHeader>
                 <CardTitle className="text-form-header flex items-center">
                   <UserIcon className="w-5 h-5 mr-2" />
@@ -225,7 +212,7 @@ const Profile = () => {
                 {currentUser.subscription && (
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">
-                      Plan Ends On
+                      Plan Ends On <button onClick={()=>navigate("/our-plans")} type="button" className="ml-2 px-2 border rounded-sm text-xs hover:bg-indigo-50 active:bg-green-300 border-indigo-600 text-indigo-600">Upgrade your plan</button>
                     </Label>
                     <p className="text-sm">
                       {new Date(currentUser.subscription.endDate).toLocaleDateString()}
@@ -263,19 +250,6 @@ const Profile = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">{t('email')}</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      disabled={!isEditing}
-                      className={!isEditing ? "bg-muted" : ""}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
                     <Label htmlFor="mobileNumber">{t('mobileNumber')}</Label>
                     <Input
                       id="mobileNumber"
@@ -288,11 +262,12 @@ const Profile = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="designation">{t('designation')}</Label>
+                    <Label htmlFor="email">{t('email')}</Label>
                     <Input
-                      id="designation"
-                      name="designation"
-                      value={formData.designation}
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
                       onChange={handleInputChange}
                       disabled={!isEditing}
                       className={!isEditing ? "bg-muted" : ""}
@@ -332,9 +307,9 @@ const Profile = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
+                <div className="text-center p-4 bg-muted/50 rounded-lg" onClick={()=>navigate("/view-records")} style={{ cursor: 'pointer' }}>
                   <p className="text-2xl font-bold text-primary">
-                    {JSON.parse(localStorage.getItem(`customers-record-lists-${currentUser.id}`) || '[]').length}
+                    {currentUser.totalRecords}
                   </p>
                   <p className="text-sm text-muted-foreground">Total Records</p>
                 </div>
