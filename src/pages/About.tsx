@@ -164,8 +164,8 @@ const About = () => {
                       <div>
                         <p className="font-medium">Address</p>
                         <p className="text-muted-foreground">
-                          123 Business District<br />
-                          New Delhi, India - 110001
+                          No. 170, Sector 39, Gurugram <br />
+                          Haryana, Bharat - 122022
                         </p>
                       </div>
                     </div>

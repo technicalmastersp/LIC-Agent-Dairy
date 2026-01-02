@@ -132,7 +132,7 @@ const Footer = () => {
               Secure, reliable, and user-friendly platform for all your policy needs.
             </p>
             <div className="text-xs text-gray-300">
-              <p>© 2025 Policy Eagle Man</p>
+              <p>© 2025 - 2026 Policy Eagle Man</p>
               <p>All Rights Reserved</p>
             </div>
           </div>
