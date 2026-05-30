@@ -164,8 +164,9 @@ const About = () => {
                       <div>
                         <p className="font-medium">Address</p>
                         <p className="text-muted-foreground">
-                          No. 170, Sector 39, Gurugram <br />
-                          Haryana, Bharat - 122022
+                          {/* No. 170, Sector 39, Gurugram <br />
+                          Haryana, Bharat - 122022 */}
+                          {t("officeAddress")}
                         </p>
                       </div>
                     </div>

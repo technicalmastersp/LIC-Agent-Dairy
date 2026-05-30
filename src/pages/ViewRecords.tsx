@@ -83,26 +83,29 @@ const ViewRecords = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<Record | null>(null);
   const [records, setRecords] = useState<Record[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  
+
   useEffect(() => {
     if (!authenticated || !currentUser) {
       navigate("/login");
       return;
     }
 
-  const fetchRecords = async () => {
-    const userRecords = await getAllRecords();
+    const fetchRecords = async () => {
+      try {
+        setIsLoading(true);
+        const userRecords = await getAllRecords();
+        setRecords(userRecords);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    setRecords((prevRecords) =>
-      JSON.stringify(prevRecords) !== JSON.stringify(userRecords)
-        ? userRecords
-        : prevRecords
-    );
-  };
-
-  fetchRecords();
-}, [authenticated, currentUser, navigate]);
+    fetchRecords();
+  }, []);
 
 
   if (!authenticated || !currentUser) {
@@ -197,7 +200,7 @@ const ViewRecords = () => {
             <Link to="/add-record">
               <Button className="bg-primary hover:bg-primary-light">
                 <Plus className="w-4 h-4 mr-2" />
-                Add New Record
+                {t("addNewRecord")}
               </Button>
             </Link>
           </div>
@@ -216,8 +219,8 @@ const ViewRecords = () => {
                   />
                 </div>
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  <span>Total Records: <Badge variant="secondary">{records.length}</Badge></span>
-                  <span>Filtered: <Badge variant="outline">{filteredAndSortedRecords.length}</Badge></span>
+                  <span>{t("totalRecords")}: <Badge variant="secondary">{records.length}</Badge></span>
+                  <span>{t("filteredRecords")}: <Badge variant="outline">{filteredAndSortedRecords.length}</Badge></span>
                 </div>
               </div>
             </CardContent>
@@ -226,13 +229,19 @@ const ViewRecords = () => {
           {/* Records Table */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">All Records</CardTitle>
+              <CardTitle className="text-form-header">{t("allRecord")}</CardTitle>
             </CardHeader>
             <CardContent>
               {filteredAndSortedRecords.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-muted-foreground text-lg mb-4">
-                    {records.length === 0 ? "No records found" : "No records match your search"}
+                    {isLoading ? (
+                      <span>{t("loadingRecords")}</span>
+                    ) : records.length === 0 ? (
+                      <span>No records</span>
+                    ) : (
+                      <span>No records match your search</span>
+                    )}
                   </div>
                   {records.length === 0 && (
                     <Link to="/add-record">

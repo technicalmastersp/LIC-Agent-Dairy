@@ -81,7 +81,7 @@ const Home = () => {
                 </p>
                 <Link to="/add-record">
                   <Button className="w-full bg-primary hover:bg-primary-light">
-                    Add New Record
+                    {t("addNewRecord")}
                   </Button>
                 </Link>
               </CardContent>
@@ -100,7 +100,7 @@ const Home = () => {
                 </p>
                 <Link to="/view-records">
                   <Button className="w-full bg-primary hover:bg-primary-light">
-                    View All Records
+                    {t("viewAllRecords")}
                   </Button>
                 </Link>
               </CardContent>
@@ -110,7 +110,7 @@ const Home = () => {
           {/* Statistics */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">Quick Statistics</CardTitle>
+              <CardTitle className="text-form-header">{t("quickStatistics")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
@@ -118,17 +118,17 @@ const Home = () => {
                   <p className="text-3xl font-bold text-primary">
                     {currentUser?.totalRecords }
                   </p>
-                  <p className="text-muted-foreground">Total Records</p>
+                  <p className="text-muted-foreground">{t("totalRecords")}</p>
                 </div>
                 <div onClick={()=>navigate("/profile")} style={{ cursor: 'pointer' }}>
                   <p className="text-3xl font-bold text-primary">
                     {currentUser ? Math.floor((Date.now() - new Date(currentUser.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 0}
                   </p>
-                  <p className="text-muted-foreground">Days Active</p>
+                  <p className="text-muted-foreground">{t("daysActive")}</p>
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-primary">100%</p>
-                  <p className="text-muted-foreground">Data Security</p>
+                  <p className="text-muted-foreground">{t("dataSecurity")}</p>
                 </div>
               </div>
             </CardContent>

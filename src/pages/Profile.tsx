@@ -233,7 +233,7 @@ const Profile = () => {
             {/* Profile Form */}
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle className="text-form-header">Profile Information</CardTitle>
+                <CardTitle className="text-form-header">{t("profileInformation")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -311,17 +311,17 @@ const Profile = () => {
                   <p className="text-2xl font-bold text-primary">
                     {currentUser.totalRecords}
                   </p>
-                  <p className="text-sm text-muted-foreground">Total Records</p>
+                  <p className="text-sm text-muted-foreground">{t("totalRecords")}</p>
                 </div>
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
                   <p className="text-2xl font-bold text-primary">
                     {Math.floor((Date.now() - new Date(currentUser.createdAt).getTime()) / (1000 * 60 * 60 * 24))}
                   </p>
-                  <p className="text-sm text-muted-foreground">Days Active</p>
+                  <p className="text-sm text-muted-foreground">{t("daysActive")}</p>
                 </div>
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
                   <p className="text-2xl font-bold text-primary">{currentUser.subscription.planType || 'Premium'}</p>
-                  <p className="text-sm text-muted-foreground">Account Type</p>
+                  <p className="text-sm text-muted-foreground">{t("accountType")}</p>
                 </div>
               </div>
             </CardContent>
