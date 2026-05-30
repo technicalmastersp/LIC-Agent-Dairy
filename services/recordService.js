@@ -12,7 +12,7 @@ export const createRecord = async (data) => {
 
 export const getAllRecords = async () => {
   try {
-    const res = await apiClient.post('user/getAllPolicyRecords', {page: "all", limit: "all"});
+    const res = await apiClient.post('/user/getAllPolicyRecords', {page: "all", limit: "all"});
     if (!res.data || !res.data.records) {
       return [];
     } else {

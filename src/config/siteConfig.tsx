@@ -1,6 +1,7 @@
 const siteConfig = {
   title: "Life Insurance Records",
   buyUrl: "policyegleman.com",
+  companyName: "LIC Agent Dairy",
 
   // on root location
   logo_basic_size: "/logos/logo_basic_size.png",

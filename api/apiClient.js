@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getToken } from '../utils/localStorageHelper';
+import { logoutCurrentUser } from '../services/userService';
 
 const apiClient = axios.create({
   // baseURL: import.meta.env.REACT_APP_API_BASE_URL,
@@ -11,13 +12,16 @@ const apiClient = axios.create({
 });
 
 // Add token to every request if present
-apiClient.interceptors.request.use((config) => {
-  const token = getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 // Handle response errors globally
 apiClient.interceptors.response.use(
@@ -25,7 +29,8 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       console.warn("Unauthorized. Redirecting to login...");
-      // optional logout
+      logoutCurrentUser();
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

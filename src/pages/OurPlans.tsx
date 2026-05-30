@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface Plan {
   id: string;
+  planType?: string;
   duration: string;
   price: number;
   originalPrice?: number;
@@ -30,6 +31,7 @@ const OurPlans = () => {
   const plans: Plan[] = [
     {
       id: "6months",
+      planType: "Basic",
       duration: "6 Months",
       price: 599,
       originalPrice: 899,
@@ -42,6 +44,7 @@ const OurPlans = () => {
     },
     {
       id: "12months",
+      planType: "Standard",
       duration: "12 Months",
       price: 1099,
       originalPrice: 1599,
@@ -56,6 +59,7 @@ const OurPlans = () => {
     },
     {
       id: "24months",
+      planType: "Premium",
       duration: "24 Months",
       price: 2099,
       originalPrice: 2999,
@@ -85,6 +89,7 @@ const OurPlans = () => {
     if (selectedPlanData) {
       const success = updateUserSubscription(currentUser.id, {
         planId: selectedPlanData.id,
+        planType: selectedPlanData.planType,
         duration: selectedPlanData.duration,
         price: selectedPlanData.price,
         startDate: new Date().toISOString(),
@@ -113,7 +118,7 @@ const OurPlans = () => {
       <Navigation />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
+        <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-primary mb-4">Choose Your Plan</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Select the perfect plan for your needs. All plans include full access to our features.
@@ -124,16 +129,23 @@ const OurPlans = () => {
           {plans.map((plan) => (
             <Card 
               key={plan.id} 
-              className={`relative ${plan.popular ? 'border-primary shadow-lg scale-105' : ''} ${selectedPlan === plan.id ? 'ring-2 ring-primary' : ''}`}
+              className={`relative ${plan.popular ? 'border-blue-300 shadow-lg scale-105' : ''} ${selectedPlan === plan.id ? 'ring-2 ring-primary' : ''}`}
             >
               {plan.popular && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-primary-foreground">
                   Most Popular
                 </Badge>
               )}
               
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl">{plan.duration}</CardTitle>
+                <CardTitle>
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    <div className="bg-primary text-primary-foreground px-8 py-2 mb-2 rounded-full">
+                      <span className="text-1xl font-bold">{plan.planType}</span>
+                    </div>
+                  </div>
+                </CardTitle>
+                <CardDescription className="text-2xl">{plan.duration}</CardDescription>
                 <CardDescription>
                   <div className="flex items-center justify-center gap-2 mt-2">
                     <span className="text-3xl font-bold text-primary">₹{plan.price}</span>

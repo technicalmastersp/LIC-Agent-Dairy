@@ -47,6 +47,7 @@ const Login = () => {
           description: `${t('welcome')}, ${user.name}!`,
         });
         navigate("/");
+        window.location.reload();
       } else {
         setError(t('invalidCredentials'));
       }
@@ -81,7 +82,8 @@ const Login = () => {
                 <Input
                   id="userId"
                   type="text"
-                  placeholder={t('userId')}
+                  // placeholder={t('userId')}
+                  placeholder='Enter User ID or Email ID'
                   value={userId}
                   onChange={(e) => setUserId(e.target.value.trim())}
                   required

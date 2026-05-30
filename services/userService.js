@@ -1,5 +1,5 @@
 import apiClient from '../api/apiClient';
-import { getToken, setToken, clearToken } from '../utils/localStorageHelper'
+import { setToken, clearToken } from '../utils/localStorageHelper';
 
 export const createUser = async (userData) => {
   const res = await apiClient.post('/auth/register', userData);
@@ -8,7 +8,7 @@ export const createUser = async (userData) => {
 
 export const checkReferralCode = async (code) => {
   const body = { "referralCode": code };
-  const res = await apiClient.post('auth/validateReferralCode', body);
+  const res = await apiClient.post('/auth/validateReferralCode', body);
 
   if (res.data.valid === true) {
     return { valid: true, message: res.data.referrer.message };
@@ -41,6 +41,9 @@ export const updateProfile = async (profileData) => {
   return res.data.userInfo;
 };
 
-export const logout = () => {
-  clearToken();
+export const logoutCurrentUser = () => {
+  const user = JSON.parse(localStorage.getItem('currentUser'))
+  localStorage.setItem('userName', user.name)
+  localStorage.removeItem('currentUser');
+  clearToken()
 };

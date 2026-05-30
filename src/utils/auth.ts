@@ -82,7 +82,7 @@ export const getCustomersList = (): User[] => {
   }
 };
 
-// Validate login credentials
+/* // Validate login credentials
 export const validateLogin = (credentials: LoginCredentials): User | null => {
   try {
     const customersList = getCustomersList();
@@ -95,7 +95,7 @@ export const validateLogin = (credentials: LoginCredentials): User | null => {
     console.error('Error validating login:', error);
     return null;
   }
-};
+}; */
 
 // Set current user session
 export const setCurrentUser = (user: User): void => {
@@ -113,13 +113,14 @@ export const getCurrentUser = (): User | null => {
   }
 };
 
-// Logout user
-export const logout = (): void => {
+/* // Logout user
+export const logoutCurrentUser = (): void => {
   const user = JSON.parse(localStorage.getItem('currentUser'))
   localStorage.setItem('userName', user.name)
   localStorage.removeItem('currentUser');
   clearToken()
-};
+  window.location.href = '/login'; // Redirect to login page
+}; */
 
 // Check if user is authenticated
 export const isAuthenticated = (): boolean => {
@@ -175,7 +176,7 @@ export const saveUserRecord = async (userId?: string, record?: any) => {
 // Get user records
 /* export const getUserRecords = async (page?: any, limit?: any) => {
   try {
-    const res = await apiClient.post('user/getAllPolicyRecords', {page: "all", limit: "all"});
+    const res = await apiClient.post('/user/getAllPolicyRecords', {page: "all", limit: "all"});
     return res.data.records;
   } catch (error) {
     console.error('Error loading user records:', error);
