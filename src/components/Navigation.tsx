@@ -206,8 +206,6 @@ const Navigation = () => {
               </div>
             )}
 
-            <LanguageSwitcher />
-
             {authenticated ? (
               <div className="flex flex-col space-y-2 mt-2">
                 <div
@@ -274,6 +272,8 @@ const Navigation = () => {
                 </Button>
               </div>
             )}
+            
+            <LanguageSwitcher type="mobile"/>
           </div>
         )}
       </div>

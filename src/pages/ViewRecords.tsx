@@ -10,9 +10,10 @@ import Footer from "@/components/Footer";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
 import EditRecordModal from "@/components/EditRecordModal";
 import { Search, Eye, Trash2, ArrowUpDown, Plus, Edit } from "lucide-react";
-import { getCurrentUser, isAuthenticated, getUserRecords, deleteUserRecord } from "@/utils/auth";
+import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
+import { getAllRecords, deleteRecord } from "../../services/recordService";
 
 interface Record {
   id: string;
@@ -45,6 +46,7 @@ interface Record {
   ifscCode: string;
   bankName: string;
   branchName: string;
+  recordId?: string;
 
   currentPolicy : {
     policyNumber: string;
@@ -82,31 +84,25 @@ const ViewRecords = () => {
   const [editingRecord, setEditingRecord] = useState<Record | null>(null);
   const [records, setRecords] = useState<Record[]>([]);
 
-  /* useEffect(() => {
-    if (!authenticated || !currentUser) {
-      navigate("/login");
-      return;
-    }
-    
-    const userRecords = getUserRecords(currentUser.id);
-    setRecords(userRecords);
-  }, [authenticated, currentUser, navigate]); */
+  
   useEffect(() => {
-    // console.log("Effect ran with:", { authenticated, currentUser });
-
     if (!authenticated || !currentUser) {
       navigate("/login");
       return;
     }
 
-    const userRecords = getUserRecords(currentUser.id);
+  const fetchRecords = async () => {
+    const userRecords = await getAllRecords();
 
     setRecords((prevRecords) =>
       JSON.stringify(prevRecords) !== JSON.stringify(userRecords)
         ? userRecords
         : prevRecords
     );
-  }, [authenticated, currentUser, navigate]);
+  };
+
+  fetchRecords();
+}, [authenticated, currentUser, navigate]);
 
 
   if (!authenticated || !currentUser) {
@@ -152,10 +148,10 @@ const ViewRecords = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteRecord = (recordId: string) => {
-    const success = deleteUserRecord(currentUser.id, recordId);
+  const handleDeleteRecord = async (recordId: string) => {
+    const success = await deleteRecord( recordId);
     if (success) {
-      setRecords(getUserRecords(currentUser.id));
+      setRecords(await getAllRecords());
       toast({
         title: "Success", 
         description: "Record deleted successfully",
@@ -168,8 +164,8 @@ const ViewRecords = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateRecord = () => {
-    setRecords(getUserRecords(currentUser.id));
+  const handleUpdateRecord = async () => {
+    // setRecords(await getAllRecords());
   };
 
   const SortableHeader = ({ field, children }: { field: keyof Record; children: React.ReactNode }) => (
@@ -265,7 +261,7 @@ const ViewRecords = () => {
                     </TableHeader>
                     <TableBody>
                       {filteredAndSortedRecords.map((record) => (
-                        <TableRow key={record.id} className="hover:bg-muted/50">
+                        <TableRow key={record.recordId} className="hover:bg-muted/50">
                           <TableCell className="border border-table-border font-medium">
                             {record.name}
                           </TableCell>
@@ -315,7 +311,7 @@ const ViewRecords = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleDeleteRecord(record.id)}
+                                onClick={() => handleDeleteRecord(record.recordId)}
                                 disabled
                                 className="h-8 w-8 p-0 opacity-50 cursor-not-allowed"
                                 title="Delete Record (Disabled)"

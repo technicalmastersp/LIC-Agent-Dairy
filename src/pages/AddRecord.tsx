@@ -8,11 +8,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
 import { Save, Plus, Trash2, Minus  } from "lucide-react";
-import { getCurrentUser, isAuthenticated, saveUserRecord } from "@/utils/auth";
+// import { getCurrentUser, isAuthenticated, saveUserRecord } from "@/utils/auth";
+import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import Footer from "@/components/Footer";
 import siteConfig from "@/config/siteConfig";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { createRecord } from "../../services/recordService.js";
 
 interface FamilyMember {
   relationship: string;
@@ -190,7 +192,7 @@ const AddRecord = () => {
       previousPolicy,
     };
 
-    const success = saveUserRecord(currentUser.id, record);
+    const success = createRecord(record);
 
     if (success) {
       toast({

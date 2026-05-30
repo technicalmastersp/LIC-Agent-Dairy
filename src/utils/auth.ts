@@ -15,6 +15,7 @@ export interface User {
   subscription?: UserSubscription;
   referralCode?: string;
   referredBy?: string;
+  totalRecords?: number;
 }
 
 export interface UserSubscription {
@@ -125,7 +126,7 @@ export const isAuthenticated = (): boolean => {
   return getCurrentUser() !== null;
 };
 
-// Initialize test user credentials
+/* // Initialize test user credentials
 export const initializeTestUser = (): void => {
   const testUser: User = {
     id: 'UID123456',
@@ -146,43 +147,43 @@ export const initializeTestUser = (): void => {
     customersList.push(testUser);
     localStorage.setItem('customers-list', JSON.stringify(customersList));
   }
-};
+}; */
 
-// Save user records to dedicated folder simulation
-export const saveUserRecord = (userId: string, record: any): boolean => {
+/* // Save user records to dedicated folder simulation
+export const saveUserRecord = async (userId?: string, record?: any) => {
   try {
-    const userRecordsKey = `customers-record-lists-${userId}`;
-    const existingRecords = JSON.parse(localStorage.getItem(userRecordsKey) || '[]');
+    const res = await apiClient.post('/user/createNewRecord', record);
+    // const userRecordsKey = `customers-record-lists-${userId}`;
+    // const existingRecords = JSON.parse(localStorage.getItem(userRecordsKey) || '[]');
     
-    const recordWithId = {
-      ...record,
-      id: Date.now().toString(),
-      userId: userId,
-      createdAt: new Date().toISOString()
-    };
+    // const recordWithId = {
+    //   ...record,
+    //   id: Date.now().toString(),
+    //   userId: userId,
+    //   createdAt: new Date().toISOString()
+    // };
     
-    existingRecords.push(recordWithId);
-    localStorage.setItem(userRecordsKey, JSON.stringify(existingRecords));
+    // existingRecords.push(recordWithId);
+    // localStorage.setItem(userRecordsKey, JSON.stringify(existingRecords));
     return true;
   } catch (error) {
     console.error('Error saving user record:', error);
     return false;
   }
-};
+}; */
 
 // Get user records
-export const getUserRecords = (userId: string): any[] => {
+/* export const getUserRecords = async (page?: any, limit?: any) => {
   try {
-    const userRecordsKey = `customers-record-lists-${userId}`;
-    const stored = localStorage.getItem(userRecordsKey);
-    return stored ? JSON.parse(stored) : [];
+    const res = await apiClient.post('user/getAllPolicyRecords', {page: "all", limit: "all"});
+    return res.data.records;
   } catch (error) {
     console.error('Error loading user records:', error);
     return [];
   }
-};
+}; */
 
-// Delete user record
+/* // Delete user record
 export const deleteUserRecord = (userId: string, recordId: string): boolean => {
   try {
     const userRecordsKey = `customers-record-lists-${userId}`;
@@ -194,10 +195,10 @@ export const deleteUserRecord = (userId: string, recordId: string): boolean => {
     console.error('Error deleting user record:', error);
     return false;
   }
-};
+}; */
 
 // Update user record
-export const updateUserRecord = (userId: string, recordId: string, updatedData: any): boolean => {
+/* export const updateUserRecord = (userId: string, recordId: string, updatedData: any): boolean => {
   try {
     const userRecordsKey = `customers-record-lists-${userId}`;
     const existingRecords = JSON.parse(localStorage.getItem(userRecordsKey) || '[]');
@@ -210,7 +211,7 @@ export const updateUserRecord = (userId: string, recordId: string, updatedData: 
     console.error('Error updating user record:', error);
     return false;
   }
-};
+}; */
 
 // Update user subscription
 export const updateUserSubscription = (userId: string, subscription: UserSubscription): boolean => {

@@ -21,12 +21,26 @@ export const login = async (credentials) => {
   const res = await apiClient.post('/auth/login', credentials);
   // console.log('login responce : ', res.data);
   
-  setToken(res.data.token)
-  localStorage.removeItem('userName')
-  return res.data;
+  if(res.data.status !== 'error') {
+    setToken(res.data.token)
+    localStorage.removeItem('userName')
+    return res.data;
+  } else {
+    throw new Error(res.data.message);
+  }
 };
 
 export const getProfile = async () => {
   const res = await apiClient.get('/auth/profile');
-  return res.data;
+  return res.data.userInfo;
+};
+
+export const updateProfile = async (profileData) => {
+  const res = await apiClient.put('/auth/updateUserProfile', profileData);
+  
+  return res.data.userInfo;
+};
+
+export const logout = () => {
+  clearToken();
 };
