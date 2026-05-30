@@ -25,7 +25,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
       <Icon className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-muted-foreground">{label}</p>
-        <p className="text-sm break-words">{value || "Not provided"}</p>
+        <p className="text-sm break-words">{value || "-"}</p>
       </div>
     </div>
   );
