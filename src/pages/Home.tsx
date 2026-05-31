@@ -6,20 +6,23 @@ import { Plus, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
+import { getCurrentUser, setCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { dueThisMonth, getRecordsWithoutLastPayment } from "../../services/recordService";
+import { getProfile } from "../../services/userService";
 
 const Home = () => {
   const [currentMonthTotalDueCount, setCurrentMonthTotalDueCount] = useState(0);
   const [recordsWithoutLastPayment, setRecordsWithoutLastPayment] = useState(0);
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const currentUser = getCurrentUser();
+  let currentUser = getCurrentUser();
   const authenticated = isAuthenticated();
 
   const fetchRecords = async () => {
     try {
+      const user = await getProfile();
+      setCurrentUser(user); 
       const userRecords = await dueThisMonth();
       const recordsWithoutLastPayment = await getRecordsWithoutLastPayment();
       setCurrentMonthTotalDueCount(userRecords.totalDue);
@@ -84,6 +87,47 @@ const Home = () => {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="hover:shadow-lg transition-shadow bg-blue-100">
+              <CardHeader>
+                <CardTitle className="text-form-header flex items-center">
+                  <Plus className="w-5 h-5 mr-2" />
+                  {t('addRecord')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  Add new life insurance policy records with complete information
+                </p>
+                <Link to="/add-record">
+                  <Button className="w-full bg-primary hover:bg-primary-light">
+                    {t("addNewRecord")}
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow bg-yellow-100">
+              <CardHeader>
+                <CardTitle className="text-form-header flex items-center">
+                  <Eye className="w-5 h-5 mr-2" />
+                  {t('viewRecords')}{<Badge variant="destructive" className="ml-2">{currentUser.totalRecords}</Badge>}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  View, search, and manage all your existing policy records
+                </p>
+                <Link to="/view-records">
+                  <Button className="w-full bg-primary hover:bg-primary-light">
+                    {t("viewAllRecords")}
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="hover:shadow-lg transition-shadow bg-green-100">
               <CardHeader>
                 <CardTitle className="text-form-header flex items-center">
@@ -118,47 +162,6 @@ const Home = () => {
                 <Link to="/view-missed-payments">
                   <Button className="w-full bg-primary hover:bg-primary-light">
                     View Missed Payments
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="hover:shadow-lg transition-shadow bg-blue-100">
-              <CardHeader>
-                <CardTitle className="text-form-header flex items-center">
-                  <Plus className="w-5 h-5 mr-2" />
-                  {t('addRecord')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Add new life insurance policy records with complete information
-                </p>
-                <Link to="/add-record">
-                  <Button className="w-full bg-primary hover:bg-primary-light">
-                    {t("addNewRecord")}
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow bg-yellow-100">
-              <CardHeader>
-                <CardTitle className="text-form-header flex items-center">
-                  <Eye className="w-5 h-5 mr-2" />
-                  {t('viewRecords')}{<Badge variant="destructive" className="ml-2">{currentUser.totalRecords}</Badge>}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  View, search, and manage all your existing policy records
-                </p>
-                <Link to="/view-records">
-                  <Button className="w-full bg-primary hover:bg-primary-light">
-                    {t("viewAllRecords")}
                   </Button>
                 </Link>
               </CardContent>

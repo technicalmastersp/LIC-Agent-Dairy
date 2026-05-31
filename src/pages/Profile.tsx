@@ -166,7 +166,7 @@ const Profile = () => {
           {/* Profile Information */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* User IDs Card */}
-            <Card className="order-2 lg:order-1">
+            <Card className="order-2 lg:order-1 bg-rose-100">
               <CardHeader>
                 <CardTitle className="text-form-header flex items-center">
                   <UserIcon className="w-5 h-5 mr-2" />
@@ -232,7 +232,7 @@ const Profile = () => {
             </Card>
 
             {/* Profile Form */}
-            <Card className="lg:col-span-2">
+            <Card className="lg:col-span-2 bg-cyan-100">
               <CardHeader>
                 <CardTitle className="text-form-header">{t("profileInformation")}</CardTitle>
               </CardHeader>
@@ -302,7 +302,7 @@ const Profile = () => {
           </div>
 
           {/* Account Statistics */}
-          <Card>
+          <Card className="bg-orange-100">
             <CardHeader>
               <CardTitle className="text-form-header">Account Statistics</CardTitle>
             </CardHeader>
