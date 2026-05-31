@@ -754,7 +754,7 @@ const AddRecord = () => {
                           <SelectValue placeholder="Select Payment Mode" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Monthly or e-NACH">Monthly or e-NACH</SelectItem>
+                          <SelectItem value="Monthly">Monthly or e-NACH</SelectItem>
                           <SelectItem value="Quarterly">Quarterly</SelectItem>
                           <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
                           <SelectItem value="Yearly">Yearly</SelectItem>
@@ -836,7 +836,7 @@ const AddRecord = () => {
                           <SelectValue placeholder="Select Payment Mode" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Monthly or e-NACH">Monthly or e-NACH</SelectItem>
+                          <SelectItem value="Monthly">Monthly or e-NACH</SelectItem>
                           <SelectItem value="Quarterly">Quarterly</SelectItem>
                           <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
                           <SelectItem value="Yearly">Yearly</SelectItem>

@@ -13,8 +13,7 @@ import { Search, Eye, Trash2, ArrowUpDown, Plus, Edit } from "lucide-react";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
-import { getAllRecords, deleteRecord } from "../../services/recordService";
-import { convertDateToIndianFormat } from "@/utils/tools";
+import { getRecordsWithoutLastPayment, deleteRecord } from "../../services/recordService";
 
 interface Record {
   id: string;
@@ -69,7 +68,7 @@ interface Record {
   createdAt: string;
 }
 
-const ViewRecords = () => {
+const CurrentMonthDue = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { toast } = useToast();
@@ -84,15 +83,16 @@ const ViewRecords = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<Record | null>(null);
   const [records, setRecords] = useState<Record[]>([]);
+  const [currentMonth, setCurrentMonth] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
 
   // Move this OUT of useEffect, make it a standalone function in the component
   const fetchRecords = async () => {
     try {
       setIsLoading(true);
-      const userRecords = await getAllRecords();
-      setRecords(userRecords);
+      const recordsWithoutLastPayment = await getRecordsWithoutLastPayment();
+      setRecords(recordsWithoutLastPayment.records);
+      setCurrentMonth("" + new Date().toLocaleString('default', { month: 'long' }) + " " + new Date().getFullYear());
     } catch (error) {
       console.error(error);
     } finally {
@@ -107,7 +107,6 @@ const ViewRecords = () => {
     }
     fetchRecords();
   }, []);
-
 
   if (!authenticated || !currentUser) {
     return null;
@@ -155,7 +154,7 @@ const ViewRecords = () => {
   const handleDeleteRecord = async (recordId: string) => {
     const success = await deleteRecord( recordId);
     if (success) {
-      setRecords(await getAllRecords());
+      setRecords(await getRecordsWithoutLastPayment());
       toast({
         title: "Success", 
         description: "Record deleted successfully",
@@ -193,17 +192,14 @@ const ViewRecords = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-form-header">Policy Records</h1>
+              <h1 className="text-3xl font-bold text-form-header">Missed Last Payment</h1>
               <p className="text-muted-foreground">
-                Manage and view all life insurance policy records
+                View records that have missed their last payment. Stay on top of your policies and ensure timely follow-ups.
               </p>
             </div>
-            <Link to="/add-record">
-              <Button className="bg-primary hover:bg-primary-light">
-                <Plus className="w-4 h-4 mr-2" />
-                {t("addNewRecord")}
-              </Button>
-            </Link>
+            <Button className="bg-primary hover:bg-primary-light cursor-default">
+              {currentMonth}
+            </Button>
           </div>
 
           {/* Search and Stats */}
@@ -230,7 +226,7 @@ const ViewRecords = () => {
           {/* Records Table */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">{t("allRecord")}</CardTitle>
+              <CardTitle className="text-form-header">All Unpaid Records</CardTitle>
             </CardHeader>
             <CardContent>
               {filteredAndSortedRecords.length === 0 ? (
@@ -239,19 +235,11 @@ const ViewRecords = () => {
                     {isLoading ? (
                       <span>{t("loadingRecords")}</span>
                     ) : records.length === 0 ? (
-                      <span>No records</span>
+                      <span>{t("missedPaymentNoRecordNote")}</span>
                     ) : (
                       <span>No records match your search</span>
                     )}
                   </div>
-                  {records.length === 0 && (
-                    <Link to="/add-record">
-                      <Button>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add First Record
-                      </Button>
-                    </Link>
-                  )}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -261,11 +249,10 @@ const ViewRecords = () => {
                         <SortableHeader field="name">Name</SortableHeader>
                         <SortableHeader field="fatherName">Father's Name</SortableHeader>
                         <SortableHeader field="age">Age</SortableHeader>
-                        {/* <SortableHeader field="occupation">Occupation</SortableHeader> */}
                         <TableHead className="border border-table-border">Policy Number</TableHead>
-                        <TableHead className="border border-table-border">Sum Assured</TableHead>
+                        <TableHead className="border border-table-border">Mode Of Payment</TableHead>
                         <TableHead className="border border-table-border">Branch</TableHead>
-                        <SortableHeader field="createdAt">Created</SortableHeader>
+                        <TableHead className="border border-table-border">Last Payment Date</TableHead>
                         <TableHead className="border border-table-border">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -281,22 +268,19 @@ const ViewRecords = () => {
                           <TableCell className="border border-table-border">
                             {record.age}
                           </TableCell>
-                          {/* <TableCell className="border border-table-border">
-                            {record.occupation}
-                          </TableCell> */}
                           <TableCell className="border border-table-border">
                             <Badge variant="outline" className="font-mono text-xs">
                               {record.currentPolicy.policyNumber || "N/A"}
                             </Badge>
                           </TableCell>
                           <TableCell className="border border-table-border">
-                            ₹{record.currentPolicy.sumAssured || "0"}
+                            ₹{record.currentPolicy.modeOfPayment || "-"}
                           </TableCell>
                           <TableCell className="border border-table-border">
                             {record.currentPolicy.branch || "-"}
                           </TableCell>
                           <TableCell className="border border-table-border text-sm text-muted-foreground">
-                            {convertDateToIndianFormat(record.createdAt)}
+                            {record.currentPolicy.lastPaymentDate || <span className="italic text-red-400">No payments</span>}
                           </TableCell>
                           <TableCell className="border border-table-border">
                             <div className="flex items-center space-x-2">
@@ -321,7 +305,7 @@ const ViewRecords = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleDeleteRecord(record.recordId)}
+                                // onClick={() => handleDeleteRecord(record.recordId)}
                                 disabled
                                 className="h-8 w-8 p-0 opacity-50 cursor-not-allowed"
                                 title="Delete Record (Disabled)"
@@ -364,4 +348,4 @@ const ViewRecords = () => {
   );
 };
 
-export default ViewRecords;
+export default CurrentMonthDue;

@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Edit, Save, X, Users, User as UserIcon } from "lucide-react";
 import { updateProfile } from "../../services/userService.js";
+import { convertDateToIndianFormat } from "@/utils/tools";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -194,7 +195,7 @@ const Profile = () => {
                     Account Created
                   </Label>
                   <p className="text-sm">
-                    {new Date(currentUser.createdAt).toLocaleDateString()}
+                    {convertDateToIndianFormat(currentUser.createdAt)}
                   </p>
                 </div>
                 <div>
@@ -215,7 +216,7 @@ const Profile = () => {
                       Plan Ends On <button onClick={()=>navigate("/our-plans")} type="button" className="ml-2 px-2 border rounded-sm text-xs hover:bg-indigo-50 active:bg-green-300 border-indigo-600 text-indigo-600">Upgrade your plan</button>
                     </Label>
                     <p className="text-sm">
-                      {new Date(currentUser.subscription.endDate).toLocaleDateString()}
+                      {convertDateToIndianFormat(currentUser.subscription.endDate)}
                     </p>
                   </div>
                 )}
