@@ -86,24 +86,24 @@ const ViewRecords = () => {
   const [isLoading, setIsLoading] = useState(true);
 
 
+  // Move this OUT of useEffect, make it a standalone function in the component
+  const fetchRecords = async () => {
+    try {
+      setIsLoading(true);
+      const userRecords = await getAllRecords();
+      setRecords(userRecords);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!authenticated || !currentUser) {
       navigate("/login");
       return;
     }
-
-    const fetchRecords = async () => {
-      try {
-        setIsLoading(true);
-        const userRecords = await getAllRecords();
-        setRecords(userRecords);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchRecords();
   }, []);
 
@@ -168,7 +168,7 @@ const ViewRecords = () => {
   };
 
   const handleUpdateRecord = async () => {
-    // setRecords(await getAllRecords());
+    await fetchRecords();
   };
 
   const SortableHeader = ({ field, children }: { field: keyof Record; children: React.ReactNode }) => (
@@ -351,7 +351,10 @@ const ViewRecords = () => {
       <EditRecordModal
         record={editingRecord}
         isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          fetchRecords(); // ← refresh on close too
+        }}
         onUpdate={handleUpdateRecord}
       />
 

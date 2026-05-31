@@ -117,21 +117,23 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     bankName: "",
     branchName: "",
 
-    // currentPolicy 
-    policyNumber: "",
-    planAndTerm: "",
-    sumAssured: "",
-    modeOfPayment: "",
-    branch: "",
-    lastPaymentDate: "",
+    currentPolicy : {
+      policyNumber: "",
+      planAndTerm: "",
+      sumAssured: "",
+      modeOfPayment: "",
+      branch: "",
+      lastPaymentDate: "",
+    },
 
-    // previousPolicy 
-    policyNumber_previousPolicy: "",
-    planAndTerm_previousPolicy: "",
-    sumAssured_previousPolicy: "",
-    modeOfInstallment_previousPolicy: "",
-    branch_previousPolicy: "",
-    lastPaymentDate_previousPolicy: "",
+    previousPolicy : {
+      policyNumber: "",
+      planAndTerm: "",
+      sumAssured: "",
+      modeOfPayment: "",
+      branch: "",
+      lastPaymentDate: "",
+    }
   });
 
   useEffect(() => {
@@ -167,26 +169,26 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
         bankName: record.bankName,
         branchName: record.branchName,
 
-        // currentPolicy
-        policyNumber: record.currentPolicy.policyNumber,
-        planAndTerm: record.currentPolicy.planAndTerm,
-        sumAssured: record.currentPolicy.sumAssured,
-        modeOfPayment: record.currentPolicy.modeOfPayment,
-        branch: record.currentPolicy.branch,
-        lastPaymentDate: record.currentPolicy.lastPaymentDate,
+        previousPolicy : {
+          policyNumber: record.previousPolicy.policyNumber,
+          planAndTerm: record.previousPolicy.planAndTerm,
+          sumAssured: record.previousPolicy.sumAssured,
+          modeOfPayment: record.previousPolicy.modeOfPayment,
+          branch: record.previousPolicy.branch,
+          lastPaymentDate: record.previousPolicy.lastPaymentDate,
+        },
 
-        // previousPolicy
-        policyNumber_previousPolicy: record.previousPolicy.policyNumber,
-        planAndTerm_previousPolicy: record.previousPolicy.planAndTerm,
-        sumAssured_previousPolicy: record.previousPolicy.sumAssured,
-        modeOfInstallment_previousPolicy: record.previousPolicy.modeOfPayment,
-        branch_previousPolicy: record.previousPolicy.branch,
-        lastPaymentDate_previousPolicy: record.previousPolicy.lastPaymentDate,
+        currentPolicy : {
+          policyNumber: record.currentPolicy.policyNumber,
+          planAndTerm: record.currentPolicy.planAndTerm,
+          sumAssured: record.currentPolicy.sumAssured,
+          modeOfPayment: record.currentPolicy.modeOfPayment,
+          branch: record.currentPolicy.branch,
+          lastPaymentDate: record.currentPolicy.lastPaymentDate,
+        },
       });
 
-      setFamilyMembers(record.familyMembers || [
-        { relationship: "Father", currentAge: "", health: "", deathAge: "", reason: "" }
-      ]);
+      setFamilyMembers(record.familyMembers);
     }
   }, [record]);
 
@@ -198,7 +200,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
 
   const relationOptions = [
     // "spouse", "son", "daughter", "father", "mother", "brother", "sister", "grandfather", "grandmother", "uncle", "aunt", "cousin", "nephew", "niece", "son-in-law", "daughter-in-law", "father-in-law", "mother-in-law", "brother-in-law", "sister-in-law"
-    "Spouse", "Son", "Daughter", "Father", "Bother", "Brother", "Sister", "Grandfather", "Grandmother"
+    "Spouse", "Son", "Daughter", "Father", "Mother", "Brother", "Sister", "Grandfather", "Grandmother"
   ];
 
   const addFamilyMember = () => {
@@ -218,6 +220,20 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     setFamilyMembers(updatedMembers);
   };
   // -----------------------------------------------------------------------------------------------------------------------------------------------
+  const handlePolicyChange = (
+    section: "currentPolicy" | "previousPolicy",
+    field: string,
+    value: string
+  ) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: value,
+      },
+    }));
+  };
+  // -----------------------------------------------------------------------------------------------------------------------------------------------
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -231,74 +247,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     if (!currentUser || !record) return;
 
     try {
-      const res = await updateRecord(formData, record.recordId); 
-      // const res = await apiClient.put('/user/updatePolicyRecord', formData, {
-      //   params: {
-      //     recordId: record.recordId, // query param
-      //   },
-      // });
-      // console.log("Update response:", formData);
-      /* const userRecordsKey = `customers-record-lists-${currentUser.id}`;
-      const existingRecords = JSON.parse(localStorage.getItem(userRecordsKey) || '[]');
-      
-      const updatedRecords = existingRecords.map((r: Record) => 
-        r.id === record.id 
-          ? {
-              ...r,
-              date: formData.date,
-              aadhaarNumber: formData.aadhaarNumber,
-              panNumber: formData.panNumber,
-              email: formData.email,
-              name: formData.name,
-              birthPlace: formData.birthPlace,
-              fatherName: formData.fatherName,
-              motherName: formData.motherName,
-              spouseName: formData.spouseName,
-              address: formData.address,
-              dateOfBirth: formData.dateOfBirth,
-              age: formData.age,
-              occupation: formData.occupation,
-              educationalQualification: formData.educationalQualification,
-              designationOfPolicyHolder: formData.designationOfPolicyHolder,
-              annualIncome: formData.annualIncome,
-              periodOfService: formData.periodOfService,
-              employerName: formData.employerName,
-              aadhaarLinkedMobileNumber: formData.aadhaarLinkedMobileNumber,
-              nameOfNominee: formData.nameOfNominee,
-              ageOfNominee: formData.ageOfNominee,
-              relationName: formData.relationName,
-              lastChildBirthDate: formData.lastChildBirthDate,
-              height: formData.height,
-              weight: formData.weight,
-              bankAccountNumber: formData.bankAccountNumber,
-              ifscCode: formData.ifscCode,
-              bankName: formData.bankName,
-              branchName: formData.branchName,
-
-              familyMembers,
-
-              currentPolicy : {
-                policyNumber: formData.policyNumber,
-                planAndTerm: formData.planAndTerm,
-                sumAssured: formData.sumAssured,
-                modeOfPayment: formData.modeOfPayment,
-                branch: formData.branch,
-                lastPaymentDate: formData.lastPaymentDate,
-              },
-
-              previousPolicy : {
-                policyNumber: formData.policyNumber_previousPolicy,
-                planAndTerm: formData.planAndTerm_previousPolicy,
-                sumAssured: formData.sumAssured_previousPolicy,
-                modeOfPayment: formData.modeOfInstallment_previousPolicy,
-                branch: formData.branch_previousPolicy,
-                lastPaymentDate: formData.lastPaymentDate_previousPolicy,
-              }
-            }
-          : r
-      );
-      
-      localStorage.setItem(userRecordsKey, JSON.stringify(updatedRecords)); */
+      const res = await updateRecord({ ...formData, familyMembers }, record.recordId); 
       
       toast({
         title: "Success",
@@ -739,30 +688,24 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="policyNumber">Policy Number</Label>
                   <Input
-                    id="policyNumber"
-                    name="policyNumber"
-                    value={formData.policyNumber}
-                    onChange={handleInputChange}
+                    value={formData.currentPolicy.policyNumber}
+                    onChange={(e) => handlePolicyChange("currentPolicy", "policyNumber", e.target.value)}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="planAndTerm">Plan & Term</Label>
                   <Input
-                    id="planAndTerm"
-                    name="planAndTerm"
-                    value={formData.planAndTerm || ""}
-                    onChange={handleInputChange}
+                    value={formData.currentPolicy.planAndTerm}
+                    onChange={(e) => handlePolicyChange("currentPolicy", "planAndTerm", e.target.value)}
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="sumAssured">Sum Assured</Label>
                   <Input
-                    id="sumAssured"
-                    name="sumAssured"
-                    value={formData.sumAssured}
-                    onChange={handleInputChange}
+                    value={formData.currentPolicy.sumAssured}
+                    onChange={(e) => handlePolicyChange("currentPolicy", "sumAssured", e.target.value)}
                   />
                 </div>
                 
@@ -775,9 +718,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     onChange={handleInputChange}
                     /> */}
                   <Select
-                    name="modeOfPayment"
-                    value={formData.modeOfPayment || ""}
-                    onValueChange={(value) => handleInputChange({ target: { name: "modeOfPayment", value } } as React.ChangeEvent<HTMLInputElement>)}
+                    value={formData.currentPolicy.modeOfPayment || ""}
+                    onValueChange={(value) => handlePolicyChange("currentPolicy", "modeOfPayment", value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Payment Mode" />
@@ -794,21 +736,17 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="branch">Branch</Label>
                   <Input
-                    id="branch"
-                    name="branch"
-                    value={formData.branch}
-                    onChange={handleInputChange}
+                    value={formData.currentPolicy.branch}
+                    onChange={(e) => handlePolicyChange("currentPolicy", "branch", e.target.value)}
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="lastPaymentDate">Last Payment Date</Label>
                   <Input
-                    id="lastPaymentDate"
-                    name="lastPaymentDate"
                     type="date"
-                    value={formData.lastPaymentDate}
-                    onChange={handleInputChange}
+                    value={formData.currentPolicy.lastPaymentDate}
+                    onChange={(e) => handlePolicyChange("currentPolicy", "lastPaymentDate", e.target.value)}
                   />
                 </div>
               </div>
@@ -825,30 +763,24 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="policyNumber_previousPolicy">Policy Number</Label>
                   <Input
-                    id="policyNumber_previousPolicy"
-                    name="policyNumber_previousPolicy"
-                    value={formData.policyNumber_previousPolicy}
-                    onChange={handleInputChange}
+                    value={formData.previousPolicy.policyNumber}
+                    onChange={(e) => handlePolicyChange("previousPolicy", "policyNumber", e.target.value)}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="planAndTerm_previousPolicy">Plan & Term</Label>
                   <Input
-                    id="planAndTerm_previousPolicy"
-                    name="planAndTerm_previousPolicy"
-                    value={formData.planAndTerm_previousPolicy || ""}
-                    onChange={handleInputChange}
+                    value={formData.previousPolicy.planAndTerm}
+                    onChange={(e) => handlePolicyChange("previousPolicy", "planAndTerm", e.target.value)}
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="sumAssured_previousPolicy">Sum Assured</Label>
                   <Input
-                    id="sumAssured_previousPolicy"
-                    name="sumAssured_previousPolicy"
-                    value={formData.sumAssured_previousPolicy}
-                    onChange={handleInputChange}
+                    value={formData.previousPolicy.sumAssured}
+                    onChange={(e) => handlePolicyChange("previousPolicy", "sumAssured", e.target.value)}
                   />
                 </div>
                 
@@ -861,9 +793,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     onChange={handleInputChange}
                   /> */}
                   <Select
-                    name="modeOfInstallment_previousPolicy"
-                    value={formData.modeOfInstallment_previousPolicy || ""}
-                    onValueChange={(value) => handleInputChange({ target: { name: "modeOfInstallment_previousPolicy", value } } as React.ChangeEvent<HTMLInputElement>)}
+                    value={formData.previousPolicy.modeOfPayment || ""}
+                    onValueChange={(value) => handlePolicyChange("previousPolicy", "modeOfPayment", value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Payment Mode" />
@@ -880,21 +811,17 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="branch_previousPolicy">Branch</Label>
                   <Input
-                    id="branch_previousPolicy"
-                    name="branch_previousPolicy"
-                    value={formData.branch_previousPolicy}
-                    onChange={handleInputChange}
+                    value={formData.previousPolicy.branch}
+                    onChange={(e) => handlePolicyChange("previousPolicy", "branch", e.target.value)}
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="lastPaymentDate_previousPolicy">Last Payment Date</Label>
                   <Input
-                    id="lastPaymentDate_previousPolicy"
-                    name="lastPaymentDate_previousPolicy"
                     type="date"
-                    value={formData.lastPaymentDate_previousPolicy}
-                    onChange={handleInputChange}
+                    value={formData.previousPolicy.lastPaymentDate}
+                    onChange={(e) => handlePolicyChange("previousPolicy", "lastPaymentDate", e.target.value)}
                   />
                 </div>
               </div>

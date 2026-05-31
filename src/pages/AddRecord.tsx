@@ -143,7 +143,7 @@ const AddRecord = () => {
 
   const relationOptions = [
     // "spouse", "son", "daughter", "father", "mother", "brother", "sister", "grandfather", "grandmother", "uncle", "aunt", "cousin", "nephew", "niece", "son-in-law", "daughter-in-law", "father-in-law", "mother-in-law", "brother-in-law", "sister-in-law"
-    "Spouse", "Son", "Daughter", "Father", "Bother", "Brother", "Sister", "Grandfather", "Grandmother"
+    "Spouse", "Son", "Daughter", "Father", "Mother", "Brother", "Sister", "Grandfather", "Grandmother"
   ];
 
   const addFamilyMember = () => {
