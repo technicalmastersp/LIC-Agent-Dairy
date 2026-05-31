@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Separator } from "@/components/ui/separator";
 import { Calendar, User, MapPin, Briefcase, Phone, CreditCard, HomeIcon } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
+import { convertDateToIndianFormat } from "@/utils/tools";
 
 interface RecordDetailsModalProps {
   record: any;
@@ -51,8 +52,9 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 &nbsp;{siteConfig.title}
               </CardTitle>
               <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                <span>Record ID: {record.id}</span>
-                <span>Created: {new Date(record.createdAt).toLocaleDateString()}</span>
+                {/* <span>Record ID: {record.id}</span> */}
+                <span>Created: {convertDateToIndianFormat(record.createdAt)}</span>
+                {record.currentPolicy?.nextDueDate ? <span>Payment Due Date: {convertDateToIndianFormat(record.currentPolicy?.nextDueDate)}</span> : ''}
               </div>
             </CardHeader>
           </Card>
@@ -64,7 +66,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InfoItem icon={User} label="Date" value={new Date(record.date).toLocaleDateString()} />
+                <InfoItem icon={User} label="Date" value={convertDateToIndianFormat(record.date)} />
                 <InfoItem icon={Calendar} label="Aadhaar Number" value={record.aadhaarNumber} />
                 <InfoItem icon={MapPin} label="Pan Number" value={record.panNumber} />
                 <InfoItem icon={User} label="E Mail" value={record.email} />
@@ -85,7 +87,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 <InfoItem icon={User} label="Mother's Name" value={record.motherName || ""} />
                 <InfoItem icon={User} label="Spouse's Name" value={record.spouseName || ""} />
                 <InfoItem icon={MapPin} label="Address" value={record.address || ""} />
-                <InfoItem icon={Calendar} label="Date of Birth" value={record.dateOfBirth || ""} />
+                <InfoItem icon={Calendar} label="Date of Birth" value={convertDateToIndianFormat(record.dateOfBirth) || ""} />
                 <InfoItem icon={User} label="Age" value={record.age || ""} />
                 <InfoItem icon={Phone} label="Aadhaar Linked Mobile Number" value={record.aadhaarLinkedMobileNumber || ""} />
                 <InfoItem icon={User} label="Name of Nominee" value={record.nameOfNominee || ""} />
@@ -121,7 +123,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <InfoItem icon={User} label="Height" value={record.height} />
                 <InfoItem icon={User} label="Weight" value={record.weight} />
-                <InfoItem icon={Calendar} label="Last Child Birth Date &#40;Only for Women&#41;" value={record.lastChildBirthDate || ""} />
+                <InfoItem icon={Calendar} label="Last Child Birth Date &#40;Only for Women&#41;" value={convertDateToIndianFormat(record.lastChildBirthDate) || ""} />
               </div>
             </CardContent>
           </Card>
@@ -225,7 +227,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                           {record.currentPolicy.branch || "-"}
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          {record.currentPolicy.lastPaymentDate || "-"}
+                          {convertDateToIndianFormat(record.currentPolicy.lastPaymentDate) || "-"}
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -274,7 +276,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                           {record.previousPolicy.branch || "-"}
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          {record.previousPolicy.lastPaymentDate || "-"}
+                          {convertDateToIndianFormat(record.previousPolicy.lastPaymentDate) || "-"}
                         </TableCell>
                       </TableRow>
                     </TableBody>

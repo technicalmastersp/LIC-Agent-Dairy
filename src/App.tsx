@@ -7,6 +7,8 @@ import { LanguageProvider } from "@/hooks/useLanguage";
 import Home from "./pages/Home";
 import AddRecord from "./pages/AddRecord";
 import ViewRecords from "./pages/ViewRecords";
+import CurrentMonthDue from "./pages/CurrentMonthDue";
+import MissedPayments from "./pages/MissedPayments";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
@@ -33,6 +35,8 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/add-record" element={<AddRecord />} />
             <Route path="/view-records" element={<ViewRecords />} />
+            <Route path="/view-due-policies" element={<CurrentMonthDue />} />
+            <Route path="/view-missed-payments" element={<MissedPayments />} />
             <Route path="/about" element={<About />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/our-plans" element={<OurPlans />} />

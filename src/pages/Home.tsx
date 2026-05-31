@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,17 +8,33 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
+import { dueThisMonth, getRecordsWithoutLastPayment } from "../../services/recordService";
 
 const Home = () => {
+  const [currentMonthTotalDueCount, setCurrentMonthTotalDueCount] = useState(0);
+  const [recordsWithoutLastPayment, setRecordsWithoutLastPayment] = useState(0);
   const navigate = useNavigate();
   const { t } = useLanguage();
   const currentUser = getCurrentUser();
   const authenticated = isAuthenticated();
 
+  const fetchRecords = async () => {
+    try {
+      const userRecords = await dueThisMonth();
+      const recordsWithoutLastPayment = await getRecordsWithoutLastPayment();
+      setCurrentMonthTotalDueCount(userRecords.totalDue);
+      setRecordsWithoutLastPayment(recordsWithoutLastPayment.total);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  };
+
   useEffect(() => {
     if (!authenticated) {
       navigate("/login");
     }
+    fetchRecords();
   }, [authenticated, navigate]);
 
   if (!authenticated || !currentUser) {
@@ -42,7 +58,7 @@ const Home = () => {
           </div>
 
           {/* User Info Card */}
-          <Card className="text-left">
+          {/* <Card className="text-left">
             <CardHeader>
               <CardTitle className="text-form-header">Your Account Information</CardTitle>
             </CardHeader>
@@ -64,11 +80,53 @@ const Home = () => {
                 <p className="text-sm">{currentUser?.mobileNumber}</p>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-lg transition-shadow bg-green-100">
+              <CardHeader>
+                <CardTitle className="text-form-header flex items-center">
+                  <Plus className="w-5 h-5 mr-2" />
+                  {/* Current Month Due {thisMonthDue.totalDue > 0 ? <Badge variant="destructive" className="ml-2">{thisMonthDue.totalDue}</Badge>:''} */}
+                  Current Month Due {<Badge variant="destructive" className="ml-2">{currentMonthTotalDueCount}</Badge>}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  View your current month's due policies and their details
+                </p>
+                <Link to="/view-due-policies">
+                  <Button className="w-full bg-primary hover:bg-primary-light">
+                    View Due Policies
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow bg-red-100">
+              <CardHeader>
+                <CardTitle className="text-form-header flex items-center">
+                  <Eye className="w-5 h-5 mr-2" />
+                  Missing Last Month's Payment {<Badge variant="destructive" className="ml-2">{recordsWithoutLastPayment}</Badge>}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  Check for any policies that missed last month's payment and take action
+                </p>
+                <Link to="/view-missed-payments">
+                  <Button className="w-full bg-primary hover:bg-primary-light">
+                    View Missed Payments
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="hover:shadow-lg transition-shadow bg-blue-100">
               <CardHeader>
                 <CardTitle className="text-form-header flex items-center">
                   <Plus className="w-5 h-5 mr-2" />
@@ -87,11 +145,11 @@ const Home = () => {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-lg transition-shadow bg-yellow-100">
               <CardHeader>
                 <CardTitle className="text-form-header flex items-center">
                   <Eye className="w-5 h-5 mr-2" />
-                  {t('viewRecords')}
+                  {t('viewRecords')}{<Badge variant="destructive" className="ml-2">{currentUser.totalRecords}</Badge>}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -108,7 +166,7 @@ const Home = () => {
           </div>
 
           {/* Statistics */}
-          <Card>
+          <Card className="bg-orange-100">
             <CardHeader>
               <CardTitle className="text-form-header">{t("quickStatistics")}</CardTitle>
             </CardHeader>

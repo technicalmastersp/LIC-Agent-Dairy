@@ -12,8 +12,7 @@ import EditRecordModal from "@/components/EditRecordModal";
 import { Search, Eye, Trash2, ArrowUpDown, Plus, Edit } from "lucide-react";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
-import { useToast } from "@/hooks/use-toast";
-import { getAllRecords, deleteRecord } from "../../services/recordService";
+import { dueThisMonth } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
 
 interface Record {
@@ -50,6 +49,7 @@ interface Record {
   recordId?: string;
 
   currentPolicy : {
+    nextDueDate: string;
     policyNumber: string;
     planAndTerm: string;
     sumAssured: string;
@@ -69,10 +69,9 @@ interface Record {
   createdAt: string;
 }
 
-const ViewRecords = () => {
+const CurrentMonthDue = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { toast } = useToast();
   const currentUser = getCurrentUser();
   const authenticated = isAuthenticated();
   
@@ -84,15 +83,16 @@ const ViewRecords = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<Record | null>(null);
   const [records, setRecords] = useState<Record[]>([]);
+  const [currentMonth, setCurrentMonth] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
 
   // Move this OUT of useEffect, make it a standalone function in the component
   const fetchRecords = async () => {
     try {
       setIsLoading(true);
-      const userRecords = await getAllRecords();
-      setRecords(userRecords);
+      const userRecords = await dueThisMonth();
+      setRecords(userRecords.records);
+      setCurrentMonth(userRecords.month)
     } catch (error) {
       console.error(error);
     } finally {
@@ -107,7 +107,6 @@ const ViewRecords = () => {
     }
     fetchRecords();
   }, []);
-
 
   if (!authenticated || !currentUser) {
     return null;
@@ -152,17 +151,6 @@ const ViewRecords = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteRecord = async (recordId: string) => {
-    const success = await deleteRecord( recordId);
-    if (success) {
-      setRecords(await getAllRecords());
-      toast({
-        title: "Success", 
-        description: "Record deleted successfully",
-      });
-    }
-  };
-
   const handleEditRecord = (record: Record) => {
     setEditingRecord(record);
     setIsEditModalOpen(true);
@@ -193,17 +181,14 @@ const ViewRecords = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-form-header">Policy Records</h1>
+              <h1 className="text-3xl font-bold text-form-header">Current Month Due</h1>
               <p className="text-muted-foreground">
-                Manage and view all life insurance policy records
+                View all policies that have payments due this month and take necessary actions
               </p>
             </div>
-            <Link to="/add-record">
-              <Button className="bg-primary hover:bg-primary-light">
-                <Plus className="w-4 h-4 mr-2" />
-                {t("addNewRecord")}
-              </Button>
-            </Link>
+            <Button className="bg-primary hover:bg-primary-light cursor-default">
+              {currentMonth}
+            </Button>
           </div>
 
           {/* Search and Stats */}
@@ -230,7 +215,7 @@ const ViewRecords = () => {
           {/* Records Table */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">{t("allRecord")}</CardTitle>
+              <CardTitle className="text-form-header">All Due Records</CardTitle>
             </CardHeader>
             <CardContent>
               {filteredAndSortedRecords.length === 0 ? (
@@ -239,19 +224,11 @@ const ViewRecords = () => {
                     {isLoading ? (
                       <span>{t("loadingRecords")}</span>
                     ) : records.length === 0 ? (
-                      <span>No records</span>
+                        <span>{t("duePaymentNoRecordNote")}</span>
                     ) : (
                       <span>No records match your search</span>
                     )}
                   </div>
-                  {records.length === 0 && (
-                    <Link to="/add-record">
-                      <Button>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add First Record
-                      </Button>
-                    </Link>
-                  )}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -260,12 +237,11 @@ const ViewRecords = () => {
                       <TableRow className="bg-table-header">
                         <SortableHeader field="name">Name</SortableHeader>
                         <SortableHeader field="fatherName">Father's Name</SortableHeader>
-                        <SortableHeader field="age">Age</SortableHeader>
-                        {/* <SortableHeader field="occupation">Occupation</SortableHeader> */}
                         <TableHead className="border border-table-border">Policy Number</TableHead>
-                        <TableHead className="border border-table-border">Sum Assured</TableHead>
+                        <TableHead className="border border-table-border">Mode Of Payment</TableHead>
                         <TableHead className="border border-table-border">Branch</TableHead>
-                        <SortableHeader field="createdAt">Created</SortableHeader>
+                        <TableHead className="border border-table-border">Last Payment Date</TableHead>
+                        <TableHead className="border border-table-border">Due Date</TableHead>
                         <TableHead className="border border-table-border">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -279,24 +255,21 @@ const ViewRecords = () => {
                             {record.fatherName}
                           </TableCell>
                           <TableCell className="border border-table-border">
-                            {record.age}
-                          </TableCell>
-                          {/* <TableCell className="border border-table-border">
-                            {record.occupation}
-                          </TableCell> */}
-                          <TableCell className="border border-table-border">
                             <Badge variant="outline" className="font-mono text-xs">
                               {record.currentPolicy.policyNumber || "N/A"}
                             </Badge>
                           </TableCell>
                           <TableCell className="border border-table-border">
-                            ₹{record.currentPolicy.sumAssured || "0"}
+                            {record.currentPolicy.modeOfPayment || "-"}
                           </TableCell>
                           <TableCell className="border border-table-border">
                             {record.currentPolicy.branch || "-"}
                           </TableCell>
                           <TableCell className="border border-table-border text-sm text-muted-foreground">
-                            {convertDateToIndianFormat(record.createdAt)}
+                            {convertDateToIndianFormat(record.currentPolicy.lastPaymentDate)}
+                          </TableCell>
+                          <TableCell className="border border-table-border text-sm text-muted-foreground">
+                            {convertDateToIndianFormat(record.currentPolicy.nextDueDate) || <span className="italic text-red-400">No due date</span>}
                           </TableCell>
                           <TableCell className="border border-table-border">
                             <div className="flex items-center space-x-2">
@@ -309,25 +282,7 @@ const ViewRecords = () => {
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEditRecord(record)}
-                                className="h-8 w-8 p-0"
-                                title="Edit Record"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleDeleteRecord(record.recordId)}
-                                disabled
-                                className="h-8 w-8 p-0 opacity-50 cursor-not-allowed"
-                                title="Delete Record (Disabled)"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                              <Badge variant="destructive" className="ml-2 cursor-pointer" title="Add Payment Details" onClick={() => handleEditRecord(record)}>Pay</Badge>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -364,4 +319,4 @@ const ViewRecords = () => {
   );
 };
 
-export default ViewRecords;
+export default CurrentMonthDue;

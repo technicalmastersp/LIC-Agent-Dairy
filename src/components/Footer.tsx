@@ -17,7 +17,7 @@ interface FooterSectionProps {
 }
 
 const FooterSection = ({ title, links, children }: FooterSectionProps) => (
-  console.log(title),
+  // console.log(title),
   
   <div className={title == "About Company" || title == "कंपनी के बारे में" ? "md:max-w-44" : ""}>
     <h3 className="text-lg font-semibold mb-4 text-accent">{title}</h3>
@@ -48,7 +48,8 @@ const Footer = () => {
         { label: t("home"), to: "/" },
         { label: t("addRecord"), to: "/add-record" },
         { label: t("viewRecords"), to: "/view-records" },
-        { label: t("profile"), to: "/profile" },
+        { label: t("currentMonthDue"), to: "/view-due-policies" },
+        { label: t("missedPayments"), to: "/view-missed-payments" }
       ]
     : [
         { label: t("login"), to: "/login" },
@@ -57,7 +58,7 @@ const Footer = () => {
 
   const otherLinks: FooterLink[] = [
     ...(authenticated
-      ? [{ label: t("currentMonthDue"), to: "/" }]
+      ? [{ label: t("profile"), to: "/profile" }]
       : []),
     { label: t("ourPlans"), to: "/our-plans" },
     { label: t("bestInfoHub"), to: "/lic-info-hub" },

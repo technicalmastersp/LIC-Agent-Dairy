@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,7 @@ import { getCurrentUser } from "@/utils/auth";
 import { Save, Plus, Trash2, User, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { updateRecord } from "../../services/recordService";
+import { convertDateToIndianFormat } from "@/utils/tools";
 
 interface FamilyMember {
   relationship: string;
@@ -272,6 +273,12 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-form-header text-xl">Edit Record</DialogTitle>
+          <DialogDescription>
+            <p>Update invoice details and save changes.</p>
+            <p>* Please ensure all required fields are filled out correctly before saving.</p>
+            <p>* Changes will be reflected immediately in the record list after saving.</p>
+            <p>* Date fields should be in the format MM/DD/YYYY. For example, 03/26/2001.</p>
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -287,7 +294,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     name="date"
                     type="date"
-                    value={formData.date}
+                    value={convertDateToIndianFormat(formData.date, 'input')}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -390,7 +397,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="dateOfBirth" 
                     name="dateOfBirth" 
                     type="date"
-                    value={formData.dateOfBirth}
+                    value={convertDateToIndianFormat(formData.dateOfBirth, 'input')}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -634,7 +641,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="lastChildBirthDate" 
                     name="lastChildBirthDate" 
                     type="date"
-                    value={formData.lastChildBirthDate || ""}
+                    value={convertDateToIndianFormat(formData.lastChildBirthDate, 'input') || ""}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -725,7 +732,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                       <SelectValue placeholder="Select Payment Mode" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Monthly or e-NACH">Monthly or e-NACH</SelectItem>
+                      <SelectItem value="Monthly">Monthly or e-NACH</SelectItem>
                       <SelectItem value="Quarterly">Quarterly</SelectItem>
                       <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
                       <SelectItem value="Yearly">Yearly</SelectItem>
@@ -745,7 +752,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="lastPaymentDate">Last Payment Date</Label>
                   <Input
                     type="date"
-                    value={formData.currentPolicy.lastPaymentDate}
+                    value={convertDateToIndianFormat(formData.currentPolicy.lastPaymentDate, 'input')}
                     onChange={(e) => handlePolicyChange("currentPolicy", "lastPaymentDate", e.target.value)}
                   />
                 </div>
@@ -800,7 +807,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                       <SelectValue placeholder="Select Payment Mode" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Monthly or e-NACH">Monthly or e-NACH</SelectItem>
+                      <SelectItem value="Monthly">Monthly or e-NACH</SelectItem>
                       <SelectItem value="Quarterly">Quarterly</SelectItem>
                       <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
                       <SelectItem value="Yearly">Yearly</SelectItem>
@@ -820,7 +827,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="lastPaymentDate_previousPolicy">Last Payment Date</Label>
                   <Input
                     type="date"
-                    value={formData.previousPolicy.lastPaymentDate}
+                    value={convertDateToIndianFormat(formData.previousPolicy.lastPaymentDate, 'input')}
                     onChange={(e) => handlePolicyChange("previousPolicy", "lastPaymentDate", e.target.value)}
                   />
                 </div>

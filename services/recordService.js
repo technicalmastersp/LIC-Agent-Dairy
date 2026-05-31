@@ -30,6 +30,46 @@ export const getAllRecords = async () => {
   }
 };
 
+export const dueThisMonth = async () => {
+  try {
+    const res = await apiClient.post('/user/dueThisMonth', {page: "all", limit: "all"});
+    if (!res.data || !res.data.records) {
+      return [];
+    } else {
+      let dueThisMonth = localStorage.getItem('dueThisMonth');
+      dueThisMonth = dueThisMonth ? JSON.parse(dueThisMonth) : null;
+      if (dueThisMonth){
+        dueThisMonth.totalRecords = res.data.records.length;
+        localStorage.setItem('dueThisMonth', JSON.stringify(dueThisMonth));
+      }
+    }
+    return res.data;
+  } catch (error) {
+    console.error('Error loading user records:', error);
+    return [];
+  }
+};
+
+export const getRecordsWithoutLastPayment = async () => {
+  try {
+    const res = await apiClient.post('/user/getRecordsWithoutLastPayment', {page: "all", limit: "all"});
+    if (!res.data || !res.data.records) {
+      return [];
+    } else {
+      let getRecordsWithoutLastPayment = localStorage.getItem('getRecordsWithoutLastPayment');
+      getRecordsWithoutLastPayment = getRecordsWithoutLastPayment ? JSON.parse(getRecordsWithoutLastPayment) : null;
+      if (getRecordsWithoutLastPayment){
+        getRecordsWithoutLastPayment.totalRecords = res.data.records.length;
+        localStorage.setItem('getRecordsWithoutLastPayment', JSON.stringify(getRecordsWithoutLastPayment));
+      }
+    }
+    return res.data;
+  } catch (error) {
+    console.error('Error loading user records:', error);
+    return [];
+  }
+};
+
 export const updateRecord = async (formData, recordId) => {
   const res = await apiClient.put(`/user/updatePolicyRecord`, formData, {
     params: {
