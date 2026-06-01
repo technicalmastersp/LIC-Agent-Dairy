@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Save, X, Users, User as UserIcon } from "lucide-react";
+import { Edit, Save, X, KeyRound, Users, User as UserIcon } from "lucide-react";
 import { updateProfile } from "../../services/userService.js";
 import { convertDateToIndianFormat } from "@/utils/tools";
 
@@ -166,7 +166,7 @@ const Profile = () => {
           {/* Profile Information */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* User IDs Card */}
-            <Card className="order-2 lg:order-1 bg-rose-100">
+            <Card className="order-2 lg:order-1 bg-green-100">
               <CardHeader>
                 <CardTitle className="text-form-header flex items-center">
                   <UserIcon className="w-5 h-5 mr-2" />
@@ -175,12 +175,15 @@ const Profile = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">
-                    Auto-generated User ID 
-                  </Label>
-                  <Badge variant="secondary" className="mt-1 font-mono">
-                    {currentUser.id}
-                  </Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-2 bg-red-200 hover:bg-red-300 border-red-400 text-red-800"
+                    onClick={() => navigate("/change-password")}
+                  >
+                    <KeyRound className="w-4 h-4 mr-2" />
+                    Change password
+                  </Button>
                 </div>
                 <div>
                   <Label className="text-base font-medium text-muted-foreground">
@@ -318,7 +321,7 @@ const Profile = () => {
                   {currentUser?.subscription.status === "active" ? (
                     <Badge variant="success" className="mb-2">Active</Badge>
                   ) : (
-                    <Badge variant="destructive" className="mb-2">"Expired"</Badge>
+                    <Badge variant="destructive" className="mb-2">Expired</Badge>
                   )}
                   <p className="text-muted-foreground">Plan Status {currentUser?.subscription.endDate ? `: ${Math.max(0, Math.ceil((new Date(currentUser.subscription.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} Days left` : "No Plan"}</p>
                 </div>

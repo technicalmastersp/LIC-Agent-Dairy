@@ -17,6 +17,8 @@ import OurPlans from "./pages/OurPlans";
 import NotFound from "./pages/NotFound";
 import LicInfoHub from "./pages/LicInfoHub";
 import ReferralProgram from "./pages/ReferralProgram";
+import ForgotPassword from "./pages/ForgotPassword";
+import ChangePassword from "./pages/ChangePassword";
 import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
@@ -42,6 +44,8 @@ const App = () => (
             <Route path="/our-plans" element={<OurPlans />} />
             <Route path="/lic-info-hub" element={<LicInfoHub />} />
             <Route path="/referral-program" element={<ReferralProgram />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/change-password" element={<ChangePassword />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

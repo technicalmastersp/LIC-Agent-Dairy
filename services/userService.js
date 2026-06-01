@@ -47,3 +47,27 @@ export const logoutCurrentUser = () => {
   localStorage.removeItem('currentUser');
   clearToken()
 };
+
+export const forgotPassword = async (data) => {
+  // { email: string }
+  const res = await apiClient.post("/auth/forgot-password", data);
+  return res.data;
+};
+
+export const verifyOTP = async (data) => {
+  // { email: string; otp: string }
+  const res = await apiClient.post("/auth/verify-otp", data);
+  return res.data;
+};
+
+export const resetPassword = async (data) => {
+//  { email: string; otp: string; newPassword: string }
+  const res = await apiClient.post("/auth/reset-password", data);
+  return res.data;
+};
+
+export const changePassword = async (data) => {
+  // { currentPassword: string; newPassword: string }
+  const res = await apiClient.post("/auth/change-password", data);
+  return res.data;
+};
