@@ -205,7 +205,7 @@ export const translations: Record<string, Translations> = {
     recordDetails: "Record Details",
     filteredRecords: "Filtered Records",
     addNewRecord: "Add New Record",
-    allRecord: "All Record",
+    allRecord: "All Records",
     viewAllRecords: "View All Records",
     duePaymentNoRecordNote: "Not a single record has payment due this month! Great job!",
     missedPaymentNoRecordNote: "Great, no records found! All previous payments are up to date.",

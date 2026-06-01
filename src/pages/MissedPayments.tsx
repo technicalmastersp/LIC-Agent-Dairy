@@ -274,7 +274,7 @@ const CurrentMonthDue = () => {
                             </Badge>
                           </TableCell>
                           <TableCell className="border border-table-border">
-                            ₹{record.currentPolicy.modeOfPayment || "-"}
+                            {record.currentPolicy.modeOfPayment || "-"}
                           </TableCell>
                           <TableCell className="border border-table-border">
                             {record.currentPolicy.branch || "-"}

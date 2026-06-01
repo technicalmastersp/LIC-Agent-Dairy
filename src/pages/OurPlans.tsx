@@ -9,6 +9,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { getCurrentUser, updateUserSubscription } from "@/utils/auth";
 import { useToast } from "@/hooks/use-toast";
+import { changePlan } from "../../services/subscriptionService";
 
 interface Plan {
   id: string;
@@ -29,6 +30,20 @@ const OurPlans = () => {
   const currentUser = getCurrentUser();
 
   const plans: Plan[] = [
+    {
+      id: "1month-free",
+      planType: "Free",
+      duration: "1 Month",
+      price: 0,
+      originalPrice: 299,
+      features: [
+        "Only for new users",
+        "Access to all features",
+        "1 month validity",
+        "Email support",
+        "Regular updates"
+      ]
+    },
     {
       id: "6months",
       planType: "Basic",
@@ -51,7 +66,7 @@ const OurPlans = () => {
       popular: true,
       features: [
         "Access to all features",
-        "12 months validity", 
+        "12 months validity",
         "Priority email support",
         "Regular updates",
         "Extended storage"
@@ -74,42 +89,14 @@ const OurPlans = () => {
     }
   ];
 
-  const handleSelectPlan = (planId: string) => {
-    if (!currentUser) {
-      toast({
-        title: "Login Required",
-        description: "Please login to select a plan",
-        variant: "destructive"
-      });
-      navigate("/login");
-      return;
-    }
-
-    const selectedPlanData = plans.find(plan => plan.id === planId);
-    if (selectedPlanData) {
-      const success = updateUserSubscription(currentUser.id, {
-        planId: selectedPlanData.id,
-        planType: selectedPlanData.planType,
-        duration: selectedPlanData.duration,
-        price: selectedPlanData.price,
-        startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + (parseInt(selectedPlanData.duration) * 30 * 24 * 60 * 60 * 1000)).toISOString(),
-        status: "active"
-      });
-
-      if (success) {
-        toast({
-          title: "Plan Selected",
-          description: `Successfully selected ${selectedPlanData.duration} plan for ₹${selectedPlanData.price}`,
-        });
-        navigate("/");
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to update subscription plan",
-          variant: "destructive"
-        });
-      }
+  const handleSelectPlan = async (planId: string) => {
+    if (!currentUser) { navigate("/login"); return; }
+    try {
+      await changePlan(planId);
+      toast({ title: "Plan Activated", description: "Your plan has been updated successfully." });
+      navigate("/");
+    } catch (err: any) {
+      toast({ title: "Error", description: err.response?.data?.message || "Something went wrong.", variant: "destructive" });
     }
   };
 
@@ -121,11 +108,11 @@ const OurPlans = () => {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-primary mb-4">Choose Your Plan</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Select the perfect plan for your needs. All plans include full access to our features.
+            Choose the plan that fits your needs. Upgrade or downgrade anytime.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {plans.map((plan) => (
             <Card 
               key={plan.id} 
@@ -186,7 +173,7 @@ const OurPlans = () => {
                   <Button
                     className="w-full"
                     variant={plan.popular ? "default" : "outline"}
-                    // onClick={() => handleSelectPlan(plan.id)}
+                    onClick={() => handleSelectPlan(plan.id)}
                   >
                     Select Plan
                   </Button>
