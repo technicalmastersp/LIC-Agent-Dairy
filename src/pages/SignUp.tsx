@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { UserPlus } from "lucide-react";
+import { UserPlus, EyeOff, Eye } from "lucide-react";
 import { User } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
@@ -30,16 +30,18 @@ const SignUp = () => {
   const [error, setError] = useState("");
   const [generatedIds, setGeneratedIds] = useState<{autoId: string, easyId: string} | null>(null);
   const [isValidReferralCode, setIsValidReferralCode] = useState(false);
+  const [showNew, setShowNew]     = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { toast } = useToast();
 
   const plans = [
-    { id: '1month-free', name: '1 Month Free Plan', price: 0, originalPrice: 299 },
-    { id: '6months', name: '6 Months Plan', price: 599, originalPrice: 899 },
-    { id: '12months', name: '12 Months Plan', price: 1099, originalPrice: 1599 },
-    { id: '24months', name: '24 Months Plan', price: 2099, originalPrice: 2999 }
+    { id: '1month-free', planType: "Free", name: '1 Month Free Plan', price: 0, originalPrice: 299 },
+    { id: '6months', planType: "Basic", name: '6 Months Plan', price: 599, originalPrice: 899 },
+    { id: '12months', planType: "Standard", name: '12 Months Plan', price: 1099, originalPrice: 1599 },
+    { id: '24months', planType: "Premium", name: '24 Months Plan', price: 2099, originalPrice: 2999 }
   ];
 
   /* const validateReferralCode = (code: string): boolean => {
@@ -266,28 +268,40 @@ const SignUp = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="password">{t('password')} <span className="text-[#ff0000]">*</span></Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder={t('password')}
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showNew ? "text" : "password"}
+                      placeholder={t('password')}
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <button type="button" onClick={() => setShowNew(!showNew)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">{t('confirmPassword')} <span className="text-[#ff0000]">*</span></Label>
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder={t('confirmPassword')}
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirm ? "text" : "password"}
+                      placeholder={t('confirmPassword')}
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <button type="button" onClick={() => setShowConfirm(!showConfirm)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 

@@ -16,6 +16,8 @@ export interface User {
   referralCode?: string;
   referredBy?: string;
   totalRecords?: number;
+  isEmailVerified?: boolean;
+  emailVerificationToken?: string;
 }
 
 export interface UserSubscription {
