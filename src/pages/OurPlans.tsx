@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +28,9 @@ const OurPlans = () => {
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   
   const currentUser = getCurrentUser();
+
+  const [searchParams] = useSearchParams();
+  const reason = searchParams.get("reason");
 
   const plans: Plan[] = [
     {
@@ -103,7 +106,18 @@ const OurPlans = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
+      {reason === "expired" && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-center py-3 px-4 rounded-lg mb-6">
+          ⚠️ Your subscription has expired. Please renew to continue.
+        </div>
+      )}
+      {reason === "no-plan" && (
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 text-center py-3 px-4 rounded-lg mb-6">
+          👋 Please choose a plan to get started.
+        </div>
+      )}
+
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-primary mb-4">Choose Your Plan</h1>
@@ -193,6 +207,169 @@ const OurPlans = () => {
       <Footer />
     </div>
   );
+
+
+  
+  // return (
+  //   <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+  //     <Navigation />
+
+  //     <main className="container mx-auto px-4 py-12">
+  //       {/* Header */}
+  //       <div className="text-center mb-14">
+  //         <span className="inline-block bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4 tracking-wide uppercase">
+  //           Pricing Plans
+  //         </span>
+  //         <h1 className="text-5xl font-extrabold text-gray-900 mb-4">
+  //           Simple, Transparent Pricing
+  //         </h1>
+  //         <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+  //           Choose the plan that fits your needs. Upgrade or downgrade anytime.
+  //         </p>
+  //       </div>
+
+  //       {/* Cards Grid — 2 cols on md, 4 on xl */}
+  //       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto items-start">
+  //         {plans.map((plan) => {
+  //           const isActive =
+  //             currentUser?.subscription?.planId === plan.id &&
+  //             currentUser?.subscription?.status === "active";
+
+  //           const isFree = plan.id === "1month-free";
+  //           const isPopular = plan.popular;
+
+  //           // Per-plan color themes
+  //           const theme = isFree
+  //             ? {
+  //                 badge: "bg-emerald-100 text-emerald-700 border border-emerald-200",
+  //                 headerBg: "bg-gradient-to-br from-emerald-500 to-teal-600",
+  //                 accent: "text-emerald-600",
+  //                 checkColor: "text-emerald-500",
+  //                 button: "bg-emerald-500 hover:bg-emerald-600 text-white",
+  //                 saveBadge: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+  //                 card: "border-emerald-200 shadow-emerald-100",
+  //               }
+  //             : isPopular
+  //             ? {
+  //                 badge: "bg-blue-600 text-white",
+  //                 headerBg: "bg-gradient-to-br from-blue-600 to-indigo-700",
+  //                 accent: "text-blue-600",
+  //                 checkColor: "text-blue-500",
+  //                 button: "bg-blue-600 hover:bg-blue-700 text-white",
+  //                 saveBadge: "bg-blue-50 text-blue-700 border border-blue-200",
+  //                 card: "border-blue-400 shadow-blue-100 scale-105",
+  //               }
+  //             : plan.id === "6months"
+  //             ? {
+  //                 badge: "bg-violet-100 text-violet-700 border border-violet-200",
+  //                 headerBg: "bg-gradient-to-br from-violet-500 to-purple-600",
+  //                 accent: "text-violet-600",
+  //                 checkColor: "text-violet-500",
+  //                 button: "border border-violet-400 text-violet-700 hover:bg-violet-50",
+  //                 saveBadge: "bg-violet-50 text-violet-700 border border-violet-200",
+  //                 card: "border-violet-200 shadow-violet-100",
+  //               }
+  //             : {
+  //                 badge: "bg-amber-100 text-amber-700 border border-amber-200",
+  //                 headerBg: "bg-gradient-to-br from-amber-500 to-orange-600",
+  //                 accent: "text-amber-600",
+  //                 checkColor: "text-amber-500",
+  //                 button: "border border-amber-400 text-amber-700 hover:bg-amber-50",
+  //                 saveBadge: "bg-amber-50 text-amber-700 border border-amber-200",
+  //                 card: "border-amber-200 shadow-amber-100",
+  //               };
+
+  //           return (
+  //             <div
+  //               key={plan.id}
+  //               className={`relative rounded-2xl border-2 bg-white shadow-lg transition-transform hover:-translate-y-1 hover:shadow-xl ${theme.card}`}
+  //             >
+  //               {/* Popular badge */}
+  //               {isPopular && (
+  //                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+  //                   <span className={`text-xs font-bold px-4 py-1.5 rounded-full shadow ${theme.badge}`}>
+  //                     ⭐ Most Popular
+  //                   </span>
+  //                 </div>
+  //               )}
+
+  //               {/* Free badge */}
+  //               {isFree && (
+  //                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+  //                   <span className={`text-xs font-bold px-4 py-1.5 rounded-full shadow ${theme.badge}`}>
+  //                     🎁 Free Trial
+  //                   </span>
+  //                 </div>
+  //               )}
+
+  //               {/* Coloured header strip */}
+  //               <div className={`${theme.headerBg} rounded-t-xl px-6 pt-8 pb-6 text-center text-white`}>
+  //                 <p className="text-sm font-semibold uppercase tracking-widest opacity-80 mb-1">
+  //                   {plan.planType}
+  //                 </p>
+  //                 <p className="text-lg font-medium opacity-90">{plan.duration}</p>
+  //                 <div className="mt-3 flex items-end justify-center gap-2">
+  //                   <span className="text-4xl font-extrabold">
+  //                     {plan.price === 0 ? "Free" : `₹${plan.price}`}
+  //                   </span>
+  //                   {plan.originalPrice && plan.price > 0 && (
+  //                     <span className="text-base line-through opacity-60 mb-1">
+  //                       ₹{plan.originalPrice}
+  //                     </span>
+  //                   )}
+  //                 </div>
+  //                 {plan.originalPrice && (
+  //                   <span className={`inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full ${theme.saveBadge}`}>
+  //                     {plan.price === 0
+  //                       ? `Worth ₹${plan.originalPrice} — Free!`
+  //                       : `Save ₹${plan.originalPrice - plan.price}`}
+  //                   </span>
+  //                 )}
+  //               </div>
+
+  //               {/* Features */}
+  //               <div className="px-6 py-5">
+  //                 <ul className="space-y-3">
+  //                   {plan.features.map((feature, i) => (
+  //                     <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+  //                       <Check className={`h-4 w-4 mt-0.5 shrink-0 ${theme.checkColor}`} />
+  //                       {feature}
+  //                     </li>
+  //                   ))}
+  //                 </ul>
+  //               </div>
+
+  //               {/* CTA */}
+  //               <div className="px-6 pb-6">
+  //                 {isActive ? (
+  //                   <button
+  //                     disabled
+  //                     className="w-full py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-2"
+  //                   >
+  //                     <Check className="h-4 w-4" /> Active Plan
+  //                   </button>
+  //                 ) : (
+  //                   <button
+  //                     onClick={() => handleSelectPlan(plan.id)}
+  //                     className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-colors ${theme.button}`}
+  //                   >
+  //                     {isFree ? "Start Free Trial" : "Get Started"}
+  //                   </button>
+  //                 )}
+  //               </div>
+  //             </div>
+  //           );
+  //         })}
+  //       </div>
+
+  //       <p className="text-center text-xs text-gray-400 mt-10">
+  //         All prices are in Indian Rupees (INR) · Plans auto-renew unless cancelled · Free plan is one-time per account
+  //       </p>
+  //     </main>
+
+  //     <Footer />
+  //   </div>
+  // );
 };
 
 export default OurPlans;
