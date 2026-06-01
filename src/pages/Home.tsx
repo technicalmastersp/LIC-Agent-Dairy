@@ -182,10 +182,12 @@ const Home = () => {
                   <p className="text-muted-foreground">{t("totalRecords")}</p>
                 </div>
                 <div onClick={()=>navigate("/profile")} style={{ cursor: 'pointer' }}>
-                  <p className="text-3xl font-bold text-primary">
-                    {currentUser ? Math.floor((Date.now() - new Date(currentUser.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 0}
-                  </p>
-                  <p className="text-muted-foreground">{t("daysActive")}</p>
+                  {currentUser?.subscription.status === "active" ? (
+                    <Badge variant="success" className="mb-2">Active</Badge>
+                  ) : (
+                    <Badge variant="destructive" className="mb-2">"Expired"</Badge>
+                  )}
+                  <p className="text-muted-foreground">Plan Status {currentUser?.subscription.endDate ? `: ${Math.max(0, Math.ceil((new Date(currentUser.subscription.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} Days left` : "No Plan"}</p>
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-primary">100%</p>
