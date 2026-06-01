@@ -22,9 +22,11 @@ const Home = () => {
   const fetchRecords = async () => {
     try {
       const user = await getProfile();
-      setCurrentUser(user); 
       const userRecords = await dueThisMonth();
       const recordsWithoutLastPayment = await getRecordsWithoutLastPayment();
+      
+      setCurrentUser(user); 
+      currentUser = getCurrentUser();
       setCurrentMonthTotalDueCount(userRecords.totalDue);
       setRecordsWithoutLastPayment(recordsWithoutLastPayment.total);
     } catch (error) {
@@ -185,7 +187,7 @@ const Home = () => {
                   {currentUser?.subscription.status === "active" ? (
                     <Badge variant="success" className="mb-2">Active</Badge>
                   ) : (
-                    <Badge variant="destructive" className="mb-2">"Expired"</Badge>
+                    <Badge variant="destructive" className="mb-2">Expired</Badge>
                   )}
                   <p className="text-muted-foreground">Plan Status {currentUser?.subscription.endDate ? `: ${Math.max(0, Math.ceil((new Date(currentUser.subscription.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} Days left` : "No Plan"}</p>
                 </div>

@@ -5,8 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { LogIn, User } from "lucide-react";
-// import { validateLogin, setCurrentUser, initializeTestUser } from "@/utils/auth";
+import { LogIn, EyeOff, Eye, User } from "lucide-react";
 import { setCurrentUser } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +15,7 @@ import { login, getProfile } from "../../services/userService";
 const Login = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [showCur, setShowCur] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   
@@ -24,11 +24,6 @@ const Login = () => {
   const { toast } = useToast();
 
   const userNamelocaStorage = localStorage.getItem('userName')
-
-  // Initialize test user on component mount
-  // useState(() => {
-  //   initializeTestUser();
-  // });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +52,13 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  const EyeToggle = ({ show, onToggle }: { show: boolean; onToggle: () => void }) => (
+    <button type="button" onClick={onToggle}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+      {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+    </button>
+  );
 
   return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
@@ -92,14 +94,17 @@ const Login = () => {
               
               <div className="space-y-2">
                 <Label htmlFor="password">{t('password')}</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder={t('password')}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showCur ? "text" : "password"}
+                    placeholder={t('password')}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <EyeToggle show={showCur} onToggle={() => setShowCur(!showCur)} />
+                </div>
               </div>
 
               {error && (
@@ -118,6 +123,11 @@ const Login = () => {
                 {t('dontHaveAccount')}{" "}
                 <Link to="/signup" className="text-primary hover:underline">
                   {t('signup')}
+                </Link>
+              </p>
+              <p className="text-sm text-muted-foreground py-1">
+                <Link to="/forgot-password" className="text-primary hover:underline">
+                  Forgot password?
                 </Link>
               </p>
               <p className="text-sm text-muted-foreground">
