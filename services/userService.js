@@ -71,3 +71,33 @@ export const changePassword = async (data) => {
   const res = await apiClient.post("/auth/change-password", data);
   return res.data;
 };
+
+export const verifyEmail = async (token) => {
+  let status;
+  try {
+    const res = await apiClient.get(`/auth/verify-email?token=${token}`);
+    const code = res.data.code;
+    if (code === "VERIFIED")          status="success";
+    else if (code === "ALREADY_VERIFIED") status="already";
+    else status="invalid";
+    return { status, message: res.data.message };
+  } catch (error) {
+    const code = error.response?.data?.code;
+    if (code === "TOKEN_EXPIRED") status="expired";
+    else status = "invalid";
+    return { status, message: error.response?.data?.message || "An error occurred" };
+  }
+};
+
+export const resendVerification = async (email) => {
+  let resendMsg = "";
+  let isResendng = true;
+  try {
+    await apiClient.post("/auth/resend-verification", { email });
+    resendMsg="Verification link sent! Please check your inbox or spam folder.";
+  } catch (err) {
+    resendMsg = err.response?.data?.message || "Something went wrong.";
+  } finally { isResendng = false; }
+  return { resendMsg, isResendng };
+};
+

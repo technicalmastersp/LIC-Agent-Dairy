@@ -266,16 +266,32 @@ const Profile = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">{t('email')}</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      disabled={!isEditing}
-                      className={!isEditing ? "bg-muted" : ""}
-                    />
+                    <Label htmlFor="email">{t('email')}</Label>{currentUser.isEmailVerified ? (
+                      <Badge variant="success" className="ml-2">Verified</Badge>
+                    ) : (
+                      <Badge variant="destructive" className="ml-2">Not Verified</Badge>
+                    )}
+                    <div className="relative">
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                        className={!isEditing ? "bg-muted" : ""}
+                      />
+                      {!currentUser.isEmailVerified && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="absolute right-1 top-1 bg-red-100 hover:bg-red-200 border-red-300 text-red-800"
+                          onClick={() => navigate("/verify-email")}
+                        >
+                          Verify Now
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
 
