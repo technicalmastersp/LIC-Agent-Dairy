@@ -91,10 +91,12 @@ const CurrentMonthDue = () => {
     try {
       setIsLoading(true);
       const userRecords = await dueThisMonth();
-      setRecords(userRecords.records);
+      setRecords(userRecords.records ?? []); // ← fallback to empty array
       setCurrentMonth(userRecords.month)
     } catch (error) {
       console.error(error);
+      setRecords([]);      // ← set empty array on error so .filter() never crashes
+      setCurrentMonth("");
     } finally {
       setIsLoading(false);
     }
@@ -113,11 +115,14 @@ const CurrentMonthDue = () => {
   }
 
   const filteredAndSortedRecords = useMemo(() => {
+    if (!records || records.length === 0) return []; // ← guard against undefined/empty
+    
     let filtered = records.filter(record =>
       record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.fatherName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.occupation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.currentPolicy.policyNumber.toLowerCase().includes(searchTerm.toLowerCase())
+      record.currentPolicy.policyNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.currentPolicy.modeOfPayment.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return filtered.sort((a, b) => {

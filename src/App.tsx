@@ -21,6 +21,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ChangePassword from "./pages/ChangePassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import ScrollToTop from "./components/ScrollToTop";
+import GlobalToastListener from "./components/GlobalToastListener";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
       <LanguageProvider>
         <Toaster />
         <Sonner />
+        <GlobalToastListener />
         <BrowserRouter>
           <ScrollToTop />
           <Routes>

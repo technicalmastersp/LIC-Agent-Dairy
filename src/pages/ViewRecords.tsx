@@ -92,9 +92,10 @@ const ViewRecords = () => {
     try {
       setIsLoading(true);
       const userRecords = await getAllRecords();
-      setRecords(userRecords);
+      setRecords(userRecords ?? []); // ← set empty array if undefined
     } catch (error) {
       console.error(error);
+      setRecords([]);      // ← set empty array on error so .filter() never crashes
     } finally {
       setIsLoading(false);
     }
@@ -114,11 +115,14 @@ const ViewRecords = () => {
   }
 
   const filteredAndSortedRecords = useMemo(() => {
+    if (!records || records.length === 0) return []; // ← guard against undefined/empty
+
     let filtered = records.filter(record =>
       record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.fatherName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.occupation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.currentPolicy.policyNumber.toLowerCase().includes(searchTerm.toLowerCase())
+      record.currentPolicy.policyNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.currentPolicy.modeOfPayment.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return filtered.sort((a, b) => {
