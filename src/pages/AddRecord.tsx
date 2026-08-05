@@ -192,21 +192,21 @@ const AddRecord = () => {
       previousPolicy,
     };
 
-    const success = createRecord(record);
-
-    if (success) {
+    const success = createRecord(record).then((success)=> {
       toast({
         title: "Success",
         description: "Record saved successfully",
       });
       navigate("/view-records");
-    } else {
-      toast({
-        title: "Error",
-        description: "Failed to save record",
-        variant: "destructive",
-      });
-    }
+    }).then( (error) => {
+      if (error !== null && error !== undefined) {
+        toast({
+          title: "Error",
+          description: "Failed to save record",
+          variant: "destructive",
+        });
+      }
+    });
   };
 
   return (
