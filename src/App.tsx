@@ -22,6 +22,12 @@ import ChangePassword from "./pages/ChangePassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import ScrollToTop from "./components/ScrollToTop";
 import GlobalToastListener from "./components/GlobalToastListener";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminUserDetail from "./pages/admin/AdminUserDetail";
+import AdminAdmins from "./pages/admin/AdminAdmins";
+import WithdrawalRequests from "./pages/admin/WithdrawalRequests";
+import AdminLogs from "./pages/admin/AdminLogs";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +56,14 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
+
+            <Route path="/admin"                  element={<AdminDashboard />} />
+            <Route path="/admin/users"            element={<AdminUsers />} />
+            <Route path="/admin/users/:userId"    element={<AdminUserDetail />} />
+            <Route path="/admin/admins"           element={<AdminAdmins />} />
+            <Route path="/admin/withdrawals"      element={<WithdrawalRequests />} />
+            <Route path="/admin/logs"             element={<AdminLogs />} />
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

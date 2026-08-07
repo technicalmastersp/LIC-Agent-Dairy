@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { UserPlus, EyeOff, Eye } from "lucide-react";
+import { UserPlus, EyeOff, Eye, Check } from "lucide-react";
 import { User } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +13,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { createUser, checkReferralCode } from "../../services/userService";
+import { getReferralConfig } from "../../services/configService";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -32,6 +33,11 @@ const SignUp = () => {
   const [isValidReferralCode, setIsValidReferralCode] = useState(false);
   const [showNew, setShowNew]     = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [referralConfig, setReferralConfig] = useState({
+    SIGNUP_DISCOUNT_AMOUNT: 100,
+    L1_COMMISSION_PCT:      5,
+    L2_COMMISSION_PCT:      2,
+  });
   
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -43,6 +49,10 @@ const SignUp = () => {
     { id: '12months', planType: "Standard", name: '12 Months Plan', price: 1099, originalPrice: 1599 },
     { id: '24months', planType: "Premium", name: '24 Months Plan', price: 2099, originalPrice: 2999 }
   ];
+
+  useEffect(() => {
+    getReferralConfig().then(setReferralConfig).catch(() => {});
+  }, []);
 
   /* const validateReferralCode = (code: string): boolean => {
     if (!code) return false;
@@ -91,7 +101,7 @@ const SignUp = () => {
     const selectedPlan = getSelectedPlan();
     if (!selectedPlan) return 0;
     
-    const discount = isValidReferralCode && formData.referralCode ? 100 : 0;
+    const discount = isValidReferralCode && formData.referralCode ? referralConfig.SIGNUP_DISCOUNT_AMOUNT : 0;
     return Math.max(0, selectedPlan.price - discount);
   };
 
@@ -340,14 +350,15 @@ const SignUp = () => {
                       id="referralCode"
                       name="referralCode"
                       type="text"
-                      placeholder={t('ReferralCode')+' ('+t('Optional')+')'}
+                      placeholder={t('ReferralCode') + ' (' + t('Optional') + ')'}
                       value={formData.referralCode}
                       onChange={(e) => {
                         const value = e.target.value.toUpperCase();
                         setFormData({ ...formData, referralCode: value });
-                        setIsValidReferralCode(false); // Reset validation when typing
+                        setIsValidReferralCode(false);
                       }}
                       className="flex-1"
+                      disabled={isValidReferralCode}
                     />
                     <Button
                       type="button"
@@ -356,8 +367,12 @@ const SignUp = () => {
                       onClick={async () => {
                         const isValid = await checkReferralCode(formData.referralCode);
                         setIsValidReferralCode(isValid);
+
                         if (isValid) {
-                          const pendingReferral = JSON.parse(localStorage.getItem('pendingReferral') || '{}');
+                          const pendingReferral = JSON.parse(
+                            localStorage.getItem("pendingReferral") || "{}"
+                          );
+
                           toast({
                             title: "Referral Code Validated!",
                             description: `Valid referral from ${pendingReferral.referrerName}. You'll receive ₹100 discount!`,
@@ -366,14 +381,25 @@ const SignUp = () => {
                           toast({
                             title: "Invalid Referral Code",
                             description: "Please check your referral code and try again.",
-                            variant: "destructive"
+                            variant: "destructive",
                           });
                         }
                       }}
-                      disabled={!formData.referralCode}
-                      className="whitespace-nowrap"
+                      disabled={!formData.referralCode || isValidReferralCode}
+                      className={`whitespace-nowrap transition-colors ${
+                        isValidReferralCode
+                          ? "bg-green-100 text-green-700 border-green-500 hover:bg-green-100"
+                          : ""
+                      }`}
                     >
-                      {t('validate')}
+                      {isValidReferralCode ? (
+                        <span className="flex items-center gap-1">
+                          Validated
+                          <Check className="h-4 w-4" />
+                        </span>
+                      ) : (
+                        t("validate")
+                      )}
                     </Button>
                   </div>
                   {formData.referralCode && !isValidReferralCode && (
@@ -414,7 +440,7 @@ const SignUp = () => {
                         {!isValidReferralCode && !formData.referralCode && (
                           <div className="bg-accent/90 border border-accent/60 rounded-lg p-3">
                             <p className="text-sm text-foreground/80 flex items-center gap-2">
-                              💡 <span><strong>Pro Tip:</strong> Enter a valid referral code to get an instant ₹100 discount!</span>
+                              💡 <span><strong>Pro Tip:</strong> Enter a valid referral code to get an instant ₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} discount!</span>
                             </p>
                           </div>
                         )}
@@ -423,7 +449,7 @@ const SignUp = () => {
                           <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
                             <div className="flex justify-between items-center mb-2">
                               <span className="text-sm font-medium text-green-800 dark:text-green-300">Referral Discount:</span>
-                              <span className="font-semibold text-green-800 dark:text-green-300">-₹100</span>
+                              <span className="font-semibold text-green-800 dark:text-green-300">-₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT}</span>
                             </div>
                             <p className="text-xs text-green-700 dark:text-green-400 flex items-center gap-1">
                               🎉 <span>Congratulations! You've received ₹100 discount with referral code: <strong>{formData.referralCode}</strong></span>
@@ -468,6 +494,27 @@ const SignUp = () => {
                   </CardContent>
                 </Card>
               )} */}
+
+              <div
+                className={`rounded-lg border p-3 text-sm ${
+                  isValidReferralCode
+                    ? "border-green-300 bg-green-50 text-green-700"
+                    : "border-blue-200 bg-blue-50 text-blue-700"
+                }`}
+              >
+                {isValidReferralCode ? (
+                  <p>
+                    🎉 <strong>Congratulations!</strong> You got a{" "}
+                    <strong>₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} discount</strong>. Pick any paid subscription plan to
+                    receive your discount.
+                  </p>
+                ) : (
+                  <p>
+                    💰 Enter a valid <strong>Referral Code</strong> and get an instant{" "}
+                    <strong>₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} discount</strong> on any paid subscription plan.
+                  </p>
+                )}
+              </div>
 
               {error && (
                 <Alert variant="destructive">

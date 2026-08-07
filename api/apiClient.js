@@ -39,6 +39,15 @@ apiClient.interceptors.response.use(
 
     // 401 — unauthorized / session expired
     if (status === 401) {
+      const code = error.response?.data?.code;
+
+      if (code === "SESSION_INVALIDATED") {
+        // Clear everything and redirect with a message
+        localStorage.clear();
+        window.location.href = "/login?reason=session_ended";
+        return Promise.reject(error);
+      }
+      
       toastEmitter.emit({
         title:       "Session Expired",
         description: "Please login again.",

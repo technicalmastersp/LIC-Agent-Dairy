@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +22,9 @@ const Login = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { toast } = useToast();
+
+  const [searchParams] = useSearchParams();
+  const reason = searchParams.get("reason");
 
   const userNamelocaStorage = localStorage.getItem('userName')
 
@@ -78,6 +81,11 @@ const Login = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {reason === "session_ended" && (
+              <div className="bg-orange-50 border border-orange-200 text-orange-700 text-sm rounded-lg px-4 py-3 text-center">
+                Your session was ended by an administrator. Please login again.
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="userId">{t('userId')}</Label>

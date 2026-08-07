@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Plus, Table, LogOut, User, Menu } from "lucide-react";
+import { Home, Plus, Table, LogOut, User, Menu, UserRoundCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -15,6 +15,11 @@ const getNavItems = (t) => [
   { to: "/", label: t("home"), icon: Home, auth: true },
   { to: "/add-record", label: t("addRecord"), icon: Plus, auth: true },
   { to: "/view-records", label: t("viewRecords"), icon: Table, auth: true },
+];
+
+// ------------------ AUTH UTILS ------------------
+const getAdminNavItems = (t) => [
+  { to: "/admin", label: t("Admin Panel"), icon: UserRoundCog, auth: true }
 ];
 
 /* ------------------ NAV ITEM ------------------ */
@@ -61,6 +66,8 @@ const Navigation = () => {
 
   const navItems = getNavItems(t);
 
+  const adminNavItems = getAdminNavItems(t);
+
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
   const handleLogout = async () => {
@@ -95,11 +102,15 @@ const Navigation = () => {
 
           {/* DESKTOP MENU */}
           <div className="hidden md:flex items-center space-x-4">
-            {authenticated &&
+            {authenticated && currentUser?.role === 'user' &&
               navItems.map((item) => (
                 <NavItem key={item.to} {...item} />
               ))}
-
+            
+            {authenticated && (currentUser?.role === 'admin' || currentUser?.role === 'superadmin' ) &&
+              [...navItems, ...adminNavItems].map((item) => (
+                <NavItem key={item.to} {...item} />
+              ))}
             <LanguageSwitcher />
 
             {authenticated ? (
