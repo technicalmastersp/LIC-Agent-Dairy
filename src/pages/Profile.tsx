@@ -21,7 +21,7 @@ const Profile = () => {
   const { toast } = useToast();
   const currentUser = getCurrentUser();
   const authenticated = isAuthenticated();
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [isReferral, setIsReferral] = useState(false);
   const [formData, setFormData] = useState({
@@ -36,7 +36,7 @@ const Profile = () => {
       navigate("/login");
       return;
     }
-    
+
     // Initialize form with current user data
     setFormData({
       name: currentUser.name,
@@ -63,7 +63,7 @@ const Profile = () => {
     try {
       const updatedUser = await updateProfile(formData);
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      
+
       setIsEditing(false);
       toast({
         title: "Success",
@@ -91,74 +91,47 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
       <Navigation />
-      
+
       <main className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-4xl mx-auto space-y-6">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-form-header">{formData.name}</h1>
-              <p className="text-muted-foreground">
-                View and update your profile information
-              </p>
+
+          {/* ── Top header ── */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              {/* Avatar initials */}
+              <div className="w-16 h-16 rounded-full bg-blue-100 border-2 border-blue-300 flex items-center justify-center text-blue-700 text-xl font-medium shrink-0">
+                {formData.name?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+              </div>
+              <div>
+                <h1 className="text-2xl font-medium text-form-header leading-tight">{formData.name}</h1>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Policy Agent ·{" "}
+                  <span className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5">
+                    {currentUser.easyId}
+                  </span>
+                </p>
+              </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              {/* {!isReferral ? (
-                <Button 
-                  onClick={() => setIsReferral(true)}
-                  className="bg-primary hover:bg-primary-light"
-                  disabled={true}
-                >
-                  <Users className="w-4 h-4 mr-2" />
-                  Refferal Program
-                </Button>
-              ) : (
-                <div className="flex space-x-2">
-                  <Button 
-                    // onClick={handleSave}
-                    onClick={() => setIsReferral(false)}
-                    className="bg-primary hover:bg-primary-light"
-                  >
-                    <X className="w-4 h-4 mr-2" />
-                    Close
-                  </Button>
-                </div>
-              )} */}
-              <Button
-                asChild
-                className="bg-primary hover:bg-primary-light"
-              >
+            <div className="flex flex-wrap gap-2">
+              <Button asChild size="sm">
                 <Link to="/referral-program">
-                <span>Referral Program</span>
-              </Link>
+                  <Users className="w-4 h-4 mr-1.5" /> Referral program
+                </Link>
               </Button>
-
               {!isEditing ? (
-                <Button 
-                  onClick={() => setIsEditing(true)}
-                  className="bg-primary hover:bg-primary-light"
-                >
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit Profile
+                <Button size="sm" onClick={() => setIsEditing(true)}>
+                  <Edit className="w-4 h-4 mr-1.5" /> Edit profile
                 </Button>
               ) : (
-                <div className="flex space-x-2">
-                  <Button 
-                    onClick={handleSave}
-                    className="bg-primary hover:bg-primary-light"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Changes
+                <>
+                  <Button size="sm" onClick={handleSave}>
+                    <Save className="w-4 h-4 mr-1.5" /> Save changes
                   </Button>
-                  <Button 
-                    onClick={handleCancel}
-                    variant="outline"
-                  >
-                    <X className="w-4 h-4 mr-2" />
-                    Cancel
+                  <Button size="sm" variant="outline" onClick={handleCancel}>
+                    <X className="w-4 h-4 mr-1.5" /> Cancel
                   </Button>
-                </div>
+                </>
               )}
             </div>
           </div>
@@ -168,68 +141,59 @@ const Profile = () => {
             {/* User IDs Card */}
             <Card className="order-2 lg:order-1 bg-green-100">
               <CardHeader>
-                <CardTitle className="text-form-header flex items-center">
+                <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
                   <UserIcon className="w-5 h-5 mr-2" />
-                  User Identifiers
+                  Account
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {[
+                  {
+                    label: "Status",
+                    value: currentUser?.subscription?.status === "active"
+                      ? <Badge className="bg-green-500 text-white border border-green-200">Active</Badge>
+                      : <Badge variant="destructive">Expired</Badge>
+                  },
+                  { label: "Plan", value: `${currentUser.subscription?.duration} — ₹${currentUser.subscription?.price}` },
+                  { label: "Expires", value: convertDateToIndianFormat(currentUser.subscription?.endDate) },
+                  {
+                    label: "Days left",
+                    value: (
+                      <Badge className="bg-blue-100 text-blue-700 border border-blue-200">
+                        {Math.max(0, Math.ceil(
+                          (new Date(currentUser.subscription?.endDate).getTime() - Date.now()) / 86400000
+                        ))} days
+                      </Badge>
+                    )
+                  },
+                  {
+                    label: "Referral code",
+                    value: <span className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5">{currentUser.referralCode || "N/A"}</span>
+                  },
+                  { label: "Member since", value: convertDateToIndianFormat(currentUser.createdAt) },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-center justify-between py-0.5">
+                    <span className="text-sm text-muted-foreground">{label}</span>
+                    <span className="text-sm font-medium">{value}</span>
+                  </div>
+                ))}
+
+                {/* Upgrade nudge */}
+                <div
+                  onClick={() => navigate("/our-plans")}
+                  className="mt-3 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-3 py-2.5 cursor-pointer hover:bg-blue-100 transition-colors"
+                >
+                  <span className="text-xs font-medium text-blue-700">Upgrade your plan</span>
+                  <span className="text-xs text-muted-foreground">See plans →</span>
+                </div>
                 <div>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full mt-2 bg-red-200 hover:bg-red-300 border-red-400 text-red-800"
+                    variant="outline" size="sm"
+                    className="w-full bg-red-50 hover:bg-red-100 border-red-200 text-red-700"
                     onClick={() => navigate("/change-password")}
                   >
-                    <KeyRound className="w-4 h-4 mr-2" />
-                    Change password
+                    <KeyRound className="w-4 h-4 mr-1.5" /> Change password
                   </Button>
-                </div>
-                <div>
-                  <Label className="text-base font-medium text-muted-foreground">
-                    Easy-to-remember User ID
-                  </Label>
-                  <Badge variant="outline" className="mt-1 font-mono">
-                    {currentUser.easyId}
-                  </Badge>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground">
-                    Account Created
-                  </Label>
-                  <p className="text-sm">
-                    {convertDateToIndianFormat(currentUser.createdAt)}
-                  </p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground">
-                    Current Plan
-                  </Label>
-                  {currentUser.subscription ? (
-                    <p className="text-sm">
-                      {currentUser.subscription.duration} — ₹{currentUser.subscription.price} ({currentUser.subscription.status})
-                    </p>
-                  ) : (
-                    <Badge variant="secondary" className="mt-1">No active plan</Badge>
-                  )}
-                </div>
-                {currentUser.subscription && (
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
-                      Plan Ends On <button onClick={()=>navigate("/our-plans")} type="button" className="ml-2 px-2 border rounded-sm text-xs hover:bg-indigo-50 active:bg-green-300 border-indigo-600 text-indigo-600">Upgrade your plan</button>
-                    </Label>
-                    <p className="text-sm">
-                      {convertDateToIndianFormat(currentUser.subscription.endDate)}
-                    </p>
-                  </div>
-                )}
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground">
-                    Your Referral Code
-                  </Label>
-                  <p className="text-sm">
-                    {currentUser.referralCode || "N/A"}
-                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -237,7 +201,7 @@ const Profile = () => {
             {/* Profile Form */}
             <Card className="lg:col-span-2 bg-cyan-100">
               <CardHeader>
-                <CardTitle className="text-form-header">{t("profileInformation")}</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{t("profileInformation")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -323,11 +287,11 @@ const Profile = () => {
           {/* Account Statistics */}
           <Card className="bg-orange-100">
             <CardHeader>
-              <CardTitle className="text-form-header">Account Statistics</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Account Statistics</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-muted/50 rounded-lg" onClick={()=>navigate("/view-records")} style={{ cursor: 'pointer' }}>
+                <div className="text-center p-4 bg-muted/50 rounded-lg" onClick={() => navigate("/view-records")} style={{ cursor: 'pointer' }}>
                   <p className="text-2xl font-bold text-primary">
                     {currentUser.totalRecords}
                   </p>
