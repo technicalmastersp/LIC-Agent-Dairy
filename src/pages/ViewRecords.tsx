@@ -9,7 +9,10 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
 import EditRecordModal from "@/components/EditRecordModal";
-import { Search, Eye, Trash2, ArrowUpDown, Plus, Edit } from "lucide-react";
+import {
+  Search, Eye, Trash2, ArrowUpDown, Plus, Edit,
+  FileText, IndianRupee, CalendarPlus, FolderOpen, ShieldCheck,
+} from "lucide-react";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
@@ -69,13 +72,29 @@ interface Record {
   createdAt: string;
 }
 
+// Deterministic soft color for an avatar chip, derived from the name itself
+const avatarPalette = [
+  "bg-blue-100 text-blue-700",
+  "bg-violet-100 text-violet-700",
+  "bg-emerald-100 text-emerald-700",
+  "bg-amber-100 text-amber-700",
+  "bg-rose-100 text-rose-700",
+  "bg-cyan-100 text-cyan-700",
+];
+const avatarColor = (name: string) => {
+  const idx = (name || "").split("").reduce((s, c) => s + c.charCodeAt(0), 0) % avatarPalette.length;
+  return avatarPalette[idx];
+};
+const initials = (name: string) =>
+  (name || "?").trim().split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase()).join("");
+
 const ViewRecords = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { toast } = useToast();
   const currentUser = getCurrentUser();
   const authenticated = isAuthenticated();
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof Record>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -86,16 +105,14 @@ const ViewRecords = () => {
   const [records, setRecords] = useState<Record[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-
-  // Move this OUT of useEffect, make it a standalone function in the component
   const fetchRecords = async () => {
     try {
       setIsLoading(true);
       const userRecords = await getAllRecords();
-      setRecords(userRecords ?? []); // ← set empty array if undefined
+      setRecords(userRecords ?? []);
     } catch (error) {
       console.error(error);
-      setRecords([]);      // ← set empty array on error so .filter() never crashes
+      setRecords([]);
     } finally {
       setIsLoading(false);
     }
@@ -109,20 +126,20 @@ const ViewRecords = () => {
     fetchRecords();
   }, []);
 
-
   if (!authenticated || !currentUser) {
     return null;
   }
 
   const filteredAndSortedRecords = useMemo(() => {
-    if (!records || records.length === 0) return []; // ← guard against undefined/empty
+    if (!records || records.length === 0) return [];
 
     let filtered = records.filter(record =>
       record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.fatherName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.occupation.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.currentPolicy.policyNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.currentPolicy.modeOfPayment.toLowerCase().includes(searchTerm.toLowerCase())
+      record.currentPolicy.modeOfPayment.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.currentPolicy.branch.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return filtered.sort((a, b) => {
@@ -142,6 +159,22 @@ const ViewRecords = () => {
     });
   }, [records, searchTerm, sortField, sortDirection]);
 
+  // ── Derived summary stats (real numbers from the data, styled like Home's stat row) ──
+  const summaryStats = useMemo(() => {
+    const totalSumAssured = records.reduce(
+      (sum, r) => sum + (Number(r.currentPolicy?.sumAssured) || 0), 0
+    );
+    const now = new Date();
+    const addedThisMonth = records.filter(r => {
+      if (!r.createdAt) return false;
+      const d = new Date(r.createdAt);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+    const branches = new Set(records.map(r => r.currentPolicy?.branch).filter(Boolean)).size;
+
+    return { totalSumAssured, addedThisMonth, branches };
+  }, [records]);
+
   const handleSort = (field: keyof Record) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -157,11 +190,11 @@ const ViewRecords = () => {
   };
 
   const handleDeleteRecord = async (recordId: string) => {
-    const success = await deleteRecord( recordId);
+    const success = await deleteRecord(recordId);
     if (success) {
       setRecords(await getAllRecords());
       toast({
-        title: "Success", 
+        title: "Success",
         description: "Record deleted successfully",
       });
     }
@@ -177,13 +210,13 @@ const ViewRecords = () => {
   };
 
   const SortableHeader = ({ field, children }: { field: keyof Record; children: React.ReactNode }) => (
-    <TableHead 
-      className="cursor-pointer hover:bg-table-header/50 border border-table-border"
+    <TableHead
+      className="cursor-pointer select-none hover:bg-table-header/70 transition-colors border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground"
       onClick={() => handleSort(field)}
     >
-      <div className="flex items-center space-x-1">
+      <div className="flex items-center gap-1.5">
         <span>{children}</span>
-        <ArrowUpDown className="w-4 h-4" />
+        <ArrowUpDown className={`w-3.5 h-3.5 ${sortField === field ? "text-form-header" : "text-muted-foreground/40"}`} />
       </div>
     </TableHead>
   );
@@ -191,26 +224,80 @@ const ViewRecords = () => {
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
       <Navigation />
-      
+
       <main className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-7xl mx-auto space-y-6">
-          {/* Header */}
+
+          {/* ── Hero header ── */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-form-header">Policy Records</h1>
-              <p className="text-muted-foreground">
-                Manage and view all life insurance policy records
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-semibold text-form-header">Policy Records</h1>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Manage and view all life insurance policy records
+                </p>
+              </div>
             </div>
             <Link to="/add-record">
-              <Button className="bg-primary hover:bg-primary-light">
+              <Button className="bg-primary hover:bg-primary-light shadow-sm">
                 <Plus className="w-4 h-4 mr-2" />
                 {t("addNewRecord")}
               </Button>
             </Link>
           </div>
 
-          {/* Search and Stats */}
+          {/* ── Stat row (Home-style summary cards) ── */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              {
+                label: "Total records",
+                val: records.length,
+                icon: <FileText className="w-4 h-4" />,
+                sub: "All policy records",
+                bg: "bg-blue-50",
+                color: "text-form-header",
+              },
+              {
+                label: "Total sum assured",
+                val: `₹${summaryStats.totalSumAssured.toLocaleString("en-IN")}`,
+                icon: <IndianRupee className="w-4 h-4" />,
+                sub: "Across all policies",
+                bg: "bg-emerald-50",
+                color: "text-emerald-700",
+              },
+              {
+                label: "Added this month",
+                val: summaryStats.addedThisMonth,
+                icon: <CalendarPlus className="w-4 h-4" />,
+                sub: "New records",
+                bg: "bg-amber-50",
+                color: "text-amber-700",
+              },
+              {
+                label: "Branches",
+                val: summaryStats.branches,
+                icon: <FolderOpen className="w-4 h-4" />,
+                sub: "Distinct branches",
+                bg: "bg-violet-50",
+                color: "text-violet-700",
+              },
+            ].map(({ label, val, icon, sub, bg, color }) => (
+              <Card key={label} className={`${bg} border-transparent hover:shadow-sm transition-shadow`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-2 text-xs">
+                    {icon} {label}
+                  </div>
+                  <p className={`text-2xl font-semibold ${color}`}>{val}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{sub}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Search bar */}
           <Card>
             <CardContent className="pt-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -220,7 +307,7 @@ const ViewRecords = () => {
                     placeholder="Search by name, policy number, occupation..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 focus-visible:ring-primary/40"
                   />
                 </div>
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
@@ -232,23 +319,28 @@ const ViewRecords = () => {
           </Card>
 
           {/* Records Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-form-header">{t("allRecord")}</CardTitle>
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b border-table-border bg-table-header/40">
+              <CardTitle className="text-form-header text-base">{t("allRecord")}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               {filteredAndSortedRecords.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-muted-foreground text-lg mb-4">
+                <div className="text-center py-16 px-4">
+                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                    {isLoading
+                      ? <div className="w-5 h-5 border-2 border-primary/40 border-t-primary rounded-full animate-spin" />
+                      : <FolderOpen className="w-6 h-6 text-muted-foreground" />}
+                  </div>
+                  <div className="text-muted-foreground text-base mb-4">
                     {isLoading ? (
                       <span>{t("loadingRecords")}</span>
                     ) : records.length === 0 ? (
-                      <span>No records</span>
+                      <span>No records yet</span>
                     ) : (
                       <span>No records match your search</span>
                     )}
                   </div>
-                  {records.length === 0 && (
+                  {records.length === 0 && !isLoading && (
                     <Link to="/add-record">
                       <Button>
                         <Plus className="w-4 h-4 mr-2" />
@@ -262,48 +354,57 @@ const ViewRecords = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground w-12">
+                          No.
+                        </TableHead>
                         <SortableHeader field="name">Name</SortableHeader>
                         <SortableHeader field="fatherName">Father's Name</SortableHeader>
                         <SortableHeader field="age">Age</SortableHeader>
-                        {/* <SortableHeader field="occupation">Occupation</SortableHeader> */}
-                        <TableHead className="border border-table-border">Policy Number</TableHead>
-                        <TableHead className="border border-table-border">Sum Assured</TableHead>
-                        <TableHead className="border border-table-border">Branch</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Policy Number</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Sum Assured</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Branch</TableHead>
                         <SortableHeader field="createdAt">Created</SortableHeader>
-                        <TableHead className="border border-table-border">Actions</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredAndSortedRecords.map((record) => (
-                        <TableRow key={record.recordId} className="hover:bg-muted/50">
-                          <TableCell className="border border-table-border font-medium">
-                            {record.name}
-                          </TableCell>
+                      {filteredAndSortedRecords.map((record, idx) => (
+                        <TableRow key={record.recordId} className="hover:bg-muted/50 transition-colors group">
                           <TableCell className="border border-table-border">
+                            <span className="font-mono text-xs text-muted-foreground">
+                              {String(idx + 1).padStart(3, "0")}
+                            </span>
+                          </TableCell>
+                          <TableCell className="border border-table-border font-medium">
+                            <div className="flex items-center gap-2.5">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 ${avatarColor(record.name)}`}>
+                                {initials(record.name)}
+                              </div>
+                              <span>{record.name}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="border border-table-border text-muted-foreground">
                             {record.fatherName}
                           </TableCell>
                           <TableCell className="border border-table-border">
                             {record.age}
                           </TableCell>
-                          {/* <TableCell className="border border-table-border">
-                            {record.occupation}
-                          </TableCell> */}
                           <TableCell className="border border-table-border">
                             <Badge variant="outline" className="font-mono text-xs">
                               {record.currentPolicy.policyNumber || "N/A"}
                             </Badge>
                           </TableCell>
-                          <TableCell className="border border-table-border">
+                          <TableCell className="border border-table-border font-medium text-emerald-700">
                             ₹{record.currentPolicy.sumAssured || "0"}
                           </TableCell>
-                          <TableCell className="border border-table-border">
+                          <TableCell className="border border-table-border text-muted-foreground">
                             {record.currentPolicy.branch || "-"}
                           </TableCell>
                           <TableCell className="border border-table-border text-sm text-muted-foreground">
                             {convertDateToIndianFormat(record.createdAt)}
                           </TableCell>
                           <TableCell className="border border-table-border">
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -358,7 +459,7 @@ const ViewRecords = () => {
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false);
-          fetchRecords(); // ← refresh on close too
+          fetchRecords();
         }}
         onUpdate={handleUpdateRecord}
       />

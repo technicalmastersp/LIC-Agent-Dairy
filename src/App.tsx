@@ -28,6 +28,7 @@ import AdminAdmins from "./pages/admin/AdminAdmins";
 import WithdrawalRequests from "./pages/admin/WithdrawalRequests";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -43,7 +44,8 @@ const App = () => (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/add-record" element={<AddRecord />} />
             <Route path="/view-records" element={<ViewRecords />} />
             <Route path="/view-due-policies" element={<CurrentMonthDue />} />

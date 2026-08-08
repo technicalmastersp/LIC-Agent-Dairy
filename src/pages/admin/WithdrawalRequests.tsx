@@ -1,6 +1,5 @@
-
 import AdminLayout  from "./AdminLayout";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate }   from "react-router-dom";
 import { Button }        from "@/components/ui/button";
 import { Badge }         from "@/components/ui/badge";
@@ -10,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast }      from "@/hooks/use-toast";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { getWithdrawals, approveWithdrawal, rejectWithdrawal } from "../../../services/adminService";
-import { CheckCircle2, XCircle, Eye, Filter } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, Search, ArrowUpDown, X, RefreshCw } from "lucide-react";
 
 const statusStyle: Record<string, string> = {
   requested: "bg-yellow-100 text-yellow-700 border border-yellow-200",
@@ -22,16 +21,30 @@ const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
   : "—";
 
+type SortField = "amount" | "requestedAt" | null;
+type SortDir = "asc" | "desc";
+
 const WithdrawalRequests = () => {
   const navigate    = useNavigate();
   const { toast }   = useToast();
   const currentUser = getCurrentUser();
   const authenticated = isAuthenticated();
 
-  const [withdrawals, setWithdrawals] = useState<any[]>([]);
-  const [summary,     setSummary]     = useState<any>(null);
-  const [loading,     setLoading]     = useState(true);
+  // ---- data (fetched once) ----
+  const [allWithdrawals, setAllWithdrawals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // ---- client-side filter / search / sort state ----
   const [statusFilter, setStatusFilter] = useState("requested");
+  const [search, setSearch] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [sortField, setSortField] = useState<SortField>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  // ---- approve / reject modals ----
+  const [approveModal, setApproveModal] = useState<{ referralId: string; withdrawalId: string; name: string; amount: number; method: string } | null>(null);
   const [rejectModal, setRejectModal]   = useState<{ referralId: string; withdrawalId: string; name: string; amount: number } | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [processing,   setProcessing]   = useState<string | null>(null);
@@ -41,25 +54,129 @@ const WithdrawalRequests = () => {
     const role = currentUser?.role;
     if (role !== "admin" && role !== "superadmin") { navigate("/"); return; }
     fetchWithdrawals();
-  }, [statusFilter]);
+  }, []);
 
-  const fetchWithdrawals = async () => {
+  const fetchWithdrawals = async (isRefresh = false) => {
     try {
-      setLoading(true);
-      const data = await getWithdrawals(statusFilter);
-      setWithdrawals(data.withdrawals);
-      setSummary(data.summary);
+      isRefresh ? setRefreshing(true) : setLoading(true);
+      const data = await getWithdrawals("all");
+      setAllWithdrawals(data.withdrawals ?? []);
     } catch (err) {
       console.error(err);
-    } finally { setLoading(false); }
+      if (!isRefresh) setAllWithdrawals([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   };
 
-  const handleApprove = async (referralId: string, withdrawalId: string, amount: number) => {
-    setProcessing(withdrawalId);
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    if (value.trim()) {
+      setStatusFilter("all");
+      setDateFrom("");
+      setDateTo("");
+    }
+  };
+
+  const summary = useMemo(() => {
+    const pending   = allWithdrawals.filter(w => w.status === "requested");
+    const processed = allWithdrawals.filter(w => w.status === "processed");
+    const failed    = allWithdrawals.filter(w => w.status === "failed");
+    const totalAmount = pending.reduce((sum, w) => sum + (Number(w.amount) || 0), 0);
+    return {
+      totalPending:   pending.length,
+      totalProcessed: processed.length,
+      totalFailed:    failed.length,
+      totalAmount,
+    };
+  }, [allWithdrawals]);
+
+  const filtered = useMemo(() => {
+    let result = allWithdrawals;
+
+    if (statusFilter !== "all") {
+      result = result.filter(w => w.status === statusFilter);
+    }
+
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      result = result.filter(w =>
+        w.userName?.toLowerCase().includes(q) ||
+        w.userEasyId?.toLowerCase().includes(q) ||
+        w.userEmail?.toLowerCase().includes(q) ||
+        w.upiId?.toLowerCase().includes(q) ||
+        w.accountHolder?.toLowerCase().includes(q) ||
+        w.bankName?.toLowerCase().includes(q) ||
+        w.accountNumber?.toLowerCase().includes(q) ||
+        w.ifscCode?.toLowerCase().includes(q)
+      );
+    }
+
+    if (dateFrom) {
+      const from = new Date(dateFrom).getTime();
+      result = result.filter(w => w.requestedAt && new Date(w.requestedAt).getTime() >= from);
+    }
+    if (dateTo) {
+      const to = new Date(dateTo);
+      to.setHours(23, 59, 59, 999);
+      result = result.filter(w => w.requestedAt && new Date(w.requestedAt).getTime() <= to.getTime());
+    }
+
+    return result;
+  }, [allWithdrawals, statusFilter, search, dateFrom, dateTo]);
+
+  const sorted = useMemo(() => {
+    if (!sortField) return filtered;
+    const copy = [...filtered];
+    copy.sort((a, b) => {
+      let cmp = 0;
+      if (sortField === "amount") {
+        cmp = (Number(a.amount) || 0) - (Number(b.amount) || 0);
+      } else if (sortField === "requestedAt") {
+        cmp = new Date(a.requestedAt || 0).getTime() - new Date(b.requestedAt || 0).getTime();
+      }
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+    return copy;
+  }, [filtered, sortField, sortDir]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDir(d => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDir("desc");
+    }
+  };
+
+  const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
+    <TableHead
+      className="text-xs cursor-pointer select-none hover:bg-muted/70"
+      onClick={() => handleSort(field)}
+    >
+      <div className="flex items-center gap-1">
+        <span>{children}</span>
+        <ArrowUpDown className={`w-3 h-3 ${sortField === field ? "text-foreground" : "text-muted-foreground/50"}`} />
+      </div>
+    </TableHead>
+  );
+
+  const clearDateFilter = () => { setDateFrom(""); setDateTo(""); };
+
+  // ---- Approve: now opens confirmation dialog instead of firing immediately ----
+  const handleApprove = async () => {
+    if (!approveModal) return;
+    setProcessing(approveModal.withdrawalId);
     try {
-      await approveWithdrawal(referralId, withdrawalId);
-      toast({ title: "Approved!", description: `₹${amount} withdrawal approved.` });
-      fetchWithdrawals();
+      await approveWithdrawal(approveModal.referralId, approveModal.withdrawalId);
+      toast({ title: "Approved!", description: `₹${approveModal.amount} withdrawal approved.` });
+      setAllWithdrawals(prev => prev.map(w =>
+        w.withdrawalId === approveModal.withdrawalId
+          ? { ...w, status: "processed", processedAt: new Date().toISOString() }
+          : w
+      ));
+      setApproveModal(null);
     } catch (err: any) {
       toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
     } finally { setProcessing(null); }
@@ -74,9 +191,13 @@ const WithdrawalRequests = () => {
     try {
       await rejectWithdrawal(rejectModal.referralId, rejectModal.withdrawalId, rejectReason);
       toast({ title: "Rejected", description: `₹${rejectModal.amount} refunded to user wallet.` });
+      setAllWithdrawals(prev => prev.map(w =>
+        w.withdrawalId === rejectModal.withdrawalId
+          ? { ...w, status: "failed", processedAt: new Date().toISOString(), rejectionReason: rejectReason }
+          : w
+      ));
       setRejectModal(null);
       setRejectReason("");
-      fetchWithdrawals();
     } catch (err: any) {
       toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
     } finally { setProcessing(null); }
@@ -89,31 +210,42 @@ const WithdrawalRequests = () => {
           <div className="max-w-6xl mx-auto space-y-6">
 
             {/* Header */}
-            <div>
-              <h1 className="text-2xl font-medium text-form-header">Withdrawal Requests</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Review and process user withdrawal requests
-              </p>
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h1 className="text-2xl font-medium text-form-header">Withdrawal Requests</h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Review and process user withdrawal requests
+                </p>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => fetchWithdrawals(true)} disabled={refreshing}>
+                <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${refreshing ? "animate-spin" : ""}`} />
+                {refreshing ? "Refreshing…" : "Refresh"}
+              </Button>
             </div>
 
             {/* Summary cards */}
-            {summary && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {[
-                  { label: "Pending",   val: summary.totalPending,   color: "text-yellow-600", bg: "bg-yellow-50 border-yellow-200" },
-                  { label: "Processed", val: summary.totalProcessed, color: "text-green-600",  bg: "bg-green-50 border-green-200"  },
-                  { label: "Failed",    val: summary.totalFailed,    color: "text-red-600",    bg: "bg-red-50 border-red-200"      },
-                  { label: "Pending amount", val: `₹${summary.totalAmount}`, color: "text-blue-600", bg: "bg-blue-50 border-blue-200" },
-                ].map(({ label, val, color, bg }) => (
-                  <Card key={label} className={`border ${bg}`}>
-                    <CardContent className="p-4 text-center">
-                      <p className={`text-2xl font-medium ${color}`}>{val}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{label}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { label: "Pending",       val: summary.totalPending,       color: "text-yellow-600", bg: "bg-yellow-50 border-yellow-200", target: "requested" },
+                { label: "Processed",     val: summary.totalProcessed,     color: "text-green-600",  bg: "bg-green-50 border-green-200",   target: "processed" },
+                { label: "Failed",        val: summary.totalFailed,        color: "text-red-600",    bg: "bg-red-50 border-red-200",       target: "failed"    },
+                { label: "Pending amount",val: `₹${summary.totalAmount}`,  color: "text-blue-600",   bg: "bg-blue-50 border-blue-200",     target: "requested" },
+              ].map(({ label, val, color, bg, target }) => (
+                <Card
+                  key={label}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => { setStatusFilter(target); setSearch(""); }}
+                  onKeyDown={e => { if (e.key === "Enter") { setStatusFilter(target); setSearch(""); } }}
+                  className={`border ${bg} cursor-pointer transition hover:shadow-sm hover:-translate-y-0.5 ${statusFilter === target && !search ? "ring-2 ring-offset-1 ring-primary/40" : ""}`}
+                >
+                  <CardContent className="p-4 text-center">
+                    <p className={`text-2xl font-medium ${color}`}>{val}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{label}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
 
             {/* Filter tabs */}
             <div className="flex gap-2 flex-wrap">
@@ -129,19 +261,70 @@ const WithdrawalRequests = () => {
               ))}
             </div>
 
+            {/* Search + date range */}
+            <div className="flex flex-wrap gap-3 items-end">
+              <div className="relative max-w-xs flex-1 min-w-[220px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  className="pl-9"
+                  placeholder="Search name, ID, email, payment details…"
+                  value={search}
+                  onChange={e => handleSearchChange(e.target.value)}
+                />
+              </div>
+
+              <div className="flex items-end gap-2">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground block">From</label>
+                  <Input
+                    type="date"
+                    className="h-9 w-[150px]"
+                    value={dateFrom}
+                    onChange={e => setDateFrom(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground block">To</label>
+                  <Input
+                    type="date"
+                    className="h-9 w-[150px]"
+                    value={dateTo}
+                    onChange={e => setDateTo(e.target.value)}
+                  />
+                </div>
+                {(dateFrom || dateTo) && (
+                  <Button size="sm" variant="ghost" className="h-9" onClick={clearDateFilter}>
+                    <X className="w-3.5 h-3.5 mr-1" />
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {search.trim() && (
+              <p className="text-xs text-muted-foreground -mt-3">
+                Searching across all statuses and dates for "{search}"
+              </p>
+            )}
+
             {/* Table */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  {statusFilter === "all" ? "All" : statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)} withdrawals
+                  {search.trim() ? "Search results" : statusFilter === "all" ? "All" : statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)} withdrawals
+                  <span className="normal-case font-normal ml-2 text-muted-foreground">
+                    ({sorted.length} of {allWithdrawals.length})
+                  </span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {loading ? (
                   <p className="text-center text-sm text-muted-foreground py-8">Loading…</p>
-                ) : !withdrawals.length ? (
+                ) : !sorted.length ? (
                   <p className="text-center text-sm text-muted-foreground py-8">
-                    No {statusFilter} withdrawal requests.
+                    {search.trim()
+                      ? `No withdrawals match "${search}".`
+                      : `No ${statusFilter === "all" ? "" : statusFilter} withdrawal requests match your filters.`}
                   </p>
                 ) : (
                   <div className="overflow-x-auto">
@@ -149,19 +332,19 @@ const WithdrawalRequests = () => {
                       <TableHeader>
                         <TableRow className="bg-muted">
                           <TableHead className="text-xs">User</TableHead>
-                          <TableHead className="text-xs">Amount</TableHead>
+                          <SortableHeader field="amount">Amount</SortableHeader>
                           <TableHead className="text-xs">Method</TableHead>
                           <TableHead className="text-xs">Payment details</TableHead>
-                          <TableHead className="text-xs">Requested</TableHead>
+                          <SortableHeader field="requestedAt">Requested</SortableHeader>
                           <TableHead className="text-xs">Status</TableHead>
-                          {statusFilter === "requested" && (
+                          {statusFilter === "requested" && !search.trim() && (
                             <TableHead className="text-xs">Actions</TableHead>
                           )}
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {withdrawals.map((w, i) => (
-                          <TableRow key={i} className="hover:bg-muted/50">
+                        {sorted.map((w, i) => (
+                          <TableRow key={w.withdrawalId ?? i} className="hover:bg-muted/50">
                             <TableCell>
                               <p className="text-sm font-medium">{w.userName}</p>
                               <p className="text-xs text-muted-foreground">{w.userEasyId}</p>
@@ -200,14 +383,20 @@ const WithdrawalRequests = () => {
                                 {w.status}
                               </Badge>
                             </TableCell>
-                            {statusFilter === "requested" && (
+                            {statusFilter === "requested" && !search.trim() && (
                               <TableCell>
                                 <div className="flex gap-2">
                                   <Button
                                     size="sm"
                                     className="h-7 text-xs bg-green-600 hover:bg-green-700 text-white"
                                     disabled={processing === w.withdrawalId}
-                                    onClick={() => handleApprove(w.referralId, w.withdrawalId, w.amount)}
+                                    onClick={() => setApproveModal({
+                                      referralId:   w.referralId,
+                                      withdrawalId: w.withdrawalId,
+                                      name:         w.userName,
+                                      amount:       w.amount,
+                                      method:       w.method,
+                                    })}
                                   >
                                     <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
                                     Approve
@@ -240,6 +429,44 @@ const WithdrawalRequests = () => {
 
           </div>
         </div>
+
+        {/* Approve modal */}
+        {approveModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <CardTitle className="text-base">Approve withdrawal</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm">
+                  <p className="font-medium text-green-700">{approveModal.name}</p>
+                  <p className="text-green-700 mt-0.5">
+                    ₹{approveModal.amount} will be sent via {approveModal.method}
+                  </p>
+                  <p className="text-xs text-green-600 mt-1">
+                    This action cannot be undone once processed.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    onClick={handleApprove}
+                    disabled={!!processing}
+                  >
+                    {processing === approveModal.withdrawalId ? "Approving…" : "Confirm approve"}
+                  </Button>
+                  <Button
+                    variant="outline" className="flex-1"
+                    onClick={() => setApproveModal(null)}
+                    disabled={!!processing}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Reject modal */}
         {rejectModal && (

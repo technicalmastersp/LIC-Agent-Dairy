@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-// import { getCurrentUser, getUserRecords } from "@/utils/auth";
 import { getCurrentUser } from "@/utils/auth";
-import { Save, Plus, Trash2, User, X } from "lucide-react";
+import {
+  Save, Plus, Trash2, User, X,
+  IdCard, Users, HeartPulse, ShieldCheck, History,
+} from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { updateRecord } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
@@ -81,6 +83,15 @@ interface EditRecordModalProps {
   onClose: () => void;
   onUpdate: () => void;
 }
+
+const SectionTitle = ({ icon: Icon, children }: { icon: any; children: React.ReactNode }) => (
+  <CardTitle className="text-form-header text-lg flex items-center gap-2.5">
+    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+      <Icon className="w-3.5 h-3.5 text-primary" />
+    </div>
+    <span>{children}</span>
+  </CardTitle>
+);
 
 const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalProps) => {
   const { toast } = useToast();
@@ -193,19 +204,15 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     }
   }, [record]);
 
-  // -----------------------------------------------------------------------------------------------------------------------------------------------
   const [familyMembers, setFamilyMembers] = useState([
-    // { name: "", relation: "spouse" }
     { relationship: "Father", currentAge: "", health: "", deathAge: "", reason: "" },
   ]);
 
   const relationOptions = [
-    // "spouse", "son", "daughter", "father", "mother", "brother", "sister", "grandfather", "grandmother", "uncle", "aunt", "cousin", "nephew", "niece", "son-in-law", "daughter-in-law", "father-in-law", "mother-in-law", "brother-in-law", "sister-in-law"
     "Spouse", "Son", "Daughter", "Father", "Mother", "Brother", "Sister", "Grandfather", "Grandmother"
   ];
 
   const addFamilyMember = () => {
-    // setFamilyMembers([...familyMembers, { name: "", relation: "spouse" }]);
     setFamilyMembers([...familyMembers, { relationship: "father", currentAge: "", health: "", deathAge: "", reason: "" }]);
   };
 
@@ -220,7 +227,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     updatedMembers[index] = { ...updatedMembers[index], [field]: value };
     setFamilyMembers(updatedMembers);
   };
-  // -----------------------------------------------------------------------------------------------------------------------------------------------
+
   const handlePolicyChange = (
     section: "currentPolicy" | "previousPolicy",
     field: string,
@@ -234,7 +241,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
       },
     }));
   };
-  // -----------------------------------------------------------------------------------------------------------------------------------------------
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -272,7 +278,10 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-form-header text-xl">Edit Record</DialogTitle>
+          <DialogTitle className="text-form-header text-xl flex items-center gap-2">
+            <User className="w-5 h-5" />
+            Edit Record — {record.name}
+          </DialogTitle>
           <DialogDescription>
             <p>Update invoice details and save changes.</p>
             <p>* Please ensure all required fields are filled out correctly before saving.</p>
@@ -285,7 +294,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
           {/* Basic Information Form */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header text-lg">Basic Details</CardTitle>
+              <SectionTitle icon={IdCard}>Basic Details</SectionTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -333,7 +342,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
           {/* Personal Information Form */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header text-lg">Personal Information</CardTitle>
+              <SectionTitle icon={User}>Personal Information</SectionTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -507,16 +516,16 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
           {/* Family details */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base text-form-header flex items-center justify-between">
-                  9. Family Information
-                  <Button type="button" onClick={addFamilyMember} size="sm" variant="outline" className="text-sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Member
-                  </Button>
-                </CardTitle>
+              <div className="flex items-center justify-between">
+                <SectionTitle icon={Users}>9. Family Information</SectionTitle>
+                <Button type="button" onClick={addFamilyMember} size="sm" variant="outline" className="text-sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Member
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-lg border border-table-border">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-table-header">
@@ -530,9 +539,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   </TableHeader>
                   <TableBody>
                     {familyMembers.map((member, index) => (
-                      <TableRow key={index}>
+                      <TableRow key={index} className="hover:bg-muted/40">
                         <TableCell className="border border-table-border font-medium">
-                          {/* {member.relationship} */}
                           <Select value={member.relationship || ""} onValueChange={(value) => handleFamilyMemberChange(index, 'relationship', value)}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select relationship" />
@@ -554,7 +562,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          {<Select value={member.health} onValueChange={(value) => handleFamilyMemberChange(index, 'health', value)}>
+                          <Select value={member.health} onValueChange={(value) => handleFamilyMemberChange(index, 'health', value)}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select Health" />
                             </SelectTrigger>
@@ -562,7 +570,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                                 <SelectItem key="Good" value="Good">Good</SelectItem>
                                 <SelectItem key="Not Good" value="Not Good">Not Good</SelectItem>
                             </SelectContent>
-                          </Select>}
+                          </Select>
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Input 
@@ -579,31 +587,18 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          {familyMembers.length > 1 && (
-                            <div className="flex items-end">
-                              <Button 
-                                type="button" 
-                                onClick={() => removeFamilyMember(index)} 
-                                variant="destructive" 
-                                size="sm"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                              </Button>
-                            </div>
-                          )}
-                          {familyMembers.length <= 1 && (
-                            <div className="flex items-end">
-                              <Button 
-                                type="button" 
-                                onClick={() => removeFamilyMember(index)} 
-                                variant="destructive" 
-                                size="sm"
-                                disabled={true}
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                              </Button>
-                            </div>
-                          )}
+                          <div className="flex items-end">
+                            <Button 
+                              type="button" 
+                              onClick={() => removeFamilyMember(index)} 
+                              variant="destructive" 
+                              size="sm"
+                              disabled={familyMembers.length <= 1}
+                              className={familyMembers.length <= 1 ? "opacity-50" : ""}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -615,7 +610,10 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
 
           {/* Additional Fields */}
           <Card>
-            <CardContent className="pt-6">
+            <CardHeader>
+              <SectionTitle icon={HeartPulse}>Physical & Banking Details</SectionTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="height">10. Height</Label>
@@ -688,7 +686,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
           {/* Current Policy Information */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header text-lg">Current Policy Information</CardTitle>
+              <SectionTitle icon={ShieldCheck}>Current Policy Information</SectionTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -718,12 +716,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 
                 <div className="space-y-2">
                   <Label htmlFor="modeOfPayment">Mode of Payment</Label>
-                  {/* <Input
-                    id="modeOfPayment"
-                    name="modeOfPayment"
-                    value={formData.modeOfPayment}
-                    onChange={handleInputChange}
-                    /> */}
                   <Select
                     value={formData.currentPolicy.modeOfPayment || ""}
                     onValueChange={(value) => handlePolicyChange("currentPolicy", "modeOfPayment", value)}
@@ -763,7 +755,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
           {/* Previous Policy Information */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header text-lg">Previous Policy Information</CardTitle>
+              <SectionTitle icon={History}>Previous Policy Information</SectionTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -793,12 +785,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 
                 <div className="space-y-2">
                   <Label htmlFor="modeOfInstallment_previousPolicy">Mode of Payment</Label>
-                  {/* <Input
-                    id="modeOfInstallment_previousPolicy"
-                    name="modeOfInstallment_previousPolicy"
-                    value={formData.modeOfInstallment_previousPolicy}
-                    onChange={handleInputChange}
-                  /> */}
                   <Select
                     value={formData.previousPolicy.modeOfPayment || ""}
                     onValueChange={(value) => handlePolicyChange("previousPolicy", "modeOfPayment", value)}
@@ -841,7 +827,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
               <X className="w-4 h-4 mr-2" />
               Cancel
             </Button>
-            <Button onClick={handleSave} className="bg-primary hover:bg-primary-light">
+            <Button onClick={handleSave} className="bg-primary hover:bg-primary-light shadow-sm">
               <Save className="w-4 h-4 mr-2" />
               Save Changes
             </Button>

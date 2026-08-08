@@ -7,8 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
-import { Save, Plus, Trash2, Minus  } from "lucide-react";
-// import { getCurrentUser, isAuthenticated, saveUserRecord } from "@/utils/auth";
+import {
+  Save, Plus, Trash2, Minus,
+  User, Users, HeartPulse, Landmark, ShieldCheck, History, IdCard,
+} from "lucide-react";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import Footer from "@/components/Footer";
@@ -32,6 +34,18 @@ interface PolicyDetail {
   branch: string;
   lastPaymentDate: string;
 }
+
+// Small section header used across the form cards — encodes the actual step
+// number from the intake sheet, so it's real sequence info, not decoration.
+const SectionTitle = ({ icon: Icon, step, children }: { icon: any; step?: string; children: React.ReactNode }) => (
+  <CardTitle className="text-form-header flex items-center gap-2.5">
+    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+      <Icon className="w-4 h-4 text-primary" />
+    </div>
+    <span>{children}</span>
+    {step && <span className="text-xs font-normal text-muted-foreground ml-1">{step}</span>}
+  </CardTitle>
+);
 
 const AddRecord = () => {
   const navigate = useNavigate();
@@ -75,7 +89,6 @@ const AddRecord = () => {
     nameOfNominee: "",
     ageOfNominee: "",
     relationName: "",
-    // relationship: "",
     lastChildBirthDate: "",
     height: "",
     weight: "",
@@ -84,15 +97,6 @@ const AddRecord = () => {
     bankName: "",
     branchName: "",
   });
-
-  // Family Details Table
-  // const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([
-  //   { relationship: "Father", currentAge: "", health: "", deathAge: "", reason: "" },
-  //   { relationship: "Mother", currentAge: "", health: "", deathAge: "", reason: "" },
-  //   { relationship: "Brother", currentAge: "", health: "", deathAge: "", reason: "" },
-  //   { relationship: "Sister", currentAge: "", health: "", deathAge: "", reason: "" },
-  //   { relationship: "Children", currentAge: "", health: "", deathAge: "", reason: "" },
-  // ]);
 
   // Policy Details Tables
   const [currentPolicy, setCurrentPolicy] = useState<PolicyDetail>({
@@ -117,14 +121,6 @@ const AddRecord = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  /* const handleFamilyMemberChange = (index: number, field: keyof FamilyMember, value: string) => {
-    setFamilyMembers(prev => 
-      prev.map((member, i) => 
-        i === index ? { ...member, [field]: value } : member
-      )
-    );
-  }; */
-
   const handlePolicyChange = (type: 'current' | 'previous', field: keyof PolicyDetail, value: string) => {
     if (type === 'current') {
       setCurrentPolicy(prev => ({ ...prev, [field]: value }));
@@ -133,21 +129,15 @@ const AddRecord = () => {
     }
   };
 
-
-  // -----------------------------------------------------------------------------------------------------------------------------------------------
-
   const [familyMembers, setFamilyMembers] = useState([
-    // { name: "", relation: "spouse" }
     { relationship: "Father", currentAge: "", health: "", deathAge: "", reason: "" },
   ]);
 
   const relationOptions = [
-    // "spouse", "son", "daughter", "father", "mother", "brother", "sister", "grandfather", "grandmother", "uncle", "aunt", "cousin", "nephew", "niece", "son-in-law", "daughter-in-law", "father-in-law", "mother-in-law", "brother-in-law", "sister-in-law"
     "Spouse", "Son", "Daughter", "Father", "Mother", "Brother", "Sister", "Grandfather", "Grandmother"
   ];
 
   const addFamilyMember = () => {
-    // setFamilyMembers([...familyMembers, { name: "", relation: "spouse" }]);
     setFamilyMembers([...familyMembers, { relationship: "father", currentAge: "", health: "", deathAge: "", reason: "" }]);
   };
 
@@ -162,18 +152,6 @@ const AddRecord = () => {
     updatedMembers[index] = { ...updatedMembers[index], [field]: value };
     setFamilyMembers(updatedMembers);
   };
-
-  /* const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  }; */
-
-  // -----------------------------------------------------------------------------------------------------------------------------------------------
-
-
 
   const handleSubmit = () => {
     if (!formData.name.trim()) {
@@ -214,13 +192,12 @@ const AddRecord = () => {
       <Navigation />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="max-w-6xl mx-auto space-y-6">
           {/* Header */}
-          <Card className="bg-gradient-to-r from-form-header to-form-subheader text-white">
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Card className="bg-gradient-to-r from-form-header to-form-subheader text-white border-0 overflow-hidden">
+            <CardHeader className="text-center relative">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 ring-4 ring-white/10">
                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-                  {/* <span className="text-form-header font-bold">LIC</span> */}
                   <img src={siteConfig.logo_medium_size} alt="site-logo" />
                 </div>
               </div>
@@ -228,14 +205,14 @@ const AddRecord = () => {
                 {siteConfig.title}
               </CardTitle>
               <p className="text-white/90">{t("addRecord")}</p>
-              {/* <p className="text-white/80 text-sm">Mobile: 9123456789</p> */}
+              <p className="text-white/60 text-xs mt-1">Fill in the sections below to create a new policy record</p>
             </CardHeader>
           </Card>
 
           {/* Basic Information Form */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">Basic Details</CardTitle>
+              <SectionTitle icon={IdCard}>Basic Details</SectionTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -245,6 +222,7 @@ const AddRecord = () => {
                     type="date"
                     value={formData.date}
                     onChange={(e) => handleInputChange("date", e.target.value)}
+                    className="mt-1"
                   />
                 </div>
                 <div>
@@ -282,7 +260,7 @@ const AddRecord = () => {
           {/* Personal Information Form */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">Personal Information</CardTitle>
+              <SectionTitle icon={User}>Personal Information</SectionTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -340,10 +318,6 @@ const AddRecord = () => {
                     className="mt-1"
                   />
                 </div>
-                {/* <div>
-                  <Label htmlFor="baseNumber">Base No.</Label>
-                  <Input id="baseNumber" className="mt-1" />
-                </div> */}
                 <div>
                   <Label htmlFor="dateOfBirth">6. Date of Birth</Label>
                   <Input 
@@ -458,19 +432,18 @@ const AddRecord = () => {
           </Card>
 
           {/* Family Details Table */}
-          {<Card>
+          <Card>
             <CardHeader>
-              {/* <CardTitle className="text-form-header">9. Family Details</CardTitle> */}
-              <CardTitle className="text-form-header flex items-center justify-between">
-                  9. Family Information
-                  <Button type="button" onClick={addFamilyMember} size="sm" variant="outline">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Member
-                  </Button>
-                </CardTitle>
+              <div className="flex items-center justify-between">
+                <SectionTitle icon={Users}>9. Family Information</SectionTitle>
+                <Button type="button" onClick={addFamilyMember} size="sm" variant="outline">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Member
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-lg border border-table-border">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-table-header">
@@ -484,9 +457,8 @@ const AddRecord = () => {
                   </TableHeader>
                   <TableBody>
                     {familyMembers.map((member, index) => (
-                      <TableRow key={index}>
+                      <TableRow key={index} className="hover:bg-muted/40">
                         <TableCell className="border border-table-border font-medium">
-                          {/* {member.relationship} */}
                           <Select value={member.relationship || ""} onValueChange={(value) => handleFamilyMemberChange(index, 'relationship', value)}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select relationship" />
@@ -508,12 +480,7 @@ const AddRecord = () => {
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          {/* <Input 
-                            value={member.health}
-                            onChange={(e) => handleFamilyMemberChange(index, "health", e.target.value)}
-                            className="w-full border-0 bg-transparent"
-                          /> */}
-                          {<Select value={member.health} onValueChange={(value) => handleFamilyMemberChange(index, 'health', value)}>
+                          <Select value={member.health} onValueChange={(value) => handleFamilyMemberChange(index, 'health', value)}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select Health" />
                             </SelectTrigger>
@@ -521,7 +488,7 @@ const AddRecord = () => {
                                 <SelectItem key="Good" value="Good">Good</SelectItem>
                                 <SelectItem key="Not Good" value="Not Good">Not Good</SelectItem>
                             </SelectContent>
-                          </Select>}
+                          </Select>
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Input 
@@ -538,31 +505,18 @@ const AddRecord = () => {
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
-                          {familyMembers.length > 1 && (
-                            <div className="flex items-end">
-                              <Button 
-                                type="button" 
-                                onClick={() => removeFamilyMember(index)} 
-                                variant="destructive" 
-                                size="sm"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                              </Button>
-                            </div>
-                          )}
-                          {familyMembers.length <= 1 && (
-                            <div className="flex items-end">
-                              <Button 
-                                type="button" 
-                                onClick={() => removeFamilyMember(index)} 
-                                variant="destructive" 
-                                size="sm"
-                                disabled={true}
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                              </Button>
-                            </div>
-                          )}
+                          <div className="flex items-end">
+                            <Button 
+                              type="button" 
+                              onClick={() => removeFamilyMember(index)} 
+                              variant="destructive" 
+                              size="sm"
+                              disabled={familyMembers.length <= 1}
+                              className={familyMembers.length <= 1 ? "opacity-50" : ""}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -570,67 +524,14 @@ const AddRecord = () => {
                 </Table>
               </div>
             </CardContent>
-          </Card>}
-
-          {/* Family Information */}
-          {/* <Card>
-            <CardHeader>
-              <CardTitle className="text-form-header flex items-center justify-between">
-                Family Information
-                <Button type="button" onClick={addFamilyMember} size="sm" variant="outline">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Member
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {familyMembers.map((member, index) => (
-                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg relative">
-                  <div className="space-y-2">
-                    <Label htmlFor={`familyName${index}`}>Name</Label>
-                    <Input 
-                      id={`familyName${index}`} 
-                      value={member.name} 
-                      onChange={(e) => handleFamilyMemberChange(index, 'name', e.target.value)}
-                      placeholder="Enter family member name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor={`relation${index}`}>Relation</Label>
-                    <Select value={member.relation} onValueChange={(value) => handleFamilyMemberChange(index, 'relation', value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select relation" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {relationOptions.map((relation) => (
-                          <SelectItem key={relation} value={relation}>
-                            {relation.charAt(0).toUpperCase() + relation.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {familyMembers.length > 1 && (
-                    <div className="flex items-end">
-                      <Button 
-                        type="button" 
-                        onClick={() => removeFamilyMember(index)} 
-                        variant="destructive" 
-                        size="sm"
-                      >
-                        <Minus className="h-4 w-4 mr-2" />
-                        Remove
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </CardContent>
-          </Card> */}
+          </Card>
 
           {/* Additional Fields */}
           <Card>
-            <CardContent className="pt-6">
+            <CardHeader>
+              <SectionTitle icon={HeartPulse}>Physical & Banking Details</SectionTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
                   <Label htmlFor="height">10. Height</Label>
@@ -703,170 +604,164 @@ const AddRecord = () => {
           {/* Current Policy Details */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">11. Current Policy Details</CardTitle>
+              <SectionTitle icon={ShieldCheck}>11. Current Policy Details</SectionTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-table-header">
-                    <TableHead className="border border-table-border">Policy Number</TableHead>
-                    <TableHead className="border border-table-border">Plan & Term</TableHead>
-                    <TableHead className="border border-table-border">Sum Assured</TableHead>
-                    <TableHead className="border border-table-border">Mode of Payment</TableHead>
-                    <TableHead className="border border-table-border">Branch</TableHead>
-                    <TableHead className="border border-table-border">Last Payment Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="border border-table-border">
-                      <Input 
-                        value={currentPolicy.policyNumber}
-                        onChange={(e) => handlePolicyChange("current", "policyNumber", e.target.value)}
-                        className="border-0 bg-transparent"
-                      />
-                    </TableCell>
-                    <TableCell className="border border-table-border">
-                      <Input 
-                        value={currentPolicy.planAndTerm}
-                        onChange={(e) => handlePolicyChange("current", "planAndTerm", e.target.value)}
-                        className="border-0 bg-transparent"
-                      />
-                    </TableCell>
-                    <TableCell className="border border-table-border">
-                      <Input 
-                        value={currentPolicy.sumAssured}
-                        onChange={(e) => handlePolicyChange("current", "sumAssured", e.target.value)}
-                        className="border-0 bg-transparent"
-                      />
-                    </TableCell>
-                    <TableCell className="border border-table-border">
-                      {/* <Input 
-                        value={currentPolicy.modeOfPayment}
-                        onChange={(e) => handlePolicyChange("current", "modeOfPayment", e.target.value)}
-                        className="border-0 bg-transparent"
-                      /> */}
-                      <Select
-                        value={currentPolicy.modeOfPayment}
-                        onValueChange={(value) => handlePolicyChange("current","modeOfPayment", value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Payment Mode" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Monthly">Monthly or e-NACH</SelectItem>
-                          <SelectItem value="Quarterly">Quarterly</SelectItem>
-                          <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
-                          <SelectItem value="Yearly">Yearly</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="border border-table-border">
-                      <Input 
-                        value={currentPolicy.branch}
-                        onChange={(e) => handlePolicyChange("current", "branch", e.target.value)}
-                        className="border-0 bg-transparent"
-                      />
-                    </TableCell>
-                    <TableCell className="border border-table-border">
-                      <Input 
-                        type="date"
-                        value={currentPolicy.lastPaymentDate}
-                        onChange={(e) => handlePolicyChange("current", "lastPaymentDate", e.target.value)}
-                        className="border-0 bg-transparent"
-                      />
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto rounded-lg border border-table-border">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-table-header">
+                      <TableHead className="border border-table-border">Policy Number</TableHead>
+                      <TableHead className="border border-table-border">Plan & Term</TableHead>
+                      <TableHead className="border border-table-border">Sum Assured</TableHead>
+                      <TableHead className="border border-table-border">Mode of Payment</TableHead>
+                      <TableHead className="border border-table-border">Branch</TableHead>
+                      <TableHead className="border border-table-border">Last Payment Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="border border-table-border">
+                        <Input 
+                          value={currentPolicy.policyNumber}
+                          onChange={(e) => handlePolicyChange("current", "policyNumber", e.target.value)}
+                          className="border-0 bg-transparent"
+                        />
+                      </TableCell>
+                      <TableCell className="border border-table-border">
+                        <Input 
+                          value={currentPolicy.planAndTerm}
+                          onChange={(e) => handlePolicyChange("current", "planAndTerm", e.target.value)}
+                          className="border-0 bg-transparent"
+                        />
+                      </TableCell>
+                      <TableCell className="border border-table-border">
+                        <Input 
+                          value={currentPolicy.sumAssured}
+                          onChange={(e) => handlePolicyChange("current", "sumAssured", e.target.value)}
+                          className="border-0 bg-transparent"
+                        />
+                      </TableCell>
+                      <TableCell className="border border-table-border">
+                        <Select
+                          value={currentPolicy.modeOfPayment}
+                          onValueChange={(value) => handlePolicyChange("current","modeOfPayment", value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Payment Mode" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Monthly">Monthly or e-NACH</SelectItem>
+                            <SelectItem value="Quarterly">Quarterly</SelectItem>
+                            <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
+                            <SelectItem value="Yearly">Yearly</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="border border-table-border">
+                        <Input 
+                          value={currentPolicy.branch}
+                          onChange={(e) => handlePolicyChange("current", "branch", e.target.value)}
+                          className="border-0 bg-transparent"
+                        />
+                      </TableCell>
+                      <TableCell className="border border-table-border">
+                        <Input 
+                          type="date"
+                          value={currentPolicy.lastPaymentDate}
+                          onChange={(e) => handlePolicyChange("current", "lastPaymentDate", e.target.value)}
+                          className="border-0 bg-transparent"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
 
           {/* Previous Policy Details */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">12. Previous Policy Details</CardTitle>
+              <SectionTitle icon={History}>12. Previous Policy Details</SectionTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-table-header">
-                    <TableHead className="border border-table-border">Policy Number</TableHead>
-                    <TableHead className="border border-table-border">Plan & Term</TableHead>
-                    <TableHead className="border border-table-border">Sum Assured</TableHead>
-                    <TableHead className="border border-table-border">Mode of Payment</TableHead>
-                    <TableHead className="border border-table-border">Branch</TableHead>
-                    <TableHead className="border border-table-border">Last Payment Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="border border-table-border">
-                      <Input 
-                        value={previousPolicy.policyNumber}
-                        onChange={(e) => handlePolicyChange("previous", "policyNumber", e.target.value)}
-                        className="border-0 bg-transparent"
-                      />
-                    </TableCell>
-                    <TableCell className="border border-table-border">
-                      <Input 
-                        value={previousPolicy.planAndTerm}
-                        onChange={(e) => handlePolicyChange("previous", "planAndTerm", e.target.value)}
-                        className="border-0 bg-transparent"
-                      />
-                    </TableCell>
-                    <TableCell className="border border-table-border">
-                      <Input 
-                        value={previousPolicy.sumAssured}
-                        onChange={(e) => handlePolicyChange("previous", "sumAssured", e.target.value)}
-                        className="border-0 bg-transparent"
-                      />
-                    </TableCell>
-                    <TableCell className="border border-table-border">
-                      {/* <Input 
-                        value={previousPolicy.modeOfPayment}
-                        onChange={(e) => handlePolicyChange("previous", "modeOfPayment", e.target.value)}
-                        className="border-0 bg-transparent"
-                      /> */}
-                      <Select
-                        value={previousPolicy.modeOfPayment}
-                        onValueChange={(value) => handlePolicyChange("previous","modeOfPayment", value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Payment Mode" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Monthly">Monthly or e-NACH</SelectItem>
-                          <SelectItem value="Quarterly">Quarterly</SelectItem>
-                          <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
-                          <SelectItem value="Yearly">Yearly</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="border border-table-border">
-                      <Input 
-                        value={previousPolicy.branch}
-                        onChange={(e) => handlePolicyChange("previous", "branch", e.target.value)}
-                        className="border-0 bg-transparent"
-                      />
-                    </TableCell>
-                    <TableCell className="border border-table-border">
-                      <Input 
-                        type="date"
-                        value={previousPolicy.lastPaymentDate}
-                        onChange={(e) => handlePolicyChange("previous", "lastPaymentDate", e.target.value)}
-                        className="border-0 bg-transparent"
-                      />
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto rounded-lg border border-table-border">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-table-header">
+                      <TableHead className="border border-table-border">Policy Number</TableHead>
+                      <TableHead className="border border-table-border">Plan & Term</TableHead>
+                      <TableHead className="border border-table-border">Sum Assured</TableHead>
+                      <TableHead className="border border-table-border">Mode of Payment</TableHead>
+                      <TableHead className="border border-table-border">Branch</TableHead>
+                      <TableHead className="border border-table-border">Last Payment Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="border border-table-border">
+                        <Input 
+                          value={previousPolicy.policyNumber}
+                          onChange={(e) => handlePolicyChange("previous", "policyNumber", e.target.value)}
+                          className="border-0 bg-transparent"
+                        />
+                      </TableCell>
+                      <TableCell className="border border-table-border">
+                        <Input 
+                          value={previousPolicy.planAndTerm}
+                          onChange={(e) => handlePolicyChange("previous", "planAndTerm", e.target.value)}
+                          className="border-0 bg-transparent"
+                        />
+                      </TableCell>
+                      <TableCell className="border border-table-border">
+                        <Input 
+                          value={previousPolicy.sumAssured}
+                          onChange={(e) => handlePolicyChange("previous", "sumAssured", e.target.value)}
+                          className="border-0 bg-transparent"
+                        />
+                      </TableCell>
+                      <TableCell className="border border-table-border">
+                        <Select
+                          value={previousPolicy.modeOfPayment}
+                          onValueChange={(value) => handlePolicyChange("previous","modeOfPayment", value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Payment Mode" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Monthly">Monthly or e-NACH</SelectItem>
+                            <SelectItem value="Quarterly">Quarterly</SelectItem>
+                            <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
+                            <SelectItem value="Yearly">Yearly</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="border border-table-border">
+                        <Input 
+                          value={previousPolicy.branch}
+                          onChange={(e) => handlePolicyChange("previous", "branch", e.target.value)}
+                          className="border-0 bg-transparent"
+                        />
+                      </TableCell>
+                      <TableCell className="border border-table-border">
+                        <Input 
+                          type="date"
+                          value={previousPolicy.lastPaymentDate}
+                          onChange={(e) => handlePolicyChange("previous", "lastPaymentDate", e.target.value)}
+                          className="border-0 bg-transparent"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex justify-center space-x-4 pt-6">
-            <Button onClick={handleSubmit} className="bg-primary hover:bg-primary-light text-primary-foreground">
+          <div className="flex justify-center space-x-4 pt-2 pb-8">
+            <Button onClick={handleSubmit} className="bg-primary hover:bg-primary-light text-primary-foreground shadow-sm">
               <Save className="w-4 h-4 mr-2" />
               Save Record
             </Button>

@@ -1,203 +1,330 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Eye } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+import { Button }     from "@/components/ui/button";
+import { Badge }      from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Navigation     from "@/components/Navigation";
+import Footer         from "@/components/Footer";
 import { getCurrentUser, setCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { dueThisMonth, getRecordsWithoutLastPayment } from "../../services/recordService";
-import { getProfile } from "../../services/userService";
+import { getProfile }  from "../../services/userService";
+import {
+  Plus, Eye, FileClock, ReceiptText,
+  Crown, Wallet, User, Lock, BarChart3,
+  ArrowRight, AlertTriangle, TrendingUp,
+  FileText, Users,
+} from "lucide-react";
+import { getReferralDashboard } from "../../services/referralService";
+
+const getGreeting = () => {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+};
+
+const fmt = (d?: string) =>
+  d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
 const Home = () => {
-  const [currentMonthTotalDueCount, setCurrentMonthTotalDueCount] = useState(0);
-  const [recordsWithoutLastPayment, setRecordsWithoutLastPayment] = useState(0);
-  const navigate = useNavigate();
-  const { t } = useLanguage();
-  let currentUser = getCurrentUser();
+  const navigate      = useNavigate();
+  const { t }         = useLanguage();
   const authenticated = isAuthenticated();
+  let currentUser     = getCurrentUser();
 
-  const fetchRecords = async () => {
-    try {
-      const user = await getProfile();
-      const userRecords = await dueThisMonth();
-      const recordsWithoutLastPayment = await getRecordsWithoutLastPayment();
-      
-      setCurrentUser(user); 
-      currentUser = getCurrentUser();
-      setCurrentMonthTotalDueCount(userRecords.totalDue);
-      setRecordsWithoutLastPayment(recordsWithoutLastPayment.total);
-    } catch (error) {
-      console.error(error);
-    } finally {
-    }
-  };
+  const [dueCount,     setDueCount]     = useState(0);
+  const [missedCount,  setMissedCount]  = useState(0);
+  const [currentMonth, setCurrentMonth] = useState("");
+  const [referralData, setReferralData] = useState<any>(null);
+  const [loading,      setLoading]      = useState(true);
 
   useEffect(() => {
-    if (!authenticated) {
-      navigate("/login");
-    }
-    fetchRecords();
+    if (!authenticated) { navigate("/login"); return; }
+    const load = async () => {
+      try {
+        const [user, due, missed, referral] = await Promise.all([
+          getProfile(),
+          dueThisMonth(),
+          getRecordsWithoutLastPayment(),
+          getReferralDashboard().catch(() => null)
+        ]);
+        setCurrentUser(user);
+        currentUser = getCurrentUser();
+        setReferralData(referral);
+        setDueCount(due.totalDue ?? 0);
+        setMissedCount(missed.total ?? 0);
+        setCurrentMonth(due.month ?? "");
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, [authenticated, navigate]);
 
-  if (!authenticated || !currentUser) {
-    return null;
-  }
+  if (!authenticated || !currentUser) return null;
+
+  const sub        = currentUser.subscription;
+  const daysLeft   = sub?.endDate
+    ? Math.max(0, Math.ceil((new Date(sub.endDate).getTime() - Date.now()) / 86400000))
+    : 0;
+  const totalDays  = sub?.planId === "6months"  ? 180
+                   : sub?.planId === "12months" ? 365
+                   : sub?.planId === "24months" ? 730
+                   : 30;
+  const progressPct = Math.round((daysLeft / totalDays) * 100);
+  const progressColor = progressPct > 50 ? "bg-blue-500"
+                      : progressPct > 20 ? "bg-yellow-500"
+                      : "bg-red-500";
+
+  const stats = [
+    {
+      label: "Total records",
+      val:   currentUser.totalRecords ?? 0,
+      icon:  <FileText  className="w-4 h-4" />,
+      color: "text-foreground",
+      sub:   "All policy records",
+      link:  "/view-records",
+      bg: "bg-blue-50"
+    },
+    {
+      label: "Due this month",
+      val:   dueCount,
+      icon:  <FileClock className="w-4 h-4" />,
+      color: dueCount   > 0 ? "text-yellow-600" : "text-foreground",
+      sub:   currentMonth || "Payments pending",
+      link:  "/view-due-policies",
+      bg: "bg-green-50"
+    },
+    {
+      label: "Missed payments",
+      val:   missedCount,
+      icon:  <ReceiptText className="w-4 h-4" />,
+      color: missedCount > 0 ? "text-red-600" : "text-foreground",
+      sub:   "Last month unpaid",
+      link:  "/view-missed-payments",
+      bg: "bg-purple-50"
+    },
+    {
+      label: "Referrals",
+      val:   (referralData?.totalL1 ?? 0) + (referralData?.totalL2 ?? 0),
+      icon:  <Users className="w-5 h-5" />,
+      color: "text-green-600",
+      sub:   `₹${referralData?.availableBalance ?? 0} in wallet`,
+      link:  "/referral-program",
+      bg: "bg-amber-50"
+    },
+  ];
+
+  const actions = [
+    {
+      title: "Add record",
+      icon:  <Plus className="w-4 h-4" />,
+      desc:  "Create a new policy record with full details — holder info, nominee, bank, and policy terms.",
+      label: "Add new record",
+      link:  "/add-record",
+      badge: <Badge className="text-xs bg-blue-100 text-blue-700 border border-blue-200">New</Badge>,
+    },
+    {
+      title: "All records",
+      icon:  <Eye className="w-4 h-4" />,
+      desc:  "Browse, search, and manage all your existing policy records. Edit or view full details.",
+      label: "View all records",
+      link:  "/view-records",
+      badge: <Badge variant="secondary" className="text-xs">{currentUser.totalRecords ?? 0} total</Badge>,
+    },
+    {
+      title: "Due this month",
+      icon:  <FileClock className="w-4 h-4" />,
+      desc:  "See all policies with payment due this month. Track mode of payment and last payment date.",
+      label: "View due policies",
+      link:  "/view-due-policies",
+      badge: dueCount > 0
+        ? <Badge className="text-xs bg-yellow-100 text-yellow-700 border border-yellow-200">{dueCount} due</Badge>
+        : null,
+    },
+    {
+      title: "Missed payments",
+      icon:  <ReceiptText className="w-4 h-4" />,
+      desc:  "Policies that missed last month's payment. Take action before lapse notices are issued.",
+      label: "View missed payments",
+      link:  "/view-missed-payments",
+      badge: missedCount > 0
+        ? <Badge variant="destructive" className="text-xs">{missedCount} missed</Badge>
+        : null,
+    },
+  ];
+
+  const quickLinks = [
+    { label: "Profile",         icon: <User       className="w-5 h-5" />, link: "/profile"          },
+    { label: "Change password", icon: <Lock       className="w-5 h-5" />, link: "/change-password"   },
+    { label: "Our plans",       icon: <BarChart3  className="w-5 h-5" />, link: "/our-plans"         },
+  ];
 
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
       <Navigation />
-      
+
       <main className="container mx-auto px-4 py-8 flex-1">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          {/* Welcome Section */}
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-[3.15rem] font-bold text-form-header">
-              {t('welcome')}, {currentUser?.name || 'User'}!
+        <div className="max-w-5xl mx-auto space-y-5">
+
+          {/* ── Greeting ── */}
+          <div>
+            <h1 className="text-2xl font-medium text-form-header">
+              {getGreeting()}, {currentUser.name}
             </h1>
-            <p className="text-xl text-muted-foreground">
-              Manage your life insurance policy records with ease and security
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {new Date().toLocaleDateString("en-IN", { weekday:"long", day:"2-digit", month:"long", year:"numeric" })}
+              {sub && ` · ${sub.planType} plan · ${daysLeft} days left`}
             </p>
           </div>
 
-          {/* User Info Card */}
-          {/* <Card className="text-left">
-            <CardHeader>
-              <CardTitle className="text-form-header">Your Account Information</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Badge variant="secondary" className="mb-2">Auto-generated ID</Badge>
-                <p className="font-mono text-sm">{currentUser?.id}</p>
-              </div>
-              <div>
-                <Badge variant="outline" className="mb-2">Easy-to-remember ID</Badge>
-                <p className="font-mono text-sm">{currentUser?.easyId}</p>
-              </div>
-              <div>
-                <Badge variant="secondary" className="mb-2">Email</Badge>
-                <p className="text-sm">{currentUser?.email}</p>
-              </div>
-              <div>
-                <Badge variant="outline" className="mb-2">Mobile</Badge>
-                <p className="text-sm">{currentUser?.mobileNumber}</p>
-              </div>
-            </CardContent>
-          </Card> */}
+          {/* ── Alert banner ── */}
+          {missedCount > 0 && (
+            <div className="flex items-start gap-3 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
+              <AlertTriangle className="w-4 h-4 text-yellow-600 shrink-0 mt-0.5" />
+              <p className="text-sm text-yellow-800">
+                <strong>{missedCount} {missedCount === 1 ? "policy" : "policies"}</strong> missed last month's payment.
+                Review them before lapse notices are issued.{" "}
+                <Link to="/view-missed-payments" className="underline font-medium">View now →</Link>
+              </p>
+            </div>
+          )}
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="hover:shadow-lg transition-shadow bg-blue-100">
-              <CardHeader>
-                <CardTitle className="text-form-header flex items-center">
-                  <Plus className="w-5 h-5 mr-2" />
-                  {t('addRecord')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Add new life insurance policy records with complete information
-                </p>
-                <Link to="/add-record">
-                  <Button className="w-full bg-primary hover:bg-primary-light">
-                    {t("addNewRecord")}
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow bg-yellow-100">
-              <CardHeader>
-                <CardTitle className="text-form-header flex items-center">
-                  <Eye className="w-5 h-5 mr-2" />
-                  {t('viewRecords')}{<Badge variant="destructive" className="ml-2">{currentUser.totalRecords}</Badge>}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  View, search, and manage all your existing policy records
-                </p>
-                <Link to="/view-records">
-                  <Button className="w-full bg-primary hover:bg-primary-light">
-                    {t("viewAllRecords")}
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          {/* ── Stat cards ── */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {stats.map(({ label, val, icon, color, sub, link, bg }) => (
+              <Card key={label}
+                className={`cursor-pointer ${bg} hover:border-blue-300 transition-colors`}
+                onClick={() => navigate(link)}>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-2 text-xs">
+                    {icon} {label}
+                  </div>
+                  <p className={`text-3xl font-medium ${color}`}>{val}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{sub}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="hover:shadow-lg transition-shadow bg-green-100">
-              <CardHeader>
-                <CardTitle className="text-form-header flex items-center">
-                  <Plus className="w-5 h-5 mr-2" />
-                  {/* Current Month Due {thisMonthDue.totalDue > 0 ? <Badge variant="destructive" className="ml-2">{thisMonthDue.totalDue}</Badge>:''} */}
-                  Current Month Due {<Badge variant="destructive" className="ml-2">{currentMonthTotalDueCount}</Badge>}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  View your current month's due policies and their details
-                </p>
-                <Link to="/view-due-policies">
-                  <Button className="w-full bg-primary hover:bg-primary-light">
-                    View Due Policies
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow bg-red-100">
-              <CardHeader>
-                <CardTitle className="text-form-header flex items-center">
-                  <Eye className="w-5 h-5 mr-2" />
-                  Missing Last Month's Payment {<Badge variant="destructive" className="ml-2">{recordsWithoutLastPayment}</Badge>}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Check for any policies that missed last month's payment and take action
-                </p>
-                <Link to="/view-missed-payments">
-                  <Button className="w-full bg-primary hover:bg-primary-light">
-                    View Missed Payments
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          {/* ── Action cards ── */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {actions.map(({ title, icon, desc, label, link, badge }) => (
+              <Card key={title} className="hover:border-blue-300 transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 font-medium text-sm">
+                      {icon} {title}
+                    </div>
+                    {badge}
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed mb-4">{desc}</p>
+                  <Link to={link}>
+                    <Button size="sm" variant="outline" className="w-full text-xs">
+                      {label} <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
-          {/* Statistics */}
-          <Card className="bg-orange-100">
-            <CardHeader>
-              <CardTitle className="text-form-header">{t("quickStatistics")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                <div onClick={()=>navigate("/view-records")} style={{ cursor: 'pointer' }}>
-                  <p className="text-3xl font-bold text-primary">
-                    {currentUser?.totalRecords }
-                  </p>
-                  <p className="text-muted-foreground">{t("totalRecords")}</p>
+          {/* ── Subscription + Referral ── */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+            {/* Subscription */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+                  <Crown className="w-4 h-4" /> Your plan
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-0 pt-0">
+                {[
+                  { label: "Plan",    val: `${sub?.planType} · ${sub?.duration}` },
+                  { label: "Status",  val: sub?.status === "active"
+                      ? <Badge className="text-xs bg-green-100 text-green-700 border border-green-200">Active</Badge>
+                      : <Badge variant="destructive" className="text-xs">Expired</Badge> },
+                  { label: "Expires", val: fmt(sub?.endDate) },
+                ].map(({ label, val }) => (
+                  <div key={label} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                    <span className="text-xs text-muted-foreground">{label}</span>
+                    <span className="text-xs font-medium">{val}</span>
+                  </div>
+                ))}
+                {/* Progress bar */}
+                <div className="pt-3">
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
+                    <span>Time remaining</span>
+                    <span>{daysLeft} / {totalDays} days</span>
+                  </div>
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full transition-all ${progressColor}`}
+                      style={{ width: `${progressPct}%` }} />
+                  </div>
                 </div>
-                <div onClick={()=>navigate("/profile")} style={{ cursor: 'pointer' }}>
-                  {currentUser?.subscription.status === "active" ? (
-                    <Badge variant="success" className="mb-2">Active</Badge>
-                  ) : (
-                    <Badge variant="destructive" className="mb-2">Expired</Badge>
+                <div className="pt-3">
+                  <Link to="/our-plans" className="text-xs font-medium text-blue-600 hover:underline">
+                    Upgrade plan →
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Referral wallet */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+                  <Wallet className="w-4 h-4" /> Referral wallet
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-0 pt-0">
+                {[
+                  { label: "Available balance", val: <span className="text-green-600 font-medium text-xs">₹{referralData?.availableBalance ?? 0}</span> },
+                  { label: "Pending rewards",   val: <span className="text-yellow-600 font-medium text-xs">₹{referralData?.pendingEarnings ?? 0}</span> },
+                  { label: "Total earned",      val: `₹${referralData?.totalEarned ?? 0}` },
+                  { label: "Direct referrals",  val: referralData?.totalL1 ?? 0 },
+                  { label: "Level 2 referrals", val: referralData?.totalL2 ?? 0 },
+                ].map(({ label, val }) => (
+                  <div key={label} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                    <span className="text-xs text-muted-foreground">{label}</span>
+                    <span className="text-xs font-medium">{val}</span>
+                  </div>
+                ))}
+                <div className="pt-3 flex gap-4">
+                  <Link to="/referral-program" className="text-xs font-medium text-blue-600 hover:underline">
+                    View referrals →
+                  </Link>
+                  {(referralData?.availableBalance ?? 0) >= 100 && (
+                    <>
+                      <span className="text-muted-foreground text-xs">·</span>
+                      <Link to="/referral-program" className="text-xs font-medium text-green-600 hover:underline">
+                        Withdraw →
+                      </Link>
+                    </>
                   )}
-                  <p className="text-muted-foreground">Plan Status {currentUser?.subscription.endDate ? `: ${Math.max(0, Math.ceil((new Date(currentUser.subscription.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} Days left` : "No Plan"}</p>
                 </div>
-                <div>
-                  <p className="text-3xl font-bold text-primary">100%</p>
-                  <p className="text-muted-foreground">{t("dataSecurity")}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* ── Quick links ── */}
+          <div className="grid grid-cols-3 gap-3">
+            {quickLinks.map(({ label, icon, link }) => (
+              <Card key={label}
+                className="cursor-pointer hover:border-blue-300 transition-colors"
+                onClick={() => navigate(link)}>
+                <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
+                  <div className="text-muted-foreground">{icon}</div>
+                  <p className="text-xs text-muted-foreground">{label}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
         </div>
       </main>
 

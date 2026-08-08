@@ -158,13 +158,18 @@ const Navigation = () => {
         {/* MOBILE MENU */}
         {isMobileMenuOpen && (
           <div className="md:hidden mt-4 space-y-2 pb-4">
-            {authenticated &&
+            {authenticated && currentUser?.role === 'user' &&
               navItems.map((item) => (
                 <NavItem
                   key={item.to}
                   {...item}
                   onClick={toggleMobileMenu}
                 />
+              ))}
+            
+            {authenticated && (currentUser?.role === 'admin' || currentUser?.role === 'superadmin' ) &&
+              [...navItems, ...adminNavItems].map((item) => (
+                <NavItem key={item.to} {...item} />
               ))}
 
             {authenticated ? (
