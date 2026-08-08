@@ -18,6 +18,7 @@ export interface User {
   totalRecords?: number;
   isEmailVerified?: boolean;
   emailVerificationToken?: string;
+  role?: 'user' | 'admin' | 'superadmin';
 }
 
 export interface UserSubscription {
