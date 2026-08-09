@@ -13,13 +13,13 @@ import { useToast }  from "@/hooks/use-toast";
 import {
   Edit, Save, X, KeyRound, Users, Camera,
   Crown, CheckCircle2, XCircle, ArrowRight,
-  RefreshCw, ChevronRight,
+  RefreshCw, ChevronRight, UserCircle2, Wallet2, Gauge,
+  FileText, PlusCircle, BellRing, ShieldCheck,
 } from "lucide-react";
 import { updateProfile, getProfile }  from "../../services/userService.js";
 import { getReferralDashboard }        from "../../services/referralService";
 import { convertDateToIndianFormat }   from "@/utils/tools";
 
-// ── helpers ───────────────────────────────────────────────────────────────────
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() || "?";
 
@@ -68,7 +68,6 @@ const Profile = () => {
         mobileNumber: u.mobileNumber ?? "",
         email:        u.email        ?? "",
       });
-      // Restore saved avatar
       const saved = localStorage.getItem(`avatar_${u._id || u.easyId}`);
       if (saved) setAvatar(saved);
     } catch (err) {
@@ -108,7 +107,6 @@ const Profile = () => {
     setIsEditing(false);
   };
 
-  // Avatar upload — stored locally (swap for API upload if you add one later)
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -122,7 +120,6 @@ const Profile = () => {
     reader.readAsDataURL(file);
   };
 
-  // ── Derived values ──────────────────────────────────────────────────────────
   const sub        = user.subscription;
   const daysLeft   = sub?.endDate
     ? Math.max(0, Math.ceil((new Date(sub.endDate).getTime() - Date.now()) / 86400000))
@@ -133,7 +130,6 @@ const Profile = () => {
   const planPct    = Math.min(100, Math.round((daysLeft / totalDays) * 100));
   const planColor  = planPct > 50 ? "bg-blue-500" : planPct > 20 ? "bg-yellow-500" : "bg-red-500";
 
-  // ── Profile completion ──────────────────────────────────────────────────────
   const completionItems = [
     { label: "Name",            done: !!user.name           },
     { label: "Email verified",  done: !!user.isEmailVerified },
@@ -147,6 +143,13 @@ const Profile = () => {
                         : completionPct >= 60  ? "bg-yellow-500"
                         : "bg-red-500";
 
+  const quickActions = [
+    { icon: FileText,   label: "View records",      to: "/view-records" },
+    { icon: PlusCircle, label: "Add record",         to: "/add-record" },
+    { icon: BellRing,   label: "Due this month",     to: "/view-due-policies" },
+    { icon: Crown,      label: "Plans & billing",    to: "/our-plans" },
+  ];
+
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
       <Navigation />
@@ -154,26 +157,32 @@ const Profile = () => {
       <main className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-3xl mx-auto space-y-4">
 
-          {/* ── Hero ── */}
-          <div className="flex items-start gap-4 flex-wrap">
-
-            {/* Avatar */}
-            <div className="relative shrink-0 cursor-pointer" onClick={() => fileRef.current?.click()}>
-              <div className="w-18 h-18 w-[72px] h-[72px] rounded-full border-2 border-blue-300 overflow-hidden bg-blue-100 flex items-center justify-center text-blue-700 text-xl font-medium select-none">
-                {avatar
-                  ? <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
-                  : <span>{initials(form.name)}</span>
-                }
+          {/* ── Cover + Hero ── */}
+          <div className="bg-white border border-border rounded-xl overflow-hidden">
+            <div className="h-20 sm:h-24 bg-gradient-to-r from-form-header via-form-header to-primary relative">
+              <div className="absolute -bottom-8 left-4 sm:left-6">
+                <div className="relative shrink-0 cursor-pointer" onClick={() => fileRef.current?.click()}>
+                  <div className="w-[102px] h-[102px] rounded-full ring-4 ring-white overflow-hidden bg-blue-100 flex items-center justify-center text-blue-700 text-xl font-medium select-none shadow-md">
+                    {avatar
+                      ? <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+                      : <span>{initials(form.name)}</span>
+                    }
+                  </div>
+                  <div className="absolute bottom-0 right-0 w-[22px] h-[22px] rounded-full bg-primary border-2 border-white flex items-center justify-center">
+                    <Camera className="w-3 h-3 text-white" />
+                  </div>
+                  <input ref={fileRef} type="file" accept="image/*" className="hidden"
+                    onChange={handleAvatarChange} />
+                </div>
               </div>
-              <div className="absolute bottom-0 right-0 w-[22px] h-[22px] rounded-full bg-blue-600 border-2 border-white flex items-center justify-center">
-                <Camera className="w-3 h-3 text-white" />
-              </div>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden"
-                onChange={handleAvatarChange} />
+              {sub?.status === "active" && (
+                <Badge className="absolute top-3 right-3 bg-white/15 text-white border border-white/25 text-[10px] backdrop-blur-sm">
+                  <ShieldCheck className="w-3 h-3 mr-1" /> Active member
+                </Badge>
+              )}
             </div>
 
-            {/* Name + role + actions */}
-            <div className="flex-1 min-w-0">
+            <div className="pt-10 pb-4 px-4 sm:px-6">
               <h1 className="text-xl font-medium leading-tight">{form.name || "—"}</h1>
               <div className="flex items-center gap-2 flex-wrap mt-1 text-sm text-muted-foreground">
                 <span>{roleLabel[user.role] ?? "Policy agent"}</span>
@@ -191,7 +200,6 @@ const Profile = () => {
                 }
               </div>
 
-              {/* Action buttons — wrapped row, no overflow */}
               <div className="flex flex-wrap gap-2 mt-3">
                 {!isEditing ? (
                   <Button size="sm" onClick={() => setIsEditing(true)}>
@@ -225,10 +233,28 @@ const Profile = () => {
             </div>
           </div>
 
+          {/* ── Quick actions — compact bento row ── */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            {quickActions.map(({ icon: Icon, label, to }) => (
+              <Link
+                key={label}
+                to={to}
+                className="bg-white border border-border rounded-xl p-3 flex flex-col items-center text-center gap-1.5 hover:border-primary/40 hover:shadow-sm transition-all"
+              >
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Icon className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-[11px] font-medium text-form-header leading-tight">{label}</span>
+              </Link>
+            ))}
+          </div>
+
           {/* ── Profile completion bar ── */}
           <div className="bg-white border border-border rounded-xl px-4 py-3.5">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium">Profile completion</p>
+              <p className="text-sm font-medium flex items-center gap-1.5">
+                <Gauge className="w-4 h-4 text-primary" /> Profile Completion
+              </p>
               <p className={`text-sm font-medium ${
                 completionPct === 100 ? "text-green-600"
                 : completionPct >= 60 ? "text-yellow-600"
@@ -241,7 +267,7 @@ const Profile = () => {
             </div>
             <div className="flex flex-wrap gap-x-4 gap-y-1">
               {completionItems.map(({ label, done }) => (
-                <span key={label} className={`flex items-center gap-1 text-xs ${done ? "text-green-600" : "text-muted-foreground"}`}>
+                <span key={label} className={`flex items-center gap-1 text-xs ${done ? "text-green-600" : "text-red-500"}`}>
                   {done
                     ? <CheckCircle2 className="w-3 h-3 shrink-0" />
                     : <XCircle      className="w-3 h-3 shrink-0" />}
@@ -254,9 +280,10 @@ const Profile = () => {
           {/* ── Main two-column ── */}
           <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4">
 
-            {/* Account card */}
             <div className="bg-white border border-border rounded-xl p-4">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Account</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                <Crown className="w-3.5 h-3.5 text-primary" /> Account
+              </p>
 
               {[
                 { label: "Status",
@@ -286,7 +313,6 @@ const Profile = () => {
                 </div>
               ))}
 
-              {/* Plan progress */}
               <div className="mt-3">
                 <div className="flex justify-between text-xs text-muted-foreground mb-1">
                   <span>Time left</span><span>{daysLeft}/{totalDays}d</span>
@@ -306,10 +332,9 @@ const Profile = () => {
               </button>
             </div>
 
-            {/* Profile form */}
             <div className="bg-white border border-border rounded-xl p-4">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
-                Profile information
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                <UserCircle2 className="w-3.5 h-3.5 text-primary" /> Profile information
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
@@ -367,7 +392,6 @@ const Profile = () => {
                 </p>
               )}
 
-              {/* Payment details nudge if missing */}
               {!user.paymentDetails?.upiId && !user.paymentDetails?.accountNumber && (
                 <button
                   onClick={() => navigate("/referral-program")}
@@ -385,8 +409,8 @@ const Profile = () => {
           {referral && (
             <div className="bg-white border border-border rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Referral summary
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+                  <Wallet2 className="w-3.5 h-3.5 text-primary" /> Referral summary
                 </p>
                 <Link to="/referral-program" className="text-xs text-blue-600 hover:underline">
                   View full dashboard →

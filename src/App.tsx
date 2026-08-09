@@ -29,6 +29,7 @@ import WithdrawalRequests from "./pages/admin/WithdrawalRequests";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Landing from "./pages/Landing";
+import HelpSupport from "./pages/HelpSupport";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
             <Route path="/view-due-policies" element={<CurrentMonthDue />} />
             <Route path="/view-missed-payments" element={<MissedPayments />} />
             <Route path="/about" element={<About />} />
+            <Route path="/help-support" element={<HelpSupport />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/our-plans" element={<OurPlans />} />
             <Route path="/lic-info-hub" element={<LicInfoHub />} />

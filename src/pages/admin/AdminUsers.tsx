@@ -112,7 +112,8 @@ const AdminUsers = () => {
         u.name?.toLowerCase().includes(q) ||
         u.email?.toLowerCase().includes(q) ||
         u.easyId?.toLowerCase().includes(q) ||
-        u.subscription.planType?.toLowerCase().includes(q) 
+        u.subscription.planType?.toLowerCase().includes(q) ||
+        u.mobileNumber?.toLowerCase().includes(q) 
       );
     }
 

@@ -46,8 +46,9 @@ const Landing = () => {
             <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
               <a href="#features" className="hover:text-form-header transition-colors">Features</a>
               <a href="#how-it-works" className="hover:text-form-header transition-colors">How it works</a>
-              <a href="#plans" className="hover:text-form-header transition-colors">Plans</a>
+              <a href="/our-plans" className="hover:text-form-header transition-colors">Plans</a>
               <Link to="/about" className="hover:text-form-header transition-colors">About</Link>
+              <Link to="/help-support" className="hover:text-form-header transition-colors">Help & Support</Link>
             </div>
             <div className="flex items-center gap-2">
               <Link to="/login">
@@ -70,7 +71,7 @@ const Landing = () => {
           <div className="absolute top-20 -left-32 w-72 h-72 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="container mx-auto px-4 relative">
-            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center py-16 md:py-24">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center pt-[2rem] pb-16 md:py-24">
 
               {/* Left: message */}
               <div className="space-y-6">
@@ -211,7 +212,8 @@ const Landing = () => {
                   { icon: ClipboardList, title: "Add your policies", description: "Bring in your existing book of clients, one record or many, with full policyholder and policy details." },
                   { icon: ListChecks, title: "Never miss a due date", description: "The dashboard flags what's due this month and what's lapsed — so follow-ups happen on time." },
                 ].map(({ icon: Icon, title, description }, i) => (
-                  <div key={title} className="relative text-center md:text-left">
+                  // <div key={title} className="relative text-center md:text-left">
+                  <div key={title} className="relative text-center md:text-center md:flex md:flex-col md:items-center">
                     <div className="relative z-10 w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto md:mx-0 mb-4 shadow-sm">
                       <Icon className="w-6 h-6" />
                     </div>
@@ -407,7 +409,7 @@ const Landing = () => {
         </section>
 
         {/* ══════════ FINAL CTA ══════════ */}
-        <section className="bg-gradient-to-r from-primary to-primary-light text-primary-foreground py-16">
+        <section className="bg-[linear-gradient(to_bottom,#0a5b76,#0e7ca1,#0a5b76)] text-primary-foreground py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center space-y-6">
               <TrendingUp className="w-10 h-10 mx-auto text-white/90" />

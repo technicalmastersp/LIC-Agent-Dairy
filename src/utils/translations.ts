@@ -37,6 +37,7 @@ export interface Translations {
   aboutCompany: string;
   companyDescription: string;
   allRightsReserved: string;
+  footerTagline: string;
 
   // Common
   welcome: string;
@@ -145,6 +146,7 @@ export const translations: Record<string, Translations> = {
     aboutCompany: "About Company",
     companyDescription: "Your trusted partner for all type insurance policy management. Secure, reliable, and user-friendly platform for all your policy needs.",
     allRightsReserved: "All Rights Reserved",
+    footerTagline: "Every policy tracked by you. Every due date remembered. Every day.",
     
     // Common
     welcome: "Welcome",
@@ -254,6 +256,7 @@ export const translations: Record<string, Translations> = {
     aboutCompany: "कंपनी के बारे में",
     companyDescription: "आपका भरोसेमंद साथी सभी बीमा पॉलिसियों के प्रबंधन में। सुरक्षित, आसान और विश्वसनीय प्लेटफ़ॉर्म जो आपकी हर पॉलिसी जरूरत को पूरा करता है।",
     allRightsReserved: "सभी अधिकार सुरक्षित हैं।",
+    footerTagline: "हर पॉलिसी पर आपकी नज़र, हर ड्यू डेट याद — हर दिन।",
     
     // Common
     welcome: "स्वागत",
