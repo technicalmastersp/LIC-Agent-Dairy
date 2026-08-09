@@ -7,10 +7,12 @@ import { Check } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { getCurrentUser, updateUserSubscription } from "@/utils/auth";
+import { getCurrentUser, updateUserSubscription, setCurrentUser } from "@/utils/auth";
 import { useToast } from "@/hooks/use-toast";
-import { changePlan } from "../../services/subscriptionService";
+import { changePlan, createCheckoutOrder, verifyPayment, getSubscription } from "../../services/subscriptionService";
 import { getReferralConfig } from "../../services/configService";
+import { getProfile } from "../../services/userService";
+import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
 import { Link } from "lucide-react";
 
 interface Plan {
@@ -29,8 +31,11 @@ const OurPlans = () => {
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [referralConfig, setReferralConfig] = useState({ SIGNUP_DISCOUNT_AMOUNT: 100 });
-  
-  const currentUser = getCurrentUser();
+
+  // Seeded from cache for instant paint, then overwritten below by a live
+  // fetch — otherwise a page refresh never leaves the browser and a payment
+  // that succeeded server-side (e.g. verify call was lost) never shows here.
+  const [currentUser, setLocalCurrentUser] = useState(getCurrentUser());
 
   const [searchParams] = useSearchParams();
   const reason = searchParams.get("reason");
@@ -97,17 +102,67 @@ const OurPlans = () => {
 
   const handleSelectPlan = async (planId: string) => {
     if (!currentUser) { navigate("/login"); return; }
+
+    const plan = plans.find(p => p.id === planId);
+
     try {
-      await changePlan(planId);
-      toast({ title: "Plan Activated", description: "Your plan has been updated successfully." });
+      if (!plan || plan.price === 0) {
+        // Free plan — unchanged direct-activation path
+        await changePlan(planId);
+        toast({ title: "Plan Activated", description: "Your plan has been updated successfully." });
+        navigate("/");
+        return;
+      }
+
+      // Paid plan — go through Razorpay checkout
+      const order = await createCheckoutOrder(planId);
+      const paymentResponse = await openRazorpayCheckout({
+        order,
+        userName: currentUser?.name,
+        userEmail: currentUser?.email,
+        userContact: currentUser?.mobileNumber,
+      });
+
+      await verifyPayment(paymentResponse);
+
+      // Refresh the cached profile so the "Active Plan" badge updates immediately
+      const freshProfile = await getProfile();
+      setCurrentUser(freshProfile);
+      setLocalCurrentUser(freshProfile);
+
+      toast({ title: "Payment Successful", description: "Your plan has been activated." });
       navigate("/");
     } catch (err: any) {
+      if (err.message === "PAYMENT_CANCELLED") {
+        toast({ title: "Payment Cancelled", description: "You can try again anytime." });
+        return;
+      }
+      if (err.message === "PAYMENT_FAILED") {
+        toast({ title: "Payment Failed", description: "Your payment could not be completed. Please try again.", variant: "destructive" });
+        return;
+      }
       toast({ title: "Error", description: err.response?.data?.message || "Something went wrong.", variant: "destructive" });
     }
   };
 
   useEffect(() => {
     getReferralConfig().then(setReferralConfig).catch(() => {});
+  }, []);
+
+  // On every mount (including a hard refresh) — fetch subscription state
+  // live from the server. If it's stuck "pending_payment", getSubscription()
+  // triggers the backend's Razorpay reconciliation before returning, so a
+  // payment that succeeded but never got verified client-side self-heals here.
+  useEffect(() => {
+    if (!currentUser) return;
+    getSubscription()
+      .then((sub) => {
+        const merged = { ...currentUser, subscription: sub };
+        setCurrentUser(merged);
+        setLocalCurrentUser(merged);
+      })
+      .catch(() => {}); // not fatal — page still works off cached state
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -198,6 +253,14 @@ const OurPlans = () => {
                   >
                     <Check className="h-4 w-4 mr-2" />
                     Active Plan
+                  </Button>
+                ) : currentUser?.subscription?.planId === plan.id && currentUser?.subscription?.status === 'pending_payment' ? (
+                  <Button
+                    className="w-full"
+                    variant="default"
+                    onClick={() => handleSelectPlan(plan.id)}
+                  >
+                    Complete Payment
                   </Button>
                 ) : (
                   <Button
