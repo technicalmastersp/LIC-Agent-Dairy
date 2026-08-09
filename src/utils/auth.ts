@@ -27,7 +27,7 @@ export interface UserSubscription {
   price: number;
   startDate: string;
   endDate: string;
-  status: 'active' | 'expired' | 'cancelled';
+  status: 'active' | 'expired' | 'cancelled' | 'pending_payment';
   planType: string;
 }
 

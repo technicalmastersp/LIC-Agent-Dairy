@@ -19,3 +19,8 @@ export const updatePaymentDetails = async (data) => {
   const res = await apiClient.put("/user/payment-details", data);
   return res.data;
 };
+
+export const lookupIfsc = async (ifscCode) => {
+  const res = await apiClient.get(`/user/payment-details/ifsc/${ifscCode}`);
+  return res.data.data; // { bank, branch, city, ifsc }
+};

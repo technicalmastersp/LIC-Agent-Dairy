@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import AdminLayout  from "./AdminLayout";
 import { Button }   from "@/components/ui/button";
 import { Input }    from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { getUsers, deactivateUser, reactivateUser } from "../../../services/adminService";
-import { Search, Eye, UserX, UserCheck, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Eye, UserX, UserCheck, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })
@@ -22,38 +22,115 @@ const planColor: Record<string, string> = {
   "24months":    "bg-amber-100 text-amber-700",
 };
 
+const PAGE_SIZE = 20;
+const STATUS_OPTIONS = ["all", "active", "deactivated", "plan expired"] as const;
+type StatusFilter = typeof STATUS_OPTIONS[number];
+
 const AdminUsers = () => {
   const navigate    = useNavigate();
   const { toast }   = useToast();
   const currentUser = getCurrentUser();
   const authenticated = isAuthenticated();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [users,   setUsers]   = useState<any[]>([]);
-  const [pagination, setPagination] = useState<any>(null);
-  const [search,  setSearch]  = useState("");
-  const [status,  setStatus]  = useState("all");
-  const [page,    setPage]    = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [acting,  setActing]  = useState<string | null>(null);
+  // ---- data (fetched once) ----
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // ---- client-side filter/search/pagination state ----
+  const initialStatus = STATUS_OPTIONS.includes(searchParams.get("status") as StatusFilter)
+    ? (searchParams.get("status") as StatusFilter)
+    : "all";
+
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<StatusFilter>(initialStatus);
+  const [page,   setPage]   = useState(1);
+  const [acting, setActing] = useState<string | null>(null);
   const [deactivateModal, setDeactivateModal] = useState<any>(null);
   const [deactivateNote,  setDeactivateNote]  = useState("");
 
+  // Auth guard + one-time fetch of ALL users
   useEffect(() => {
     if (!authenticated || !["admin","superadmin"].includes(currentUser?.role)) {
       navigate("/"); return;
     }
-    fetchUsers();
-  }, [search, status, page]);
+    fetchAllUsers();
+  }, []);
 
-  const fetchUsers = async () => {
+  // Keep status in sync with the URL (?status=active) without refetching
+  useEffect(() => {
+    const urlStatus = searchParams.get("status");
+    if (urlStatus && STATUS_OPTIONS.includes(urlStatus as StatusFilter) && urlStatus !== status) {
+      setStatus(urlStatus as StatusFilter);
+      setPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  const fetchAllUsers = async (isRefresh = false) => {
     try {
-      setLoading(true);
-      const data = await getUsers({ search, page, limit: 20, role: "user", status: status === "all" ? undefined : status });
-      setUsers(data.users);
-      setPagination(data.pagination);
-    } catch (err) { console.error(err); }
-    finally { setLoading(false); }
+      isRefresh ? setRefreshing(true) : setLoading(true);
+      // Fetch everything once (large limit, no search/status params) —
+      // filtering/searching from here on happens client-side.
+      const data = await getUsers({ role: "user", limit: 100000, page: 1 });
+      setAllUsers(data.users ?? []);
+    } catch (err) {
+      console.error(err);
+      setAllUsers([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   };
+
+  const handleStatusChange = (s: StatusFilter) => {
+    setStatus(s);
+    setPage(1);
+    const next = new URLSearchParams(searchParams);
+    if (s === "all") next.delete("status");
+    else next.set("status", s);
+    setSearchParams(next, { replace: true });
+  };
+
+  // ---- client-side filtering + searching (no API calls) ----
+  const filteredUsers = useMemo(() => {
+    let result = allUsers;
+
+    if (status !== "all") {
+      console.log("status : ", status);
+      
+      const wantActive = status === "active";
+      if(status === "plan expired") {
+        result = result.filter(u => u.subscription.status === "expired");
+      } else result = result.filter(u => !!u.isActive === wantActive);
+    }
+
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      result = result.filter(u =>
+        u.name?.toLowerCase().includes(q) ||
+        u.email?.toLowerCase().includes(q) ||
+        u.easyId?.toLowerCase().includes(q) ||
+        u.subscription.planType?.toLowerCase().includes(q) ||
+        u.mobileNumber?.toLowerCase().includes(q) 
+      );
+    }
+
+    return result;
+  }, [allUsers, search, status]);
+
+  // ---- client-side pagination over the filtered set ----
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE));
+  const pagedUsers = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return filteredUsers.slice(start, start + PAGE_SIZE);
+  }, [filteredUsers, page]);
+
+  // Clamp page if filtering shrinks the result set below the current page
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [totalPages, page]);
 
   const handleDeactivate = async () => {
     if (!deactivateModal) return;
@@ -61,7 +138,11 @@ const AdminUsers = () => {
     try {
       await deactivateUser(deactivateModal.userId, deactivateNote);
       toast({ title: "Deactivated", description: `${deactivateModal.name} has been deactivated.` });
-      setDeactivateModal(null); setDeactivateNote(""); fetchUsers();
+      setDeactivateModal(null); setDeactivateNote("");
+      // Update local state instead of refetching
+      setAllUsers(prev => prev.map(u =>
+        u.userId === deactivateModal.userId ? { ...u, isActive: false } : u
+      ));
     } catch (err: any) {
       toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
     } finally { setActing(null); }
@@ -72,7 +153,9 @@ const AdminUsers = () => {
     try {
       await reactivateUser(userId);
       toast({ title: "Reactivated", description: `${name} has been reactivated.` });
-      fetchUsers();
+      setAllUsers(prev => prev.map(u =>
+        u.userId === userId ? { ...u, isActive: true } : u
+      ));
     } catch (err: any) {
       toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
     } finally { setActing(null); }
@@ -81,11 +164,17 @@ const AdminUsers = () => {
   return (
     <AdminLayout>
       <div className="space-y-5">
-        <div>
-          <h1 className="text-xl font-medium">Users</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {pagination?.total ?? 0} total users
-          </p>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 className="text-xl font-medium">Users</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {filteredUsers.length} of {allUsers.length} users
+            </p>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => fetchAllUsers(true)} disabled={refreshing}>
+            <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${refreshing ? "animate-spin" : ""}`} />
+            {refreshing ? "Refreshing…" : "Refresh"}
+          </Button>
         </div>
 
         {/* Filters */}
@@ -96,9 +185,9 @@ const AdminUsers = () => {
               value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
           </div>
           <div className="flex gap-2">
-            {["all","active","deactivated"].map(s => (
+            {STATUS_OPTIONS.map(s => (
               <Button key={s} size="sm" variant={status === s ? "default" : "outline"}
-                className="capitalize" onClick={() => { setStatus(s); setPage(1); }}>
+                className="capitalize" onClick={() => handleStatusChange(s)}>
                 {s}
               </Button>
             ))}
@@ -110,11 +199,11 @@ const AdminUsers = () => {
           <CardContent className="p-0">
             {loading ? (
               <p className="text-center text-sm text-muted-foreground py-10">Loading…</p>
-            ) : !users.length ? (
+            ) : !pagedUsers.length ? (
               <p className="text-center text-sm text-muted-foreground py-10">No users found.</p>
             ) : (
               <div className="overflow-x-auto">
-                <Table>
+                <Table className="min-w-[890px]">
                   <TableHeader>
                     <TableRow className="bg-muted">
                       <TableHead className="text-xs">User</TableHead>
@@ -127,8 +216,8 @@ const AdminUsers = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((u, i) => (
-                      <TableRow key={i} className="hover:bg-muted/50">
+                    {pagedUsers.map((u, i) => (
+                      <TableRow key={u.userId ?? i} className="hover:bg-muted/50">
                         <TableCell>
                           <p className="text-sm font-medium">{u.name}</p>
                           <p className="text-xs text-muted-foreground">{u.email}</p>
@@ -184,17 +273,17 @@ const AdminUsers = () => {
         </Card>
 
         {/* Pagination */}
-        {pagination && pagination.totalPages > 1 && (
+        {totalPages > 1 && (
           <div className="flex items-center justify-between text-sm">
             <p className="text-muted-foreground">
-              Page {pagination.page} of {pagination.totalPages}
+              Page {page} of {totalPages}
             </p>
             <div className="flex gap-2">
               <Button size="sm" variant="outline" disabled={page === 1}
                 onClick={() => setPage(p => p - 1)}>
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <Button size="sm" variant="outline" disabled={page === pagination.totalPages}
+              <Button size="sm" variant="outline" disabled={page === totalPages}
                 onClick={() => setPage(p => p + 1)}>
                 <ChevronRight className="w-4 h-4" />
               </Button>

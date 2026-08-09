@@ -9,7 +9,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
 import EditRecordModal from "@/components/EditRecordModal";
-import { Search, Eye, Trash2, ArrowUpDown, Plus, Edit } from "lucide-react";
+import { Search, Eye, Trash2, ArrowUpDown, ReceiptText, AlertTriangle, FolderOpen, Ban, Edit } from "lucide-react";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
@@ -68,7 +68,22 @@ interface Record {
   createdAt: string;
 }
 
-const CurrentMonthDue = () => {
+const avatarPalette = [
+  "bg-blue-100 text-blue-700",
+  "bg-violet-100 text-violet-700",
+  "bg-emerald-100 text-emerald-700",
+  "bg-amber-100 text-amber-700",
+  "bg-rose-100 text-rose-700",
+  "bg-cyan-100 text-cyan-700",
+];
+const avatarColor = (name: string) => {
+  const idx = (name || "").split("").reduce((s, c) => s + c.charCodeAt(0), 0) % avatarPalette.length;
+  return avatarPalette[idx];
+};
+const initials = (name: string) =>
+  (name || "?").trim().split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase()).join("");
+
+const MissedPayments = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { toast } = useToast();
@@ -86,7 +101,6 @@ const CurrentMonthDue = () => {
   const [currentMonth, setCurrentMonth] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Move this OUT of useEffect, make it a standalone function in the component
   const fetchRecords = async () => {
     try {
       setIsLoading(true);
@@ -95,7 +109,7 @@ const CurrentMonthDue = () => {
       setCurrentMonth("" + new Date().toLocaleString('default', { month: 'long' }) + " " + new Date().getFullYear());
     } catch (error) {
       console.error(error);
-      setRecords([]);      // ← set empty array on error so .filter() never crashes
+      setRecords([]);
       setCurrentMonth("");
     } finally {
       setIsLoading(false);
@@ -115,7 +129,7 @@ const CurrentMonthDue = () => {
   }
 
   const filteredAndSortedRecords = useMemo(() => {
-    if (!records || records.length === 0) return []; // ← guard against undefined/empty
+    if (!records || records.length === 0) return [];
 
     let filtered = records.filter(record =>
       record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -141,6 +155,14 @@ const CurrentMonthDue = () => {
       }
     });
   }, [records, searchTerm, sortField, sortDirection]);
+
+  // ── Derived stats ──
+  const summaryStats = useMemo(() => {
+    const neverPaid = records.filter(r => !r.currentPolicy?.lastPaymentDate).length;
+    const branches = new Set(records.map(r => r.currentPolicy?.branch).filter(Boolean)).size;
+    const totalSumAssured = records.reduce((sum, r) => sum + (Number(r.currentPolicy?.sumAssured) || 0), 0);
+    return { neverPaid, branches, totalSumAssured };
+  }, [records]);
 
   const handleSort = (field: keyof Record) => {
     if (sortField === field) {
@@ -177,13 +199,13 @@ const CurrentMonthDue = () => {
   };
 
   const SortableHeader = ({ field, children }: { field: keyof Record; children: React.ReactNode }) => (
-    <TableHead 
-      className="cursor-pointer hover:bg-table-header/50 border border-table-border"
+    <TableHead
+      className="cursor-pointer select-none hover:bg-table-header/70 transition-colors border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground"
       onClick={() => handleSort(field)}
     >
-      <div className="flex items-center space-x-1">
+      <div className="flex items-center gap-1.5">
         <span>{children}</span>
-        <ArrowUpDown className="w-4 h-4" />
+        <ArrowUpDown className={`w-3.5 h-3.5 ${sortField === field ? "text-form-header" : "text-muted-foreground/40"}`} />
       </div>
     </TableHead>
   );
@@ -194,17 +216,42 @@ const CurrentMonthDue = () => {
       
       <main className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-7xl mx-auto space-y-6">
-          {/* Header */}
+          {/* Hero header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-form-header">Missed Last Payment</h1>
-              <p className="text-muted-foreground">
-                View records that have missed their last payment. Stay on top of your policies and ensure timely follow-ups.
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                <ReceiptText className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-semibold text-form-header">Missed Last Payment</h1>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Records that missed their last payment. Stay on top of your policies and follow up on time.
+                </p>
+              </div>
             </div>
-            <Button className="bg-primary hover:bg-primary-light cursor-default">
+            <Badge className="bg-primary text-primary-foreground text-sm px-3 py-1.5 rounded-full">
               {currentMonth}
-            </Button>
+            </Badge>
+          </div>
+
+          {/* Stat row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { label: "Total missed", val: records.length, icon: <AlertTriangle className="w-4 h-4" />, sub: "Need follow-up", bg: "bg-red-50", color: "text-red-600" },
+              { label: "Never paid", val: summaryStats.neverPaid, icon: <Ban className="w-4 h-4" />, sub: "No payment on record", bg: "bg-rose-50", color: "text-rose-700" },
+              { label: "At-risk value", val: `₹${summaryStats.totalSumAssured.toLocaleString("en-IN")}`, icon: <ReceiptText className="w-4 h-4" />, sub: "Sum assured", bg: "bg-amber-50", color: "text-amber-700" },
+              { label: "Branches", val: summaryStats.branches, icon: <FolderOpen className="w-4 h-4" />, sub: "Affected branches", bg: "bg-violet-50", color: "text-violet-700" },
+            ].map(({ label, val, icon, sub, bg, color }) => (
+              <Card key={label} className={`${bg} border-transparent hover:shadow-sm transition-shadow`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-2 text-xs">
+                    {icon} {label}
+                  </div>
+                  <p className={`text-2xl font-semibold ${color}`}>{val}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{sub}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           {/* Search and Stats */}
@@ -217,7 +264,7 @@ const CurrentMonthDue = () => {
                     placeholder="Search by name, policy number, occupation..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 focus-visible:ring-primary/40"
                   />
                 </div>
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
@@ -229,14 +276,19 @@ const CurrentMonthDue = () => {
           </Card>
 
           {/* Records Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-form-header">All Unpaid Records</CardTitle>
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b border-table-border bg-table-header/40">
+              <CardTitle className="text-form-header text-base">All Unpaid Records</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               {filteredAndSortedRecords.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-muted-foreground text-lg mb-4">
+                <div className="text-center py-16 px-4">
+                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                    {isLoading
+                      ? <div className="w-5 h-5 border-2 border-primary/40 border-t-primary rounded-full animate-spin" />
+                      : <ReceiptText className="w-6 h-6 text-muted-foreground" />}
+                  </div>
+                  <div className="text-muted-foreground text-base mb-4">
                     {isLoading ? (
                       <span>{t("loadingRecords")}</span>
                     ) : records.length === 0 ? (
@@ -254,20 +306,25 @@ const CurrentMonthDue = () => {
                         <SortableHeader field="name">Name</SortableHeader>
                         <SortableHeader field="fatherName">Father's Name</SortableHeader>
                         <SortableHeader field="age">Age</SortableHeader>
-                        <TableHead className="border border-table-border">Policy Number</TableHead>
-                        <TableHead className="border border-table-border">Mode Of Payment</TableHead>
-                        <TableHead className="border border-table-border">Branch</TableHead>
-                        <TableHead className="border border-table-border">Last Payment Date</TableHead>
-                        <TableHead className="border border-table-border">Actions</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Policy Number</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Mode Of Payment</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Branch</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Last Payment Date</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredAndSortedRecords.map((record) => (
-                        <TableRow key={record.recordId} className="hover:bg-muted/50">
+                        <TableRow key={record.recordId} className="hover:bg-muted/50 transition-colors">
                           <TableCell className="border border-table-border font-medium">
-                            {record.name}
+                            <div className="flex items-center gap-2.5">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 ${avatarColor(record.name)}`}>
+                                {initials(record.name)}
+                              </div>
+                              <span>{record.name}</span>
+                            </div>
                           </TableCell>
-                          <TableCell className="border border-table-border">
+                          <TableCell className="border border-table-border text-muted-foreground">
                             {record.fatherName}
                           </TableCell>
                           <TableCell className="border border-table-border">
@@ -278,14 +335,16 @@ const CurrentMonthDue = () => {
                               {record.currentPolicy.policyNumber || "N/A"}
                             </Badge>
                           </TableCell>
-                          <TableCell className="border border-table-border">
+                          <TableCell className="border border-table-border text-muted-foreground">
                             {record.currentPolicy.modeOfPayment || "-"}
                           </TableCell>
-                          <TableCell className="border border-table-border">
+                          <TableCell className="border border-table-border text-muted-foreground">
                             {record.currentPolicy.branch || "-"}
                           </TableCell>
-                          <TableCell className="border border-table-border text-sm text-muted-foreground">
-                            {record.currentPolicy.lastPaymentDate || <span className="italic text-red-400">No payments</span>}
+                          <TableCell className="border border-table-border text-sm">
+                            {record.currentPolicy.lastPaymentDate
+                              ? <span className="text-muted-foreground">{record.currentPolicy.lastPaymentDate}</span>
+                              : <Badge className="bg-red-100 text-red-700 border border-red-200 text-xs">No payments</Badge>}
                           </TableCell>
                           <TableCell className="border border-table-border">
                             <div className="flex items-center space-x-2">
@@ -310,7 +369,6 @@ const CurrentMonthDue = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                // onClick={() => handleDeleteRecord(record.recordId)}
                                 disabled
                                 className="h-8 w-8 p-0 opacity-50 cursor-not-allowed"
                                 title="Delete Record (Disabled)"
@@ -330,20 +388,18 @@ const CurrentMonthDue = () => {
         </div>
       </main>
 
-      {/* Record Details Modal */}
       <RecordDetailsModal
         record={selectedRecord}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
 
-      {/* Edit Record Modal */}
       <EditRecordModal
         record={editingRecord}
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false);
-          fetchRecords(); // ← refresh on close too
+          fetchRecords();
         }}
         onUpdate={handleUpdateRecord}
       />
@@ -353,4 +409,4 @@ const CurrentMonthDue = () => {
   );
 };
 
-export default CurrentMonthDue;
+export default MissedPayments;

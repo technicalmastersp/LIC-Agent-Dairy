@@ -285,7 +285,7 @@ const AdminDashboard = () => {
               {[
                 { label: "View pending withdrawals", path: "/admin/withdrawals",         show: true,                                      urgent: withdrawals.pending > 0 },
                 { label: "View all users",           path: "/admin/users",               show: true,                                      urgent: false },
-                { label: "View expired plans",       path: "/admin/users?status=expired",show: true,                                      urgent: subscriptions.expired > 0 },
+                { label: "View expired plans",       path: "/admin/users?status=plan+expired",show: true,                                      urgent: subscriptions.expired > 0 },
                 { label: "Manage admins",            path: "/admin/admins",              show: currentUser?.role === "superadmin",         urgent: false },
                 { label: "Activity logs",            path: "/admin/logs",                show: currentUser?.role === "superadmin",         urgent: false },
               ].filter(a => a.show).map(({ label, path, urgent }) => (

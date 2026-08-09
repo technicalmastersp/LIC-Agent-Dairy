@@ -8,7 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, User, MapPin, Briefcase, Phone, CreditCard, HomeIcon } from "lucide-react";
+import {
+  Calendar, User, MapPin, Briefcase, Phone, CreditCard, HomeIcon,
+  IdCard, HeartPulse, Users, ShieldCheck, History,
+} from "lucide-react";
 import siteConfig from "@/config/siteConfig";
 import { convertDateToIndianFormat } from "@/utils/tools";
 
@@ -18,15 +21,24 @@ interface RecordDetailsModalProps {
   onClose: () => void;
 }
 
+const SectionTitle = ({ icon: Icon, children }: { icon: any; children: React.ReactNode }) => (
+  <CardTitle className="text-form-header flex items-center gap-2.5">
+    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+      <Icon className="w-3.5 h-3.5 text-primary" />
+    </div>
+    <span>{children}</span>
+  </CardTitle>
+);
+
 const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps) => {
   if (!record) return null;
 
   const InfoItem = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
-    <div className="flex items-start space-x-3 p-3 rounded-lg bg-muted/30">
+    <div className="flex items-start space-x-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
       <Icon className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-muted-foreground">{label}</p>
-        <p className="text-sm break-words">{value || "-"}</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{label}</p>
+        <p className="text-sm break-words mt-0.5">{value || "-"}</p>
       </div>
     </div>
   );
@@ -43,7 +55,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
 
         <div className="space-y-6">
           {/* Header Card */}
-          <Card className="bg-gradient-to-r from-primary/10 to-accent/20">
+          <Card className="bg-gradient-to-r from-primary/10 to-accent/20 border-primary/10">
             <CardHeader>
               <CardTitle className="text-lg text-form-header flex items-center space-x-2">
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -51,10 +63,16 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 </div>
                 &nbsp;{siteConfig.title}
               </CardTitle>
-              <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                {/* <span>Record ID: {record.id}</span> */}
-                <span>Created: {convertDateToIndianFormat(record.createdAt)}</span>
-                {record.currentPolicy?.nextDueDate ? <span>Payment Due Date: {convertDateToIndianFormat(record.currentPolicy?.nextDueDate)}</span> : ''}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5" />
+                  Created: {convertDateToIndianFormat(record.createdAt)}
+                </span>
+                {record.currentPolicy?.nextDueDate && (
+                  <Badge className="bg-amber-100 text-amber-700 border border-amber-200">
+                    Payment Due: {convertDateToIndianFormat(record.currentPolicy?.nextDueDate)}
+                  </Badge>
+                )}
               </div>
             </CardHeader>
           </Card>
@@ -62,10 +80,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
           {/* Basic Details */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">Basic Details</CardTitle>
+              <SectionTitle icon={IdCard}>Basic Details</SectionTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <InfoItem icon={User} label="Date" value={convertDateToIndianFormat(record.date)} />
                 <InfoItem icon={Calendar} label="Aadhaar Number" value={record.aadhaarNumber} />
                 <InfoItem icon={MapPin} label="Pan Number" value={record.panNumber} />
@@ -77,10 +95,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
           {/* Personal Information */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">Personal Information</CardTitle>
+              <SectionTitle icon={User}>Personal Information</SectionTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <InfoItem icon={User} label="Full Name" value={record.name || ""} />
                 <InfoItem icon={MapPin} label="Birth Place" value={record.birthPlace || ""} />
                 <InfoItem icon={User} label="Father's Name" value={record.fatherName || ""} />
@@ -100,10 +118,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
           {/* Education & Occupation */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">Education & Occupation</CardTitle>
+              <SectionTitle icon={Briefcase}>Education & Occupation</SectionTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <InfoItem icon={Briefcase} label="Educational Qualification" value={record.educationalQualification || ""} />
                 <InfoItem icon={Briefcase} label="Occupation" value={record.occupation || ""} />
                 <InfoItem icon={Briefcase} label="Designation" value={record.designationOfPolicyHolder || ""} />
@@ -117,10 +135,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
           {/* Physical Details */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">Physical Details</CardTitle>
+              <SectionTitle icon={HeartPulse}>Physical Details</SectionTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <InfoItem icon={User} label="Height" value={record.height} />
                 <InfoItem icon={User} label="Weight" value={record.weight} />
                 <InfoItem icon={Calendar} label="Last Child Birth Date &#40;Only for Women&#41;" value={convertDateToIndianFormat(record.lastChildBirthDate) || ""} />
@@ -131,10 +149,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
           {/* Banking Details */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-form-header">Banking Information</CardTitle>
+              <SectionTitle icon={CreditCard}>Banking Information</SectionTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <InfoItem icon={CreditCard} label="Bank Account Number" value={record.bankAccountNumber} />
                 <InfoItem icon={CreditCard} label="IFSC Code" value={record.ifscCode} />
                 <InfoItem icon={HomeIcon} label="Bank Name" value={record.bankName} />
@@ -147,10 +165,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
           {record.familyMembers && record.familyMembers.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-form-header">Family Details</CardTitle>
+                <SectionTitle icon={Users}>Family Details</SectionTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto rounded-lg border border-table-border">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
@@ -163,7 +181,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                     </TableHeader>
                     <TableBody>
                       {record.familyMembers.map((member: any, index: number) => (
-                        <TableRow key={index}>
+                        <TableRow key={index} className="hover:bg-muted/40">
                           <TableCell className="border border-table-border font-medium">
                             {member.relationship}
                           </TableCell>
@@ -171,7 +189,11 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                             {member.currentAge || "-"}
                           </TableCell>
                           <TableCell className="border border-table-border">
-                            {member.health || "-"}
+                            {member.health === "Good" ? (
+                              <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs">Good</Badge>
+                            ) : member.health === "Not Good" ? (
+                              <Badge className="bg-red-100 text-red-700 border border-red-200 text-xs">Not Good</Badge>
+                            ) : "-"}
                           </TableCell>
                           <TableCell className="border border-table-border">
                             {member.deathAge || "-"}
@@ -192,10 +214,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
           {record.currentPolicy && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-form-header">Current Policy Details</CardTitle>
+                <SectionTitle icon={ShieldCheck}>Current Policy Details</SectionTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto rounded-lg border border-table-border">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
@@ -208,7 +230,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
+                      <TableRow className="hover:bg-muted/40">
                         <TableCell className="border border-table-border">
                           <Badge variant="outline" className="font-mono">
                             {record.currentPolicy.policyNumber || "N/A"}
@@ -217,7 +239,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                         <TableCell className="border border-table-border">
                           {record.currentPolicy.planAndTerm || "-"}
                         </TableCell>
-                        <TableCell className="border border-table-border">
+                        <TableCell className="border border-table-border font-medium text-emerald-700">
                           ₹{record.currentPolicy.sumAssured || "0"}
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -241,10 +263,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
           {record.previousPolicy && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-form-header">Previous Policy Details</CardTitle>
+                <SectionTitle icon={History}>Previous Policy Details</SectionTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto rounded-lg border border-table-border">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
@@ -257,7 +279,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
+                      <TableRow className="hover:bg-muted/40">
                         <TableCell className="border border-table-border">
                           <Badge variant="outline" className="font-mono">
                             {record.previousPolicy.policyNumber || "N/A"}

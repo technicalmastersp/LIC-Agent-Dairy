@@ -5,11 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { validateUpiId, validateIfsc, validateAccountNumber } from "../../utils/bankValidators";
+// import { INDIAN_BANKS } from "../../utils/indianBanks";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
-import { getReferralDashboard, withdrawEarnings, updatePaymentDetails } from "../../services/referralService";
+import { getReferralDashboard, withdrawEarnings, updatePaymentDetails, lookupIfsc } from "../../services/referralService";
 import {
   Copy, Share, Users, TrendingUp, Gift, Crown,
   Wallet, GitBranch, Receipt, Route, Clock,
@@ -111,7 +114,12 @@ const ReferralProgram = () => {
   const [loading,     setLoading]     = useState(true);
   const [withdrawing, setWithdrawing] = useState(false);
   const [editingBank, setEditingBank] = useState(false);
-  const [savingBank,  setSavingBank]  = useState(false);
+  const [savingBank, setSavingBank] = useState(false);
+  const [ifscLookupState, setIfscLookupState] = useState<{
+    status: "idle" | "loading" | "found" | "not_found";
+    bank?: string;
+    branch?: string;
+  }>({ status: "idle" });
 
   const [config, setConfig] = useState({ SIGNUP_DISCOUNT_AMOUNT: 100, L1_COMMISSION_PCT: 5, L2_COMMISSION_PCT: 2, MIN_WITHDRAWAL: 100, REWARD_WINDOW_DAYS: 15 });
 
@@ -174,17 +182,48 @@ const ReferralProgram = () => {
     window.open(`https://wa.me/?text=${msg}`, "_blank");
   };
 
+  const handleIfscBlur = async () => {
+    const code = bankForm.ifscCode.trim().toUpperCase();
+    if (!validateIfsc(code)) {
+      setIfscLookupState({ status: "idle" });
+      return;
+    }
+    setIfscLookupState({ status: "loading" });
+    try {
+      const details = await lookupIfsc(code);
+      setIfscLookupState({ status: "found", bank: details.bank, branch: details.branch });
+      setBankForm(p => ({ ...p, bankName: details.bank }));
+    } catch {
+      setIfscLookupState({ status: "not_found" });
+      setBankForm(p => ({ ...p, bankName: "" }));
+    }
+  };
+
   const handleSaveBank = async () => {
     if (!bankForm.upiId && !bankForm.accountNumber) {
       toast({ title: "Required", description: "Add at least a UPI ID or bank account.", variant: "destructive" });
       return;
     }
-    if (bankForm.accountNumber && (!bankForm.ifscCode || !bankForm.accountHolder || !bankForm.bankName)) {
-      toast({ title: "Incomplete", description: "Fill all bank account fields.", variant: "destructive" });
+    if (bankForm.upiId && !validateUpiId(bankForm.upiId)) {
+      toast({ title: "Invalid UPI ID", description: "Expected a format like name@bank.", variant: "destructive" });
+      return;
+    }
+    if (bankForm.accountNumber && (!bankForm.ifscCode || !bankForm.accountHolder)) {
+      toast({ title: "Incomplete", description: "Fill account number, IFSC, and account holder name.", variant: "destructive" });
+      return;
+    }
+    if (bankForm.accountNumber && !validateAccountNumber(bankForm.accountNumber)) {
+      toast({ title: "Invalid account number", description: "Expected 9–18 digits.", variant: "destructive" });
+      return;
+    }
+    if (bankForm.accountNumber && ifscLookupState.status !== "found") {
+      toast({ title: "Verify IFSC first", description: "Enter a valid IFSC code and let it resolve to a bank before saving.", variant: "destructive" });
       return;
     }
     setSavingBank(true);
     try {
+      // bankName is resolved server-side from IFSC too — sending it here is
+      // just for optimistic UI; the backend derives its own authoritative value.
       await updatePaymentDetails(bankForm);
       toast({ title: "Saved!", description: "Payment details updated." });
       setEditingBank(false);
@@ -392,6 +431,7 @@ const ReferralProgram = () => {
                         value={bankForm.upiId}
                         onChange={e => setBankForm(p => ({ ...p, upiId: e.target.value }))}
                       />
+                      <p className="text-xs text-muted-foreground">Pending manual verification before first withdrawal.</p>
                     </div>
                   </div>
 
@@ -428,16 +468,33 @@ const ReferralProgram = () => {
                         <Input
                           placeholder="SBIN0001234"
                           value={bankForm.ifscCode}
-                          onChange={e => setBankForm(p => ({ ...p, ifscCode: e.target.value.toUpperCase() }))}
+                          onChange={e => {
+                            setBankForm(p => ({ ...p, ifscCode: e.target.value.toUpperCase() }));
+                            setIfscLookupState({ status: "idle" });
+                          }}
+                          onBlur={handleIfscBlur}
                         />
                       </div>
                       <div className="space-y-1.5">
                         <Label className="text-xs">Bank name</Label>
-                        <Input
-                          placeholder="State Bank of India"
-                          value={bankForm.bankName}
-                          onChange={e => setBankForm(p => ({ ...p, bankName: e.target.value }))}
-                        />
+                        {ifscLookupState.status === "loading" && (
+                          <p className="text-xs text-muted-foreground py-2">Looking up bank…</p>
+                        )}
+                        {ifscLookupState.status === "found" && (
+                          <div className="flex items-center gap-1.5 text-sm py-2">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                            <span>{ifscLookupState.bank}{ifscLookupState.branch ? ` · ${ifscLookupState.branch}` : ""}</span>
+                          </div>
+                        )}
+                        {ifscLookupState.status === "not_found" && (
+                          <div className="flex items-center gap-1.5 text-sm text-destructive py-2">
+                            <AlertCircle className="w-3.5 h-3.5" />
+                            <span>IFSC not found — check the code</span>
+                          </div>
+                        )}
+                        {ifscLookupState.status === "idle" && (
+                          <p className="text-xs text-muted-foreground py-2">Enter a valid IFSC above to auto-fill</p>
+                        )}
                       </div>
                     </div>
                   </div>
