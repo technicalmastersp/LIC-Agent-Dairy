@@ -11,6 +11,7 @@ export interface Translations {
   viewRecords: string;
   login: string;
   signup: string;
+  signupFree: string;
   logout: string;
   profile: string;  
   referral: string;  
@@ -120,6 +121,7 @@ export const translations: Record<string, Translations> = {
     viewRecords: "View Records",
     login: "Login",
     signup: "Sign Up",
+    signupFree: "Sign up Free",
     logout: "Logout",
     profile: "Profile",
     referral: "Referral",
@@ -228,8 +230,8 @@ export const translations: Record<string, Translations> = {
     addRecord: "रिकॉर्ड जोड़ें",
     viewRecords: "रिकॉर्ड देखें",
     login: "लॉग इन",
-    // signup: "साइन अप",
     signup: "खाता बनाएं",
+    signupFree: "मुफ़्त में खाता बनाएं",
     logout: "लॉग आउट",
     profile: "प्रोफ़ाइल",
     referral: "रेफ़रल",

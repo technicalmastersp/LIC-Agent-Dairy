@@ -204,18 +204,11 @@ const Navigation = () => {
             ) : (
               <div className="flex items-center gap-2 pl-2 ml-1 border-l border-primary-foreground/15 shrink-0">
                 <Button variant="outline" size="sm" asChild
-                  className="bg-transparent border-primary-foreground/25 text-primary-foreground hover:bg-primary-light/50 hover:text-primary-foreground shrink-0 px-2.5 xl:px-3">
-                  <Link to="/referral-program" title="Referral">
-                    <Users className="w-3.5 h-3.5 xl:mr-1.5" />
-                    <span className="hidden xl:inline">Referral</span>
-                  </Link>
-                </Button>
-                <Button variant="outline" size="sm" asChild
                   className="bg-transparent border-primary-foreground/25 text-primary-foreground hover:bg-primary-light/50 hover:text-primary-foreground shrink-0">
                   <Link to="/login">{t("login")}</Link>
                 </Button>
                 <Button size="sm" asChild className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 shrink-0">
-                  <Link to="/signup">{t("signup")}</Link>
+                  <Link to="/signup">{t("signupFree")}</Link>
                 </Button>
               </div>
             )}
@@ -288,7 +281,7 @@ const Navigation = () => {
                 </Button>
                 <Button size="sm" asChild className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                   <Link to="/signup" onClick={closeMobileMenu}>
-                    {t("signup")}
+                    {t("signupFree")}
                   </Link>
                 </Button>
               </div>

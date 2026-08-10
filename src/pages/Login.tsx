@@ -130,7 +130,7 @@ const Login = () => {
               <p className="text-sm text-muted-foreground">
                 {t('dontHaveAccount')}{" "}
                 <Link to="/signup" className="text-primary hover:underline">
-                  {t('signup')}
+                  {t('signupFree')}
                 </Link>
               </p>
               <p className="text-sm text-muted-foreground py-1">
@@ -141,7 +141,6 @@ const Login = () => {
               <p className="text-sm text-muted-foreground">
                 {/* {t('dontHaveAccount')}{" "} */}Explore &nbsp;  
                 <Link to="/our-plans" className="text-primary hover:underline">
-                  {/* {t('signup')} */}
                   Our Plans
                 </Link>
               </p>

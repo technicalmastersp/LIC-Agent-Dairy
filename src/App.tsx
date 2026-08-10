@@ -26,6 +26,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminUserDetail from "./pages/admin/AdminUserDetail";
 import AdminAdmins from "./pages/admin/AdminAdmins";
 import WithdrawalRequests from "./pages/admin/WithdrawalRequests";
+import PaymentVerifications from "./pages/admin/PaymentVerifications";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Landing from "./pages/Landing";
@@ -66,6 +67,7 @@ const App = () => (
             <Route path="/admin/users/:userId"    element={<AdminUserDetail />} />
             <Route path="/admin/admins"           element={<AdminAdmins />} />
             <Route path="/admin/withdrawals"      element={<WithdrawalRequests />} />
+            <Route path="/admin/payment-verifications" element={<PaymentVerifications />} />
             <Route path="/admin/logs"             element={<AdminLogs />} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

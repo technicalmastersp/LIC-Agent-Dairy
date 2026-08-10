@@ -21,6 +21,8 @@ const ACTION_COLORS: Record<string, string> = {
   ADMIN_DEACTIVATED:   "bg-orange-100 text-orange-700",
   RECORD_DELETED:      "bg-red-100 text-red-700",
   ADMIN_PERMISSIONS_UPDATED: "bg-indigo-100 text-indigo-700",
+  UPI_VERIFIED:        "bg-green-100 text-green-700",
+  UPI_REJECTED:        "bg-red-100 text-red-700",
 };
 
 const ACTIONS = Object.keys(ACTION_COLORS);

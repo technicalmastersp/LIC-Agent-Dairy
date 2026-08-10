@@ -84,6 +84,11 @@ export const getMyPermissions = async () => {
   return res.data;
 };
 
+export const getPendingCounts = async () => {
+  const res = await apiClient.get("/admin/pending-counts");
+  return res.data.data;
+};
+
 // Force Logout a user or admin
 export const forceLogoutUser = async (userId, reason) => {
   const res = await apiClient.post(`/admin/force-logout/${userId}`, { reason });
@@ -111,5 +116,21 @@ export const promoteAdmin = async (adminId, durationHours, reason) => {
 
 export const demoteAdmin = async (adminId) => {
   const res = await apiClient.post(`/admin/admins/${adminId}/demote`);
+  return res.data;
+};
+
+// Payment verification
+export const getPendingUpiVerifications = async () => {
+  const res = await apiClient.get("/admin/payment-verifications/upi/pending");
+  return res.data.data;
+};
+
+export const verifyUpiId = async (userId) => {
+  const res = await apiClient.patch(`/admin/payment-verifications/upi/${userId}/approve`);
+  return res.data;
+};
+
+export const rejectUpiId = async (userId, reason) => {
+  const res = await apiClient.patch(`/admin/payment-verifications/upi/${userId}/reject`, { reason });
   return res.data;
 };

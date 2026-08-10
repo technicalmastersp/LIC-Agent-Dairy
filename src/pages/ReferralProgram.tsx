@@ -23,13 +23,16 @@ import { getReferralConfig } from "../../services/configService";
 
 // ── types ─────────────────────────────────────────────────────────────────────
 interface PaymentDetails {
-  upiId?:         string;
-  accountNumber?: string;
-  ifscCode?:      string;
-  accountHolder?: string;
-  bankName?:      string;
-  isVerified?:    boolean;
-  updatedAt?:     string;
+  upiId?:              string;
+  upiVerified?:        boolean;
+  upiRejectionReason?: string;
+  accountNumber?:      string;
+  ifscCode?:           string;
+  accountHolder?:      string;
+  bankName?:           string;
+  branchName?:         string;
+  bankVerified?:       boolean;
+  updatedAt?:          string;
 }
 
 interface WithdrawalRecord {
@@ -393,6 +396,7 @@ const ReferralProgram = () => {
                         : "—",                                                                icon: <Building2  className="w-3.5 h-3.5" /> },
                     { label: "IFSC code",       val: d.paymentDetails?.ifscCode      || "—", icon: null },
                     { label: "Bank name",       val: d.paymentDetails?.bankName      || "—", icon: null },
+                    { label: "Branch",          val: d.paymentDetails?.branchName    || "—", icon: null },
                     { label: "Last updated",    val: fmt(d.paymentDetails?.updatedAt),        icon: null },
                   ].map(({ label, val }) => (
                     <div key={label} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
@@ -400,6 +404,35 @@ const ReferralProgram = () => {
                       <span className="text-sm font-medium">{val}</span>
                     </div>
                   ))}
+
+                  <div className="flex flex-wrap gap-2 pt-3">
+                    {d.paymentDetails?.upiId && (
+                      d.paymentDetails.upiVerified ? (
+                        <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200">
+                          <CheckCircle2 className="w-3 h-3 mr-1" /> UPI Verified
+                        </Badge>
+                      ) : d.paymentDetails.upiRejectionReason ? (
+                        <Badge variant="destructive">
+                          <AlertCircle className="w-3 h-3 mr-1" /> UPI Rejected: {d.paymentDetails.upiRejectionReason}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-amber-700 border-amber-300">
+                          <Clock className="w-3 h-3 mr-1" /> UPI Pending Review
+                        </Badge>
+                      )
+                    )}
+                    {d.paymentDetails?.accountNumber && (
+                      d.paymentDetails.bankVerified ? (
+                        <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200">
+                          <CheckCircle2 className="w-3 h-3 mr-1" /> Bank Verified
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-amber-700 border-amber-300">
+                          <Clock className="w-3 h-3 mr-1" /> Bank Pending
+                        </Badge>
+                      )
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -431,6 +464,9 @@ const ReferralProgram = () => {
                         value={bankForm.upiId}
                         onChange={e => setBankForm(p => ({ ...p, upiId: e.target.value }))}
                       />
+                      <p className="text-xs text-muted-foreground">
+                        This UPI ID will be validated within 24 hours by admin. Must use your own UPI ID.
+                      </p>
                       <p className="text-xs text-muted-foreground">Pending manual verification before first withdrawal.</p>
                     </div>
                   </div>

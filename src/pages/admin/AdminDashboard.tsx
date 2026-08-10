@@ -6,11 +6,12 @@ import { Button }   from "@/components/ui/button";
 import { Input }   from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
-import { getDashboardStats, forceLogoutGroup } from "../../../services/adminService";
+import { getDashboardStats, forceLogoutGroup, getMyPermissions } from "../../../services/adminService";
 import {
   Users, TrendingUp, Wallet, ArrowDownToLine,
   Clock, CheckCircle2, UserX, Gift,
-  ArrowUpRight, ArrowDownRight, RefreshCw, LogOut, AlertTriangle
+  ArrowUpRight, ArrowDownRight, RefreshCw, LogOut, AlertTriangle,
+  BadgeCheck,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -24,6 +25,8 @@ const ACTION_COLORS: Record<string, string> = {
   ADMIN_CREATED:             "bg-blue-100 text-blue-700",
   ADMIN_DEACTIVATED:         "bg-orange-100 text-orange-700",
   ADMIN_PERMISSIONS_UPDATED: "bg-indigo-100 text-indigo-700",
+  UPI_VERIFIED:              "bg-green-100 text-green-700",
+  UPI_REJECTED:              "bg-red-100 text-red-700",
 };
 
 const PLAN_COLOR: Record<string, string> = {
@@ -45,6 +48,7 @@ const fmtTime = (d?: string) => d
   : "—";
 
 const AdminDashboard = () => {
+  const [permissions, setPermissions] = useState<Record<string, boolean> | null>(null);
   const { toast }   = useToast();
   const navigate    = useNavigate();
   const currentUser = getCurrentUser();
@@ -78,6 +82,7 @@ const AdminDashboard = () => {
     if (!authenticated || !["admin","superadmin"].includes(currentUser?.role)) {
       navigate("/"); return;
     }
+    getMyPermissions().then(d => setPermissions(d.permissions)).catch(() => {});
     fetchStats();
   }, []);
 
@@ -159,6 +164,15 @@ const AdminDashboard = () => {
               link:    "/admin/withdrawals",
               urgent:  withdrawals.pending > 0,
             },
+            ...(currentUser?.role === "superadmin" || permissions?.can_verify_payment_details ? [{
+              label:   "Pending UPI verifications",
+              val:     stats.paymentVerifications?.pendingUpi ?? 0,
+              icon:    <BadgeCheck className="w-5 h-5 text-blue-600" />,
+              bg:      `border ${(stats.paymentVerifications?.pendingUpi ?? 0) > 0 ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-gray-200"}`,
+              sub:     "Awaiting manual review",
+              link:    "/admin/payment-verifications",
+              urgent:  (stats.paymentVerifications?.pendingUpi ?? 0) > 0,
+            }] : []),
           ].map(({ label, val, icon, bg, sub, trend, link, urgent }) => (
             <Card key={label}
               className={`border ${bg} ${link ? "cursor-pointer hover:shadow-md transition-shadow" : ""} ${urgent ? "ring-2 ring-amber-400" : ""}`}

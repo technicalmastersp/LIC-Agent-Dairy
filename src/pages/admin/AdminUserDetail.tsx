@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getCurrentUser } from "@/utils/auth";
 import { getUserDetails, deleteUser, changeUserSubscription, forceLogoutUser } from "../../../services/adminService";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
-import { ArrowLeft, Trash2, RefreshCw, Eye, LogOut } from "lucide-react";
+import { ArrowLeft, Trash2, RefreshCw, Eye, LogOut, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })
@@ -206,6 +206,75 @@ const AdminUserDetail = () => {
                     disabled={changingPlan || selectedPlan === user.subscription?.planId}>
                     {changingPlan ? "Updating…" : "Update plan"}
                   </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Payment details + verification status */}
+            {user.paymentDetails && (user.paymentDetails.upiId || user.paymentDetails.accountNumber) && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">Payment details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-0">
+                  {user.paymentDetails.upiId && (
+                    <>
+                      <div className="flex justify-between py-2 border-b border-border">
+                        <span className="text-xs text-muted-foreground">UPI ID</span>
+                        <span className="text-xs font-medium font-mono">{user.paymentDetails.upiId}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 border-b border-border">
+                        <span className="text-xs text-muted-foreground">UPI status</span>
+                        {user.paymentDetails.upiVerified ? (
+                          <Badge className="bg-green-100 text-green-700 border border-green-200 text-xs">
+                            <CheckCircle2 className="w-3 h-3 mr-1" /> Verified
+                          </Badge>
+                        ) : user.paymentDetails.upiRejectionReason ? (
+                          <Badge className="bg-red-100 text-red-700 border border-red-200 text-xs">
+                            <AlertCircle className="w-3 h-3 mr-1" /> Rejected
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-amber-100 text-amber-700 border border-amber-200 text-xs">
+                            <Clock className="w-3 h-3 mr-1" /> Pending
+                          </Badge>
+                        )}
+                      </div>
+                      {user.paymentDetails.upiRejectionReason && (
+                        <div className="flex justify-between py-2 border-b border-border">
+                          <span className="text-xs text-muted-foreground">Rejection reason</span>
+                          <span className="text-xs font-medium text-right max-w-[200px]">{user.paymentDetails.upiRejectionReason}</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {user.paymentDetails.accountNumber && (
+                    <>
+                      {[
+                        { label: "Account holder", val: user.paymentDetails.accountHolder || "—" },
+                        { label: "Account number", val: `••••${user.paymentDetails.accountNumber.slice(-4)}` },
+                        { label: "IFSC code",      val: user.paymentDetails.ifscCode || "—" },
+                        { label: "Bank name",      val: user.paymentDetails.bankName || "—" },
+                        { label: "Branch",         val: user.paymentDetails.branchName || "—" },
+                      ].map(({ label, val }) => (
+                        <div key={label} className="flex justify-between py-2 border-b border-border">
+                          <span className="text-xs text-muted-foreground">{label}</span>
+                          <span className="text-xs font-medium">{val}</span>
+                        </div>
+                      ))}
+                      <div className="flex justify-between items-center py-2 border-b last:border-0 border-border">
+                        <span className="text-xs text-muted-foreground">Bank status</span>
+                        {user.paymentDetails.bankVerified ? (
+                          <Badge className="bg-green-100 text-green-700 border border-green-200 text-xs">
+                            <CheckCircle2 className="w-3 h-3 mr-1" /> Verified via IFSC
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-amber-100 text-amber-700 border border-amber-200 text-xs">
+                            <Clock className="w-3 h-3 mr-1" /> Pending
+                          </Badge>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             )}
