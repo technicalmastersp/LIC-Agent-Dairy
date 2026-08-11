@@ -60,7 +60,7 @@ const NAV = [
     path: "/admin/logs",
     label: "Activity logs",
     icon: ScrollText,
-    roles: ["superadmin"],
+    roles: ["admin", "superadmin"],
     permission: "can_view_logs",
   },
 ];

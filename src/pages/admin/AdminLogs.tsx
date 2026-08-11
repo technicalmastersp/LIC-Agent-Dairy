@@ -23,6 +23,10 @@ const ACTION_COLORS: Record<string, string> = {
   ADMIN_PERMISSIONS_UPDATED: "bg-indigo-100 text-indigo-700",
   UPI_VERIFIED:        "bg-green-100 text-green-700",
   UPI_REJECTED:        "bg-red-100 text-red-700",
+  ADMIN_PROMOTED_TO_SUPERADMIN: "bg-red-100 text-red-700",
+  SUPERADMIN_DEMOTED_TO_ADMIN: "bg-red-100 text-red-700",
+  FORCE_LOGOUT: "bg-red-100 text-red-700",
+  FORCE_LOGOUT_GROUP: "bg-red-100 text-red-700",
 };
 
 const ACTIONS = Object.keys(ACTION_COLORS);

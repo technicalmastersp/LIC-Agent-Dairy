@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Plus, Table, LogOut, User, Menu, X, UserRoundCog, Users, Globe } from "lucide-react";
+import { Home, Plus, Table, LogOut, User, Menu, X, UserRoundCog, Users, Globe, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
+  DropdownMenuItem, DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -57,7 +62,7 @@ const NavItem = ({ to, label, icon: Icon, onClick,
       )}
     >
       <Icon className="w-4 h-4 shrink-0" />
-      <span className="hidden xl:inline">{label}</span>
+      <span className="xl:inline">{label}</span>
     </Link>
   );
 };
@@ -150,7 +155,7 @@ const Navigation = () => {
                 elsewhere in this file; if it doesn't support a compact/icon variant, swap the
                 lg-tier block below for whatever compact prop it does expose. */}
             <div className="pl-1.5 ml-1 border-l border-primary-foreground/15 shrink-0 flex items-center">
-              <div className="xl:hidden">
+              {/* <div className="xl:hidden">
                 <button
                   type="button"
                   title="Change language"
@@ -162,44 +167,46 @@ const Navigation = () => {
                 >
                   <Globe className="w-4 h-4" />
                 </button>
-              </div>
-              <div className="hidden xl:block">
+              </div> */}
+              <div className="xl:block">
                 <LanguageSwitcher />
               </div>
             </div>
 
             {authenticated ? (
-              <div className="flex items-center gap-1.5 pl-2 ml-1 border-l border-primary-foreground/15 shrink-0">
-                {/* Profile — avatar only at lg, avatar+name at xl */}
-                <button
-                  type="button"
-                  onClick={() => navigate("/profile")}
-                  title={currentUser?.name}
-                  className={cn(
-                    "flex items-center gap-2 rounded-full text-sm font-medium transition-colors shrink-0",
-                    "px-1.5 py-1.5 xl:pr-3",
-                    location.pathname === "/profile"
-                      ? "bg-primary-light text-primary-foreground"
-                      : "text-primary-foreground/85 hover:bg-primary-light/50 hover:text-primary-foreground"
-                  )}
-                >
-                  <span className="w-6 h-6 rounded-full bg-primary-foreground/15 flex items-center justify-center text-[10px] font-semibold shrink-0">
-                    {initials(currentUser?.name)}
-                  </span>
-                  <span className="hidden xl:inline max-w-[140px] truncate">{currentUser?.name}</span>
-                </button>
-
-                {/* Logout — icon only at lg, icon+label at xl */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLogout}
-                  title={t("logout")}
-                  className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-red-600 hover:border-red-600 hover:text-white transition-colors shrink-0 px-2.5 xl:px-3"
-                >
-                  <LogOut className="w-4 h-4 xl:mr-2" />
-                  <span className="hidden xl:inline">{t("logout")}</span>
-                </Button>
+              <div className="flex items-center pl-2 ml-1 border-l border-primary-foreground/15 shrink-0">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      title={currentUser?.name}
+                      className="flex items-center gap-2 rounded-full pl-1 pr-1.5 xl:pr-3 py-1 text-sm font-medium text-primary-foreground/85 hover:bg-primary-light/50 hover:text-primary-foreground transition-colors shrink-0"
+                    >
+                      <Avatar className="w-7 h-7">
+                        {currentUser?.profileImage && <AvatarImage src={currentUser.profileImage} alt={currentUser?.name} />}
+                        <AvatarFallback className="bg-primary-foreground/15 text-primary-foreground text-[10px] font-semibold">
+                          {initials(currentUser?.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className=" xl:inline max-w-[140px] truncate">{currentUser?.name}</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={() => navigate("/home")}>
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/profile")}>
+                      <User className="w-4 h-4 mr-2" />
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ) : (
               <div className="flex items-center gap-2 pl-2 ml-1 border-l border-primary-foreground/15 shrink-0">
@@ -243,9 +250,12 @@ const Navigation = () => {
                   }}
                   className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary-light/40 rounded-lg transition-colors"
                 >
-                  <span className="w-7 h-7 rounded-full bg-primary-foreground/15 flex items-center justify-center text-[11px] font-semibold shrink-0">
-                    {initials(currentUser?.name)}
-                  </span>
+                  <Avatar className="w-7 h-7">
+                    {currentUser?.profileImage && <AvatarImage src={currentUser.profileImage} alt={currentUser?.name} />}
+                    <AvatarFallback className="bg-primary-foreground/15 text-primary-foreground text-[11px] font-semibold">
+                      {initials(currentUser?.name)}
+                    </AvatarFallback>
+                  </Avatar>
                   <span className="truncate">{currentUser?.name}</span>
                 </button>
 

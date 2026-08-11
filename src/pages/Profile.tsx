@@ -16,7 +16,8 @@ import {
   RefreshCw, ChevronRight, UserCircle2, Wallet2, Gauge,
   FileText, PlusCircle, BellRing, ShieldCheck,
 } from "lucide-react";
-import { updateProfile, getProfile }  from "../../services/userService.js";
+import { getProfile, updateProfile, updateProfileImage } from "../../services/userService";
+import { resizeImageToSquare } from "@/utils/imageResize";
 import { getReferralDashboard }        from "../../services/referralService";
 import { convertDateToIndianFormat }   from "@/utils/tools";
 
@@ -68,8 +69,7 @@ const Profile = () => {
         mobileNumber: u.mobileNumber ?? "",
         email:        u.email        ?? "",
       });
-      const saved = localStorage.getItem(`avatar_${u._id || u.easyId}`);
-      if (saved) setAvatar(saved);
+      if (u.profileImage) setAvatar(u.profileImage);
     } catch (err) {
       console.error(err);
     } finally {
@@ -107,17 +107,17 @@ const Profile = () => {
     setIsEditing(false);
   };
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      setAvatar(result);
-      localStorage.setItem(`avatar_${user._id || user.easyId}`, result);
+    try {
+      const resized = await resizeImageToSquare(file, 256, 0.6);
+      setAvatar(resized);
+      await updateProfileImage(resized);
       toast({ title: "Photo updated", description: "Profile photo saved." });
-    };
-    reader.readAsDataURL(file);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.response?.data?.message || "Could not update photo.", variant: "destructive" });
+    }
   };
 
   const sub        = user.subscription;
@@ -155,7 +155,7 @@ const Profile = () => {
       <Navigation />
 
       <main className="container mx-auto px-4 py-8 flex-1">
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="max-w-5xl mx-auto space-y-4">
 
           {/* ── Cover + Hero ── */}
           <div className="bg-white border border-border rounded-xl overflow-hidden">

@@ -10,6 +10,10 @@ import { useToast }      from "@/hooks/use-toast";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { getPendingUpiVerifications, verifyUpiId, rejectUpiId } from "../../../services/adminService";
 import { CheckCircle2, XCircle, RefreshCw } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+const initials = (name = "") =>
+  name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
@@ -124,9 +128,19 @@ const PaymentVerifications = () => {
                         {pending.map((p) => (
                           <TableRow key={p.userId} className="hover:bg-muted/50">
                             <TableCell>
-                              <p className="text-sm font-medium">{p.userName}</p>
-                              <p className="text-xs text-muted-foreground">{p.userEasyId}</p>
-                              <p className="text-xs text-muted-foreground">{p.userEmail}</p>
+                              <div className="flex items-center gap-2.5">
+                                <Avatar className="w-8 h-8 shrink-0">
+                                  {p.userProfileImage && <AvatarImage src={p.userProfileImage} alt={p.userName} />}
+                                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                                    {initials(p.userName)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium">{p.userName}</p>
+                                  <p className="text-xs text-muted-foreground">{p.userEasyId}</p>
+                                  <p className="text-xs text-muted-foreground">{p.userEmail}</p>
+                                </div>
+                              </div>
                             </TableCell>
                             <TableCell>
                               <p className="text-sm font-mono">{p.upiId}</p>

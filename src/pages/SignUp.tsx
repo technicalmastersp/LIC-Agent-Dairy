@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { UserPlus, EyeOff, Eye, Check } from "lucide-react";
+import { UserPlus, EyeOff, Eye, Check, Home } from "lucide-react";
 import { User } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
@@ -167,7 +167,8 @@ const SignUp = () => {
           startDate: new Date().toISOString(),
           endDate: new Date(Date.now() + (planDurationMonths * 30 * 24 * 60 * 60 * 1000)).toISOString(),
           status: 'active' as const
-        } : undefined
+        } : undefined,
+        profileImage: ""
       };
 
       // const success = saveUser(newUser);
@@ -232,8 +233,46 @@ const SignUp = () => {
   return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl space-y-6">
-        <div className="flex justify-end">
-          <LanguageSwitcher />
+        <div className="flex w-full items-center justify-between">
+          <div 
+            className="
+              justify-center
+              whitespace-nowrap
+              text-sm
+              font-medium
+              cursor-pointer
+              ring-offset-background
+              transition-colors
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-ring
+              focus-visible:ring-offset-2
+              disabled:pointer-events-none
+              disabled:opacity-50
+              [&_svg]:pointer-events-none
+              [&_svg]:size-4
+              [&_svg]:shrink-0
+              border
+              border-input
+              bg-background
+              hover:bg-accent
+              hover:text-accent-foreground
+              h-9
+              rounded-md
+              px-3
+              flex
+              items-center
+              gap-2
+            "
+            onClick={()=>{
+              navigate("/");
+            }}
+          >
+            <Home className="w-4 h-4" />Back to Home
+          </div>
+          <div className="flex">
+            <LanguageSwitcher />
+          </div>
         </div>
         
         <Card>
