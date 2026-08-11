@@ -11,6 +11,7 @@ import { useToast }     from "@/hooks/use-toast";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { getAdmins, createAdmin, deactivateUser, reactivateUser, updateAdminPermissions, forceLogoutUser, getSuperAdmins, promoteAdmin, demoteAdmin } from "../../../services/adminService";
 import { Plus, UserX, UserCheck, X, Shield, ToggleLeft, ToggleRight, LogOut, Crown, Clock } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })
@@ -45,6 +46,10 @@ const AdminAdmins = () => {
   const [promoting,       setPromoting]        = useState(false);
   const [demoting,        setDemoting]         = useState<string | null>(null);
 
+  const [deactivateModal, setDeactivateModal] = useState<any>(null);
+  const [deactivateNote,  setDeactivateNote]  = useState("");
+  const [reactivateModal, setReactivateModal] = useState<any>(null);
+
   const PERMISSION_DEFS = [
     { key: "can_view_users",          label: "View users",              desc: "See user list and details",                  risk: "low"    },
     { key: "can_deactivate_users",    label: "Deactivate users",        desc: "Activate or deactivate user accounts",       risk: "medium" },
@@ -54,6 +59,7 @@ const AdminAdmins = () => {
     { key: "can_view_logs",           label: "View activity logs",      desc: "See admin action logs",                      risk: "medium" },
     { key: "can_change_subscription", label: "Change subscriptions",    desc: "Modify any user's subscription plan",        risk: "high"   },
     { key: "can_delete_users",        label: "Delete users",            desc: "Permanently delete user accounts and data",  risk: "critical"},
+    { key: "can_verify_payment_details", label: "Verify payment details", desc: "Approve or reject users' UPI IDs for withdrawal payouts", risk: "high" },
   ];
 
   const riskColor: Record<string, string> = {
@@ -132,16 +138,27 @@ const AdminAdmins = () => {
     } finally { setCreating(false); }
   };
 
-  const handleToggle = async (admin: any) => {
-    setActing(admin.userId);
+  const handleDeactivate = async () => {
+    if (!deactivateModal) return;
+    setActing(deactivateModal.userId);
     try {
-      if (admin.isActive) {
-        await deactivateUser(admin.userId);
-        toast({ title: "Deactivated", description: `${admin.name} deactivated.` });
-      } else {
-        await reactivateUser(admin.userId);
-        toast({ title: "Reactivated", description: `${admin.name} reactivated.` });
-      }
+      await deactivateUser(deactivateModal.userId, deactivateNote);
+      toast({ title: "Deactivated", description: `${deactivateModal.name} deactivated.` });
+      setDeactivateModal(null);
+      setDeactivateNote("");
+      fetchAll();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } finally { setActing(null); }
+  };
+
+  const handleReactivate = async () => {
+    if (!reactivateModal) return;
+    setActing(reactivateModal.userId);
+    try {
+      await reactivateUser(reactivateModal.userId);
+      toast({ title: "Reactivated", description: `${reactivateModal.name} reactivated.` });
+      setReactivateModal(null);
       fetchAll();
     } catch (err: any) {
       toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
@@ -241,9 +258,12 @@ const AdminAdmins = () => {
 
                   return (
                     <div key={i} className="flex items-center gap-3 p-4 border-b border-border last:border-0">
-                      <div className="w-9 h-9 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center text-xs font-medium shrink-0">
-                        {s.name.split(" ").map((w: string) => w[0]).join("").slice(0,2).toUpperCase()}
-                      </div>
+                      <Avatar className="w-9 h-9 shrink-0">
+                        {s.userProfileImage && <AvatarImage src={s.userProfileImage} alt={s.name} />}
+                        <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                          {s.name.split(" ").map((w: string) => w[0]).join("").slice(0,2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm font-medium">{s.name}</p>
@@ -293,9 +313,12 @@ const AdminAdmins = () => {
               <div>
                 {admins.map((a, i) => (
                   <div key={i} className="flex items-center gap-3 p-4 border-b border-border last:border-0">
-                    <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-medium shrink-0">
-                      {a.name.split(" ").map((w: string) => w[0]).join("").slice(0,2).toUpperCase()}
-                    </div>
+                    <Avatar className="w-9 h-9 shrink-0">
+                      {a.profileImage && <AvatarImage src={a.profileImage} alt={a.name} />}
+                      <AvatarFallback className="bg-blue-100 text-blue-700 text-xs font-medium">
+                        {a.name.split(" ").map((w: string) => w[0]).join("").slice(0,2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">{a.name}</p>
                       <p className="text-xs text-muted-foreground">{a.email} · {a.easyId}</p>
@@ -317,7 +340,9 @@ const AdminAdmins = () => {
                           ? "bg-red-50 hover:bg-red-100 border-red-200 text-red-700"
                           : "bg-green-50 hover:bg-green-100 border-green-200 text-green-700"}`}
                         disabled={acting === a.userId}
-                        onClick={() => handleToggle(a)}>
+                        onClick={() => a.isActive
+                          ? setDeactivateModal({ userId: a.userId, name: a.name })
+                          : setReactivateModal({ userId: a.userId, name: a.name })}>
                         {a.isActive
                           ? <><UserX className="w-3.5 h-3.5 mr-1" />Deactivate</>
                           : <><UserCheck className="w-3.5 h-3.5 mr-1" />Reactivate</>}
@@ -409,6 +434,7 @@ const AdminAdmins = () => {
                         can_view_withdrawals: true, can_approve_withdrawals: true,
                         can_reject_withdrawals: true, can_view_logs: true,
                         can_change_subscription: false, can_delete_users: false,
+                        can_verify_payment_details: true,
                       })}>
                       Full admin
                     </Button>
@@ -434,7 +460,66 @@ const AdminAdmins = () => {
           </div>
         )}
 
-        {/* Force Loguot Model */}
+        {deactivateModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <CardTitle className="text-base">Deactivate admin</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p className="text-sm font-medium text-red-700">{deactivateModal.name}</p>
+                  <p className="text-xs text-red-600 mt-0.5">This admin will lose access immediately and won't be able to login.</p>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Reason (optional)</Label>
+                  <Input
+                    placeholder="e.g. Role change, leave of absence"
+                    value={deactivateNote}
+                    onChange={e => setDeactivateNote(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                    onClick={handleDeactivate} disabled={!!acting}>
+                    {acting ? "Deactivating…" : "Confirm deactivate"}
+                  </Button>
+                  <Button variant="outline" className="flex-1"
+                    onClick={() => { setDeactivateModal(null); setDeactivateNote(""); }}>
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {reactivateModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <CardTitle className="text-base">Reactivate admin</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <p className="text-sm font-medium text-green-700">{reactivateModal.name}</p>
+                  <p className="text-xs text-green-600 mt-0.5">This admin will be able to login again immediately.</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    onClick={handleReactivate} disabled={!!acting}>
+                    {acting ? "Reactivating…" : "Confirm reactivate"}
+                  </Button>
+                  <Button variant="outline" className="flex-1"
+                    onClick={() => setReactivateModal(null)}>
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {logoutModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <Card className="w-full max-w-md">

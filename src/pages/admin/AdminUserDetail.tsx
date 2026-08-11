@@ -10,11 +10,15 @@ import { useToast } from "@/hooks/use-toast";
 import { getCurrentUser } from "@/utils/auth";
 import { getUserDetails, deleteUser, changeUserSubscription, forceLogoutUser } from "../../../services/adminService";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
-import { ArrowLeft, Trash2, RefreshCw, Eye, LogOut } from "lucide-react";
+import { ArrowLeft, Trash2, RefreshCw, Eye, LogOut, Building2, Smartphone, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })
   : "—";
+
+const initials = (name = "") =>
+  name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
 const PLANS = [
   { id: "1month-free", label: "Free — 1 Month"    },
@@ -143,6 +147,18 @@ const AdminUserDetail = () => {
               <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">Profile</CardTitle>
             </CardHeader>
             <CardContent className="space-y-0">
+              <div className="flex items-center gap-3 pb-4 mb-1 border-b border-border">
+                <Avatar className="w-14 h-14">
+                  {user.profileImage && <AvatarImage src={user.profileImage} alt={user.name} />}
+                  <AvatarFallback className="bg-primary/10 text-primary text-base font-semibold">
+                    {initials(user.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">{user.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">{user.easyId}</p>
+                </div>
+              </div>
               {[
                 { label: "Name",         val: user.name },
                 { label: "Email",        val: user.email },
@@ -206,6 +222,62 @@ const AdminUserDetail = () => {
                     disabled={changingPlan || selectedPlan === user.subscription?.planId}>
                     {changingPlan ? "Updating…" : "Update plan"}
                   </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Payment details — debit-card style */}
+            {user.paymentDetails && (user.paymentDetails.upiId || user.paymentDetails.accountNumber) && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">Payment details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {user.paymentDetails.accountNumber && (
+                    <div className="relative rounded-2xl p-4 text-white overflow-hidden shadow-md"
+                      style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #1e40af 45%, #2563eb 100%)" }}>
+                      <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/10" />
+                      <div className="relative flex items-center justify-between mb-4">
+                        <Building2 className="w-5 h-5 opacity-90" />
+                        {user.paymentDetails.bankVerified ? (
+                          <Badge className="bg-white/15 text-white border-0 text-[10px]"><CheckCircle2 className="w-3 h-3 mr-1" />Verified</Badge>
+                        ) : (
+                          <Badge className="bg-amber-400/90 text-amber-950 border-0 text-[10px]"><Clock className="w-3 h-3 mr-1" />Pending</Badge>
+                        )}
+                      </div>
+                      <p className="font-mono text-base tracking-[0.15em] mb-3">•••• •••• •••• {user.paymentDetails.accountNumber.slice(-4)}</p>
+                      <div className="flex items-end justify-between text-xs">
+                        <div>
+                          <p className="text-[9px] uppercase text-white/60">Holder</p>
+                          <p className="uppercase">{user.paymentDetails.accountHolder || "—"}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] uppercase text-white/60">{user.paymentDetails.bankName || "Bank"}</p>
+                          <p className="text-white/80">{user.paymentDetails.ifscCode}{user.paymentDetails.branchName ? ` · ${user.paymentDetails.branchName}` : ""}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {user.paymentDetails.upiId && (
+                    <div className="relative rounded-2xl p-4 text-white overflow-hidden shadow-md"
+                      style={{ background: "linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%)" }}>
+                      <div className="absolute -right-4 -bottom-4 w-20 h-20 rounded-full bg-white/10" />
+                      <div className="relative flex items-center justify-between mb-4">
+                        <Smartphone className="w-5 h-5 opacity-90" />
+                        {user.paymentDetails.upiVerified ? (
+                          <Badge className="bg-white/15 text-white border-0 text-[10px]"><CheckCircle2 className="w-3 h-3 mr-1" />Verified via IFSC</Badge>
+                        ) : user.paymentDetails.upiRejectionReason ? (
+                          <Badge className="bg-red-400/90 text-red-950 border-0 text-[10px]"><AlertCircle className="w-3 h-3 mr-1" />Rejected</Badge>
+                        ) : (
+                          <Badge className="bg-amber-400/90 text-amber-950 border-0 text-[10px]"><Clock className="w-3 h-3 mr-1" />Pending review</Badge>
+                        )}
+                      </div>
+                      <p className="font-mono text-base">{user.paymentDetails.upiId}</p>
+                      {user.paymentDetails.upiRejectionReason && (
+                        <p className="text-xs text-red-100 mt-2 bg-red-950/30 rounded px-2 py-1">{user.paymentDetails.upiRejectionReason}</p>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}

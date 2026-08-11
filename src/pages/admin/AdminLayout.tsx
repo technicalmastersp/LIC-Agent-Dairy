@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "@/utils/auth";
-import { getMyPermissions } from "../../../services/adminService";
+import { getMyPermissions, getPendingCounts } from "../../../services/adminService";
 import {
   Users,
   ShieldCheck,
@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   Home,
+  BadgeCheck,
 } from "lucide-react";
 
 // Nav items with required permission
@@ -38,6 +39,15 @@ const NAV = [
     icon: ArrowDownToLine,
     roles: ["admin", "superadmin"],
     permission: "can_view_withdrawals",
+    countKey: "withdrawals",
+  },
+  {
+    path: "/admin/payment-verifications",
+    label: "UPI Verifications",
+    icon: BadgeCheck,
+    roles: ["admin", "superadmin"],
+    permission: "can_verify_payment_details",
+    countKey: "upiVerifications",
   },
   {
     path: "/admin/admins",
@@ -50,7 +60,7 @@ const NAV = [
     path: "/admin/logs",
     label: "Activity logs",
     icon: ScrollText,
-    roles: ["superadmin"],
+    roles: ["admin", "superadmin"],
     permission: "can_view_logs",
   },
 ];
@@ -63,17 +73,28 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   const [permissions, setPermissions] = useState<Record<string, boolean> | null>(null);
   const [loadingPerms, setLoadingPerms] = useState(true);
+  const [counts, setCounts] = useState<{ withdrawals: number; upiVerifications: number }>({ withdrawals: 0, upiVerifications: 0 });
 
   // Mobile sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetchPermissions();
+    fetchCounts();
 
     // ✅ Poll every 30 seconds so permission changes reflect without logout
     // const interval = setInterval(fetchPermissions, 30_000);
     // return () => clearInterval(interval);
   }, []);
+
+  const fetchCounts = async () => {
+    try {
+      const data = await getPendingCounts();
+      setCounts(data);
+    } catch {
+      // non-fatal — sidebar just shows no badge
+    }
+  };
 
   const fetchPermissions = async () => {
     try {
@@ -211,9 +232,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            visibleNav.map(({ path, label, icon: Icon }) => {
+            visibleNav.map(({ path, label, icon: Icon, countKey }: any) => {
               const active = location.pathname === path ||
                 (path !== "/admin" && location.pathname.startsWith(path));
+              const badgeCount = countKey ? counts[countKey as keyof typeof counts] : 0;
 
               return (
                 <Link key={path} to={path} onClick={() => setSidebarOpen(false)}
@@ -224,7 +246,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                   }`}>
                   <Icon className="w-4 h-4 shrink-0" />
                   <span>{label}</span>
-                  {active && (<ChevronRight className="w-3.5 h-3.5 ml-auto" />)}
+                  {badgeCount > 0 && (
+                    <span className="ml-auto bg-amber-500 text-white text-[10px] font-medium rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      {badgeCount > 99 ? "99+" : badgeCount}
+                    </span>
+                  )}
+                  {active && !badgeCount && (<ChevronRight className="w-3.5 h-3.5 ml-auto" />)}
                 </Link>
               );
             })

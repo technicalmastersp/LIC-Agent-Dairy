@@ -10,6 +10,10 @@ import { useToast }      from "@/hooks/use-toast";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { getWithdrawals, approveWithdrawal, rejectWithdrawal } from "../../../services/adminService";
 import { CheckCircle2, XCircle, Eye, Search, ArrowUpDown, X, RefreshCw } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+const initials = (name = "") =>
+  name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
 const statusStyle: Record<string, string> = {
   requested: "bg-yellow-100 text-yellow-700 border border-yellow-200",
@@ -346,9 +350,19 @@ const WithdrawalRequests = () => {
                         {sorted.map((w, i) => (
                           <TableRow key={w.withdrawalId ?? i} className="hover:bg-muted/50">
                             <TableCell>
-                              <p className="text-sm font-medium">{w.userName}</p>
-                              <p className="text-xs text-muted-foreground">{w.userEasyId}</p>
-                              <p className="text-xs text-muted-foreground">{w.userEmail}</p>
+                              <div className="flex items-center gap-2.5">
+                                <Avatar className="w-8 h-8 shrink-0">
+                                  {w.userProfileImage && <AvatarImage src={w.userProfileImage} alt={w.userName} />}
+                                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                                    {initials(w.userName)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium">{w.userName}</p>
+                                  <p className="text-xs text-muted-foreground">{w.userEasyId}</p>
+                                  <p className="text-xs text-muted-foreground">{w.userEmail}</p>
+                                </div>
+                              </div>
                             </TableCell>
                             <TableCell>
                               <p className="text-sm font-medium text-green-600">₹{w.amount}</p>

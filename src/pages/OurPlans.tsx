@@ -101,7 +101,7 @@ const OurPlans = () => {
   ];
 
   const handleSelectPlan = async (planId: string) => {
-    if (!currentUser) { navigate("/login"); return; }
+    if (!currentUser) { navigate("/signup"); return; }
 
     const plan = plans.find(p => p.id === planId);
 

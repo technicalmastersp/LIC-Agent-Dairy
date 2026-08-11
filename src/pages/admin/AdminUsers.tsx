@@ -9,7 +9,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { getUsers, deactivateUser, reactivateUser } from "../../../services/adminService";
-import { Search, Eye, UserX, UserCheck, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Eye, UserX, UserCheck, ChevronLeft, ChevronRight, RefreshCw, ArrowUpDown } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+const initials = (name = "") =>
+  name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })
@@ -25,6 +30,15 @@ const planColor: Record<string, string> = {
 const PAGE_SIZE = 20;
 const STATUS_OPTIONS = ["all", "active", "deactivated", "plan expired"] as const;
 type StatusFilter = typeof STATUS_OPTIONS[number];
+
+const PLAN_SORT_OPTIONS = {
+  default: { label: "Latest first", order: null },
+  "0st":   { label: "Free Trial → Basic → Standard → Premium", order: ["1month-free", "6months", "12months", "24months"] },
+  "1st":   { label: "Basic → Standard → Premium",  order: ["6months", "12months", "24months"] },
+  "2nd":   { label: "Standard → Premium → Basic",  order: ["12months", "24months", "6months"] },
+  "3rd":   { label: "Premium → Basic → Standard",  order: ["24months", "6months", "12months"] },
+} as const;
+type PlanSort = keyof typeof PLAN_SORT_OPTIONS;
 
 const AdminUsers = () => {
   const navigate    = useNavigate();
@@ -49,6 +63,11 @@ const AdminUsers = () => {
   const [acting, setActing] = useState<string | null>(null);
   const [deactivateModal, setDeactivateModal] = useState<any>(null);
   const [deactivateNote,  setDeactivateNote]  = useState("");
+  const [reactivateModal, setReactivateModal] = useState<any>(null);
+  const initialPlanSort = (searchParams.get("planSort") as PlanSort) in PLAN_SORT_OPTIONS
+    ? (searchParams.get("planSort") as PlanSort)
+    : "default";
+  const [planSort, setPlanSort] = useState<PlanSort>(initialPlanSort);
 
   // Auth guard + one-time fetch of ALL users
   useEffect(() => {
@@ -93,6 +112,15 @@ const AdminUsers = () => {
     setSearchParams(next, { replace: true });
   };
 
+  const handlePlanSortChange = (s: PlanSort) => {
+    setPlanSort(s);
+    setPage(1);
+    const next = new URLSearchParams(searchParams);
+    if (s === "default") next.delete("planSort");
+    else next.set("planSort", s);
+    setSearchParams(next, { replace: true });
+  };
+
   // ---- client-side filtering + searching (no API calls) ----
   const filteredUsers = useMemo(() => {
     let result = allUsers;
@@ -117,8 +145,17 @@ const AdminUsers = () => {
       );
     }
 
+    if (planSort !== "default") {
+      const order = PLAN_SORT_OPTIONS[planSort].order as readonly string[];
+      result = [...result].sort((a, b) => {
+        const rankA = order.indexOf(a.subscription?.planId);
+        const rankB = order.indexOf(b.subscription?.planId);
+        return (rankA === -1 ? 99 : rankA) - (rankB === -1 ? 99 : rankB);
+      });
+    }
+
     return result;
-  }, [allUsers, search, status]);
+  }, [allUsers, search, status, planSort]);
 
   // ---- client-side pagination over the filtered set ----
   const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE));
@@ -148,14 +185,16 @@ const AdminUsers = () => {
     } finally { setActing(null); }
   };
 
-  const handleReactivate = async (userId: string, name: string) => {
-    setActing(userId);
+  const handleReactivate = async () => {
+    if (!reactivateModal) return;
+    setActing(reactivateModal.userId);
     try {
-      await reactivateUser(userId);
-      toast({ title: "Reactivated", description: `${name} has been reactivated.` });
+      await reactivateUser(reactivateModal.userId);
+      toast({ title: "Reactivated", description: `${reactivateModal.name} has been reactivated.` });
       setAllUsers(prev => prev.map(u =>
-        u.userId === userId ? { ...u, isActive: true } : u
+        u.userId === reactivateModal.userId ? { ...u, isActive: true } : u
       ));
+      setReactivateModal(null);
     } catch (err: any) {
       toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
     } finally { setActing(null); }
@@ -192,6 +231,19 @@ const AdminUsers = () => {
               </Button>
             ))}
           </div>
+          <div className="flex items-center gap-1.5">
+            <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            <Select value={planSort} onValueChange={(v) => handlePlanSortChange(v as PlanSort)}>
+              <SelectTrigger className="h-9 w-[220px] text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(PLAN_SORT_OPTIONS).map(([key, { label }]) => (
+                  <SelectItem key={key} value={key}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Table */}
@@ -219,8 +271,18 @@ const AdminUsers = () => {
                     {pagedUsers.map((u, i) => (
                       <TableRow key={u.userId ?? i} className="hover:bg-muted/50">
                         <TableCell>
-                          <p className="text-sm font-medium">{u.name}</p>
-                          <p className="text-xs text-muted-foreground">{u.email}</p>
+                          <div className="flex items-center gap-2.5">
+                            <Avatar className="w-8 h-8 shrink-0">
+                              {u.profileImage && <AvatarImage src={u.profileImage} alt={u.name} />}
+                              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                                {initials(u.name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium truncate">{u.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                            </div>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{u.easyId}</span>
@@ -257,7 +319,7 @@ const AdminUsers = () => {
                               <Button size="sm" variant="outline"
                                 className="h-7 text-xs bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
                                 disabled={acting === u.userId}
-                                onClick={() => handleReactivate(u.userId, u.name)}>
+                                onClick={() => setReactivateModal({ userId: u.userId, name: u.name })}>
                                 <UserCheck className="w-3.5 h-3.5" />
                               </Button>
                             )}
@@ -291,6 +353,33 @@ const AdminUsers = () => {
           </div>
         )}
       </div>
+
+      {/* Reactivate modal */}
+      {reactivateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-base">Reactivate account</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-sm font-medium text-green-700">{reactivateModal.name}</p>
+                <p className="text-xs text-green-600 mt-0.5">User will be able to login again after this.</p>
+              </div>
+              <div className="flex gap-2">
+                <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  onClick={handleReactivate} disabled={!!acting}>
+                  {acting ? "Reactivating…" : "Confirm reactivate"}
+                </Button>
+                <Button variant="outline" className="flex-1"
+                  onClick={() => setReactivateModal(null)}>
+                  Cancel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Deactivate modal */}
       {deactivateModal && (

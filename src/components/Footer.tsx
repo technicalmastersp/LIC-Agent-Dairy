@@ -54,7 +54,7 @@ const Footer = () => {
       ]
     : [
         { label: t("login"), to: "/login" },
-        { label: t("signup"), to: "/signup" },
+        { label: t("signupFree"), to: "/signup" },
         { label: ("Help & Support"), to: "/help-support" }
       ];
 

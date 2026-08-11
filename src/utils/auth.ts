@@ -3,6 +3,7 @@ import { processReferral } from "./referral";
 import { clearToken } from '../../utils/localStorageHelper.js'
 
 export interface User {
+  profileImage: string;
   id?: string;
   easyId?: string;
   name: string;

@@ -41,6 +41,16 @@ export const updateProfile = async (profileData) => {
   return res.data.userInfo;
 };
 
+export const updateProfileImage = async (image) => {
+  const res = await apiClient.put("/user/profile-image", { image });
+  return res.data;
+};
+
+export const removeProfileImage = async () => {
+  const res = await apiClient.delete("/user/profile-image");
+  return res.data;
+};
+
 export const logoutCurrentUser = () => {
   const user = JSON.parse(localStorage.getItem('currentUser'))
   localStorage.setItem('userName', user.name)
