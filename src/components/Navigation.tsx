@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Plus, Table, LogOut, User, Menu, X, UserRoundCog, Users, Globe, LayoutDashboard } from "lucide-react";
+import { Home, Plus, Table, LogOut, User, Menu, X, UserRoundCog, CircleHelp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -125,7 +125,7 @@ const Navigation = () => {
             <div className="w-8 h-8 bg-primary-foreground rounded-full flex items-center justify-center overflow-hidden shrink-0">
               <img src={siteConfig.logo_medium_size} alt="site-logo" />
             </div>
-            <span className="text-primary-foreground font-semibold text-lg truncate max-w-[140px] sm:max-w-none">
+            <span className="text-primary-foreground font-semibold text-lg sm:max-w-none">
               {siteConfig.title}
             </span>
           </Link>
@@ -192,13 +192,13 @@ const Navigation = () => {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => navigate("/home")}>
-                      <LayoutDashboard className="w-4 h-4 mr-2" />
-                      Dashboard
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/profile")}>
                       <User className="w-4 h-4 mr-2" />
                       Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/help-support")}>
+                      <CircleHelp className="w-4 h-4 mr-2" />
+                      Help & Support
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
@@ -278,9 +278,8 @@ const Navigation = () => {
               <div className="space-y-1.5 px-1">
                 <Button variant="outline" size="sm" asChild
                   className="w-full bg-transparent border-primary-foreground/25 text-primary-foreground hover:bg-primary-light/50 hover:text-primary-foreground">
-                  <Link to="/referral-program" onClick={closeMobileMenu}>
-                    <Users className="w-3.5 h-3.5 mr-1.5" />
-                    Referral
+                  <Link to="/our-plans" onClick={closeMobileMenu}>
+                    Plans
                   </Link>
                 </Button>
                 <Button variant="outline" size="sm" asChild

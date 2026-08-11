@@ -49,8 +49,7 @@ const Footer = () => {
         { label: t("addRecord"), to: "/add-record" },
         { label: t("viewRecords"), to: "/view-records" },
         { label: t("currentMonthDue"), to: "/view-due-policies" },
-        { label: t("missedPayments"), to: "/view-missed-payments" },
-        { label: ("Help & Support"), to: "/help-support" },
+        { label: t("missedPayments"), to: "/view-missed-payments" }
       ]
     : [
         { label: t("login"), to: "/login" },
@@ -60,12 +59,19 @@ const Footer = () => {
 
   const otherLinks: FooterLink[] = [
     ...(authenticated
-      ? [{ label: t("profile"), to: "/profile" }]
-      : []),
-    { label: t("ourPlans"), to: "/our-plans" },
-    { label: t("bestInfoHub"), to: "/lic-info-hub" },
-    { label: t("aboutUs"), to: "/about" },
-    { label: t("referral"), to: "/referral-program" },
+      ? [
+          { label: t("profile"), to: "/profile" },
+          { label: t("ourPlans"), to: "/our-plans" },
+          { label: t("bestInfoHub"), to: "/lic-info-hub" },
+          { label: t("aboutUs"), to: "/about" },
+          { label: ("Help & Support"), to: "/help-support" },
+        ]
+      : [
+          { label: t("ourPlans"), to: "/our-plans" },
+          { label: t("bestInfoHub"), to: "/lic-info-hub" },
+          { label: t("aboutUs"), to: "/about" },
+      ]),
+    // { label: t("referral"), to: "/referral-program" },
   ];
 
   const features = [

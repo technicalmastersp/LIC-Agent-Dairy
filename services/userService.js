@@ -37,8 +37,8 @@ export const getProfile = async () => {
 
 export const updateProfile = async (profileData) => {
   const res = await apiClient.put('/auth/updateUserProfile', profileData);
-  
-  return res.data.userInfo;
+
+  return res.data; // { statusCode, message, emailChanged, userInfo }
 };
 
 export const updateProfileImage = async (image) => {
