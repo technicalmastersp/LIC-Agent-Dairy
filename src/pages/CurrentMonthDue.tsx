@@ -135,6 +135,7 @@ const CurrentMonthDue = () => {
       record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.fatherName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.occupation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.aadhaarLinkedMobileNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.currentPolicy.policyNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.currentPolicy.modeOfPayment.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -299,7 +300,7 @@ const CurrentMonthDue = () => {
                     <TableHeader>
                       <TableRow className="bg-table-header">
                         <SortableHeader field="name">Name</SortableHeader>
-                        <SortableHeader field="fatherName">Father's Name</SortableHeader>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Mobile Number</TableHead>
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Policy Number</TableHead>
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Mode Of Payment</TableHead>
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Branch</TableHead>
@@ -325,7 +326,7 @@ const CurrentMonthDue = () => {
                               </div>
                             </TableCell>
                             <TableCell className="border border-table-border text-muted-foreground">
-                              {record.fatherName}
+                              {record.aadhaarLinkedMobileNumber}
                             </TableCell>
                             <TableCell className="border border-table-border">
                               <Badge variant="outline" className="font-mono text-xs">

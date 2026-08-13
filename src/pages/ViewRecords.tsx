@@ -137,6 +137,7 @@ const ViewRecords = () => {
       record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.fatherName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.occupation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.aadhaarLinkedMobileNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.currentPolicy.policyNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.currentPolicy.modeOfPayment.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.currentPolicy.branch.toLowerCase().includes(searchTerm.toLowerCase())
