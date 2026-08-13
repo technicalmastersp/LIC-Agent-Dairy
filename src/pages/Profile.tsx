@@ -87,7 +87,16 @@ const Profile = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const updated = await updateProfile(form);
+      const res = await updateProfile(form);
+      const updated = res.userInfo ?? res; // keep compatible if updateProfile's return shape changes
+
+      if (res.emailChanged) {
+        toast({
+          title: "Verify your new email",
+          description: "We've sent a verification link to your new email address.",
+        });
+      }
+
       setCurrentUser(updated);
       setUser(updated);
       setIsEditing(false);
@@ -116,7 +125,11 @@ const Profile = () => {
       await updateProfileImage(resized);
       toast({ title: "Photo updated", description: "Profile photo saved." });
     } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message || "Could not update photo.", variant: "destructive" });
+      if (err.response?.data?.code === "EMAIL_ALREADY_IN_USE") {
+        toast({ title: "Email already in use", description: "That email belongs to another account. Try a different one.", variant: "destructive" });
+        return;
+      }
+      toast({ title: "Error", description: err.response?.data?.message || "Something went wrong.", variant: "destructive" });
     }
   };
 

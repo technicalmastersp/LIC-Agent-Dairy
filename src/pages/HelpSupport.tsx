@@ -350,7 +350,7 @@ const HelpSupport = () => {
         </section>
 
         {/* ══════════ RESOURCES CTA ══════════ */}
-        <section className="bg-gradient-to-r from-primary to-primary-light text-primary-foreground py-14">
+        <section className="bg-[linear-gradient(to_bottom,#0a5b76,#0e7ca1,#0a5b76)] text-primary-foreground py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
               <div>
