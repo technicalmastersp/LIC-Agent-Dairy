@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
+import Navigation     from "@/components/Navigation";
 import { isAuthenticated } from "@/utils/auth";
 import {
   ShieldCheck, FileText, Search, Wallet, BellRing, Smartphone,
@@ -33,36 +34,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
 
-      {/* ══════════ Public header ══════════ */}
-      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-md border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto flex items-center justify-between h-16">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <img src={siteConfig.logo_medium_size} alt="site-logo" className="w-5 h-5" />
-              </div>
-              <span className="font-semibold text-form-header">{siteConfig.title}</span>
-            </div>
-            <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-              <a href="#features" className="hover:text-form-header transition-colors">Features</a>
-              <a href="#how-it-works" className="hover:text-form-header transition-colors">How it works</a>
-              <a href="/our-plans" className="hover:text-form-header transition-colors">Plans</a>
-              <Link to="/about" className="hover:text-form-header transition-colors">About</Link>
-              <Link to="/help-support" className="hover:text-form-header transition-colors">Help & Support</Link>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link to="/login">
-                <Button variant="ghost" size="sm">Log in</Button>
-              </Link>
-              <Link to="/signup">
-                <Button size="sm" className="bg-primary hover:bg-primary-light">
-                  Sign up free
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       <main className="flex-1">
 
@@ -80,7 +52,7 @@ const Landing = () => {
                   Free for your first month
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight text-form-header">
-                  Stop chasing policies across spreadsheets.
+                  Stop Chasing Policies Across Spreadsheets.
                 </h1>
                 <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
                   {siteConfig.title} is where policy agents — life, health, motor, or general

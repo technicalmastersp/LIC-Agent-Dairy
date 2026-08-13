@@ -60,6 +60,7 @@ const AdminAdmins = () => {
     { key: "can_change_subscription", label: "Change subscriptions",    desc: "Modify any user's subscription plan",        risk: "high"   },
     { key: "can_delete_users",        label: "Delete users",            desc: "Permanently delete user accounts and data",  risk: "critical"},
     { key: "can_verify_payment_details", label: "Verify payment details", desc: "Approve or reject users' UPI IDs for withdrawal payouts", risk: "high" },
+    { key: "can_manage_support", label: "Manage support & suggestions", desc: "View and reply to support tickets, review user suggestions", risk: "medium" },
   ];
 
   const riskColor: Record<string, string> = {
@@ -435,6 +436,7 @@ const AdminAdmins = () => {
                         can_reject_withdrawals: true, can_view_logs: true,
                         can_change_subscription: false, can_delete_users: false,
                         can_verify_payment_details: true,
+                        can_manage_support: true,
                       })}>
                       Full admin
                     </Button>

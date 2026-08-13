@@ -89,6 +89,28 @@ export const getPendingCounts = async () => {
   return res.data.data;
 };
 
+export const getSupportTickets = async (priority = "all", status) => {
+  const params = new URLSearchParams({ priority });
+  if (status) params.set("status", status);
+  const res = await apiClient.get(`/admin/support/tickets?${params.toString()}`);
+  return res.data.data;
+};
+
+export const replyToTicket = async (ticketId, payload) => {
+  const res = await apiClient.patch(`/admin/support/tickets/${ticketId}`, payload);
+  return res.data;
+};
+
+export const getAllSuggestions = async () => {
+  const res = await apiClient.get("/admin/suggestions");
+  return res.data.data;
+};
+
+export const updateSuggestionStatus = async (id, payload) => {
+  const res = await apiClient.patch(`/admin/suggestions/${id}`, payload);
+  return res.data;
+};
+
 // Force Logout a user or admin
 export const forceLogoutUser = async (userId, reason) => {
   const res = await apiClient.post(`/admin/force-logout/${userId}`, { reason });
