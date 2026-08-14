@@ -11,7 +11,7 @@ import RecordDetailsModal from "@/components/RecordDetailsModal";
 import EditRecordModal from "@/components/EditRecordModal";
 import {
   Search, Eye, Trash2, ArrowUpDown, Plus, Edit,
-  FileText, IndianRupee, CalendarPlus, FolderOpen, ShieldCheck,
+  FileText, IndianRupee, CalendarPlus, FolderOpen, ShieldCheck, Lock,
 } from "lucide-react";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -104,6 +104,13 @@ const ViewRecords = () => {
   const [editingRecord, setEditingRecord] = useState<Record | null>(null);
   const [records, setRecords] = useState<Record[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Mirrors the backend: an expired/cancelled plan still gets full read access
+  // to this list (requireSubscriptionForViewing), but add/edit/delete stay
+  // gated behind requireActiveSubscription — so we disable those controls
+  // here too rather than let the user hit a confusing 403 after the fact.
+  const subStatus = currentUser?.subscription?.status;
+  const isReadOnly = subStatus === "expired" || subStatus === "cancelled";
 
   const fetchRecords = async () => {
     try {
@@ -202,6 +209,14 @@ const ViewRecords = () => {
   };
 
   const handleEditRecord = (record: Record) => {
+    if (isReadOnly) {
+      toast({
+        title: "Subscription expired",
+        description: "Renew your plan to edit records. You can still view everything below.",
+        variant: "destructive",
+      });
+      return;
+    }
     setEditingRecord(record);
     setIsEditModalOpen(true);
   };
@@ -229,6 +244,23 @@ const ViewRecords = () => {
       <main className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-7xl mx-auto space-y-6">
 
+          {/* ── Expired subscription notice: view stays open, add/edit is disabled ── */}
+          {isReadOnly && (
+            <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <Lock className="w-4.5 h-4.5 text-amber-600 mt-0.5 shrink-0" />
+              <div className="text-sm">
+                <p className="text-amber-900 font-medium">Your subscription has expired</p>
+                <p className="text-amber-800/90 mt-0.5">
+                  You can still view all your saved records here, but adding new policies or editing
+                  existing ones is paused until you renew.{" "}
+                  <Link to="/our-plans" className="text-amber-900 font-medium underline underline-offset-2">
+                    Renew your plan
+                  </Link>
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* ── Hero header ── */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center gap-3">
@@ -242,12 +274,23 @@ const ViewRecords = () => {
                 </p>
               </div>
             </div>
-            <Link to="/add-record">
-              <Button className="bg-primary hover:bg-primary-light shadow-sm">
-                <Plus className="w-4 h-4 mr-2" />
-                {t("addNewRecord")}
+            {isReadOnly ? (
+              <Button
+                variant="outline"
+                className="border-amber-300 text-amber-800 hover:bg-amber-50"
+                onClick={() => navigate("/our-plans")}
+              >
+                <Lock className="w-4 h-4 mr-2" />
+                Renew to add records
               </Button>
-            </Link>
+            ) : (
+              <Link to="/add-record">
+                <Button className="bg-primary hover:bg-primary-light shadow-sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  {t("addNewRecord")}
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* ── Stat row (Home-style summary cards) ── */}
@@ -342,12 +385,19 @@ const ViewRecords = () => {
                     )}
                   </div>
                   {records.length === 0 && !isLoading && (
-                    <Link to="/add-record">
-                      <Button>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add First Record
+                    isReadOnly ? (
+                      <Button variant="outline" className="border-amber-300 text-amber-800 hover:bg-amber-50" onClick={() => navigate("/our-plans")}>
+                        <Lock className="w-4 h-4 mr-2" />
+                        Renew to add records
                       </Button>
-                    </Link>
+                    ) : (
+                      <Link to="/add-record">
+                        <Button>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add First Record
+                        </Button>
+                      </Link>
+                    )
                   )}
                 </div>
               ) : (
@@ -419,8 +469,8 @@ const ViewRecords = () => {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleEditRecord(record)}
-                                className="h-8 w-8 p-0"
-                                title="Edit Record"
+                                className={`h-8 w-8 p-0 ${isReadOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                                title={isReadOnly ? "Edit disabled — subscription expired" : "Edit Record"}
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
