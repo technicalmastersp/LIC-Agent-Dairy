@@ -30,6 +30,7 @@ import PaymentVerifications from "./pages/admin/PaymentVerifications";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminSupportTickets from "./pages/admin/AdminSupportTickets";
 import AdminSuggestions from "./pages/admin/AdminSuggestions";
+import AdminRevenue from "./pages/admin/AdminRevenue";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Landing from "./pages/Landing";
 import HelpSupport from "./pages/HelpSupport";
@@ -75,6 +76,7 @@ const App = () => (
             <Route path="/admin/logs"             element={<AdminLogs />} />
             <Route path="/admin/support"          element={<AdminSupportTickets />} />
             <Route path="/admin/suggestions"      element={<AdminSuggestions />} />
+            <Route path="/admin/revenue"          element={<AdminRevenue />} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

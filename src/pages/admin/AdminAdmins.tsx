@@ -61,6 +61,8 @@ const AdminAdmins = () => {
     { key: "can_delete_users",        label: "Delete users",            desc: "Permanently delete user accounts and data",  risk: "critical"},
     { key: "can_verify_payment_details", label: "Verify payment details", desc: "Approve or reject users' UPI IDs for withdrawal payouts", risk: "high" },
     { key: "can_manage_support", label: "Manage support & suggestions", desc: "View and reply to support tickets, review user suggestions", risk: "medium" },
+    { key: "can_view_revenue", label: "View revenue", desc: "See financial reports — income, expenses, profit/loss", risk: "high" },
+    { key: "can_manage_expenses", label: "Manage expenses & refunds", desc: "Log expenses, edit/delete entries, process payment refunds", risk: "critical" },
   ];
 
   const riskColor: Record<string, string> = {
@@ -437,6 +439,8 @@ const AdminAdmins = () => {
                         can_change_subscription: false, can_delete_users: false,
                         can_verify_payment_details: true,
                         can_manage_support: true,
+                        can_view_revenue: true,
+                        can_manage_expenses: true,
                       })}>
                       Full admin
                     </Button>

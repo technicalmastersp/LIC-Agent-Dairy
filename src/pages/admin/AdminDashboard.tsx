@@ -11,7 +11,7 @@ import {
   Users, TrendingUp, Wallet, ArrowDownToLine,
   Clock, CheckCircle2, UserX, Gift,
   ArrowUpRight, ArrowDownRight, RefreshCw, LogOut, AlertTriangle,
-  BadgeCheck, LifeBuoy, Lightbulb,
+  BadgeCheck, LifeBuoy, Lightbulb, IndianRupee,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -149,7 +149,7 @@ const AdminDashboard = () => {
             },
             {
               label:   "Total revenue",
-              val:     `₹${revenue.total.toLocaleString("en-IN")}`,
+              val:     `₹${(revenue.total ?? 0).toLocaleString("en-IN")}`,
               icon:    <TrendingUp className="w-5 h-5 text-purple-600" />,
               bg:      "bg-purple-50 border-purple-200",
               sub:     `${subscriptions.paid} paid users`,
@@ -193,6 +193,15 @@ const AdminDashboard = () => {
                 urgent:  false,
               },
             ] : []),
+            ...(currentUser?.role === "superadmin" || permissions?.can_view_revenue ? [{
+              label:   "This month's income",
+              val:     `₹${(stats.revenue?.thisMonthIncome ?? 0).toLocaleString("en-IN")}`,
+              icon:    <IndianRupee className="w-5 h-5 text-green-600" />,
+              bg:      "border bg-green-50 border-green-200",
+              sub:     "View full revenue report",
+              link:    "/admin/revenue",
+              urgent:  false,
+            }] : []),
           ].map(({ label, val, icon, bg, sub, trend, link, urgent }) => (
             <Card key={label}
               className={`border ${bg} ${link ? "cursor-pointer hover:shadow-md transition-shadow" : ""} ${urgent ? "ring-2 ring-amber-400" : ""}`}

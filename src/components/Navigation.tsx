@@ -339,6 +339,9 @@ const Navigation = () => {
                   <DropdownMenuItem onClick={() => navigate("/profile")}>
                     <User className="w-4 h-4 mr-2" /> Profile
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/referral-program")}>
+                    <User className="w-4 h-4 mr-2" /> Referral Program
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/about")}>
                     <MapPinnedIcon className="w-4 h-4 mr-2" /> About
                   </DropdownMenuItem>
