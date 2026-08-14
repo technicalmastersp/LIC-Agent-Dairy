@@ -1,54 +1,60 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Plus, Table, LogOut, User, Menu, X, UserRoundCog, CircleHelp } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  Home, Plus, Table, LogOut, User, Menu, X,
+  UserRoundCog, CircleHelp, MapPinnedIcon
+} from "lucide-react";
+import { Button }        from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
-import { useLanguage } from "@/hooks/useLanguage";
-import LanguageSwitcher from "./LanguageSwitcher";
-import { cn } from "@/lib/utils";
-import siteConfig from "@/config/siteConfig";
+import { useLanguage }   from "@/hooks/useLanguage";
+import LanguageSwitcher  from "./LanguageSwitcher";
+import { cn }            from "@/lib/utils";
+import siteConfig        from "@/config/siteConfig";
 import { logoutCurrentUser } from "../../services/userService";
 
-/* ------------------ NAV CONFIG ------------------ */
+/* ─────────────────────────────────────────────
+   NAV CONFIG
+───────────────────────────────────────────── */
 
-const getNavItems = (t) => [
-  { to: "/", label: t("home"), icon: Home, auth: true },
-  { to: "/add-record", label: t("addRecord"), icon: Plus, auth: true },
-  { to: "/view-records", label: t("viewRecords"), icon: Table, auth: true },
-];
-const getNavItemsMobile = (t) => [
-  { to: "/", label: t("home"), icon: Home, auth: true },
-  { to: "/add-record", label: t("addRecord"), icon: Plus, auth: true },
-  { to: "/view-records", label: t("viewRecords"), icon: Table, auth: true },
+const getNavItems = (t: any) => [
+  { to: "/",             label: t("home"),        icon: Home        },
+  { to: "/add-record",   label: t("addRecord"),   icon: Plus        },
+  { to: "/view-records", label: t("viewRecords"), icon: Table       },
 ];
 
-const getAdminNavItems = (t) => [
-  { to: "/admin", label: t("Admin Panel"), icon: UserRoundCog, auth: true }
+const getNavItemsMobile = (t: any) => [
+  { to: "/",             label: t("home"),        icon: Home        },
+  { to: "/add-record",   label: t("addRecord"),   icon: Plus        },
+  { to: "/view-records", label: t("viewRecords"), icon: Table       },
 ];
 
-/* ------------------ HELPERS ------------------ */
+const getAdminNavItems = (t: any) => [
+  { to: "/admin", label: "Admin Panel", icon: UserRoundCog },
+];
+
+/* ─────────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────────── */
 
 const initials = (name = "") =>
   name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() || "?";
 
-/* ------------------ NAV ITEM — icon-only at lg, icon+label at xl ------------------ */
+/* ─────────────────────────────────────────────
+   DESKTOP NAV ITEM
+───────────────────────────────────────────── */
 
-const NavItem = ({ to, label, icon: Icon, onClick,
-  }: {
-    to: string;
-    label: any;
-    icon: any;
-    onClick?: () => void;
-  }
-) => {
+const NavItem = ({
+  to, label, icon: Icon, onClick,
+}: {
+  to: string; label: any; icon: any; onClick?: () => void;
+}) => {
   const location = useLocation();
   const isActive = location.pathname === to;
-
   return (
     <Link
       to={to}
@@ -67,12 +73,17 @@ const NavItem = ({ to, label, icon: Icon, onClick,
   );
 };
 
-/* ------------------ MOBILE NAV ITEM (block style, roomier tap target) ------------------ */
+/* ─────────────────────────────────────────────
+   MOBILE NAV ITEM
+───────────────────────────────────────────── */
 
-const MobileNavItem = ({ to, label, icon: Icon, onClick }: { to: string; label: any; icon: any; onClick?: () => void }) => {
+const MobileNavItem = ({
+  to, label, icon: Icon, onClick,
+}: {
+  to: string; label: any; icon: any; onClick?: () => void;
+}) => {
   const location = useLocation();
   const isActive = location.pathname === to;
-
   return (
     <Link
       to={to}
@@ -90,47 +101,187 @@ const MobileNavItem = ({ to, label, icon: Icon, onClick }: { to: string; label: 
   );
 };
 
-/* ------------------ MAIN COMPONENT ------------------ */
+/* ─────────────────────────────────────────────
+   PUBLIC MOBILE LINK
+───────────────────────────────────────────── */
+
+const PublicMobileLink = ({
+  href, label, onClick,
+}: {
+  href: string; label: string; onClick: () => void;
+}) => {
+  const cls =
+    "block px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors";
+  return href.startsWith("#") ? (
+    <a href={href} onClick={onClick} className={cls}>{label}</a>
+  ) : (
+    <Link to={href} onClick={onClick} className={cls}>{label}</Link>
+  );
+};
+
+/* ─────────────────────────────────────────────
+   MAIN COMPONENT
+───────────────────────────────────────────── */
 
 const Navigation = () => {
-  const { t } = useLanguage();
-  const location = useLocation();
-  const navigate = useNavigate();
-
+  const { t }         = useLanguage();
+  const location      = useLocation();
+  const navigate      = useNavigate();
   const authenticated = isAuthenticated();
-  const currentUser = getCurrentUser();
+  const currentUser   = getCurrentUser();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navItems = getNavItems(t);
+  const navItems       = getNavItems(t);
   const navItemsMobile = getNavItemsMobile(t);
-  const adminNavItems = getAdminNavItems(t);
-  const isAdmin = currentUser?.role === "admin" || currentUser?.role === "superadmin";
+  const adminNavItems  = getAdminNavItems(t);
+  const isAdmin        = currentUser?.role === "admin" || currentUser?.role === "superadmin";
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
-  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const toggleMobileMenu = () => setIsMobileMenuOpen((p) => !p);
+  const closeMobileMenu  = () => setIsMobileMenuOpen(false);
 
   const handleLogout = async () => {
+    closeMobileMenu();
     await logoutCurrentUser();
     navigate("/login");
   };
 
+  const publicLinks = [
+    { href: "/our-plans",     label: "Plans"          },
+    { href: "/lic-info-hub",  label: "Best Info Hub"  },
+    // { href: "#Career",  label: "Career"   },
+    { href: "/help-support",  label: "Help & Support" },
+    { href: "/about",         label: "About"          },
+  ];
+
+  /* ═══════════════════════════════════════════
+     PUBLIC HEADER — not logged in
+  ═══════════════════════════════════════════ */
+  if (!authenticated) {
+    return (
+      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-md border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto flex items-center justify-between h-16">
+
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <img src={siteConfig.logo_medium_size} alt="logo" className="w-5 h-5" />
+              </div>
+              <span className="font-semibold text-form-header">{siteConfig.title}</span>
+            </Link>
+
+            {/* Desktop links */}
+            <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground mx-2">
+              {publicLinks.map(({ href, label }) =>
+                href.startsWith("#") ? (
+                  <a key={label} href={href}
+                    className="hover:text-form-header transition-colors">
+                    {label}
+                  </a>
+                ) : (
+                  <Link key={label} to={href}
+                    className={cn(
+                      "hover:text-form-header transition-colors",
+                      location.pathname === href && "text-form-header font-medium"
+                    )}>
+                    {label}
+                  </Link>
+                )
+              )}
+            </div>
+
+            {/* Right — auth + mobile hamburger */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="md:hidden p-1.5 rounded-md hover:bg-muted transition-colors"
+                onClick={toggleMobileMenu}
+                aria-label="Toggle menu"
+                aria-expanded={isMobileMenuOpen}
+              >
+                {isMobileMenuOpen
+                  ? <X    className="w-5 h-5" />
+                  : <Menu className="w-5 h-5" />}
+              </button>
+              
+              
+              <div className="hidden md:block min-w-24">
+              <LanguageSwitcher />
+              </div>
+
+              <Link to="/login">
+                <Button variant="ghost" size="sm">Log in</Button>
+              </Link>
+              <Link to="/signup">
+                <Button size="sm" className="bg-primary hover:bg-primary-light">
+                  Sign up free
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Public mobile menu */}
+          <div className={cn(
+            "md:hidden overflow-hidden transition-all duration-300 ease-in-out",
+            isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          )}>
+            <div className="space-y-1 pb-4 pt-2 border-t border-border">
+              {publicLinks.map(({ href, label }) => (
+                <PublicMobileLink
+                  key={label}
+                  href={href}
+                  label={label}
+                  onClick={closeMobileMenu}
+                />
+              ))}
+              <div className="px-1 pt-2 flex gap-2">
+                <Link to="/login" className="flex-1" onClick={closeMobileMenu}>
+                  <Button variant="outline" size="sm" className="w-full">
+                    Log in
+                  </Button>
+                </Link>
+                <Link to="/signup" className="flex-1" onClick={closeMobileMenu}>
+                  <Button size="sm" className="w-full bg-primary hover:bg-primary-light">
+                    Sign up free
+                  </Button>
+                </Link>
+              </div>
+              <div className="px-1 pt-1">
+                <LanguageSwitcher type="mobile" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  /* ═══════════════════════════════════════════
+     AUTHENTICATED NAV — logged in
+  ═══════════════════════════════════════════ */
   return (
     <nav className="bg-primary shadow-lg border-b border-border sticky top-0 z-50">
       <div className="container mx-auto px-4">
-        {/* HEADER */}
+
+        {/* ── Desktop header row ── */}
         <div className="flex items-center justify-between min-h-16 py-2 gap-3">
-          {/* LOGO */}
-          <Link to="/" className="flex items-center space-x-2 shrink-0 min-w-0" onClick={closeMobileMenu}>
+
+          {/* Logo */}
+          <Link
+            to="/"
+            onClick={closeMobileMenu}
+            className="flex items-center space-x-2 shrink-0 min-w-0"
+          >
             <div className="w-8 h-8 bg-primary-foreground rounded-full flex items-center justify-center overflow-hidden shrink-0">
-              <img src={siteConfig.logo_medium_size} alt="site-logo" />
+              <img src={siteConfig.logo_medium_size} alt="logo" />
             </div>
             <span className="text-primary-foreground font-semibold text-lg sm:max-w-none">
               {siteConfig.title}
             </span>
           </Link>
 
-          {/* MOBILE / TABLET MENU BUTTON */}
+          {/* Mobile hamburger */}
           <button
             type="button"
             className="lg:hidden text-primary-foreground p-1.5 -mr-1.5 rounded-md hover:bg-primary-light/50 transition-colors shrink-0"
@@ -138,169 +289,153 @@ const Navigation = () => {
             aria-label="Toggle menu"
             aria-expanded={isMobileMenuOpen}
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen
+              ? <X    className="w-6 h-6" />
+              : <Menu className="w-6 h-6" />}
           </button>
 
-          {/* DESKTOP MENU — no overflow-x-auto / scrollbar; the lg tier collapses to icons
-              instead so the row always fits without scrolling */}
+          {/* Desktop right side */}
           <div className="hidden lg:flex items-center gap-1 shrink-0">
-            {authenticated && currentUser?.role === "user" &&
-              navItems.map((item) => <NavItem key={item.to} {...item} />)}
 
-            {authenticated && isAdmin &&
+            {/* Nav links */}
+            {currentUser?.role === "user" &&
+              navItems.map((item) => <NavItem key={item.to} {...item} />)}
+            {isAdmin &&
               [...navItems, ...adminNavItems].map((item) => <NavItem key={item.to} {...item} />)}
 
-            {/* Language switcher — icon-only pill at lg, full switcher at xl.
-                Assumes LanguageSwitcher accepts a `type` prop the same way "mobile" is used
-                elsewhere in this file; if it doesn't support a compact/icon variant, swap the
-                lg-tier block below for whatever compact prop it does expose. */}
+            {/* Language switcher */}
             <div className="pl-1.5 ml-1 border-l border-primary-foreground/15 shrink-0 flex items-center">
-              {/* <div className="xl:hidden">
-                <button
-                  type="button"
-                  title="Change language"
-                  className="flex items-center justify-center w-9 h-9 rounded-md text-primary-foreground/85 hover:bg-primary-light/50 hover:text-primary-foreground transition-colors"
-                  onClick={() => {
-                    // Falls back to a no-op if LanguageSwitcher doesn't expose an
-                    // imperative toggle — swap this for the switcher's own compact mode.
-                  }}
-                >
-                  <Globe className="w-4 h-4" />
-                </button>
-              </div> */}
               <div className="xl:block">
                 <LanguageSwitcher />
               </div>
             </div>
 
-            {authenticated ? (
-              <div className="flex items-center pl-2 ml-1 border-l border-primary-foreground/15 shrink-0">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      title={currentUser?.name}
-                      className="flex items-center gap-2 rounded-full pl-1 pr-1.5 xl:pr-3 py-1 text-sm font-medium text-primary-foreground/85 hover:bg-primary-light/50 hover:text-primary-foreground transition-colors shrink-0"
-                    >
-                      <Avatar className="w-7 h-7">
-                        {currentUser?.profileImage && <AvatarImage src={currentUser.profileImage} alt={currentUser?.name} />}
-                        <AvatarFallback className="bg-primary-foreground/15 text-primary-foreground text-[10px] font-semibold">
-                          {initials(currentUser?.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className=" xl:inline max-w-[140px] truncate">{currentUser?.name}</span>
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => navigate("/profile")}>
-                      <User className="w-4 h-4 mr-2" />
-                      Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate("/help-support")}>
-                      <CircleHelp className="w-4 h-4 mr-2" />
-                      Help & Support
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 pl-2 ml-1 border-l border-primary-foreground/15 shrink-0">
-                <Button variant="outline" size="sm" asChild
-                  className="bg-transparent border-primary-foreground/25 text-primary-foreground hover:bg-primary-light/50 hover:text-primary-foreground shrink-0">
-                  <Link to="/login">{t("login")}</Link>
-                </Button>
-                <Button size="sm" asChild className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 shrink-0">
-                  <Link to="/signup">{t("signupFree")}</Link>
-                </Button>
-              </div>
-            )}
+            {/* User dropdown */}
+            <div className="flex items-center pl-2 ml-1 border-l border-primary-foreground/15 shrink-0">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    title={currentUser?.name}
+                    className="flex items-center gap-2 rounded-full pl-1 pr-1.5 xl:pr-3 py-1 text-sm font-medium text-primary-foreground/85 hover:bg-primary-light/50 hover:text-primary-foreground transition-colors shrink-0"
+                  >
+                    <Avatar className="w-7 h-7">
+                      {currentUser?.profileImage && (
+                        <AvatarImage
+                          src={currentUser.profileImage}
+                          alt={currentUser?.name}
+                        />
+                      )}
+                      <AvatarFallback className="bg-primary-foreground/15 text-primary-foreground text-[10px] font-semibold">
+                        {initials(currentUser?.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="xl:inline max-w-[140px] truncate">
+                      {currentUser?.name}
+                    </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <User className="w-4 h-4 mr-2" /> Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/about")}>
+                    <MapPinnedIcon className="w-4 h-4 mr-2" /> About
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/help-support")}>
+                    <CircleHelp className="w-4 h-4 mr-2" /> Help & Support
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" /> Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
 
-        {/* MOBILE / TABLET MENU */}
-        <div
-          className={cn(
-            "lg:hidden overflow-hidden transition-all duration-300 ease-in-out",
-            isMobileMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
-          )}
-        >
+        {/* ── Mobile menu ── */}
+        <div className={cn(
+          "lg:hidden overflow-hidden transition-all duration-300 ease-in-out",
+          isMobileMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+        )}>
           <div className="space-y-1.5 pb-4 pt-2 border-t border-primary-foreground/10">
-            {authenticated && currentUser?.role === "user" &&
+
+            {/* Nav links */}
+            {currentUser?.role === "user" &&
               navItemsMobile.map((item) => (
                 <MobileNavItem key={item.to} {...item} onClick={closeMobileMenu} />
               ))}
-
-            {authenticated && isAdmin &&
+            {isAdmin &&
               [...navItemsMobile, ...adminNavItems].map((item) => (
                 <MobileNavItem key={item.to} {...item} onClick={closeMobileMenu} />
               ))}
 
-            {authenticated ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigate("/profile");
-                    closeMobileMenu();
-                  }}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary-light/40 rounded-lg transition-colors"
-                >
-                  <Avatar className="w-7 h-7">
-                    {currentUser?.profileImage && <AvatarImage src={currentUser.profileImage} alt={currentUser?.name} />}
-                    <AvatarFallback className="bg-primary-foreground/15 text-primary-foreground text-[11px] font-semibold">
-                      {initials(currentUser?.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="truncate">{currentUser?.name}</span>
-                </button>
+            {/* About */}
+            <MobileNavItem
+              to="/about"
+              label="About"
+              icon={MapPinnedIcon}
+              onClick={closeMobileMenu}
+            />
 
-                <div className="px-1 pt-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      handleLogout();
-                      closeMobileMenu();
-                    }}
-                    className="w-full bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-red-600 hover:border-red-600 hover:text-white"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    {t("logout")}
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <div className="space-y-1.5 px-1">
-                <Button variant="outline" size="sm" asChild
-                  className="w-full bg-transparent border-primary-foreground/25 text-primary-foreground hover:bg-primary-light/50 hover:text-primary-foreground">
-                  <Link to="/our-plans" onClick={closeMobileMenu}>
-                    Plans
-                  </Link>
-                </Button>
-                <Button variant="outline" size="sm" asChild
-                  className="w-full bg-transparent border-primary-foreground/25 text-primary-foreground hover:bg-primary-light/50 hover:text-primary-foreground">
-                  <Link to="/login" onClick={closeMobileMenu}>
-                    {t("login")}
-                  </Link>
-                </Button>
-                <Button size="sm" asChild className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-                  <Link to="/signup" onClick={closeMobileMenu}>
-                    {t("signupFree")}
-                  </Link>
-                </Button>
-              </div>
-            )}
+            {/* Help & support */}
+            <MobileNavItem
+              to="/help-support"
+              label="Help & Support"
+              icon={CircleHelp}
+              onClick={closeMobileMenu}
+            />
 
+            {/* Profile row */}
+            <button
+              type="button"
+              onClick={() => { navigate("/profile"); closeMobileMenu(); }}
+              className={cn(
+                "flex w-full items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors",
+                location.pathname === "/profile"
+                  ? "bg-primary-light text-primary-foreground"
+                  : "text-primary-foreground hover:bg-primary-light/40"
+              )}
+            >
+              <Avatar className="w-7 h-7">
+                {currentUser?.profileImage && (
+                  <AvatarImage
+                    src={currentUser.profileImage}
+                    alt={currentUser?.name}
+                  />
+                )}
+                <AvatarFallback className="bg-primary-foreground/15 text-primary-foreground text-[11px] font-semibold">
+                  {initials(currentUser?.name)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="truncate">{currentUser?.name}</span>
+            </button>
+
+            {/* Logout */}
+            <div className="px-1 pt-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="w-full bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-red-600 hover:border-red-600 hover:text-white"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                {t("logout")}
+              </Button>
+            </div>
+
+            {/* Language */}
             <div className="pt-2 px-1">
               <LanguageSwitcher type="mobile" />
             </div>
           </div>
         </div>
+
       </div>
     </nav>
   );

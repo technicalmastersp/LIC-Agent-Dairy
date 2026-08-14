@@ -15,6 +15,7 @@ import {
   X,
   Home,
   BadgeCheck,
+  LifeBuoy,
 } from "lucide-react";
 
 // Nav items with required permission
@@ -62,6 +63,14 @@ const NAV = [
     icon: ScrollText,
     roles: ["admin", "superadmin"],
     permission: "can_view_logs",
+  },
+  {
+    path: "/admin/support",
+    label: "Support & suggestions",
+    icon: LifeBuoy,
+    roles: ["admin", "superadmin"],
+    permission: "can_manage_support",
+    countKey: "supportTickets",
   },
 ];
 

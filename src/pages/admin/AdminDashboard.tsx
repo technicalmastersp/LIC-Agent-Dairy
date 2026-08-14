@@ -11,7 +11,7 @@ import {
   Users, TrendingUp, Wallet, ArrowDownToLine,
   Clock, CheckCircle2, UserX, Gift,
   ArrowUpRight, ArrowDownRight, RefreshCw, LogOut, AlertTriangle,
-  BadgeCheck,
+  BadgeCheck, LifeBuoy, Lightbulb,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -173,6 +173,26 @@ const AdminDashboard = () => {
               link:    "/admin/payment-verifications",
               urgent:  (stats.paymentVerifications?.pendingUpi ?? 0) > 0,
             }] : []),
+            ...(currentUser?.role === "superadmin" || permissions?.can_manage_support ? [
+              {
+                label:   "Open support tickets",
+                val:     (stats.support?.openHighPriority ?? 0) + (stats.support?.openGuest ?? 0),
+                icon:    <LifeBuoy className="w-5 h-5 text-orange-600" />,
+                bg:      `border ${(stats.support?.openHighPriority ?? 0) > 0 ? "bg-orange-50 border-orange-300" : "bg-gray-50 border-gray-200"}`,
+                sub:     `${stats.support?.openHighPriority ?? 0} high · ${stats.support?.openGuest ?? 0} guest`,
+                link:    "/admin/support",
+                urgent:  (stats.support?.openHighPriority ?? 0) > 0,
+              },
+              {
+                label:   "New suggestions",
+                val:     stats.support?.newSuggestions ?? 0,
+                icon:    <Lightbulb className="w-5 h-5 text-purple-600" />,
+                bg:      `border ${(stats.support?.newSuggestions ?? 0) > 0 ? "bg-purple-50 border-purple-300" : "bg-gray-50 border-gray-200"}`,
+                sub:     "Awaiting review",
+                link:    "/admin/suggestions",
+                urgent:  false,
+              },
+            ] : []),
           ].map(({ label, val, icon, bg, sub, trend, link, urgent }) => (
             <Card key={label}
               className={`border ${bg} ${link ? "cursor-pointer hover:shadow-md transition-shadow" : ""} ${urgent ? "ring-2 ring-amber-400" : ""}`}

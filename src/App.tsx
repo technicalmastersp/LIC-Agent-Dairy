@@ -28,9 +28,12 @@ import AdminAdmins from "./pages/admin/AdminAdmins";
 import WithdrawalRequests from "./pages/admin/WithdrawalRequests";
 import PaymentVerifications from "./pages/admin/PaymentVerifications";
 import AdminLogs from "./pages/admin/AdminLogs";
+import AdminSupportTickets from "./pages/admin/AdminSupportTickets";
+import AdminSuggestions from "./pages/admin/AdminSuggestions";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Landing from "./pages/Landing";
 import HelpSupport from "./pages/HelpSupport";
+import FloatingHelpButton from "./components/FloatingHelpButton";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +46,7 @@ const App = () => (
         <GlobalToastListener />
         <BrowserRouter>
           <ScrollToTop />
+          <FloatingHelpButton />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
@@ -69,6 +73,8 @@ const App = () => (
             <Route path="/admin/withdrawals"      element={<WithdrawalRequests />} />
             <Route path="/admin/payment-verifications" element={<PaymentVerifications />} />
             <Route path="/admin/logs"             element={<AdminLogs />} />
+            <Route path="/admin/support"          element={<AdminSupportTickets />} />
+            <Route path="/admin/suggestions"      element={<AdminSuggestions />} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

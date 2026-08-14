@@ -9,13 +9,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
+import { useEffect } from "react";
 import {
   LifeBuoy, Mail, MessageCircle, Phone, Search, ChevronDown,
   ShieldCheck, Clock, CheckCircle2, Send, BookOpenText,
   Wallet, FileText, Lock, UserCog, Users, ArrowRight, Timer, DatabaseBackup,
+  Lightbulb, Inbox,
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import siteConfig from "@/config/siteConfig";
-// import { createSupportTicket } from "../../services/supportService"; // ← wire up when the endpoint exists
+import { createTicket, getMyTickets } from "../../services/supportService";
+import { createSuggestion, getMySuggestions } from "../../services/suggestionService";
 
 type FaqItem = { q: string; a: string; category: string };
 
@@ -39,7 +44,27 @@ const categories = [
   { icon: FileText, title: "Policies & Records", description: "Adding, editing, and tracking policy records of any type." },
   { icon: Wallet, title: "Payments & Referrals", description: "Referral wallet, withdrawals, and payment details." },
   { icon: Lock, title: "Security & Data", description: "How your data is protected, backed up, and accessed." },
+  { icon: ShieldCheck, title: "Technical", description: "Bugs, loading issues, or anything not working as expected." },
 ];
+
+const ticketStatusStyle: Record<string, string> = {
+  open:        "bg-blue-100 text-blue-700 border border-blue-200",
+  in_progress: "bg-amber-100 text-amber-700 border border-amber-200",
+  resolved:    "bg-green-100 text-green-700 border border-green-200",
+  closed:      "bg-gray-100 text-gray-600 border border-gray-200",
+};
+
+const suggestionStatusStyle: Record<string, string> = {
+  new:          "bg-blue-100 text-blue-700 border border-blue-200",
+  under_review: "bg-amber-100 text-amber-700 border border-amber-200",
+  planned:      "bg-purple-100 text-purple-700 border border-purple-200",
+  implemented:  "bg-green-100 text-green-700 border border-green-200",
+  declined:     "bg-gray-100 text-gray-600 border border-gray-200",
+};
+
+const fmt = (d?: string) => d
+  ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
+  : "—";
 
 const HelpSupport = () => {
   const { toast } = useToast();
@@ -56,6 +81,20 @@ const HelpSupport = () => {
     message: "",
   });
   const [submitting, setSubmitting] = useState(false);
+
+  const [myTickets, setMyTickets]     = useState<any[]>([]);
+  const [loadingTickets, setLoadingTickets] = useState(true);
+
+  const [suggestForm, setSuggestForm] = useState({ title: "", message: "" });
+  const [submittingSuggestion, setSubmittingSuggestion] = useState(false);
+  const [mySuggestions, setMySuggestions] = useState<any[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(true);
+
+  useEffect(() => {
+    if (!authenticated) { setLoadingTickets(false); setLoadingSuggestions(false); return; }
+    getMyTickets().then(setMyTickets).catch(() => {}).finally(() => setLoadingTickets(false));
+    getMySuggestions().then(setMySuggestions).catch(() => {}).finally(() => setLoadingSuggestions(false));
+  }, [authenticated]);
 
   const filteredFaqs = useMemo(() => {
     if (!query.trim()) return faqs;
@@ -78,19 +117,38 @@ const HelpSupport = () => {
     }
     setSubmitting(true);
     try {
-      // await createSupportTicket(form); // ← replace with real API call once the endpoint exists
-      await new Promise((res) => setTimeout(res, 600)); // placeholder delay
-      toast({ title: "Message sent", description: "Our team will get back to you within a few hours." });
+      const res = await createTicket(form);
+      toast({ title: "Message sent", description: `Ticket ${res.data.ticketId} — our team will get back to you within a few hours.` });
       setForm({ name: currentUser?.name ?? "", email: currentUser?.email ?? "", category: "Account & Billing", message: "" });
-    } catch {
-      toast({ title: "Something went wrong", description: "Please try again, or email us directly.", variant: "destructive" });
+      if (authenticated) getMyTickets().then(setMyTickets).catch(() => {});
+    } catch (err: any) {
+      toast({ title: "Something went wrong", description: err.response?.data?.message || "Please try again, or email us directly.", variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
   };
 
+  const handleSuggestionSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!suggestForm.title.trim() || !suggestForm.message.trim()) {
+      toast({ title: "Missing details", description: "Please add a title and description.", variant: "destructive" });
+      return;
+    }
+    setSubmittingSuggestion(true);
+    try {
+      await createSuggestion(suggestForm);
+      toast({ title: "Thanks for the suggestion!", description: "Our team will review it." });
+      setSuggestForm({ title: "", message: "" });
+      getMySuggestions().then(setMySuggestions).catch(() => {});
+    } catch (err: any) {
+      toast({ title: "Something went wrong", description: err.response?.data?.message || "Please try again.", variant: "destructive" });
+    } finally {
+      setSubmittingSuggestion(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navigation />
 
       <main className="flex-1">
@@ -348,6 +406,116 @@ const HelpSupport = () => {
             </div>
           </div>
         </section>
+
+        {/* ══════════ MY REQUESTS (logged-in only) ══════════ */}
+        {authenticated && (
+          <section className="bg-background py-16 md:py-20 border-t border-border">
+            <div className="container mx-auto px-4">
+              <div className="max-w-3xl mx-auto">
+                <div className="text-center max-w-xl mx-auto mb-10">
+                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Your history</p>
+                  <h2 className="text-3xl font-bold text-form-header">My requests</h2>
+                  <p className="text-muted-foreground mt-2">Track every message you've sent us and its current status.</p>
+                </div>
+
+                {loadingTickets ? (
+                  <p className="text-center text-sm text-muted-foreground py-8">Loading…</p>
+                ) : !myTickets.length ? (
+                  <p className="text-center text-sm text-muted-foreground py-8">
+                    <Inbox className="w-6 h-6 mx-auto mb-2 text-muted-foreground/60" />
+                    No requests yet — send us a message below if you need help.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {myTickets.map((t) => (
+                      <Card key={t.ticketId}>
+                        <CardHeader className="pb-2">
+                          <div className="flex items-start justify-between flex-wrap gap-2">
+                            <div>
+                              <CardTitle className="text-sm font-mono">{t.ticketId}</CardTitle>
+                              <p className="text-xs text-muted-foreground mt-1">{t.category} · {fmt(t.createdAt)}</p>
+                            </div>
+                            <Badge className={`text-xs ${ticketStatusStyle[t.status]}`}>{t.status.replace("_", " ")}</Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <p className="text-sm text-foreground">{t.message}</p>
+                          {t.adminReply && (
+                            <div className="bg-blue-50 border-l-2 border-blue-400 rounded px-3 py-2 mt-2">
+                              <p className="text-[10px] uppercase text-blue-600 mb-1">Support reply</p>
+                              <p className="text-sm text-blue-900 whitespace-pre-wrap">{t.adminReply}</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ══════════ SUGGESTIONS (logged-in users only) ══════════ */}
+        {authenticated && (
+          <section className="bg-muted/30 py-16 md:py-20">
+            <div className="container mx-auto px-4">
+              <div className="max-w-3xl mx-auto">
+                <div className="text-center max-w-xl mx-auto mb-10">
+                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Have an idea?</p>
+                  <h2 className="text-3xl font-bold text-form-header">Suggest a feature</h2>
+                  <p className="text-muted-foreground mt-2">Tell us what would make the platform better for you.</p>
+                </div>
+
+                <form onSubmit={handleSuggestionSubmit} className="bg-background rounded-2xl border border-border p-6 md:p-8 space-y-4 mb-8">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="suggestTitle" className="text-xs text-muted-foreground">Title</Label>
+                    <Input
+                      id="suggestTitle"
+                      value={suggestForm.title}
+                      onChange={(e) => setSuggestForm(p => ({ ...p, title: e.target.value }))}
+                      placeholder="e.g. Dark mode for the dashboard"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="suggestMessage" className="text-xs text-muted-foreground">Details</Label>
+                    <Textarea
+                      id="suggestMessage"
+                      rows={4}
+                      value={suggestForm.message}
+                      onChange={(e) => setSuggestForm(p => ({ ...p, message: e.target.value }))}
+                      placeholder="What would this help you do?"
+                      className="resize-none"
+                    />
+                  </div>
+                  <Button type="submit" disabled={submittingSuggestion} className="bg-primary hover:bg-primary-light w-full sm:w-auto">
+                    <Lightbulb className="w-4 h-4 mr-2" />
+                    {submittingSuggestion ? "Sending…" : "Send suggestion"}
+                  </Button>
+                </form>
+
+                {!loadingSuggestions && mySuggestions.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Your suggestions</p>
+                    {mySuggestions.map((s) => (
+                      <Card key={s._id}>
+                        <CardHeader className="pb-2">
+                          <div className="flex items-start justify-between flex-wrap gap-2">
+                            <CardTitle className="text-sm">{s.title}</CardTitle>
+                            <Badge className={`text-xs ${suggestionStatusStyle[s.status]}`}>{s.status.replace("_", " ")}</Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">{s.message}</p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ══════════ RESOURCES CTA ══════════ */}
         <section className="bg-[linear-gradient(to_bottom,#0a5b76,#0e7ca1,#0a5b76)] text-primary-foreground py-16">

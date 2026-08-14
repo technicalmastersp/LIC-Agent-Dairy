@@ -88,7 +88,7 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navigation />
 
       <main className="flex-1">
@@ -109,7 +109,7 @@ const About = () => {
                   Trusted by policy agents every day
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
-                  One platform for every policy you manage.
+                  One Platform For Every Policy You Manage.
                 </h1>
                 <p className="text-lg text-white/80 leading-relaxed max-w-lg">
                   {siteConfig.title} replaces spreadsheets and paper registers with a single, secure
