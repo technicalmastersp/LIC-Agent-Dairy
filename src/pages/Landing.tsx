@@ -32,7 +32,7 @@ const Landing = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+    <div className="min-h-screen bg-background flex flex-col">
 
       <Navigation />
 

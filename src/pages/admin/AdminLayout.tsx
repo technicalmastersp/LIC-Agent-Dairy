@@ -16,6 +16,7 @@ import {
   Home,
   BadgeCheck,
   LifeBuoy,
+  IndianRupee,
 } from "lucide-react";
 
 // Nav items with required permission
@@ -71,6 +72,13 @@ const NAV = [
     roles: ["admin", "superadmin"],
     permission: "can_manage_support",
     countKey: "supportTickets",
+  },
+  {
+    path: "/admin/revenue",
+    label: "Revenue",
+    icon: IndianRupee,
+    roles: ["admin", "superadmin"],
+    permission: "can_view_revenue",
   },
 ];
 
