@@ -323,6 +323,7 @@ const AdminUserDetail = () => {
                   <thead>
                     <tr className="bg-muted">
                       <th className="text-xs text-left p-2.5 font-medium text-muted-foreground">Name</th>
+                      <th className="text-xs text-left p-2.5 font-medium text-muted-foreground">Policy Type</th>
                       <th className="text-xs text-left p-2.5 font-medium text-muted-foreground">Policy no.</th>
                       <th className="text-xs text-left p-2.5 font-medium text-muted-foreground">Sum assured</th>
                       <th className="text-xs text-left p-2.5 font-medium text-muted-foreground">Branch</th>
@@ -333,6 +334,11 @@ const AdminUserDetail = () => {
                     {user.records.map((r: any, i: number) => (
                       <tr key={i} className="border-b border-border last:border-0 hover:bg-muted/50">
                         <td className="p-2.5 font-medium">{r.name}</td>
+                        <td className="p-2.5">
+                          <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">
+                            {r?.insuranceType || "Life Insurance"}
+                          </span>
+                        </td>
                         <td className="p-2.5">
                           <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">
                             {r.currentPolicy?.policyNumber || "—"}

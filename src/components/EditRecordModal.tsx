@@ -14,6 +14,12 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { updateRecord } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
+import InsuranceTypeSelector from "@/components/InsuranceTypeSelector";
+import TypeSpecificFieldsForm from "@/components/TypeSpecificFieldsForm";
+import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
+import {
+  isOtherInsuranceType, emptyTypeSpecificData, type CustomFieldValue,
+} from "@/config/insuranceTypes";
 
 interface FamilyMember {
   relationship: string;
@@ -75,6 +81,11 @@ interface Record {
     branch: string;
     lastPaymentDate: string;
   }
+
+  insuranceType?: string;
+  customInsuranceTypeName?: string;
+  typeSpecificData?: Record<string, string>;
+  customFields?: CustomFieldValue[];
 }
 
 interface EditRecordModalProps {
@@ -96,6 +107,28 @@ const SectionTitle = ({ icon: Icon, children }: { icon: any; children: React.Rea
 const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalProps) => {
   const { toast } = useToast();
   const currentUser = getCurrentUser();
+
+  // Insurance type editing — same shape/behavior as AddRecord. Defaults to
+  // Life Insurance until the record loads and overrides it in the effect below.
+  const [insuranceType, setInsuranceType] = useState("Life Insurance");
+  const [customInsuranceTypeName, setCustomInsuranceTypeName] = useState("");
+  const [typeSpecificData, setTypeSpecificData] = useState<Record<string, string>>({});
+  const [customFields, setCustomFields] = useState<CustomFieldValue[]>([]);
+
+  const handleInsuranceTypeChange = (id: string) => {
+    setInsuranceType(id);
+    if (isOtherInsuranceType(id)) {
+      setTypeSpecificData({});
+    } else {
+      setTypeSpecificData(emptyTypeSpecificData(id));
+      setCustomInsuranceTypeName("");
+      setCustomFields([]);
+    }
+  };
+
+  const handleTypeSpecificChange = (key: string, value: string) => {
+    setTypeSpecificData((prev) => ({ ...prev, [key]: value }));
+  };
   
   const [formData, setFormData] = useState({
     date: "",
@@ -201,6 +234,18 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
       });
 
       setFamilyMembers(record.familyMembers);
+
+      const loadedType = record.insuranceType || "Life Insurance";
+      setInsuranceType(loadedType);
+      if (isOtherInsuranceType(loadedType)) {
+        setCustomInsuranceTypeName(record.customInsuranceTypeName || "");
+        setCustomFields(record.customFields || []);
+        setTypeSpecificData({});
+      } else {
+        setTypeSpecificData({ ...emptyTypeSpecificData(loadedType), ...(record.typeSpecificData || {}) });
+        setCustomInsuranceTypeName("");
+        setCustomFields([]);
+      }
     }
   }, [record]);
 
@@ -253,8 +298,24 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
   const handleSave = async () => {
     if (!currentUser || !record) return;
 
+    if (isOtherInsuranceType(insuranceType) && !customInsuranceTypeName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a name for this custom insurance type",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      const res = await updateRecord({ ...formData, familyMembers }, record.recordId); 
+      const res = await updateRecord({
+        ...formData,
+        familyMembers,
+        insuranceType,
+        customInsuranceTypeName: isOtherInsuranceType(insuranceType) ? customInsuranceTypeName.trim() : null,
+        typeSpecificData: isOtherInsuranceType(insuranceType) ? {} : typeSpecificData,
+        customFields: isOtherInsuranceType(insuranceType) ? customFields : [],
+      }, record.recordId);
       
       toast({
         title: "Success",
@@ -291,6 +352,46 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
         </DialogHeader>
         
         <div className="space-y-6">
+          {/* Insurance Type */}
+          <Card>
+            <CardHeader>
+              <SectionTitle icon={ShieldCheck}>Insurance Type</SectionTitle>
+            </CardHeader>
+            <CardContent>
+              <InsuranceTypeSelector value={insuranceType} onChange={handleInsuranceTypeChange} />
+            </CardContent>
+          </Card>
+
+          {/* Type-Specific / Custom Details */}
+          {isOtherInsuranceType(insuranceType) ? (
+            <Card>
+              <CardHeader>
+                <SectionTitle icon={IdCard}>Custom Insurance Details</SectionTitle>
+              </CardHeader>
+              <CardContent>
+                <CustomFieldsBuilder
+                  customTypeName={customInsuranceTypeName}
+                  onCustomTypeNameChange={setCustomInsuranceTypeName}
+                  fields={customFields}
+                  onFieldsChange={setCustomFields}
+                />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <SectionTitle icon={IdCard}>{insuranceType} Details</SectionTitle>
+              </CardHeader>
+              <CardContent>
+                <TypeSpecificFieldsForm
+                  insuranceType={insuranceType}
+                  values={typeSpecificData}
+                  onChange={handleTypeSpecificChange}
+                />
+              </CardContent>
+            </Card>
+          )}
+
           {/* Basic Information Form */}
           <Card>
             <CardHeader>

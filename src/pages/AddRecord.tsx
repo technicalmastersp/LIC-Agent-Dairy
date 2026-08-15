@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
 import {
   Save, Plus, Trash2, Minus,
-  User, Users, HeartPulse, Landmark, ShieldCheck, History, IdCard,
+  User, Users, HeartPulse, Landmark, ShieldCheck, History, IdCard, ListChecks,
 } from "lucide-react";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -17,6 +17,12 @@ import Footer from "@/components/Footer";
 import siteConfig from "@/config/siteConfig";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createRecord } from "../../services/recordService.js";
+import InsuranceTypeSelector from "@/components/InsuranceTypeSelector";
+import TypeSpecificFieldsForm from "@/components/TypeSpecificFieldsForm";
+import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
+import {
+  isOtherInsuranceType, emptyTypeSpecificData, type CustomFieldValue,
+} from "@/config/insuranceTypes";
 
 interface FamilyMember {
   relationship: string;
@@ -63,6 +69,31 @@ const AddRecord = () => {
   if (!authenticated || !currentUser) {
     return null;
   }
+
+  // Insurance type selection — drives which type-specific fields (or the
+  // custom field builder, for "Other") render below the common form.
+  // Defaults to "Life Insurance" since that's what this form has always been.
+  const [insuranceType, setInsuranceType] = useState("Life Insurance");
+  const [customInsuranceTypeName, setCustomInsuranceTypeName] = useState("");
+  const [typeSpecificData, setTypeSpecificData] = useState<Record<string, string>>(
+    emptyTypeSpecificData("Life Insurance")
+  );
+  const [customFields, setCustomFields] = useState<CustomFieldValue[]>([]);
+
+  const handleInsuranceTypeChange = (id: string) => {
+    setInsuranceType(id);
+    if (isOtherInsuranceType(id)) {
+      setTypeSpecificData({});
+    } else {
+      setTypeSpecificData(emptyTypeSpecificData(id));
+      setCustomInsuranceTypeName("");
+      setCustomFields([]);
+    }
+  };
+
+  const handleTypeSpecificChange = (key: string, value: string) => {
+    setTypeSpecificData((prev) => ({ ...prev, [key]: value }));
+  };
 
   // Basic Information
   const [formData, setFormData] = useState({
@@ -163,11 +194,24 @@ const AddRecord = () => {
       return;
     }
 
+    if (isOtherInsuranceType(insuranceType) && !customInsuranceTypeName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a name for this custom insurance type",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const record = {
       ...formData,
       familyMembers,
       currentPolicy,
       previousPolicy,
+      insuranceType,
+      customInsuranceTypeName: isOtherInsuranceType(insuranceType) ? customInsuranceTypeName.trim() : null,
+      typeSpecificData: isOtherInsuranceType(insuranceType) ? {} : typeSpecificData,
+      customFields: isOtherInsuranceType(insuranceType) ? customFields : [],
     };
 
     const success = createRecord(record).then((success)=> {
@@ -208,6 +252,47 @@ const AddRecord = () => {
               <p className="text-white/60 text-xs mt-1">Fill in the sections below to create a new policy record</p>
             </CardHeader>
           </Card>
+
+          {/* Insurance Type Selection */}
+          <Card>
+            <CardHeader>
+              <SectionTitle icon={ListChecks} step="Step 1">Select Insurance Type</SectionTitle>
+            </CardHeader>
+            <CardContent>
+              <InsuranceTypeSelector value={insuranceType} onChange={handleInsuranceTypeChange} />
+            </CardContent>
+          </Card>
+
+          {/* Type-Specific Details — dynamic fields per built-in type, or the
+              custom field builder when "Other (Custom)" is selected */}
+          {isOtherInsuranceType(insuranceType) ? (
+            <Card>
+              <CardHeader>
+                <SectionTitle icon={ShieldCheck} step="Step 2">Custom Insurance Details</SectionTitle>
+              </CardHeader>
+              <CardContent>
+                <CustomFieldsBuilder
+                  customTypeName={customInsuranceTypeName}
+                  onCustomTypeNameChange={setCustomInsuranceTypeName}
+                  fields={customFields}
+                  onFieldsChange={setCustomFields}
+                />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <SectionTitle icon={ShieldCheck} step="Step 2">{insuranceType} Details</SectionTitle>
+              </CardHeader>
+              <CardContent>
+                <TypeSpecificFieldsForm
+                  insuranceType={insuranceType}
+                  values={typeSpecificData}
+                  onChange={handleTypeSpecificChange}
+                />
+              </CardContent>
+            </Card>
+          )}
 
           {/* Basic Information Form */}
           <Card>

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
 import { convertDateToIndianFormat } from "@/utils/tools";
+import { getInsuranceTypeDef, isOtherInsuranceType } from "@/config/insuranceTypes";
 
 interface RecordDetailsModalProps {
   record: any;
@@ -64,6 +65,11 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 &nbsp;{siteConfig.title}
               </CardTitle>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                <Badge variant="outline" className="bg-white/60 border-primary/30 text-form-header font-medium">
+                  {isOtherInsuranceType(record.insuranceType)
+                    ? (record.customInsuranceTypeName || "Custom Insurance")
+                    : (getInsuranceTypeDef(record.insuranceType)?.label || record.insuranceType || "Life Insurance")}
+                </Badge>
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5" />
                   Created: {convertDateToIndianFormat(record.createdAt)}
@@ -91,6 +97,48 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
               </div>
             </CardContent>
           </Card>
+
+          {/* Type-Specific / Custom Details */}
+          {isOtherInsuranceType(record.insuranceType) ? (
+            record.customFields && record.customFields.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <SectionTitle icon={ShieldCheck}>
+                    {record.customInsuranceTypeName || "Custom"} Details
+                  </SectionTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {record.customFields.map((f: any) => (
+                      <InfoItem key={f.key} icon={IdCard} label={f.label} value={String(f.value ?? "")} />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          ) : (
+            record.typeSpecificData && Object.values(record.typeSpecificData).some((v: any) => v) && (
+              <Card>
+                <CardHeader>
+                  <SectionTitle icon={ShieldCheck}>
+                    {getInsuranceTypeDef(record.insuranceType)?.label || record.insuranceType} Details
+                  </SectionTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {(getInsuranceTypeDef(record.insuranceType)?.fields || []).map((field) => (
+                      <InfoItem
+                        key={field.key}
+                        icon={IdCard}
+                        label={field.label}
+                        value={String(record.typeSpecificData?.[field.key] ?? "")}
+                      />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          )}
 
           {/* Personal Information */}
           <Card>

@@ -18,6 +18,8 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import { getAllRecords, deleteRecord } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
+import { INSURANCE_TYPES, getInsuranceTypeDef } from "@/config/insuranceTypes";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Record {
   id: string;
@@ -70,6 +72,11 @@ interface Record {
     lastPaymentDate: string;
   }
   createdAt: string;
+
+  insuranceType?: string;
+  customInsuranceTypeName?: string;
+  typeSpecificData?: Record<string, string>;
+  customFields?: { key: string; label: string; fieldType: string; options?: string[]; value: string }[];
 }
 
 // Deterministic soft color for an avatar chip, derived from the name itself
@@ -88,6 +95,14 @@ const avatarColor = (name: string) => {
 const initials = (name: string) =>
   (name || "?").trim().split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase()).join("");
 
+// A pre-existing record with no insuranceType predates this feature and is
+// treated as Life Insurance, matching the backend's default.
+const recordTypeLabel = (record: Record) => {
+  const type = record.insuranceType || "Life Insurance";
+  if (type === "Other") return record.customInsuranceTypeName || "Custom";
+  return getInsuranceTypeDef(type)?.shortLabel || type;
+};
+
 const ViewRecords = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -96,6 +111,7 @@ const ViewRecords = () => {
   const authenticated = isAuthenticated();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
   const [sortField, setSortField] = useState<keyof Record>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
@@ -147,8 +163,13 @@ const ViewRecords = () => {
       record.aadhaarLinkedMobileNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.currentPolicy.policyNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.currentPolicy.modeOfPayment.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.currentPolicy.branch.toLowerCase().includes(searchTerm.toLowerCase())
+      record.currentPolicy.branch.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      recordTypeLabel(record).toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    if (typeFilter !== "all") {
+      filtered = filtered.filter(record => (record.insuranceType || "Life Insurance") === typeFilter);
+    }
 
     return filtered.sort((a, b) => {
       let aValue = a[sortField] as string;
@@ -165,7 +186,7 @@ const ViewRecords = () => {
         return bValue.localeCompare(aValue);
       }
     });
-  }, [records, searchTerm, sortField, sortDirection]);
+  }, [records, searchTerm, typeFilter, sortField, sortDirection]);
 
   // ── Derived summary stats (real numbers from the data, styled like Home's stat row) ──
   const summaryStats = useMemo(() => {
@@ -345,14 +366,28 @@ const ViewRecords = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    placeholder="Search by name, policy number, occupation..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 focus-visible:ring-primary/40"
-                  />
+                <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full sm:max-w-2xl">
+                  <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      placeholder="Search by name, policy number, occupation..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 focus-visible:ring-primary/40"
+                    />
+                  </div>
+                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                    <SelectTrigger className="sm:w-56 shrink-0">
+                      <SelectValue placeholder="All insurance types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All insurance types</SelectItem>
+                      {INSURANCE_TYPES.filter(t => t.id !== "Other").map((t) => (
+                        <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                      ))}
+                      <SelectItem value="Other">Other (Custom)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                   <span>{t("totalRecords")}: <Badge variant="secondary">{records.length}</Badge></span>
@@ -409,6 +444,7 @@ const ViewRecords = () => {
                           No.
                         </TableHead>
                         <SortableHeader field="name">Name</SortableHeader>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Type</TableHead>
                         <SortableHeader field="fatherName">Father's Name</SortableHeader>
                         <SortableHeader field="age">Age</SortableHeader>
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Policy Number</TableHead>
@@ -433,6 +469,11 @@ const ViewRecords = () => {
                               </div>
                               <span>{record.name}</span>
                             </div>
+                          </TableCell>
+                          <TableCell className="border border-table-border">
+                            <Badge variant="outline" className="text-xs font-normal whitespace-nowrap">
+                              {recordTypeLabel(record)}
+                            </Badge>
                           </TableCell>
                           <TableCell className="border border-table-border text-muted-foreground">
                             {record.fatherName}
