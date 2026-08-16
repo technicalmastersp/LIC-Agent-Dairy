@@ -15,9 +15,9 @@ export const cancelSubscription = async () => {
   return res.data.data;
 };
 
-export const createCheckoutOrder = async (planId) => {
-  const res = await apiClient.post("/subscription/checkout/create", { planId });
-  return res.data.data; // { razorpayOrderId, amount, currency, keyId }
+export const createCheckoutOrder = async (planId, useWalletAmount = 0) => {
+  const res = await apiClient.post("/subscription/checkout/create", { planId, useWalletAmount });
+  return res.data.data;
 };
 
 export const verifyPayment = async (payload) => {

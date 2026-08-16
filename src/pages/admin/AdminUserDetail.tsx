@@ -165,8 +165,9 @@ const AdminUserDetail = () => {
                 { label: "Email",        val: user.email },
                 { label: "Mobile",       val: user.mobileNumber || "—" },
                 { label: "Address",      val: user.fullAddress  || "—" },
-                { label: "Referred by",  val: user.referredBy   || "—" },
+                { label: "Referral Code",  val: user.referralCode   || "—" },
                 { label: "Joined",       val: fmt(user.createdAt) },
+                { label: "Referred by",  val: user.referredBy   || "—" },
                 { label: "Email verified", val: user.isEmailVerified ? "Yes" : "No" },
               ].map(({ label, val }) => (
                 <div key={label} className="flex justify-between py-2 border-b border-border last:border-0">

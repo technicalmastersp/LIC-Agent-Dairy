@@ -30,6 +30,16 @@ export const getAllRecords = async () => {
   }
 };
 
+export const getMonthlyTrend = async () => {
+  try {
+    const res = await apiClient.get('/user/dashboard/monthly-trend');
+    return res.data.data || [];
+  } catch (error) {
+    console.error('Error loading monthly trend:', error);
+    return [];
+  }
+};
+
 export const dueNextMonth = async () => {
   try {
     const res = await apiClient.post('/user/dueNextMonth', { page: "all", limit: "all" });
