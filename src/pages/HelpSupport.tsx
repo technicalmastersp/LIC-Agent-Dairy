@@ -18,6 +18,10 @@ import {
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import siteConfig from "@/config/siteConfig";
 import { createTicket, getMyTickets } from "../../services/supportService";
 import { createSuggestion, getMySuggestions } from "../../services/suggestionService";
@@ -81,6 +85,7 @@ const HelpSupport = () => {
     message: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [myTickets, setMyTickets]     = useState<any[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(true);
@@ -109,12 +114,19 @@ const HelpSupport = () => {
     setForm((p) => ({ ...p, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Validate, then ask for a final confirmation before anything is actually sent —
+  // this is the point where a typo'd email quietly breaks the whole follow-up loop.
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
       toast({ title: "Missing details", description: "Please fill in your name, email, and message.", variant: "destructive" });
       return;
     }
+    setConfirmOpen(true);
+  };
+
+  const confirmAndSend = async () => {
+    setConfirmOpen(false);
     setSubmitting(true);
     try {
       const res = await createTicket(form);
@@ -360,6 +372,11 @@ const HelpSupport = () => {
                   <div className="space-y-1.5">
                     <Label htmlFor="email" className="text-xs text-muted-foreground">Email</Label>
                     <Input id="email" name="email" type="email" value={form.email} onChange={handleFormChange} placeholder="you@example.com" />
+                    {!authenticated && (
+                      <p className="text-xs text-muted-foreground">
+                        Already registered on the platform? Use your registered email for faster replies and priority support.
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -403,6 +420,29 @@ const HelpSupport = () => {
                   </p>
                 )}
               </form>
+
+              <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Please confirm your details before sending</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Double-check that your email address is correct and your message is clear.
+                      We reply to the email you provide — if it's mistyped or incorrect, you'll miss
+                      our follow-up and we won't be able to reach you.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <div className="rounded-lg bg-muted/50 border border-border px-4 py-3 text-sm space-y-1">
+                    <p><span className="text-muted-foreground">Name:</span> <span className="font-medium text-form-header">{form.name || "—"}</span></p>
+                    <p><span className="text-muted-foreground">Email:</span> <span className="font-medium text-form-header">{form.email || "—"}</span></p>
+                  </div>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Let me check again</AlertDialogCancel>
+                    <AlertDialogAction onClick={confirmAndSend} className="bg-primary hover:bg-primary-light">
+                      Looks good, send it
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </section>

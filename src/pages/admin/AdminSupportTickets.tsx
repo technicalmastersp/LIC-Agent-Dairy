@@ -148,6 +148,11 @@ const AdminSupportTickets = () => {
                             <span className="flex items-center gap-1"><Mail className="w-3 h-3" />{t.email}</span>
                             <span>{fmt(t.createdAt)}</span>
                             {t.isGuest && <Badge variant="outline" className="text-[10px]">Guest</Badge>}
+                            {t.isGuest && t.guestMatchedAccount && (
+                              <Badge className="text-[10px] bg-primary/10 text-primary border border-primary/20">
+                                Registered email
+                              </Badge>
+                            )}
                           </p>
                         </div>
                         <Badge className={`text-xs ${statusStyle[t.status]}`}>{t.status.replace("_", " ")}</Badge>
