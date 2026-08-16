@@ -442,6 +442,7 @@ const SignUp = () => {
                         setIsValidReferralCode(false);
                       }}
                       className="flex-1"
+                      maxLength={7}
                       disabled={isValidReferralCode}
                     />
                     <Button
