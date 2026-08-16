@@ -49,6 +49,7 @@ const Footer = () => {
         { label: t("addRecord"), to: "/add-record" },
         { label: t("viewRecords"), to: "/view-records" },
         { label: t("currentMonthDue"), to: "/view-due-policies" },
+        { label: t("nextMonthDue"), to: "/view-upcoming-due" },
         { label: t("missedPayments"), to: "/view-missed-payments" }
       ]
     : [

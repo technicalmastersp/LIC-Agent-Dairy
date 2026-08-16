@@ -49,6 +49,7 @@ const SignUp = () => {
 
   const plans = [
     { id: '1month-free', planType: "Free", name: '1 Month Free Plan', price: 0, originalPrice: 299 },
+    { id: "1month", planType: "Starter", name: "1 Month Plan", price: 249, originalPrice: 299 },
     { id: '6months', planType: "Basic", name: '6 Months Plan', price: 599, originalPrice: 899 },
     { id: '12months', planType: "Standard", name: '12 Months Plan', price: 1099, originalPrice: 1599 },
     { id: '24months', planType: "Premium", name: '24 Months Plan', price: 2099, originalPrice: 2999 }

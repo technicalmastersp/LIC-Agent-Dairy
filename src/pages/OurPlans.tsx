@@ -40,7 +40,7 @@ const OurPlans = () => {
   const [searchParams] = useSearchParams();
   const reason = searchParams.get("reason");
 
-  const plans: Plan[] = [
+  const allPlans: Plan[] = [
     {
       id: "1month-free",
       planType: "Free",
@@ -49,6 +49,19 @@ const OurPlans = () => {
       originalPrice: 299,
       features: [
         "Only for new users",
+        "Access to all features",
+        "1 month validity",
+        "Email support",
+        "Regular updates"
+      ]
+    },
+    {
+      id: "1month",
+      planType: "Starter",
+      duration: "1 Month",
+      price: 249,
+      originalPrice: 299,
+      features: [
         "Access to all features",
         "1 month validity",
         "Email support",
@@ -100,8 +113,18 @@ const OurPlans = () => {
     }
   ];
 
+  // Free trial is signup-only in spirit — hide it entirely once someone
+  // has already taken any paid plan (current planId isn't the free plan),
+  // rather than only blocking re-selection after the fact.
+  const hasHadPaidPlan = currentUser?.subscription && currentUser.subscription.planId !== "1month-free";
+  const plans = allPlans.filter(p => p.id !== "1month-free" || !hasHadPaidPlan);
+
   const handleSelectPlan = async (planId: string) => {
     if (!currentUser) { navigate("/signup"); return; }
+    if (currentUser.role === "admin" || currentUser.role === "superadmin") {
+      toast({ title: "Not applicable", description: "Admin accounts don't use subscription plans." });
+      return;
+    }
 
     const plan = plans.find(p => p.id === planId);
 
@@ -197,7 +220,7 @@ const OurPlans = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div className={`grid md:grid-cols-2 ${hasHadPaidPlan ? 'lg:grid-cols-4' : 'lg:grid-cols-5'} gap-8 max-w-7xl mx-auto`}>
           {plans.map((plan) => (
             <Card 
               key={plan.id} 

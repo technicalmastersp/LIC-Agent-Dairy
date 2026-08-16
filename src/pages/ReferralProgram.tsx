@@ -525,7 +525,7 @@ const ReferralProgram = () => {
                           </Badge>
                         )}
                       </div>
-                      <p className="font-mono text-lg mb-1">{d.paymentDetails.upiId}</p>
+                      <p className="font-mono text-lg mb-1">••••••{d.paymentDetails.upiId.slice(6)}</p>
                       <p className="text-[10px] uppercase tracking-wide text-white/60">UPI ID</p>
                       {d.paymentDetails.upiRejectionReason && (
                         <p className="text-xs text-red-100 mt-2 bg-red-950/30 rounded px-2 py-1">
@@ -654,43 +654,6 @@ const ReferralProgram = () => {
             </CardContent>
           </Card>
 
-          {/* ── Withdrawal history ── */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <History className="w-4 h-4" /> Withdrawal history
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!d.withdrawalHistory?.length ? (
-                <p className="text-center text-sm text-muted-foreground py-6">No withdrawals yet.</p>
-              ) : (
-                <div>
-                  {d.withdrawalHistory.slice(0, 5).map((w, i) => (
-                    <WithdrawalRow key={i} w={w} fmt={fmt} withdrawStatusStyle={withdrawStatusStyle} />
-                  ))}
-                  {d.withdrawalHistory.length > 5 && (
-                    <Button variant="outline" size="sm" className="w-full mt-3"
-                      onClick={() => setShowAllWithdrawals(true)}>
-                      See all {d.withdrawalHistory.length} withdrawals
-                    </Button>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Dialog open={showAllWithdrawals} onOpenChange={setShowAllWithdrawals}>
-            <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-              <DialogHeader><DialogTitle>All withdrawals ({d.withdrawalHistory?.length ?? 0})</DialogTitle></DialogHeader>
-              <div>
-                {d.withdrawalHistory?.map((w, i) => (
-                  <WithdrawalRow key={i} w={w} fmt={fmt} withdrawStatusStyle={withdrawStatusStyle} />
-                ))}
-              </div>
-            </DialogContent>
-          </Dialog>
-
           {/* ── Share link ── */}
           <Card>
             <CardHeader className="pb-3">
@@ -716,6 +679,72 @@ const ReferralProgram = () => {
                 <Button size="sm" variant="outline"
                   className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
                   onClick={shareWhatsApp}>WhatsApp</Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ── Reward structure ── */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                <Crown className="w-4 h-4" /> Reward structure
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { level: "Level 1 — direct",   pct: config.L1_COMMISSION_PCT, color: "text-green-600",  pctColor: "bg-green-100 text-green-700 border-green-200"   },
+                  { level: "Level 2 — indirect",  pct: config.L2_COMMISSION_PCT, color: "text-purple-600", pctColor: "bg-purple-100 text-purple-700 border-purple-200" },
+                ].map(({ level, pct, color, pctColor }) => (
+                  <div key={level} className="bg-muted rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium">{level}</span>
+                      <Badge className={`text-base font-medium px-2 border ${pctColor}`}>{pct}%</Badge>
+                    </div>
+                    {PLANS.map(plan => (
+                      <div key={plan.name} className="flex justify-between items-center py-2 border-b border-border last:border-0">
+                        <div>
+                          <p className="text-xs font-medium">{plan.name}</p>
+                          <p className="text-xs text-muted-foreground">{plan.duration}</p>
+                        </div>
+                        <span className={`text-sm font-medium ${color}`}>
+                          ₹{Math.round(plan.price * pct / 100)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
+                Referred users get ₹{config.SIGNUP_DISCOUNT_AMOUNT} off at signup.
+                You earn {config.L1_COMMISSION_PCT}% on their plan (L1) and {config.L2_COMMISSION_PCT}% on their referrals (L2).
+                One-time reward per user within {config.REWARD_WINDOW_DAYS} days. Min withdrawal ₹{config.MIN_WITHDRAWAL || 100}.
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ── How it works ── */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                <Route className="w-4 h-4" /> How it works
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { step: "1", title: "Share your link",  desc: "Send your referral URL to agents or friends" },
+                  { step: "2", title: "They sign up",     desc: `They register with your link and get ₹${config.SIGNUP_DISCOUNT_AMOUNT} off any paid plan` },
+                  { step: "3", title: "Earn commission",  desc: `Get ${config.L1_COMMISSION_PCT}% on their plan once, ${config.L2_COMMISSION_PCT}% on their referrals once` },
+                ].map(({ step, title, desc }) => (
+                  <div key={step} className="text-center p-4 bg-muted rounded-lg">
+                    <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-medium text-sm mx-auto mb-3">
+                      {step}
+                    </div>
+                    <p className="text-sm font-medium mb-1">{title}</p>
+                    <p className="text-xs text-muted-foreground">{desc}</p>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -808,71 +837,42 @@ const ReferralProgram = () => {
             </DialogContent>
           </Dialog>
 
-          {/* ── Reward structure ── */}
+          {/* ── Withdrawal history ── */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <Crown className="w-4 h-4" /> Reward structure
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { level: "Level 1 — direct",   pct: config.L1_COMMISSION_PCT, color: "text-green-600",  pctColor: "bg-green-100 text-green-700 border-green-200"   },
-                  { level: "Level 2 — indirect",  pct: config.L2_COMMISSION_PCT, color: "text-purple-600", pctColor: "bg-purple-100 text-purple-700 border-purple-200" },
-                ].map(({ level, pct, color, pctColor }) => (
-                  <div key={level} className="bg-muted rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-medium">{level}</span>
-                      <Badge className={`text-base font-medium px-2 border ${pctColor}`}>{pct}%</Badge>
-                    </div>
-                    {PLANS.map(plan => (
-                      <div key={plan.name} className="flex justify-between items-center py-2 border-b border-border last:border-0">
-                        <div>
-                          <p className="text-xs font-medium">{plan.name}</p>
-                          <p className="text-xs text-muted-foreground">{plan.duration}</p>
-                        </div>
-                        <span className={`text-sm font-medium ${color}`}>
-                          ₹{Math.round(plan.price * pct / 100)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
-                Referred users get ₹{config.SIGNUP_DISCOUNT_AMOUNT} off at signup.
-                You earn {config.L1_COMMISSION_PCT}% on their plan (L1) and {config.L2_COMMISSION_PCT}% on their referrals (L2).
-                One-time reward per user within {config.REWARD_WINDOW_DAYS} days. Min withdrawal ₹{config.MIN_WITHDRAWAL || 100}.
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* ── How it works ── */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <Route className="w-4 h-4" /> How it works
+                <History className="w-4 h-4" /> Withdrawal history
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { step: "1", title: "Share your link",  desc: "Send your referral URL to agents or friends" },
-                  { step: "2", title: "They sign up",     desc: `They register with your link and get ₹${config.SIGNUP_DISCOUNT_AMOUNT} off any paid plan` },
-                  { step: "3", title: "Earn commission",  desc: `Get ${config.L1_COMMISSION_PCT}% on their plan once, ${config.L2_COMMISSION_PCT}% on their referrals once` },
-                ].map(({ step, title, desc }) => (
-                  <div key={step} className="text-center p-4 bg-muted rounded-lg">
-                    <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-medium text-sm mx-auto mb-3">
-                      {step}
-                    </div>
-                    <p className="text-sm font-medium mb-1">{title}</p>
-                    <p className="text-xs text-muted-foreground">{desc}</p>
-                  </div>
-                ))}
-              </div>
+              {!d.withdrawalHistory?.length ? (
+                <p className="text-center text-sm text-muted-foreground py-6">No withdrawals yet.</p>
+              ) : (
+                <div>
+                  {d.withdrawalHistory.slice(0, 5).map((w, i) => (
+                    <WithdrawalRow key={i} w={w} fmt={fmt} withdrawStatusStyle={withdrawStatusStyle} />
+                  ))}
+                  {d.withdrawalHistory.length > 5 && (
+                    <Button variant="outline" size="sm" className="w-full mt-3"
+                      onClick={() => setShowAllWithdrawals(true)}>
+                      See all {d.withdrawalHistory.length} withdrawals
+                    </Button>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
+
+          <Dialog open={showAllWithdrawals} onOpenChange={setShowAllWithdrawals}>
+            <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+              <DialogHeader><DialogTitle>All withdrawals ({d.withdrawalHistory?.length ?? 0})</DialogTitle></DialogHeader>
+              <div>
+                {d.withdrawalHistory?.map((w, i) => (
+                  <WithdrawalRow key={i} w={w} fmt={fmt} withdrawStatusStyle={withdrawStatusStyle} />
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
 
         </div>
       </main>

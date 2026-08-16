@@ -30,6 +30,16 @@ export const getAllRecords = async () => {
   }
 };
 
+export const dueNextMonth = async () => {
+  try {
+    const res = await apiClient.post('/user/dueNextMonth', { page: "all", limit: "all" });
+    return res.data || [];
+  } catch (error) {
+    console.error('Error loading upcoming due records:', error);
+    return [];
+  }
+};
+
 export const dueThisMonth = async () => {
   try {
     const res = await apiClient.post('/user/dueThisMonth', {page: "all", limit: "all"});

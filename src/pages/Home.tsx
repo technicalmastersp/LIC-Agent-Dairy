@@ -7,7 +7,7 @@ import Navigation     from "@/components/Navigation";
 import Footer         from "@/components/Footer";
 import { getCurrentUser, setCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
-import { dueThisMonth, getRecordsWithoutLastPayment } from "../../services/recordService";
+import { dueThisMonth, dueNextMonth, getRecordsWithoutLastPayment } from "../../services/recordService";
 import { getProfile }  from "../../services/userService";
 import {
   Plus, Eye, FileClock, ReceiptText,
@@ -33,8 +33,9 @@ const Home = () => {
   const authenticated = isAuthenticated();
   let currentUser     = getCurrentUser();
 
-  const [dueCount,     setDueCount]     = useState(0);
-  const [missedCount,  setMissedCount]  = useState(0);
+  const [dueCount,        setDueCount]        = useState(0);
+  const [upcomingDueCount, setUpcomingDueCount] = useState(0);
+  const [missedCount,     setMissedCount]     = useState(0);
   const [currentMonth, setCurrentMonth] = useState("");
   const [referralData, setReferralData] = useState<any>(null);
   const [loading,      setLoading]      = useState(true);
@@ -43,9 +44,10 @@ const Home = () => {
     if (!authenticated) { navigate("/login"); return; }
     const load = async () => {
       try {
-        const [user, due, missed, referral] = await Promise.all([
+        const [user, due, upcoming, missed, referral] = await Promise.all([
           getProfile(),
           dueThisMonth(),
+          dueNextMonth(),
           getRecordsWithoutLastPayment(),
           getReferralDashboard().catch(() => null)
         ]);
@@ -53,6 +55,7 @@ const Home = () => {
         currentUser = getCurrentUser();
         setReferralData(referral);
         setDueCount(due.totalDue ?? 0);
+        setUpcomingDueCount(upcoming.totalDue ?? 0);
         setMissedCount(missed.total ?? 0);
         setCurrentMonth(due.month ?? "");
       } catch (err) {
@@ -106,6 +109,15 @@ const Home = () => {
       sub:   "Last month unpaid",
       link:  "/view-missed-payments",
       bg: "bg-purple-50"
+    },
+    {
+      label: "Upcoming due",
+      val:   upcomingDueCount,
+      icon:  <FileClock className="w-4 h-4" />,
+      color: upcomingDueCount > 0 ? "text-emerald-600" : "text-foreground",
+      sub:   "Due next month",
+      link:  "/view-upcoming-due",
+      bg: "bg-emerald-50"
     },
     {
       label: "Referrals",
@@ -194,7 +206,7 @@ const Home = () => {
           )}
 
           {/* ── Stat cards ── */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {stats.map(({ label, val, icon, color, sub, link, bg }) => (
               <Card key={label}
                 className={`cursor-pointer ${bg} hover:border-blue-300 transition-colors`}
