@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home, Plus, Table, LogOut, User, Menu, X,
-  UserRoundCog, CircleHelp, MapPinnedIcon
+  UserRoundCog, CircleHelp, MapPinnedIcon, Wrench,
+  Cake, TrendingUp, Receipt, ShieldCheck, LineChart, ChevronDown,
 } from "lucide-react";
 import { Button }        from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -10,6 +11,10 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  NavigationMenu, NavigationMenuList, NavigationMenuItem,
+  NavigationMenuTrigger, NavigationMenuContent,
+} from "@/components/ui/navigation-menu";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage }   from "@/hooks/useLanguage";
 import LanguageSwitcher  from "./LanguageSwitcher";
@@ -35,6 +40,15 @@ const getNavItemsMobile = (t: any) => [
 
 const getAdminNavItems = (t: any) => [
   { to: "/admin", label: "Admin Panel", icon: UserRoundCog },
+];
+
+const TOOLS = [
+  { to: "/tools/age-calculator", icon: Cake, label: "Age Calculator" },
+  { to: "/tools/sip-calculator", icon: TrendingUp, label: "SIP Calculator" },
+  { to: "/tools/income-tax-calculator", icon: Receipt, label: "Income Tax Calculator" },
+  { to: "/tools/home-loan-emi-calculator", icon: Home, label: "Home Loan EMI Calculator" },
+  { to: "/tools/term-insurance-calculator", icon: ShieldCheck, label: "Term Insurance Calculator" },
+  { to: "/tools/inflation-calculator", icon: LineChart, label: "Inflation Calculator" },
 ];
 
 /* ─────────────────────────────────────────────
@@ -120,6 +134,52 @@ const PublicMobileLink = ({
 };
 
 /* ─────────────────────────────────────────────
+   TOOLS DROPDOWN (desktop, hover-triggered)
+───────────────────────────────────────────── */
+
+const ToolsDropdown = ({ dark }: { dark?: boolean }) => (
+  <NavigationMenu>
+    <NavigationMenuList>
+      <NavigationMenuItem>
+        <NavigationMenuTrigger
+          className={cn(
+            "!bg-transparent h-auto px-3 py-2 text-sm font-medium",
+            dark
+              ? "text-primary-foreground/80 hover:!bg-primary-light/50 hover:!text-primary-foreground data-[state=open]:!bg-primary-light/50 data-[state=open]:!text-primary-foreground"
+              : "text-muted-foreground hover:!bg-transparent hover:!text-form-header data-[state=open]:!text-form-header"
+          )}
+        >
+          <Wrench className="w-4 h-4 mr-1.5" />
+          Tools
+        </NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <div className="w-[280px] p-2">
+            {TOOLS.map(({ to, icon: Icon, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-form-header hover:bg-muted transition-colors"
+              >
+                <Icon className="w-4 h-4 text-primary shrink-0" />
+                {label}
+              </Link>
+            ))}
+            <div className="border-t border-border mt-1 pt-1">
+              <Link
+                to="/tools"
+                className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-primary hover:bg-muted transition-colors"
+              >
+                View all tools
+              </Link>
+            </div>
+          </div>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+    </NavigationMenuList>
+  </NavigationMenu>
+);
+
+/* ─────────────────────────────────────────────
    MAIN COMPONENT
 ───────────────────────────────────────────── */
 
@@ -172,7 +232,8 @@ const Navigation = () => {
             </Link>
 
             {/* Desktop links */}
-            <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground mx-2">
+            <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground mx-2">
+              <ToolsDropdown />
               {publicLinks.map(({ href, label }) =>
                 href.startsWith("#") ? (
                   <a key={label} href={href}
@@ -227,6 +288,11 @@ const Navigation = () => {
             isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           )}>
             <div className="space-y-1 pb-4 pt-2 border-t border-border">
+              <p className="px-4 pt-1 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tools</p>
+              {TOOLS.map(({ to, label }) => (
+                <PublicMobileLink key={to} href={to} label={label} onClick={closeMobileMenu} />
+              ))}
+              <p className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Menu</p>
               {publicLinks.map(({ href, label }) => (
                 <PublicMobileLink
                   key={label}
@@ -303,6 +369,8 @@ const Navigation = () => {
             {isAdmin &&
               [...navItems, ...adminNavItems].map((item) => <NavItem key={item.to} {...item} />)}
 
+            <ToolsDropdown dark />
+
             {/* Language switcher */}
             <div className="pl-1.5 ml-1 border-l border-primary-foreground/15 shrink-0 flex items-center">
               <div className="xl:block">
@@ -377,6 +445,20 @@ const Navigation = () => {
               [...navItemsMobile, ...adminNavItems].map((item) => (
                 <MobileNavItem key={item.to} {...item} onClick={closeMobileMenu} />
               ))}
+
+            {/* Tools */}
+            {/* <p className="px-4 pt-2 pb-1 text-xs font-semibold uppercase tracking-wide text-primary-foreground/50">Tools</p>
+            {TOOLS.map((tool) => (
+              <MobileNavItem key={tool.to} {...tool} onClick={closeMobileMenu} />
+            ))} */}
+
+            {/* Tools */}
+            <MobileNavItem
+              to="/tools"
+              label="Tools"
+              icon={Wrench}
+              onClick={closeMobileMenu}
+            />
 
             {/* About */}
             <MobileNavItem

@@ -17,6 +17,13 @@ import SignUp from "./pages/SignUp";
 import OurPlans from "./pages/OurPlans";
 import NotFound from "./pages/NotFound";
 import LicInfoHub from "./pages/LicInfoHub";
+import ToolsHub from "./pages/tools/ToolsHub";
+import AgeCalculator from "./pages/tools/AgeCalculator";
+import SipCalculator from "./pages/tools/SipCalculator";
+import IncomeTaxCalculator from "./pages/tools/IncomeTaxCalculator";
+import HomeLoanEmiCalculator from "./pages/tools/HomeLoanEmiCalculator";
+import TermInsuranceCalculator from "./pages/tools/TermInsuranceCalculator";
+import InflationCalculator from "./pages/tools/InflationCalculator";
 import ReferralProgram from "./pages/ReferralProgram";
 import ForgotPassword from "./pages/ForgotPassword";
 import ChangePassword from "./pages/ChangePassword";
@@ -64,6 +71,13 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/our-plans" element={<OurPlans />} />
             <Route path="/lic-info-hub" element={<LicInfoHub />} />
+            <Route path="/tools" element={<ToolsHub />} />
+            <Route path="/tools/age-calculator" element={<AgeCalculator />} />
+            <Route path="/tools/sip-calculator" element={<SipCalculator />} />
+            <Route path="/tools/income-tax-calculator" element={<IncomeTaxCalculator />} />
+            <Route path="/tools/home-loan-emi-calculator" element={<HomeLoanEmiCalculator />} />
+            <Route path="/tools/term-insurance-calculator" element={<TermInsuranceCalculator />} />
+            <Route path="/tools/inflation-calculator" element={<InflationCalculator />} />
             <Route path="/referral-program" element={<ReferralProgram />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/change-password" element={<ChangePassword />} />
