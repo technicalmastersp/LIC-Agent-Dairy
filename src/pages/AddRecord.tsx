@@ -8,8 +8,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
 import {
-  Save, Plus, Trash2, Minus,
-  User, Users, HeartPulse, Landmark, ShieldCheck, History, IdCard, ListChecks,
+  Save, Plus, Trash2, User, Users, 
+  HeartPulse, ShieldCheck, History, IdCard, ListChecks,
+  LucideIcon,
 } from "lucide-react";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -43,7 +44,7 @@ interface PolicyDetail {
 
 // Small section header used across the form cards — encodes the actual step
 // number from the intake sheet, so it's real sequence info, not decoration.
-const SectionTitle = ({ icon: Icon, step, children }: { icon: any; step?: string; children: React.ReactNode }) => (
+const SectionTitle = ({ icon: Icon, step, children }: { icon: LucideIcon; step?: string; children: React.ReactNode }) => (
   <CardTitle className="text-form-header flex items-center gap-2.5">
     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
       <Icon className="w-4 h-4 text-primary" />
@@ -65,10 +66,6 @@ const AddRecord = () => {
       navigate("/login");
     }
   }, [authenticated, currentUser, navigate]);
-
-  if (!authenticated || !currentUser) {
-    return null;
-  }
 
   // Insurance type selection — drives which type-specific fields (or the
   // custom field builder, for "Other") render below the common form.
@@ -243,6 +240,10 @@ const AddRecord = () => {
     });
   };
 
+  if (!authenticated || !currentUser) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-muted/30">
       <Navigation />
@@ -316,6 +317,7 @@ const AddRecord = () => {
                 <div>
                   <Label htmlFor="date">Date</Label>
                   <Input 
+                    id="date"
                     type="date"
                     value={formData.date}
                     onChange={(e) => handleInputChange("date", e.target.value)}
@@ -563,7 +565,7 @@ const AddRecord = () => {
                       <TableRow key={index} className="hover:bg-muted/40">
                         <TableCell className="border border-table-border font-medium">
                           <Select value={member.relationship || ""} onValueChange={(value) => handleFamilyMemberChange(index, 'relationship', value)}>
-                            <SelectTrigger>
+                            <SelectTrigger aria-label={`Relationship for family member ${index + 1}`}>
                               <SelectValue placeholder="Select relationship" />
                             </SelectTrigger>
                             <SelectContent>
@@ -579,12 +581,13 @@ const AddRecord = () => {
                           <Input 
                             value={member.currentAge}
                             onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
+                            aria-label={`Current age for family member ${index + 1}`}
                             className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Select value={member.health} onValueChange={(value) => handleFamilyMemberChange(index, 'health', value)}>
-                            <SelectTrigger>
+                            <SelectTrigger aria-label={`Health status for family member ${index + 1}`}>
                               <SelectValue placeholder="Select Health" />
                             </SelectTrigger>
                             <SelectContent>
@@ -597,6 +600,7 @@ const AddRecord = () => {
                           <Input 
                             value={member.deathAge}
                             onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
+                            aria-label={`Age at death or year for family member ${index + 1}`}
                             className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
                           />
                         </TableCell>
@@ -604,6 +608,7 @@ const AddRecord = () => {
                           <Input 
                             value={member.reason}
                             onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
+                            aria-label={`Reason for family member ${index + 1}`}
                             className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
                           />
                         </TableCell>
@@ -615,6 +620,7 @@ const AddRecord = () => {
                               variant="destructive" 
                               size="sm"
                               disabled={familyMembers.length <= 1}
+                              aria-label={`Remove family member ${index + 1}`}
                               className={familyMembers.length <= 1 ? "opacity-50" : ""}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -732,6 +738,7 @@ const AddRecord = () => {
                         <Input 
                           value={currentPolicy.policyNumber}
                           onChange={(e) => handlePolicyChange("current", "policyNumber", e.target.value)}
+                          aria-label="Policy Number"
                           className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
@@ -739,6 +746,7 @@ const AddRecord = () => {
                         <Input 
                           value={currentPolicy.planAndTerm}
                           onChange={(e) => handlePolicyChange("current", "planAndTerm", e.target.value)}
+                          aria-label="Plan and Term"
                           className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
@@ -746,6 +754,7 @@ const AddRecord = () => {
                         <Input 
                           value={currentPolicy.sumAssured}
                           onChange={(e) => handlePolicyChange("current", "sumAssured", e.target.value)}
+                          aria-label="Sum Assured"
                           className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
@@ -754,7 +763,7 @@ const AddRecord = () => {
                           value={currentPolicy.modeOfPayment}
                           onValueChange={(value) => handlePolicyChange("current","modeOfPayment", value)}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="Mode of Payment">
                             <SelectValue placeholder="Select Payment Mode" />
                           </SelectTrigger>
                           <SelectContent>
@@ -769,6 +778,7 @@ const AddRecord = () => {
                         <Input 
                           value={currentPolicy.branch}
                           onChange={(e) => handlePolicyChange("current", "branch", e.target.value)}
+                          aria-label="Branch"
                           className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
@@ -777,6 +787,7 @@ const AddRecord = () => {
                           type="date"
                           value={currentPolicy.lastPaymentDate}
                           onChange={(e) => handlePolicyChange("current", "lastPaymentDate", e.target.value)}
+                          aria-label="Last Payment Date"
                           className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
@@ -811,6 +822,7 @@ const AddRecord = () => {
                         <Input 
                           value={previousPolicy.policyNumber}
                           onChange={(e) => handlePolicyChange("previous", "policyNumber", e.target.value)}
+                          aria-label="Previous Policy Number"
                           className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
@@ -818,6 +830,7 @@ const AddRecord = () => {
                         <Input 
                           value={previousPolicy.planAndTerm}
                           onChange={(e) => handlePolicyChange("previous", "planAndTerm", e.target.value)}
+                          aria-label="Previous Plan and Term"
                           className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
@@ -825,6 +838,7 @@ const AddRecord = () => {
                         <Input 
                           value={previousPolicy.sumAssured}
                           onChange={(e) => handlePolicyChange("previous", "sumAssured", e.target.value)}
+                          aria-label="Previous Sum Assured"
                           className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
@@ -833,7 +847,7 @@ const AddRecord = () => {
                           value={previousPolicy.modeOfPayment}
                           onValueChange={(value) => handlePolicyChange("previous","modeOfPayment", value)}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger aria-label="Previous Mode of Payment">
                             <SelectValue placeholder="Select Payment Mode" />
                           </SelectTrigger>
                           <SelectContent>
@@ -848,6 +862,7 @@ const AddRecord = () => {
                         <Input 
                           value={previousPolicy.branch}
                           onChange={(e) => handlePolicyChange("previous", "branch", e.target.value)}
+                          aria-label="Previous Branch"
                           className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
@@ -856,6 +871,7 @@ const AddRecord = () => {
                           type="date"
                           value={previousPolicy.lastPaymentDate}
                           onChange={(e) => handlePolicyChange("previous", "lastPaymentDate", e.target.value)}
+                          aria-label="Previous Last Payment Date"
                           className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
