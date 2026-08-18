@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { UserPlus, EyeOff, Eye, Check, Home } from "lucide-react";
+import { UserPlus, EyeOff, Eye, Check, Home, CheckCircle2, Circle } from "lucide-react";
 import { User } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
@@ -46,6 +46,16 @@ const SignUp = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { toast } = useToast();
+
+  // Same standard used on the Change Password page: 6+ chars, one uppercase, one number.
+  const passwordStrength = {
+    hasLen:   formData.password.length >= 6,
+    hasUpper: /[A-Z]/.test(formData.password),
+    hasNum:   /\d/.test(formData.password),
+    get score() { return [this.hasLen, this.hasUpper, this.hasNum].filter(Boolean).length; },
+  };
+  const strengthColor = ["", "bg-red-400", "bg-yellow-400", "bg-green-500"][passwordStrength.score];
+  const strengthWidth = ["0%", "33%", "66%", "100%"][passwordStrength.score];
 
   const plans = [
     { id: '1month-free', planType: "Free", name: '1 Month Free Plan', price: 0, originalPrice: 299 },
@@ -116,6 +126,12 @@ const SignUp = () => {
     setError("");
 
     // Validation
+    if (formData.password.length < 6 || !/[A-Z]/.test(formData.password) || !/\d/.test(formData.password)) {
+      setError("Password must be at least 6 characters and include an uppercase letter and a number");
+      setIsLoading(false);
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       setIsLoading(false);
@@ -376,6 +392,27 @@ const SignUp = () => {
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
+                  </div>
+                  {/* Strength bar */}
+                  <div className="h-1 rounded-full bg-muted overflow-hidden">
+                    <div className={`h-full rounded-full transition-all ${strengthColor}`}
+                      style={{ width: strengthWidth }} />
+                  </div>
+                  {/* Requirements */}
+                  <div className="space-y-1">
+                    {[
+                      { ok: passwordStrength.hasLen,   label: "At least 6 characters" },
+                      { ok: passwordStrength.hasUpper, label: "One uppercase letter"  },
+                      { ok: passwordStrength.hasNum,   label: "One number"            },
+                    ].map(({ ok, label }) => (
+                      <div key={label}
+                        className={`flex items-center gap-1.5 text-xs transition-colors ${ok ? "text-green-600" : "text-muted-foreground"}`}>
+                        {ok
+                          ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                          : <Circle       className="w-3.5 h-3.5 shrink-0" />}
+                        {label}
+                      </div>
+                    ))}
                   </div>
                 </div>
                 

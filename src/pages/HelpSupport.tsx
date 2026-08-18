@@ -270,7 +270,10 @@ const HelpSupport = () => {
                 {categories.map(({ icon: Icon, title, description }) => (
                   <button
                     key={title}
-                    onClick={() => setQuery(title)}
+                    onClick={() => {
+                      setQuery(title);
+                      document.getElementById("faq")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
                     className="text-left bg-background border border-border rounded-2xl p-6 hover:shadow-md hover:border-primary/30 transition-all"
                   >
                     <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
@@ -354,8 +357,9 @@ const HelpSupport = () => {
                 <div className="flex items-start gap-3 bg-background rounded-xl p-4 border border-border">
                   <Clock className="w-4.5 h-4.5 text-primary mt-0.5 shrink-0" />
                   <div className="text-sm">
-                    <p className="text-form-header font-medium">Support hours</p>
-                    <p className="text-muted-foreground">Mon–Fri 9:00 AM–6:00 PM · Sat 10:00 AM–4:00 PM</p>
+                    <p className="text-form-header font-medium mb-2">Support hours</p>
+                    <p className="text-muted-foreground mb-1">Mon–Fri 9:00 AM – 9:00 PM</p>
+                    <p className="text-muted-foreground">Sat-Sun 10:00 AM – 8:00 PM</p>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">

@@ -8,6 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
@@ -68,6 +72,9 @@ const AdminRevenue = () => {
   const [refundReason, setRefundReason] = useState("");
   const [refunding, setRefunding] = useState(false);
 
+  const [expenseToDelete, setExpenseToDelete] = useState<any>(null);
+  const [deletingExpense, setDeletingExpense] = useState(false);
+
   useEffect(() => {
     if (!authenticated || !currentUser) { navigate("/login"); return; }
     if (currentUser?.role !== "admin" && currentUser?.role !== "superadmin") { navigate("/"); return; }
@@ -116,14 +123,19 @@ const AdminRevenue = () => {
     } finally { setSavingExpense(false); }
   };
 
-  const handleDeleteExpense = async (id: string) => {
+  const handleDeleteExpense = async () => {
+    if (!expenseToDelete) return;
+    setDeletingExpense(true);
     try {
-      await deleteExpense(id);
+      await deleteExpense(expenseToDelete.id);
       toast({ title: "Deleted" });
       fetchAll(true);
       fetchTransactions();
+      setExpenseToDelete(null);
     } catch (err: any) {
       toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } finally {
+      setDeletingExpense(false);
     }
   };
 
@@ -354,7 +366,7 @@ const AdminRevenue = () => {
                               )}
                               {t.kind === "expense" && canManageExpenses && (
                                 <Button size="sm" variant="outline" className="h-6 text-[11px] px-2 text-red-600 border-red-200"
-                                  onClick={() => handleDeleteExpense(t.id)}>
+                                  onClick={() => setExpenseToDelete(t)}>
                                   <Trash2 className="w-3 h-3" />
                                 </Button>
                               )}
@@ -409,6 +421,33 @@ const AdminRevenue = () => {
             </Card>
           </div>
         )}
+
+        {/* Delete expense confirmation */}
+        <AlertDialog open={!!expenseToDelete} onOpenChange={(open) => !open && setExpenseToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this expense?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {expenseToDelete && (
+                  <>
+                    You're about to delete <span className="font-medium text-foreground">{expenseToDelete.description}</span> ({inr(expenseToDelete.amount)}).
+                    {" "}This will remove it from the revenue records permanently and cannot be undone.
+                  </>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deletingExpense}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteExpense}
+                disabled={deletingExpense}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {deletingExpense ? "Deleting…" : "Delete expense"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );

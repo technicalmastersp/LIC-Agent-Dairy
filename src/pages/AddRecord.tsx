@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -148,8 +148,16 @@ const AddRecord = () => {
     lastPaymentDate: "",
   });
 
+  // Tracks whether the Name field should show the red "required" border,
+  // and lets us scroll/focus straight to it when validation fails on submit.
+  const [nameError, setNameError] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === "name" && value.trim()) {
+      setNameError(false);
+    }
   };
 
   const handlePolicyChange = (type: 'current' | 'previous', field: keyof PolicyDetail, value: string) => {
@@ -186,13 +194,17 @@ const AddRecord = () => {
 
   const handleSubmit = () => {
     if (!formData.name.trim()) {
+      setNameError(true);
       toast({
         title: "Error",
         description: "Please enter the applicant's name",
         variant: "destructive",
       });
+      nameInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      nameInputRef.current?.focus();
       return;
     }
+    setNameError(false);
 
     if (isOtherInsuranceType(insuranceType) && !customInsuranceTypeName.trim()) {
       toast({
@@ -314,18 +326,22 @@ const AddRecord = () => {
                   <Label htmlFor="aadhaarNumber">Aadhaar Number</Label>
                   <Input 
                     id="aadhaarNumber" 
+                    placeholder="12-digit Aadhaar number"
                     value={formData.aadhaarNumber}
                     onChange={(e) => handleInputChange("aadhaarNumber", e.target.value)}
                     className="mt-1"
+                    maxLength={12}
                   />
                 </div>
                 <div>
                   <Label htmlFor="panNumber">Pan Number</Label>
                   <Input 
                     id="panNumber" 
+                    placeholder="e.g. ABCDE1234F"
                     value={formData.panNumber}
                     onChange={(e) => handleInputChange("panNumber", e.target.value)}
-                    className="mt-1"
+                    className="mt-1 uppercase"
+                    maxLength={10}
                   />
                 </div>
                 <div>
@@ -353,9 +369,11 @@ const AddRecord = () => {
                   <Label htmlFor="name">1. Name</Label>
                   <Input 
                     id="name" 
+                    ref={nameInputRef}
+                    placeholder="Enter applicant's full name"
                     value={formData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
-                    className="mt-1"
+                    className={`mt-1 ${nameError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                   />
                 </div>
                 <div>
@@ -561,7 +579,7 @@ const AddRecord = () => {
                           <Input 
                             value={member.currentAge}
                             onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
-                            className="w-full border-0 bg-transparent"
+                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -579,14 +597,14 @@ const AddRecord = () => {
                           <Input 
                             value={member.deathAge}
                             onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
-                            className="w-full border-0 bg-transparent"
+                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Input 
                             value={member.reason}
                             onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
-                            className="w-full border-0 bg-transparent"
+                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -622,6 +640,7 @@ const AddRecord = () => {
                   <Label htmlFor="height">10. Height</Label>
                   <Input 
                     id="height" 
+                    placeholder="Height in cm"
                     value={formData.height}
                     onChange={(e) => handleInputChange("height", e.target.value)}
                     className="mt-1"
@@ -631,6 +650,7 @@ const AddRecord = () => {
                   <Label htmlFor="weight">10a. Weight</Label>
                   <Input 
                     id="weight" 
+                    placeholder="Weight in kg"
                     value={formData.weight}
                     onChange={(e) => handleInputChange("weight", e.target.value)}
                     className="mt-1"
@@ -650,6 +670,7 @@ const AddRecord = () => {
                   <Label htmlFor="bankAccount">12. Bank Account Number</Label>
                   <Input 
                     id="bankAccount" 
+                    placeholder="Enter bank account number"
                     value={formData.bankAccountNumber}
                     onChange={(e) => handleInputChange("bankAccountNumber", e.target.value)}
                     className="mt-1"
@@ -659,6 +680,7 @@ const AddRecord = () => {
                   <Label htmlFor="ifsc">12a. IFSC Code</Label>
                   <Input 
                     id="ifsc" 
+                    placeholder="e.g. SBIN0001234"
                     value={formData.ifscCode}
                     onChange={(e) => handleInputChange("ifscCode", e.target.value)}
                     className="mt-1"
@@ -710,21 +732,21 @@ const AddRecord = () => {
                         <Input 
                           value={currentPolicy.policyNumber}
                           onChange={(e) => handlePolicyChange("current", "policyNumber", e.target.value)}
-                          className="border-0 bg-transparent"
+                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
                         <Input 
                           value={currentPolicy.planAndTerm}
                           onChange={(e) => handlePolicyChange("current", "planAndTerm", e.target.value)}
-                          className="border-0 bg-transparent"
+                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
                         <Input 
                           value={currentPolicy.sumAssured}
                           onChange={(e) => handlePolicyChange("current", "sumAssured", e.target.value)}
-                          className="border-0 bg-transparent"
+                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -747,7 +769,7 @@ const AddRecord = () => {
                         <Input 
                           value={currentPolicy.branch}
                           onChange={(e) => handlePolicyChange("current", "branch", e.target.value)}
-                          className="border-0 bg-transparent"
+                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -755,7 +777,7 @@ const AddRecord = () => {
                           type="date"
                           value={currentPolicy.lastPaymentDate}
                           onChange={(e) => handlePolicyChange("current", "lastPaymentDate", e.target.value)}
-                          className="border-0 bg-transparent"
+                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
                     </TableRow>
@@ -789,21 +811,21 @@ const AddRecord = () => {
                         <Input 
                           value={previousPolicy.policyNumber}
                           onChange={(e) => handlePolicyChange("previous", "policyNumber", e.target.value)}
-                          className="border-0 bg-transparent"
+                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
                         <Input 
                           value={previousPolicy.planAndTerm}
                           onChange={(e) => handlePolicyChange("previous", "planAndTerm", e.target.value)}
-                          className="border-0 bg-transparent"
+                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
                         <Input 
                           value={previousPolicy.sumAssured}
                           onChange={(e) => handlePolicyChange("previous", "sumAssured", e.target.value)}
-                          className="border-0 bg-transparent"
+                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -826,7 +848,7 @@ const AddRecord = () => {
                         <Input 
                           value={previousPolicy.branch}
                           onChange={(e) => handlePolicyChange("previous", "branch", e.target.value)}
-                          className="border-0 bg-transparent"
+                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -834,7 +856,7 @@ const AddRecord = () => {
                           type="date"
                           value={previousPolicy.lastPaymentDate}
                           onChange={(e) => handlePolicyChange("previous", "lastPaymentDate", e.target.value)}
-                          className="border-0 bg-transparent"
+                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
                         />
                       </TableCell>
                     </TableRow>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -183,6 +183,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
 
   useEffect(() => {
     if (record) {
+      setNameError(false);
       setFormData({
         date: record.date,
         aadhaarNumber: record.aadhaarNumber,
@@ -287,16 +288,37 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     }));
   };
 
+  // Tracks whether the Name field should show the red "required" border,
+  // and lets us scroll/focus straight to it when validation fails on save.
+  const [nameError, setNameError] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+    if (name === "name" && value.trim()) {
+      setNameError(false);
+    }
   };
 
   const handleSave = async () => {
     if (!currentUser || !record) return;
+
+    if (!formData.name.trim()) {
+      setNameError(true);
+      toast({
+        title: "Error",
+        description: "Please enter the applicant's name",
+        variant: "destructive",
+      });
+      nameInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      nameInputRef.current?.focus();
+      return;
+    }
+    setNameError(false);
 
     if (isOtherInsuranceType(insuranceType) && !customInsuranceTypeName.trim()) {
       toast({
@@ -452,8 +474,11 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="name" 
                     name="name" 
+                    ref={nameInputRef}
+                    placeholder="Enter applicant's full name"
                     value={formData.name}
                     onChange={handleInputChange}
+                    className={nameError ? "border-red-500 focus-visible:ring-red-500" : ""}
                   />
                 </div>
                 <div className="space-y-2">
@@ -659,7 +684,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                           <Input 
                             value={member.currentAge}
                             onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
-                            className="w-full border-0 bg-transparent"
+                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -677,14 +702,14 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                           <Input 
                             value={member.deathAge}
                             onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
-                            className="w-full border-0 bg-transparent"
+                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Input 
                             value={member.reason}
                             onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
-                            className="w-full border-0 bg-transparent"
+                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -721,6 +746,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="height" 
                     name="height" 
+                    placeholder="Height in cm"
                     value={formData.height}
                     onChange={handleInputChange}
                   />
@@ -730,6 +756,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="weight" 
                     name="weight" 
+                    placeholder="Weight in kg"
                     value={formData.weight}
                     onChange={handleInputChange}
                   />
@@ -749,6 +776,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="bankAccountNumber" 
                     name="bankAccountNumber" 
+                    placeholder="Enter bank account number"
                     value={formData.bankAccountNumber}
                     onChange={handleInputChange}
                   />
@@ -758,6 +786,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="ifscCode" 
                     name="ifscCode" 
+                    placeholder="e.g. SBIN0001234"
                     value={formData.ifscCode}
                     onChange={handleInputChange}
                   />

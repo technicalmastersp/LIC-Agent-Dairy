@@ -103,6 +103,25 @@ const recordTypeLabel = (record: Record) => {
   return getInsuranceTypeDef(type)?.shortLabel || type;
 };
 
+// The API can occasionally return the same underlying record more than once
+// in `recordLists` (e.g. a retried save, or an id collision from the record
+// id generator) — that duplication is invisible in the unfiltered table
+// (paged out of view) but becomes obvious once a search narrows the list
+// down. Collapse to one entry per recordId (falling back to the Mongo _id,
+// then a JSON fingerprint) before it ever reaches component state.
+const dedupeRecords = (list: Record[]): Record[] => {
+  const seen = new Set<string>();
+  const result: Record[] = [];
+  for (const record of list) {
+    const key = record.recordId || (record as any)._id || JSON.stringify(record);
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push(record);
+    }
+  }
+  return result;
+};
+
 const ViewRecords = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -132,7 +151,7 @@ const ViewRecords = () => {
     try {
       setIsLoading(true);
       const userRecords = await getAllRecords();
-      setRecords(userRecords ?? []);
+      setRecords(dedupeRecords(userRecords ?? []));
     } catch (error) {
       console.error(error);
       setRecords([]);
@@ -221,7 +240,7 @@ const ViewRecords = () => {
   const handleDeleteRecord = async (recordId: string) => {
     const success = await deleteRecord(recordId);
     if (success) {
-      setRecords(await getAllRecords());
+      setRecords(dedupeRecords(await getAllRecords()));
       toast({
         title: "Success",
         description: "Record deleted successfully",
