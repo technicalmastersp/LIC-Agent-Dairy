@@ -7,7 +7,8 @@ import Navigation     from "@/components/Navigation";
 import Footer         from "@/components/Footer";
 import { getCurrentUser, setCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
-import { dueThisMonth, getRecordsWithoutLastPayment } from "../../services/recordService";
+import { dueThisMonth, dueNextMonth, getMonthlyTrend, getRecordsWithoutLastPayment } from "../../services/recordService";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { getProfile }  from "../../services/userService";
 import {
   Plus, Eye, FileClock, ReceiptText,
@@ -33,8 +34,10 @@ const Home = () => {
   const authenticated = isAuthenticated();
   let currentUser     = getCurrentUser();
 
-  const [dueCount,     setDueCount]     = useState(0);
-  const [missedCount,  setMissedCount]  = useState(0);
+  const [dueCount,        setDueCount]        = useState(0);
+  const [upcomingDueCount, setUpcomingDueCount] = useState(0);
+  const [missedCount,     setMissedCount]     = useState(0);
+  const [trendData, setTrendData] = useState<any[]>([]);
   const [currentMonth, setCurrentMonth] = useState("");
   const [referralData, setReferralData] = useState<any>(null);
   const [loading,      setLoading]      = useState(true);
@@ -43,16 +46,20 @@ const Home = () => {
     if (!authenticated) { navigate("/login"); return; }
     const load = async () => {
       try {
-        const [user, due, missed, referral] = await Promise.all([
+        const [user, due, upcoming, missed, referral, trend] = await Promise.all([
           getProfile(),
           dueThisMonth(),
+          dueNextMonth(),
           getRecordsWithoutLastPayment(),
-          getReferralDashboard().catch(() => null)
+          getReferralDashboard().catch(() => null),
+          getMonthlyTrend(),
         ]);
+        setTrendData(trend);
         setCurrentUser(user);
         currentUser = getCurrentUser();
         setReferralData(referral);
         setDueCount(due.totalDue ?? 0);
+        setUpcomingDueCount(upcoming.totalDue ?? 0);
         setMissedCount(missed.total ?? 0);
         setCurrentMonth(due.month ?? "");
       } catch (err) {
@@ -106,6 +113,15 @@ const Home = () => {
       sub:   "Last month unpaid",
       link:  "/view-missed-payments",
       bg: "bg-purple-50"
+    },
+    {
+      label: "Upcoming due",
+      val:   upcomingDueCount,
+      icon:  <FileClock className="w-4 h-4" />,
+      color: upcomingDueCount > 0 ? "text-emerald-600" : "text-foreground",
+      sub:   "Due next month",
+      link:  "/view-upcoming-due",
+      bg: "bg-emerald-50"
     },
     {
       label: "Referrals",
@@ -194,7 +210,7 @@ const Home = () => {
           )}
 
           {/* ── Stat cards ── */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {stats.map(({ label, val, icon, color, sub, link, bg }) => (
               <Card key={label}
                 className={`cursor-pointer ${bg} hover:border-blue-300 transition-colors`}
@@ -209,6 +225,25 @@ const Home = () => {
               </Card>
             ))}
           </div>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">Last 6 months</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={260}>
+                <LineChart data={trendData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="recordsAdded" stroke="#2563eb" name="Records added" strokeWidth={2} />
+                  <Line type="monotone" dataKey="duePolicies" stroke="#f97316" name="Policies due" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
 
           {/* ── Action cards ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

@@ -89,6 +89,16 @@ export const getPendingCounts = async () => {
   return res.data.data;
 };
 
+export const triggerNextMonthDueReminders = async () => {
+  const res = await apiClient.post("/admin/trigger-next-month-due-reminders");
+  return res.data;
+};
+
+export const triggerMissedPaymentReminders = async () => {
+  const res = await apiClient.post("/admin/trigger-missed-payment-reminders");
+  return res.data;
+};
+
 export const getSupportTickets = async (priority = "all", status) => {
   const params = new URLSearchParams({ priority });
   if (status) params.set("status", status);

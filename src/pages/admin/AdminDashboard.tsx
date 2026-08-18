@@ -6,12 +6,15 @@ import { Button }   from "@/components/ui/button";
 import { Input }   from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
-import { getDashboardStats, forceLogoutGroup, getMyPermissions } from "../../../services/adminService";
+import {
+  getDashboardStats, forceLogoutGroup, getMyPermissions,
+  triggerNextMonthDueReminders, triggerMissedPaymentReminders,
+} from "../../../services/adminService";
 import {
   Users, TrendingUp, Wallet, ArrowDownToLine,
   Clock, CheckCircle2, UserX, Gift,
   ArrowUpRight, ArrowDownRight, RefreshCw, LogOut, AlertTriangle,
-  BadgeCheck, LifeBuoy, Lightbulb, IndianRupee,
+  BadgeCheck, LifeBuoy, Lightbulb, IndianRupee, CalendarClock, Mail,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -61,6 +64,9 @@ const AdminDashboard = () => {
   const [groupLogoutModal,  setGroupLogoutModal]  = useState<string | null>(null);
   const [groupLogoutReason, setGroupLogoutReason] = useState("");
   const [groupLoggingOut,   setGroupLoggingOut]   = useState(false);
+
+  const [sendingNextMonth, setSendingNextMonth] = useState(false);
+  const [sendingMissed,    setSendingMissed]    = useState(false);
   
   const handleGroupLogout = async () => {
     if (!groupLogoutModal) return;
@@ -85,6 +91,26 @@ const AdminDashboard = () => {
     getMyPermissions().then(d => setPermissions(d.permissions)).catch(() => {});
     fetchStats();
   }, []);
+
+  const handleTriggerNextMonthReminders = async () => {
+    setSendingNextMonth(true);
+    try {
+      const res = await triggerNextMonthDueReminders();
+      toast({ title: "Reminders sent", description: `Sent to ${res.data.sent} agent(s) with policies due next month.` });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } finally { setSendingNextMonth(false); }
+  };
+
+  const handleTriggerMissedReminders = async () => {
+    setSendingMissed(true);
+    try {
+      const res = await triggerMissedPaymentReminders();
+      toast({ title: "Reminders sent", description: `Sent to ${res.data.sent} agent(s) with overdue policies.` });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } finally { setSendingMissed(false); }
+  };
 
   const fetchStats = async (isRefresh = false) => {
     try {
@@ -278,6 +304,29 @@ const AdminDashboard = () => {
           </Card>
         )}
         
+        {currentUser?.role === "superadmin" && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+                <Mail className="w-4 h-4 text-blue-600" /> Policy reminder emails
+              </CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">
+                These run automatically on the 28th and 1st of every month — trigger them manually here if needed.
+              </p>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-3">
+              <Button variant="outline" onClick={handleTriggerNextMonthReminders} disabled={sendingNextMonth}>
+                <CalendarClock className="w-4 h-4 mr-2" />
+                {sendingNextMonth ? "Sending…" : "Send next-month due reminders"}
+              </Button>
+              <Button variant="outline" onClick={handleTriggerMissedReminders} disabled={sendingMissed}>
+                <AlertTriangle className="w-4 h-4 mr-2" />
+                {sendingMissed ? "Sending…" : "Send missed-payment reminders"}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Group logout confirmation modal */}
         {groupLogoutModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

@@ -22,6 +22,7 @@ const initials = (name = "") =>
 
 const PLANS = [
   { id: "1month-free", label: "Free — 1 Month"    },
+  { id: "1month", label: "Starter — 1 Month"    },
   { id: "6months",     label: "Basic — 6 Months"  },
   { id: "12months",    label: "Standard — 12 Months" },
   { id: "24months",    label: "Premium — 24 Months"  },
@@ -164,8 +165,9 @@ const AdminUserDetail = () => {
                 { label: "Email",        val: user.email },
                 { label: "Mobile",       val: user.mobileNumber || "—" },
                 { label: "Address",      val: user.fullAddress  || "—" },
-                { label: "Referred by",  val: user.referredBy   || "—" },
+                { label: "Referral Code",  val: user.referralCode   || "—" },
                 { label: "Joined",       val: fmt(user.createdAt) },
+                { label: "Referred by",  val: user.referredBy   || "—" },
                 { label: "Email verified", val: user.isEmailVerified ? "Yes" : "No" },
               ].map(({ label, val }) => (
                 <div key={label} className="flex justify-between py-2 border-b border-border last:border-0">

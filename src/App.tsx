@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import AddRecord from "./pages/AddRecord";
 import ViewRecords from "./pages/ViewRecords";
 import CurrentMonthDue from "./pages/CurrentMonthDue";
+import UpcomingDuePolicies from "./pages/UpcomingDuePolicies";
 import MissedPayments from "./pages/MissedPayments";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/add-record" element={<AddRecord />} />
             <Route path="/view-records" element={<ViewRecords />} />
             <Route path="/view-due-policies" element={<CurrentMonthDue />} />
+            <Route path="/view-upcoming-due" element={<UpcomingDuePolicies />} />
             <Route path="/view-missed-payments" element={<MissedPayments />} />
             <Route path="/about" element={<About />} />
             <Route path="/help-support" element={<HelpSupport />} />

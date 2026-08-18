@@ -20,6 +20,7 @@ export interface Translations {
 
   otherLinks: string;
   currentMonthDue: string;
+  nextMonthDue: string;
   missedPayments: string;
   bestInfoHub: string;
   quickLinks: string;
@@ -102,6 +103,7 @@ export interface Translations {
   allRecord: string;
   viewAllRecords: string;
   duePaymentNoRecordNote: string;
+  nextMonthDuePaymentNoRecordNote: string;
   missedPaymentNoRecordNote: string;
   
   // Generated IDs
@@ -130,6 +132,7 @@ export const translations: Record<string, Translations> = {
 
     otherLinks: "Other Links",
     currentMonthDue: "Current Month Due",
+    nextMonthDue: "Next Month Due",
     missedPayments: "Missed Payments",
     bestInfoHub: "Best Info Hub",
     quickLinks: "Quick Links",
@@ -212,6 +215,7 @@ export const translations: Record<string, Translations> = {
     allRecord: "All Records",
     viewAllRecords: "View All Records",
     duePaymentNoRecordNote: "Not a single record has payment due this month! Great job!",
+    nextMonthDuePaymentNoRecordNote: "Not a single record has payment due next month!",
     missedPaymentNoRecordNote: "Great, no records found! All previous payments are up to date.",
     
     // Generated IDs
@@ -240,6 +244,7 @@ export const translations: Record<string, Translations> = {
 
     otherLinks: "अन्य लिंक",
     currentMonthDue: "इस महीने का बकाया",
+    nextMonthDue: "अगले महीने का बकाया",
     missedPayments: "मिस्ड पेमेंट्स",
     bestInfoHub: "ज्ञान बढ़ाएँ",
     quickLinks: "मुख्य लिंक",
@@ -322,6 +327,7 @@ export const translations: Record<string, Translations> = {
     allRecord: "सभी रिकॉर्ड",
     viewAllRecords: "सभी रिकॉर्ड देखें",
     duePaymentNoRecordNote: "इस महीने किसी भी रिकॉर्ड का भुगतान बकाया नहीं है! बहुत बढ़िया!",
+    nextMonthDuePaymentNoRecordNote: "अगले महीने किसी भी रिकॉर्ड का भुगतान बकाया नहीं है!",
     missedPaymentNoRecordNote: "शानदार, कोई रिकॉर्ड नहीं मिला! सभी पिछली भुगतान राशि समय पर चुकाई जा चुकी है।",
     
     // Generated IDs

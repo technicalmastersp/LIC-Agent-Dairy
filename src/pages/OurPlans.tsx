@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { changePlan, createCheckoutOrder, verifyPayment, getSubscription } from "../../services/subscriptionService";
 import { getReferralConfig } from "../../services/configService";
 import { getProfile } from "../../services/userService";
+import { getReferralDashboard } from "../../services/referralService";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
 import { Link } from "lucide-react";
 
@@ -31,6 +32,9 @@ const OurPlans = () => {
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [referralConfig, setReferralConfig] = useState({ SIGNUP_DISCOUNT_AMOUNT: 100 });
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [useWallet, setUseWallet] = useState(false);
+  const [walletAmountInput, setWalletAmountInput] = useState("");
 
   // Seeded from cache for instant paint, then overwritten below by a live
   // fetch — otherwise a page refresh never leaves the browser and a payment
@@ -40,7 +44,7 @@ const OurPlans = () => {
   const [searchParams] = useSearchParams();
   const reason = searchParams.get("reason");
 
-  const plans: Plan[] = [
+  const allPlans: Plan[] = [
     {
       id: "1month-free",
       planType: "Free",
@@ -49,6 +53,19 @@ const OurPlans = () => {
       originalPrice: 299,
       features: [
         "Only for new users",
+        "Access to all features",
+        "1 month validity",
+        "Email support",
+        "Regular updates"
+      ]
+    },
+    {
+      id: "1month",
+      planType: "Starter",
+      duration: "1 Month",
+      price: 249,
+      originalPrice: 299,
+      features: [
         "Access to all features",
         "1 month validity",
         "Email support",
@@ -100,8 +117,18 @@ const OurPlans = () => {
     }
   ];
 
+  // Free trial is signup-only in spirit — hide it entirely once someone
+  // has already taken any paid plan (current planId isn't the free plan),
+  // rather than only blocking re-selection after the fact.
+  const hasHadPaidPlan = currentUser?.subscription && currentUser.subscription.planId !== "1month-free";
+  const plans = allPlans.filter(p => p.id !== "1month-free" || !hasHadPaidPlan);
+
   const handleSelectPlan = async (planId: string) => {
     if (!currentUser) { navigate("/signup"); return; }
+    if (currentUser.role === "admin" || currentUser.role === "superadmin") {
+      toast({ title: "Not applicable", description: "Admin accounts don't use subscription plans." });
+      return;
+    }
 
     const plan = plans.find(p => p.id === planId);
 
@@ -114,8 +141,21 @@ const OurPlans = () => {
         return;
       }
 
-      // Paid plan — go through Razorpay checkout
-      const order = await createCheckoutOrder(planId);
+      // Paid plan — apply wallet balance first (server clamps to real
+      // balance + plan price regardless of what's requested here)
+      const walletToApply = useWallet ? Number(walletAmountInput) || 0 : 0;
+      const order = await createCheckoutOrder(planId, walletToApply);
+
+      if (order.walletCovered) {
+        // Fully paid from wallet — no Razorpay modal needed at all
+        const freshProfile = await getProfile();
+        setCurrentUser(freshProfile);
+        setLocalCurrentUser(freshProfile);
+        toast({ title: "Plan Activated", description: "Fully covered by your referral wallet." });
+        navigate("/");
+        return;
+      }
+
       const paymentResponse = await openRazorpayCheckout({
         order,
         userName: currentUser?.name,
@@ -147,6 +187,11 @@ const OurPlans = () => {
 
   useEffect(() => {
     getReferralConfig().then(setReferralConfig).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    getReferralDashboard().then(d => setWalletBalance(d.availableBalance ?? 0)).catch(() => {});
   }, []);
 
   // On every mount (including a hard refresh) — fetch subscription state
@@ -188,6 +233,30 @@ const OurPlans = () => {
           </p>
         </div>
 
+        {currentUser && walletBalance > 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 max-w-md mx-auto">
+            <label className="flex items-center gap-2 text-sm font-medium text-blue-900">
+              <input
+                type="checkbox"
+                checked={useWallet}
+                onChange={(e) => { setUseWallet(e.target.checked); setWalletAmountInput(String(walletBalance)); }}
+              />
+              Use my referral wallet (₹{walletBalance} available)
+            </label>
+            {useWallet && (
+              <input
+                type="number"
+                min={1}
+                max={walletBalance}
+                value={walletAmountInput}
+                onChange={(e) => setWalletAmountInput(e.target.value)}
+                className="mt-2 w-full border border-blue-200 rounded-lg px-3 py-1.5 text-sm"
+                placeholder="Amount to apply"
+              />
+            )}
+          </div>
+        )}
+
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center mb-8">
           <p className="text-md text-green-800 text-center">
             🎁 Have a referral code?{" "}
@@ -197,7 +266,7 @@ const OurPlans = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div className={`grid md:grid-cols-2 ${hasHadPaidPlan ? 'lg:grid-cols-4' : 'lg:grid-cols-5'} gap-8 max-w-7xl mx-auto`}>
           {plans.map((plan) => (
             <Card 
               key={plan.id} 

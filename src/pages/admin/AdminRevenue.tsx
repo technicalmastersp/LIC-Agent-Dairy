@@ -220,6 +220,7 @@ const AdminRevenue = () => {
                     { label: "Payment gateway fees", val: summary.gatewayFees },
                     { label: "Refunds issued",        val: summary.refunds },
                     { label: "Referral payouts",      val: summary.referralPayouts },
+                    { label: "Wallet redemptions",    val: summary.walletRedemptions },
                     ...summary.expenseBreakdown.map((e: any) => ({ label: e.category, val: e.amount })),
                   ].filter(r => r.val > 0).map(({ label, val }) => (
                     <div key={label} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
