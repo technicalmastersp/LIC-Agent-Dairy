@@ -241,7 +241,7 @@ const Landing = () => {
                 {/* Referral wallet */}
                 <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
                   <div className="mb-4 bg-emerald-50 rounded-xl p-4">
-                    <p className="text-[10px] text-emerald-700/70 mb-1">Available balance</p>
+                    <p className="text-[10px] text-emerald-700 mb-1">Available balance</p>
                     <p className="text-lg font-bold text-emerald-700">₹4,250</p>
                   </div>
                   <Wallet className="w-5 h-5 text-primary mb-2" />

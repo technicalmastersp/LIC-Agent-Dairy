@@ -124,7 +124,7 @@ const Footer = () => {
             <p className="mb-4 leading-relaxed">
               {t("companyDescription")}
             </p>
-            <div className="text-xs text-white/50">
+            <div className="text-xs text-white/70">
               <p>© 2025 - {currentYear} {siteConfig.companyName}</p>
               <p>{t("allRightsReserved")}</p>
             </div>
