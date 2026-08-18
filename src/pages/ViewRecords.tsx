@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface Record {
   id: string;
+  _id?: string;
   date: string;
   aadhaarNumber: string;
   panNumber: string;
@@ -113,7 +115,7 @@ const dedupeRecords = (list: Record[]): Record[] => {
   const seen = new Set<string>();
   const result: Record[] = [];
   for (const record of list) {
-    const key = record.recordId || (record as any)._id || JSON.stringify(record);
+    const key = record.recordId || record._id || JSON.stringify(record);
     if (!seen.has(key)) {
       seen.add(key);
       result.push(record);
@@ -130,6 +132,7 @@ const ViewRecords = () => {
   const authenticated = isAuthenticated();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
   const [typeFilter, setTypeFilter] = useState("all");
   const [sortField, setSortField] = useState<keyof Record>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -168,22 +171,18 @@ const ViewRecords = () => {
     fetchRecords();
   }, []);
 
-  if (!authenticated || !currentUser) {
-    return null;
-  }
-
   const filteredAndSortedRecords = useMemo(() => {
     if (!records || records.length === 0) return [];
 
     let filtered = records.filter(record =>
-      record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.fatherName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.occupation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.aadhaarLinkedMobileNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.currentPolicy.policyNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.currentPolicy.modeOfPayment.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.currentPolicy.branch.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      recordTypeLabel(record).toLowerCase().includes(searchTerm.toLowerCase())
+      record.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      record.fatherName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      record.occupation.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      record.aadhaarLinkedMobileNumber.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      record.currentPolicy.policyNumber.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      record.currentPolicy.modeOfPayment.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      record.currentPolicy.branch.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      recordTypeLabel(record).toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
 
     if (typeFilter !== "all") {
@@ -205,7 +204,7 @@ const ViewRecords = () => {
         return bValue.localeCompare(aValue);
       }
     });
-  }, [records, searchTerm, typeFilter, sortField, sortDirection]);
+  }, [records, debouncedSearchTerm, typeFilter, sortField, sortDirection]);
 
   // ── Derived summary stats (real numbers from the data, styled like Home's stat row) ──
   const summaryStats = useMemo(() => {
@@ -276,6 +275,10 @@ const ViewRecords = () => {
       </div>
     </TableHead>
   );
+
+  if (!authenticated || !currentUser) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
@@ -475,7 +478,7 @@ const ViewRecords = () => {
                     </TableHeader>
                     <TableBody>
                       {filteredAndSortedRecords.map((record, idx) => (
-                        <TableRow key={record.recordId} className="hover:bg-muted/50 transition-colors group">
+                        <TableRow key={record.recordId || record._id || record.id} className="hover:bg-muted/50 transition-colors group">
                           <TableCell className="border border-table-border">
                             <span className="font-mono text-xs text-muted-foreground">
                               {String(idx + 1).padStart(3, "0")}

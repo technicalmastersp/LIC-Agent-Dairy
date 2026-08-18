@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useEffect } from "react";
 import {
   LifeBuoy, Mail, MessageCircle, Phone, Search, ChevronDown,
@@ -25,6 +26,23 @@ import {
 import siteConfig from "@/config/siteConfig";
 import { createTicket, getMyTickets } from "../../services/supportService";
 import { createSuggestion, getMySuggestions } from "../../services/suggestionService";
+import axios from "axios";
+
+type Ticket = {
+  ticketId: string;
+  category: string;
+  createdAt?: string;
+  status: string;
+  message: string;
+  adminReply?: string;
+};
+
+type Suggestion = {
+  _id: string;
+  title: string;
+  message: string;
+  status: string;
+};
 
 type FaqItem = { q: string; a: string; category: string };
 
@@ -76,6 +94,7 @@ const HelpSupport = () => {
   const currentUser = getCurrentUser();
 
   const [query, setQuery] = useState("");
+  const debouncedQuery = useDebouncedValue(query, 300);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const [form, setForm] = useState({
@@ -87,12 +106,12 @@ const HelpSupport = () => {
   const [submitting, setSubmitting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const [myTickets, setMyTickets]     = useState<any[]>([]);
+  const [myTickets, setMyTickets]     = useState<Ticket[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(true);
 
   const [suggestForm, setSuggestForm] = useState({ title: "", message: "" });
   const [submittingSuggestion, setSubmittingSuggestion] = useState(false);
-  const [mySuggestions, setMySuggestions] = useState<any[]>([]);
+  const [mySuggestions, setMySuggestions] = useState<Suggestion[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(true);
 
   useEffect(() => {
@@ -102,12 +121,12 @@ const HelpSupport = () => {
   }, [authenticated]);
 
   const filteredFaqs = useMemo(() => {
-    if (!query.trim()) return faqs;
-    const q = query.trim().toLowerCase();
+    if (!debouncedQuery.trim()) return faqs;
+    const q = debouncedQuery.trim().toLowerCase();
     return faqs.filter(
       (f) => f.q.toLowerCase().includes(q) || f.a.toLowerCase().includes(q) || f.category.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [debouncedQuery]);
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -133,8 +152,16 @@ const HelpSupport = () => {
       toast({ title: "Message sent", description: `Ticket ${res.data.ticketId} — our team will get back to you within a few hours.` });
       setForm({ name: currentUser?.name ?? "", email: currentUser?.email ?? "", category: "Account & Billing", message: "" });
       if (authenticated) getMyTickets().then(setMyTickets).catch(() => {});
-    } catch (err: any) {
-      toast({ title: "Something went wrong", description: err.response?.data?.message || "Please try again, or email us directly.", variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err)
+        ? err.response?.data?.message || "Please try again, or email us directly."
+        : "Please try again, or email us directly.";
+
+      toast({
+        title: "Something went wrong",
+        description: message,
+        variant: "destructive",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -152,8 +179,16 @@ const HelpSupport = () => {
       toast({ title: "Thanks for the suggestion!", description: "Our team will review it." });
       setSuggestForm({ title: "", message: "" });
       getMySuggestions().then(setMySuggestions).catch(() => {});
-    } catch (err: any) {
-      toast({ title: "Something went wrong", description: err.response?.data?.message || "Please try again.", variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err)
+        ? err.response?.data?.message || "Please try again."
+        : "Please try again.";
+
+      toast({
+        title: "Something went wrong",
+        description: message,
+        variant: "destructive",
+      });
     } finally {
       setSubmittingSuggestion(false);
     }
