@@ -93,6 +93,8 @@ Copy `.env.example` to `.env` and set:
 | `npm run deploy:dev` | Builds (`build:dev`) and publishes `dist/` to the `gh-pages` branch. |
 | `npm run lint` | Run ESLint across the project. |
 | `npm run preview` | Locally preview the production build output. |
+| `npm run test` | Run the Vitest test suite once (CI mode). |
+| `npm run test:watch` | Run Vitest in watch mode while developing. |
 
 ---
 

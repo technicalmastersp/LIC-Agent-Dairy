@@ -23,7 +23,7 @@ import { convertDateToIndianFormat } from "@/utils/tools";
 import { INSURANCE_TYPES, getInsuranceTypeDef } from "@/config/insuranceTypes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface Record {
+export interface Record {
   id: string;
   _id?: string;
   date: string;
@@ -112,7 +112,7 @@ const recordTypeLabel = (record: Record) => {
 // (paged out of view) but becomes obvious once a search narrows the list
 // down. Collapse to one entry per recordId (falling back to the Mongo _id,
 // then a JSON fingerprint) before it ever reaches component state.
-const dedupeRecords = (list: Record[]): Record[] => {
+export const dedupeRecords = (list: Record[]): Record[] => {
   const seen = new Set<string>();
   const result: Record[] = [];
   for (const record of list) {
