@@ -3,6 +3,7 @@ import Navigation from '@/components/Navigation';
 import React, { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { BookOpenText, Search, X } from 'lucide-react';
+import SEO from '@/components/SEO';
 
 type AbbreviationItem = {
   abbreviation: string;
@@ -165,6 +166,10 @@ const LicInfoHub: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
+      <SEO
+        title="LIC Info Hub — Insurance Abbreviations & Terms Explained"
+        description="Look up LIC abbreviations, internal codes, private insurer names, and common policy terms — a searchable glossary built for life insurance agents."
+      />
       <Navigation />
 
       <main className="container mx-auto px-4 py-8 flex-1">

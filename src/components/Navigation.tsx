@@ -4,6 +4,7 @@ import {
   Home, Plus, Table, LogOut, User, Menu, X,
   UserRoundCog, CircleHelp, MapPinnedIcon, Wrench,
   Cake, TrendingUp, Receipt, ShieldCheck, LineChart, ChevronDown,
+  LucideIcon
 } from "lucide-react";
 import { Button }        from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -26,19 +27,21 @@ import { logoutCurrentUser } from "../../services/userService";
    NAV CONFIG
 ───────────────────────────────────────────── */
 
-const getNavItems = (t: any) => [
+type TranslateFunction = (key: string) => string;
+
+const getNavItems = (t: TranslateFunction) => [
   { to: "/",             label: t("home"),        icon: Home        },
   { to: "/add-record",   label: t("addRecord"),   icon: Plus        },
   { to: "/view-records", label: t("viewRecords"), icon: Table       },
 ];
 
-const getNavItemsMobile = (t: any) => [
+const getNavItemsMobile = (t: TranslateFunction) => [
   { to: "/",             label: t("home"),        icon: Home        },
   { to: "/add-record",   label: t("addRecord"),   icon: Plus        },
   { to: "/view-records", label: t("viewRecords"), icon: Table       },
 ];
 
-const getAdminNavItems = (t: any) => [
+const getAdminNavItems = (t: TranslateFunction) => [
   { to: "/admin", label: "Admin Panel", icon: UserRoundCog },
 ];
 
@@ -65,7 +68,7 @@ const initials = (name = "") =>
 const NavItem = ({
   to, label, icon: Icon, onClick,
 }: {
-  to: string; label: any; icon: any; onClick?: () => void;
+  to: string; label: string; icon: LucideIcon; onClick?: () => void;
 }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
@@ -94,7 +97,7 @@ const NavItem = ({
 const MobileNavItem = ({
   to, label, icon: Icon, onClick,
 }: {
-  to: string; label: any; icon: any; onClick?: () => void;
+  to: string; label: string; icon: LucideIcon; onClick?: () => void;
 }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
@@ -137,6 +140,13 @@ const PublicMobileLink = ({
    TOOLS DROPDOWN (desktop, hover-triggered)
 ───────────────────────────────────────────── */
 
+// NOTE: opening this dropdown logs a harmless React dev-mode warning
+// ("Function components cannot be given refs") originating entirely inside
+// @radix-ui/react-navigation-menu's own Presence/Viewport internals — not
+// from this component. Dev-console-only noise; stripped from production
+// builds. Confirmed via live audit on 2026-08-18, current version
+// @radix-ui/react-navigation-menu@1.2.13. Revisit if a Radix release notes
+// a fix.
 const ToolsDropdown = ({ dark }: { dark?: boolean }) => (
   <NavigationMenu>
     <NavigationMenuList>

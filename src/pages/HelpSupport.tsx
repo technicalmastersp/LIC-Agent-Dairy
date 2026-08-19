@@ -23,6 +23,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import SEO from "@/components/SEO";
 import siteConfig from "@/config/siteConfig";
 import { createTicket, getMyTickets } from "../../services/supportService";
 import { createSuggestion, getMySuggestions } from "../../services/suggestionService";
@@ -196,6 +197,10 @@ const HelpSupport = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Help & Support"
+        description="Find answers to common questions, browse help topics, or contact our support team directly. Track your open tickets and suggestions in one place."
+      />
       <Navigation />
 
       <main className="flex-1">

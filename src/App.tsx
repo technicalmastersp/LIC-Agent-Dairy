@@ -44,6 +44,8 @@ const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const HelpSupport = lazy(() => import("./pages/HelpSupport"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminUserDetail = lazy(() => import("./pages/admin/AdminUserDetail"));
@@ -102,6 +104,8 @@ const App = () => (
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/change-password" element={<ChangePassword />} />
                   <Route path="/verify-email" element={<VerifyEmail />} />
+                  <Route path="/terms-of-service" element={<TermsOfService />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
                   <Route path="/admin"                  element={<AdminDashboard />} />
                   <Route path="/admin/users"            element={<AdminUsers />} />

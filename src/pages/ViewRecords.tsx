@@ -13,6 +13,7 @@ import EditRecordModal from "@/components/EditRecordModal";
 import {
   Search, Eye, Trash2, ArrowUpDown, Plus, Edit,
   FileText, IndianRupee, CalendarPlus, FolderOpen, ShieldCheck, Lock,
+  Download,
 } from "lucide-react";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -231,6 +232,52 @@ const ViewRecords = () => {
     }
   };
 
+  // ── CSV export of the currently filtered/searched records ──
+  // A cell can legitimately contain a comma, quote, or newline (names,
+  // branch names, etc.), so quote every field and escape embedded quotes
+  // by doubling them, per the standard CSV quoting rule.
+  const csvEscape = (value: string) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+
+  const handleExportCsv = () => {
+    const headers = [
+      "Name", "Type", "Father's Name", "Age", "Policy Number",
+      "Sum Assured", "Branch", "Created Date",
+    ];
+
+    const rows = filteredAndSortedRecords.map((record) => [
+      record.name,
+      recordTypeLabel(record),
+      record.fatherName,
+      record.age,
+      record.currentPolicy?.policyNumber,
+      record.currentPolicy?.sumAssured,
+      record.currentPolicy?.branch,
+      convertDateToIndianFormat(record.createdAt),
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map(csvEscape).join(","))
+      .join("\r\n");
+
+    // Leading BOM so Excel opens the file as UTF-8 instead of guessing
+    // wrong and mangling non-ASCII names.
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    link.href = url;
+    link.download = `policy-records-${dateStamp}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Export complete",
+      description: `${filteredAndSortedRecords.length} record${filteredAndSortedRecords.length !== 1 ? "s" : ""} exported to CSV.`,
+    });
+  };
+
   const handleViewRecord = (record: Record) => {
     setSelectedRecord(record);
     setIsModalOpen(true);
@@ -410,6 +457,15 @@ const ViewRecords = () => {
                       <SelectItem value="Other">Other (Custom)</SelectItem>
                     </SelectContent>
                   </Select>
+                  <Button
+                    variant="outline"
+                    onClick={handleExportCsv}
+                    disabled={filteredAndSortedRecords.length === 0}
+                    className="shrink-0"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Export CSV
+                  </Button>
                 </div>
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                   <span>{t("totalRecords")}: <Badge variant="secondary">{records.length}</Badge></span>
