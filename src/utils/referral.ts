@@ -49,7 +49,7 @@ export const processReferral = (userId: string, planPrice: number): void => {
 
   // Find the referrer by referral code
   const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const referrer = users.find((user: any) => user.referralCode === referralCode);
+  const referrer = users.find((user: { referralCode?: string }) => user.referralCode === referralCode);
   
   if (!referrer) return;
 

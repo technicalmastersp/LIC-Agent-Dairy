@@ -26,7 +26,11 @@ export const openRazorpayCheckout = async (
   await loadRazorpayScript();
 
   return new Promise((resolve, reject) => {
-    const rzp = new (window as any).Razorpay({
+    if (!window.Razorpay) {
+      reject(new Error("Razorpay checkout script failed to load."));
+      return;
+    }
+    const rzp = new window.Razorpay({
       key: options.order.keyId,
       amount: options.order.amount * 100, // paise
       currency: options.order.currency,

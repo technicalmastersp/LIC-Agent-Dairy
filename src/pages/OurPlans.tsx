@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -182,14 +183,8 @@ const OurPlans = () => {
         toast({ title: "Payment Failed", description: "Your payment could not be completed. Please try again.", variant: "destructive" });
         return;
       }
-      const errorResponse = err as {
-        response?: {
-          data?: {
-            message?: string;
-          };
-        };
-      };
-      toast({ title: "Error", description: errorResponse.response?.data?.message || "Something went wrong.", variant: "destructive" });
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message || "Something went wrong.", variant: "destructive" });
     }
   };
 
@@ -200,6 +195,7 @@ const OurPlans = () => {
   useEffect(() => {
     if (!currentUser) return;
     getReferralDashboard().then(d => setWalletBalance(d.availableBalance ?? 0)).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // On every mount (including a hard refresh) — fetch subscription state

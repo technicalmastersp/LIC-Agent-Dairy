@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,9 +90,9 @@ const ForgotPassword = () => {
       await verifyOTP({ email, otp: otpValue });
       // ✅ OTP valid — proceed to password step
       setStep("password");
-    } catch (err: any) {
-      const code    = err.response?.data?.code;
-      const message = err.response?.data?.message;
+    } catch (err: unknown) {
+      const code    = axios.isAxiosError(err) ? err.response?.data?.code : undefined;
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
 
       if (code === "OTP_EXPIRED") {
       // Clear boxes and tell user to resend
@@ -118,8 +119,9 @@ const ForgotPassword = () => {
     try {
       await resetPassword({ email, otp: otp.join(""), newPassword });
       setStep("success");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Invalid OTP or request expired.");
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      setError(message || "Invalid OTP or request expired.");
     } finally { setLoading(false); }
   };
 

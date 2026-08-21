@@ -69,23 +69,6 @@ const SignUp = () => {
     getReferralConfig().then(setReferralConfig).catch(() => {});
   }, []);
 
-  /* const validateReferralCode = (code: string): boolean => {
-    if (!code) return false;
-    let users = JSON.parse(localStorage.getItem('customers-list') || '[]');
-
-    const referrerUser = users.find((user: any) => user.referralCode === code);
-    if (referrerUser) {
-      // Store referral details for processing during signup
-      localStorage.setItem('pendingReferral', JSON.stringify({
-        referrerUserId: referrerUser.id,
-        referralCode: code,
-        referrerName: referrerUser.name
-      }));
-      return true;
-    }
-    return false;
-  }; */
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -94,18 +77,6 @@ const SignUp = () => {
     if (name === 'referralCode') {
       setIsValidReferralCode(checkReferralCode(value));
     }
-    
-   /*  // Generate preview IDs when user types name, mobile, or address
-    if ((name === 'name' || name === 'mobileNumber' || name === 'fullAddress') && 
-        formData.name && formData.mobileNumber && formData.fullAddress) {
-      const autoId = generateAutoUserId();
-      const easyId = generateEasyUserId(
-        name === 'name' ? value : formData.name,
-        name === 'mobileNumber' ? value : formData.mobileNumber,
-        name === 'fullAddress' ? value : formData.fullAddress
-      );
-      setGeneratedIds({ autoId, easyId });
-    } */
   };
 
   const getSelectedPlan = () => {
@@ -216,10 +187,10 @@ const SignUp = () => {
 
             toast({ title: "Payment Successful", description: "Your account and plan are ready." });
             navigate("/");
-          } catch (err: any) {
+          } catch (err: unknown) {
             // Account exists but payment wasn't completed — send them to login;
             // they can finish payment from Our Plans afterwards.
-            if (err.message === "PAYMENT_CANCELLED") {
+            if (err instanceof Error && err.message === "PAYMENT_CANCELLED") {
               toast({
                 title: "Payment Cancelled",
                 description: "Your account was created. You can complete payment anytime from Our Plans.",
