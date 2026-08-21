@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react";
-import { useNavigate }  from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
 import AdminLayout      from "./AdminLayout";
 import { Button }       from "@/components/ui/button";
 import { Input }        from "@/components/ui/input";
 import { Badge }        from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { getActivityLogs } from "../../../services/adminService";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -38,13 +36,25 @@ const fmt = (d?: string) => d
     })
   : "—";
 
-const AdminLogs = () => {
-  const navigate    = useNavigate();
-  const currentUser = getCurrentUser();
-  const authenticated = isAuthenticated();
+interface ActivityLog {
+  _id: string;
+  action: string;
+  adminName?: string;
+  adminRole?: string;
+  targetUserName?: string;
+  createdAt?: string;
+  details?: unknown;
+}
 
-  const [logs,       setLogs]       = useState<any[]>([]);
-  const [pagination, setPagination] = useState<any>(null);
+interface Pagination {
+  page: number;
+  totalPages: number;
+  total: number;
+}
+
+const AdminLogs = () => {
+  const [logs,       setLogs]       = useState<ActivityLog[]>([]);
+  const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading,    setLoading]    = useState(true);
   const [action,     setAction]     = useState("all");
   const [from,       setFrom]       = useState("");
@@ -52,12 +62,7 @@ const AdminLogs = () => {
   const [page,       setPage]       = useState(1);
   const [expanded,   setExpanded]   = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!authenticated || currentUser?.role !== "superadmin") { navigate("/"); return; }
-    fetchLogs();
-  }, [action, from, to, page]);
-
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getActivityLogs({
@@ -70,7 +75,11 @@ const AdminLogs = () => {
       setPagination(data.pagination);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  };
+  }, [action, from, to, page]);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
 
   return (
     <AdminLayout>

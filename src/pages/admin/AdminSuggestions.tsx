@@ -1,12 +1,12 @@
 import AdminLayout from "./AdminLayout";
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { getAllSuggestions, updateSuggestionStatus } from "../../../services/adminService";
 import { RefreshCw, User as UserIcon } from "lucide-react";
 
@@ -22,26 +22,27 @@ const statusStyle: Record<string, string> = {
   declined:       "bg-gray-100 text-gray-600 border border-gray-200",
 };
 
-const AdminSuggestions = () => {
-  const navigate      = useNavigate();
-  const { toast }     = useToast();
-  const currentUser   = getCurrentUser();
-  const authenticated = isAuthenticated();
+interface Suggestion {
+  _id: string;
+  title: string;
+  name: string;
+  email: string;
+  createdAt?: string;
+  status: string;
+  message: string;
+}
 
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+const AdminSuggestions = () => {
+  const { toast }     = useToast();
+
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!authenticated || !currentUser) { navigate("/login"); return; }
-    if (currentUser?.role !== "admin" && currentUser?.role !== "superadmin") { navigate("/"); return; }
-    fetchAll();
-  }, []);
-
-  const fetchAll = async (isRefresh = false) => {
+  const fetchAll = useCallback(async (isRefresh = false) => {
     try {
-      isRefresh ? setRefreshing(true) : setLoading(true);
+      if (isRefresh) { setRefreshing(true); } else { setLoading(true); }
       const data = await getAllSuggestions();
       setSuggestions(data);
     } catch {
@@ -50,7 +51,11 @@ const AdminSuggestions = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   const handleStatusChange = async (id: string, status: string) => {
     setSaving(id);
@@ -58,8 +63,9 @@ const AdminSuggestions = () => {
       await updateSuggestionStatus(id, { status });
       toast({ title: "Updated" });
       setSuggestions(prev => prev.map(s => s._id === id ? { ...s, status } : s));
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setSaving(null); }
   };
 

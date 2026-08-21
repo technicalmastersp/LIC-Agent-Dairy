@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AdminLayout  from "./AdminLayout";
 import { Button }   from "@/components/ui/button";
@@ -7,7 +8,6 @@ import { Badge }    from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { getUsers, deactivateUser, reactivateUser } from "../../../services/adminService";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Eye, UserX, UserCheck, ChevronLeft, ChevronRight, RefreshCw, ArrowUpDown } from "lucide-react";
@@ -40,15 +40,37 @@ const PLAN_SORT_OPTIONS = {
 } as const;
 type PlanSort = keyof typeof PLAN_SORT_OPTIONS;
 
+interface UserSubscriptionInfo {
+  planId?: string;
+  planType?: string;
+  status?: string;
+}
+
+interface AdminUserRow {
+  userId: string;
+  name: string;
+  email: string;
+  easyId?: string;
+  mobileNumber?: string;
+  profileImage?: string;
+  isActive: boolean;
+  totalRecords?: number;
+  createdAt?: string;
+  subscription: UserSubscriptionInfo;
+}
+
+interface ModalTarget {
+  userId: string;
+  name: string;
+}
+
 const AdminUsers = () => {
   const navigate    = useNavigate();
   const { toast }   = useToast();
-  const currentUser = getCurrentUser();
-  const authenticated = isAuthenticated();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // ---- data (fetched once) ----
-  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [allUsers, setAllUsers] = useState<AdminUserRow[]>([]);
   const [loading, setLoading]   = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -61,19 +83,16 @@ const AdminUsers = () => {
   const [status, setStatus] = useState<StatusFilter>(initialStatus);
   const [page,   setPage]   = useState(1);
   const [acting, setActing] = useState<string | null>(null);
-  const [deactivateModal, setDeactivateModal] = useState<any>(null);
+  const [deactivateModal, setDeactivateModal] = useState<ModalTarget | null>(null);
   const [deactivateNote,  setDeactivateNote]  = useState("");
-  const [reactivateModal, setReactivateModal] = useState<any>(null);
+  const [reactivateModal, setReactivateModal] = useState<ModalTarget | null>(null);
   const initialPlanSort = (searchParams.get("planSort") as PlanSort) in PLAN_SORT_OPTIONS
     ? (searchParams.get("planSort") as PlanSort)
     : "default";
   const [planSort, setPlanSort] = useState<PlanSort>(initialPlanSort);
 
-  // Auth guard + one-time fetch of ALL users
+  // One-time fetch of ALL users
   useEffect(() => {
-    if (!authenticated || !["admin","superadmin"].includes(currentUser?.role)) {
-      navigate("/"); return;
-    }
     fetchAllUsers();
   }, []);
 
@@ -89,7 +108,7 @@ const AdminUsers = () => {
 
   const fetchAllUsers = async (isRefresh = false) => {
     try {
-      isRefresh ? setRefreshing(true) : setLoading(true);
+      if (isRefresh) { setRefreshing(true); } else { setLoading(true); }
       // Fetch everything once (large limit, no search/status params) —
       // filtering/searching from here on happens client-side.
       const data = await getUsers({ role: "user", limit: 100000, page: 1 });
@@ -180,8 +199,9 @@ const AdminUsers = () => {
       setAllUsers(prev => prev.map(u =>
         u.userId === deactivateModal.userId ? { ...u, isActive: false } : u
       ));
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setActing(null); }
   };
 
@@ -195,8 +215,9 @@ const AdminUsers = () => {
         u.userId === reactivateModal.userId ? { ...u, isActive: true } : u
       ));
       setReactivateModal(null);
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setActing(null); }
   };
 

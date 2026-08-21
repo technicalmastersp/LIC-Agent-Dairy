@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { dedupeRecords, type Record } from "./ViewRecords";
+import { type Record } from "./ViewRecords";
+import { dedupeRecords } from "@/utils/recordDedupe";
 
 // All the fields below are required by the Record interface but irrelevant
 // to dedupeRecords' logic (it only reads recordId/_id) — filled with

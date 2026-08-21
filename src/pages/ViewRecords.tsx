@@ -15,72 +15,17 @@ import {
   FileText, IndianRupee, CalendarPlus, FolderOpen, ShieldCheck, Lock,
   Download,
 } from "lucide-react";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
+import { getCurrentUser } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import { getAllRecords, deleteRecord } from "../../services/recordService";
+import { dedupeRecords } from "@/utils/recordDedupe";
 import { convertDateToIndianFormat } from "@/utils/tools";
 import { INSURANCE_TYPES, getInsuranceTypeDef } from "@/config/insuranceTypes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Record } from "@/types/Record";
 
-export interface Record {
-  id: string;
-  _id?: string;
-  date: string;
-  aadhaarNumber: string;
-  panNumber: string;
-  email: string;
-  name: string;
-  birthPlace: string;
-  fatherName: string;
-  motherName: string;
-  spouseName: string;
-  address: string;
-  dateOfBirth: string;
-  age: string;
-  occupation: string;
-  educationalQualification: string;
-  designationOfPolicyHolder: string;
-  annualIncome: string;
-  periodOfService: string;
-  employerName: string;
-  aadhaarLinkedMobileNumber: string;
-  nameOfNominee: string;
-  ageOfNominee: string;
-  relationName: string;
-  lastChildBirthDate: string;
-  height: string;
-  weight: string;
-  bankAccountNumber: string;
-  ifscCode: string;
-  bankName: string;
-  branchName: string;
-  recordId?: string;
-
-  currentPolicy : {
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-
-  previousPolicy : {
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-  createdAt: string;
-
-  insuranceType?: string;
-  customInsuranceTypeName?: string;
-  typeSpecificData?: Record<string, string>;
-  customFields?: { key: string; label: string; fieldType: string; options?: string[]; value: string }[];
-}
+export type { Record };
 
 // Deterministic soft color for an avatar chip, derived from the name itself
 const avatarPalette = [
@@ -106,31 +51,11 @@ const recordTypeLabel = (record: Record) => {
   return getInsuranceTypeDef(type)?.shortLabel || type;
 };
 
-// The API can occasionally return the same underlying record more than once
-// in `recordLists` (e.g. a retried save, or an id collision from the record
-// id generator) — that duplication is invisible in the unfiltered table
-// (paged out of view) but becomes obvious once a search narrows the list
-// down. Collapse to one entry per recordId (falling back to the Mongo _id,
-// then a JSON fingerprint) before it ever reaches component state.
-export const dedupeRecords = (list: Record[]): Record[] => {
-  const seen = new Set<string>();
-  const result: Record[] = [];
-  for (const record of list) {
-    const key = record.recordId || record._id || JSON.stringify(record);
-    if (!seen.has(key)) {
-      seen.add(key);
-      result.push(record);
-    }
-  }
-  return result;
-};
-
 const ViewRecords = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { toast } = useToast();
   const currentUser = getCurrentUser();
-  const authenticated = isAuthenticated();
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
@@ -165,10 +90,6 @@ const ViewRecords = () => {
   };
 
   useEffect(() => {
-    if (!authenticated || !currentUser) {
-      navigate("/login");
-      return;
-    }
     fetchRecords();
   }, []);
 
@@ -322,10 +243,6 @@ const ViewRecords = () => {
       </div>
     </TableHead>
   );
-
-  if (!authenticated || !currentUser) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">

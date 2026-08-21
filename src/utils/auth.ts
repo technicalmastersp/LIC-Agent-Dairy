@@ -2,6 +2,19 @@
 import { processReferral } from "./referral";
 import { clearToken } from '../../utils/localStorageHelper.js'
 
+export interface PaymentDetails {
+  upiId?: string;
+  upiVerified?: boolean;
+  upiRejectionReason?: string;
+  accountNumber?: string;
+  ifscCode?: string;
+  accountHolder?: string;
+  bankName?: string;
+  branchName?: string;
+  bankVerified?: boolean;
+  updatedAt?: string;
+}
+
 export interface User {
   profileImage: string;
   id?: string;
@@ -20,6 +33,9 @@ export interface User {
   isEmailVerified?: boolean;
   emailVerificationToken?: string;
   role?: 'user' | 'admin' | 'superadmin';
+  isActive: boolean;
+  permissions?: Record<string, boolean>;
+  paymentDetails?: PaymentDetails | null;
 }
 
 export interface UserSubscription {

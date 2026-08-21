@@ -95,6 +95,7 @@ Copy `.env.example` to `.env` and set:
 | `npm run preview` | Locally preview the production build output. |
 | `npm run test` | Run the Vitest test suite once (CI mode). |
 | `npm run test:watch` | Run Vitest in watch mode while developing. |
+| `npm run test:e2e` | Run the Playwright end-to-end suite (starts the dev server automatically). |
 
 ---
 

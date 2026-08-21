@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import ErrorBoundary from "./components/ErrorBoundary";
+import ProtectedRoute from "./components/ProtectedRoute";
 import PageLoader from "./components/PageLoader";
 import ScrollToTop from "./components/ScrollToTop";
 import GlobalToastListener from "./components/GlobalToastListener";
@@ -82,15 +83,15 @@ const App = () => (
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<SignUp />} />
                   <Route path="/" element={<Landing />} />
-                  <Route path="/home" element={<Home />} />
-                  <Route path="/add-record" element={<AddRecord />} />
-                  <Route path="/view-records" element={<ViewRecords />} />
-                  <Route path="/view-due-policies" element={<CurrentMonthDue />} />
-                  <Route path="/view-upcoming-due" element={<UpcomingDuePolicies />} />
-                  <Route path="/view-missed-payments" element={<MissedPayments />} />
+                  <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                  <Route path="/add-record" element={<ProtectedRoute><AddRecord /></ProtectedRoute>} />
+                  <Route path="/view-records" element={<ProtectedRoute><ViewRecords /></ProtectedRoute>} />
+                  <Route path="/view-due-policies" element={<ProtectedRoute><CurrentMonthDue /></ProtectedRoute>} />
+                  <Route path="/view-upcoming-due" element={<ProtectedRoute><UpcomingDuePolicies /></ProtectedRoute>} />
+                  <Route path="/view-missed-payments" element={<ProtectedRoute><MissedPayments /></ProtectedRoute>} />
                   <Route path="/about" element={<About />} />
                   <Route path="/help-support" element={<HelpSupport />} />
-                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                   <Route path="/our-plans" element={<OurPlans />} />
                   <Route path="/lic-info-hub" element={<LicInfoHub />} />
                   <Route path="/tools" element={<ToolsHub />} />
@@ -100,23 +101,26 @@ const App = () => (
                   <Route path="/tools/home-loan-emi-calculator" element={<HomeLoanEmiCalculator />} />
                   <Route path="/tools/term-insurance-calculator" element={<TermInsuranceCalculator />} />
                   <Route path="/tools/inflation-calculator" element={<InflationCalculator />} />
-                  <Route path="/referral-program" element={<ReferralProgram />} />
+                  <Route path="/referral-program" element={<ProtectedRoute><ReferralProgram /></ProtectedRoute>} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/change-password" element={<ChangePassword />} />
+                  <Route path="/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
                   <Route path="/verify-email" element={<VerifyEmail />} />
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
-                  <Route path="/admin"                  element={<AdminDashboard />} />
-                  <Route path="/admin/users"            element={<AdminUsers />} />
-                  <Route path="/admin/users/:userId"    element={<AdminUserDetail />} />
-                  <Route path="/admin/admins"           element={<AdminAdmins />} />
-                  <Route path="/admin/withdrawals"      element={<WithdrawalRequests />} />
-                  <Route path="/admin/payment-verifications" element={<PaymentVerifications />} />
-                  <Route path="/admin/logs"             element={<AdminLogs />} />
-                  <Route path="/admin/support"          element={<AdminSupportTickets />} />
-                  <Route path="/admin/suggestions"      element={<AdminSuggestions />} />
-                  <Route path="/admin/revenue"          element={<AdminRevenue />} />
+                  <Route path="/admin" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminDashboard /></ProtectedRoute>} />
+                  <Route path="/admin/users" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminUsers /></ProtectedRoute>} />
+                  {/* AdminUserDetail previously had no auth/role guard at all — a
+                      pre-existing gap, not a behavior this refactor preserves.
+                      Gated the same as its parent /admin/users list. */}
+                  <Route path="/admin/users/:userId" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminUserDetail /></ProtectedRoute>} />
+                  <Route path="/admin/admins" element={<ProtectedRoute roles={["superadmin"]}><AdminAdmins /></ProtectedRoute>} />
+                  <Route path="/admin/withdrawals" element={<ProtectedRoute roles={["admin", "superadmin"]}><WithdrawalRequests /></ProtectedRoute>} />
+                  <Route path="/admin/payment-verifications" element={<ProtectedRoute roles={["admin", "superadmin"]}><PaymentVerifications /></ProtectedRoute>} />
+                  <Route path="/admin/logs" element={<ProtectedRoute roles={["superadmin"]}><AdminLogs /></ProtectedRoute>} />
+                  <Route path="/admin/support" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminSupportTickets /></ProtectedRoute>} />
+                  <Route path="/admin/suggestions" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminSuggestions /></ProtectedRoute>} />
+                  <Route path="/admin/revenue" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminRevenue /></ProtectedRoute>} />
 
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

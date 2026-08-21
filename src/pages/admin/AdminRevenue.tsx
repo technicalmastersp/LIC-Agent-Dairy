@@ -1,5 +1,6 @@
 import AdminLayout from "./AdminLayout";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
+import { getCurrentUser } from "@/utils/auth";
 import {
   getRevenueSummary, getRevenueTrend, getRevenueTransactions,
   createExpense, getExpenses, deleteExpense, refundPayment,
@@ -42,20 +43,54 @@ const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
   : "—";
 
+interface ExpenseBreakdownItem {
+  category: string;
+  amount: number;
+}
+
+interface RevenueSummary {
+  income: number;
+  totalExpenses: number;
+  totalProfit: number;
+  totalLoss: number;
+  gatewayFees?: number;
+  refunds?: number;
+  referralPayouts?: number;
+  walletRedemptions?: number;
+  expenseBreakdown?: ExpenseBreakdownItem[];
+}
+
+interface RevenueTrendPoint {
+  label: string;
+  income: number;
+  expenses: number;
+  net: number;
+}
+
+interface RevenueTransaction {
+  id: string;
+  kind: "income" | "expense" | "payout";
+  date?: string;
+  description: string;
+  user?: string;
+  amount: number;
+  refundStatus?: "none" | "partial" | "full";
+  refundedAmount?: number;
+}
+
 const AdminRevenue = () => {
   const navigate      = useNavigate();
   const { toast }     = useToast();
   const currentUser   = getCurrentUser();
-  const authenticated = isAuthenticated();
   const canManageExpenses = currentUser?.role === "superadmin" || currentUser?.permissions?.can_manage_expenses;
 
   const [scope, setScope]   = useState<"all" | "year" | "month">("all");
   const [year, setYear]     = useState(currentYear);
   const [month, setMonth]   = useState(new Date().getMonth() + 1);
 
-  const [summary, setSummary]         = useState<any>(null);
-  const [trend, setTrend]             = useState<any[]>([]);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [summary, setSummary]         = useState<RevenueSummary | null>(null);
+  const [trend, setTrend]             = useState<RevenueTrendPoint[]>([]);
+  const [transactions, setTransactions] = useState<RevenueTransaction[]>([]);
   const [txType, setTxType]           = useState<"all" | "income" | "expense" | "payout">("all");
   const [txPage, setTxPage]           = useState(1);
   const [txPages, setTxPages]         = useState(1);
@@ -67,43 +102,39 @@ const AdminRevenue = () => {
   const [expenseForm, setExpenseForm] = useState({ category: EXPENSE_CATEGORIES[0], description: "", amount: "", date: "" });
   const [savingExpense, setSavingExpense] = useState(false);
 
-  const [refundModal, setRefundModal] = useState<any>(null);
+  const [refundModal, setRefundModal] = useState<RevenueTransaction | null>(null);
   const [refundAmount, setRefundAmount] = useState("");
   const [refundReason, setRefundReason] = useState("");
   const [refunding, setRefunding] = useState(false);
 
-  const [expenseToDelete, setExpenseToDelete] = useState<any>(null);
+  const [expenseToDelete, setExpenseToDelete] = useState<RevenueTransaction | null>(null);
   const [deletingExpense, setDeletingExpense] = useState(false);
 
-  useEffect(() => {
-    if (!authenticated || !currentUser) { navigate("/login"); return; }
-    if (currentUser?.role !== "admin" && currentUser?.role !== "superadmin") { navigate("/"); return; }
-  }, []);
-
-  useEffect(() => { fetchAll(); }, [scope, year, month]);
-  useEffect(() => { fetchTransactions(); }, [scope, year, month, txType, txPage]);
-
-  const fetchAll = async (isRefresh = false) => {
+  const fetchAll = useCallback(async (isRefresh = false) => {
     try {
-      isRefresh ? setRefreshing(true) : setLoading(true);
+      if (isRefresh) { setRefreshing(true); } else { setLoading(true); }
       const [s, t] = await Promise.all([
         getRevenueSummary(scope, scope !== "all" ? year : undefined, scope === "month" ? month : undefined),
         getRevenueTrend(year),
       ]);
       setSummary(s);
       setTrend(t);
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setLoading(false); setRefreshing(false); }
-  };
+  }, [scope, year, month, toast]);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       const data = await getRevenueTransactions(scope, scope !== "all" ? year : undefined, scope === "month" ? month : undefined, txType, txPage);
       setTransactions(data.records);
       setTxPages(data.pages || 1);
     } catch { setTransactions([]); }
-  };
+  }, [scope, year, month, txType, txPage]);
+
+  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
 
   const handleAddExpense = async () => {
     if (!expenseForm.description.trim() || !expenseForm.amount || Number(expenseForm.amount) <= 0) {
@@ -118,8 +149,9 @@ const AdminRevenue = () => {
       setShowExpenseForm(false);
       fetchAll(true);
       fetchTransactions();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setSavingExpense(false); }
   };
 
@@ -132,8 +164,9 @@ const AdminRevenue = () => {
       fetchAll(true);
       fetchTransactions();
       setExpenseToDelete(null);
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally {
       setDeletingExpense(false);
     }
@@ -153,8 +186,9 @@ const AdminRevenue = () => {
       setRefundReason("");
       fetchAll(true);
       fetchTransactions();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setRefunding(false); }
   };
 
@@ -233,7 +267,7 @@ const AdminRevenue = () => {
                     { label: "Refunds issued",        val: summary.refunds },
                     { label: "Referral payouts",      val: summary.referralPayouts },
                     { label: "Wallet redemptions",    val: summary.walletRedemptions },
-                    ...summary.expenseBreakdown.map((e: any) => ({ label: e.category, val: e.amount })),
+                    ...(summary.expenseBreakdown ?? []).map((e: ExpenseBreakdownItem) => ({ label: e.category, val: e.amount })),
                   ].filter(r => r.val > 0).map(({ label, val }) => (
                     <div key={label} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
                       <span className="text-sm text-muted-foreground">{label}</span>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate }  from "react-router-dom";
 import AdminLayout      from "./AdminLayout";
 import { Button }       from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@
 import { Badge }        from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast }     from "@/hooks/use-toast";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
+import { getCurrentUser } from "@/utils/auth";
 import { getAdmins, createAdmin, deactivateUser, reactivateUser, updateAdminPermissions, forceLogoutUser, getSuperAdmins, promoteAdmin, demoteAdmin } from "../../../services/adminService";
 import { Plus, UserX, UserCheck, X, Shield, ToggleLeft, ToggleRight, LogOut, Crown, Clock } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -17,13 +18,38 @@ const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })
   : "—";
 
+interface AdminItem {
+  userId: string;
+  name: string;
+  email: string;
+  easyId?: string;
+  isActive: boolean;
+  deactivatedAt?: string;
+  deactivationNote?: string;
+  profileImage?: string;
+  permissions?: Record<string, boolean>;
+}
+
+interface SuperAdminItem {
+  userId: string;
+  name: string;
+  email: string;
+  easyId?: string;
+  userProfileImage?: string;
+  tempSuperadmin?: { expiresAt: string; reason?: string };
+}
+
+interface ModalTarget {
+  userId: string;
+  name: string;
+}
+
 const AdminAdmins = () => {
   const navigate    = useNavigate();
   const { toast }   = useToast();
   const currentUser = getCurrentUser();
-  const authenticated = isAuthenticated();
 
-  const [admins,  setAdmins]  = useState<any[]>([]);
+  const [admins,  setAdmins]  = useState<AdminItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [creating,   setCreating]   = useState(false);
@@ -31,24 +57,24 @@ const AdminAdmins = () => {
   const [form, setForm] = useState({
     name: "", email: "", password: "", mobileNumber: ""
   });
-  const [selectedAdmin,  setSelectedAdmin]  = useState<any>(null);
+  const [selectedAdmin,  setSelectedAdmin]  = useState<AdminItem | null>(null);
   const [savingPerms,    setSavingPerms]    = useState(false);
   const [localPerms,     setLocalPerms]     = useState<Record<string,boolean>>({});
 
-  const [logoutModal,  setLogoutModal]  = useState<any>(null);
+  const [logoutModal,  setLogoutModal]  = useState<ModalTarget | null>(null);
   const [logoutReason, setLogoutReason] = useState("");
   const [loggingOut,   setLoggingOut]   = useState(false);
-  const [superadmins,     setSuperadmins]     = useState<any[]>([]);
+  const [superadmins,     setSuperadmins]     = useState<SuperAdminItem[]>([]);
 
-  const [promoteModal,    setPromoteModal]     = useState<any>(null);
+  const [promoteModal,    setPromoteModal]     = useState<ModalTarget | null>(null);
   const [promoteDuration, setPromoteDuration] = useState("24");
   const [promoteReason,   setPromoteReason]   = useState("");
   const [promoting,       setPromoting]        = useState(false);
   const [demoting,        setDemoting]         = useState<string | null>(null);
 
-  const [deactivateModal, setDeactivateModal] = useState<any>(null);
+  const [deactivateModal, setDeactivateModal] = useState<ModalTarget | null>(null);
   const [deactivateNote,  setDeactivateNote]  = useState("");
-  const [reactivateModal, setReactivateModal] = useState<any>(null);
+  const [reactivateModal, setReactivateModal] = useState<ModalTarget | null>(null);
 
   const PERMISSION_DEFS = [
     { key: "can_view_users",          label: "View users",              desc: "See user list and details",                  risk: "low"    },
@@ -80,12 +106,13 @@ const AdminAdmins = () => {
       toast({ title: "Logged out", description: `${logoutModal.name}'s session has been ended.` });
       setLogoutModal(null);
       setLogoutReason("");
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setLoggingOut(false); }
   };
   
-  const handleOpenPerms = (admin: any) => {
+  const handleOpenPerms = (admin: AdminItem) => {
     setSelectedAdmin(admin);
     setLocalPerms(admin.permissions || {});
   };
@@ -98,13 +125,13 @@ const AdminAdmins = () => {
       toast({ title: "Permissions saved!", description: `${selectedAdmin.name}'s permissions updated.` });
       fetchAll();
       setSelectedAdmin(null);
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setSavingPerms(false); }
   };
 
   useEffect(() => {
-    if (!authenticated || currentUser?.role !== "superadmin") { navigate("/"); return; }
     fetchAll();
   }, []);
 
@@ -136,8 +163,9 @@ const AdminAdmins = () => {
       setShowCreate(false);
       setForm({ name: "", email: "", password: "", mobileNumber: "" });
       fetchAll();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setCreating(false); }
   };
 
@@ -150,8 +178,9 @@ const AdminAdmins = () => {
       setDeactivateModal(null);
       setDeactivateNote("");
       fetchAll();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setActing(null); }
   };
 
@@ -163,8 +192,9 @@ const AdminAdmins = () => {
       toast({ title: "Reactivated", description: `${reactivateModal.name} reactivated.` });
       setReactivateModal(null);
       fetchAll();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setActing(null); }
   };
 
@@ -176,8 +206,9 @@ const AdminAdmins = () => {
       toast({ title: "Promoted!", description: `${promoteModal.name} is now a temporary superadmin. They must re-login.` });
       setPromoteModal(null); setPromoteReason(""); setPromoteDuration("24");
       fetchAll();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setPromoting(false); }
   };
 
@@ -187,8 +218,9 @@ const AdminAdmins = () => {
       await demoteAdmin(adminId);
       toast({ title: "Demoted", description: `${name} is back to admin. They must re-login.` });
       fetchAll();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setDemoting(null); }
   };
 
@@ -225,7 +257,7 @@ const AdminAdmins = () => {
                   <div key={id} className="space-y-1.5">
                     <Label className="text-xs">{label}</Label>
                     <Input type={type} placeholder={placeholder}
-                      value={(form as any)[id]}
+                      value={form[id as keyof typeof form]}
                       onChange={e => setForm(p => ({ ...p, [id]: e.target.value }))} />
                   </div>
                 ))}

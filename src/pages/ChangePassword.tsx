@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,13 +11,10 @@ import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { changePassword } from "../../services/userService";
-import { isAuthenticated, getCurrentUser } from "@/utils/auth";
 
 const ChangePassword = () => {
   const navigate   = useNavigate();
   const { toast }  = useToast();
-  const authenticated = isAuthenticated();
-  const currentUser   = getCurrentUser();
 
   const [step, setStep]             = useState<"form" | "success">("form");
   const [currentPass, setCurrentPass] = useState("");
@@ -27,11 +25,6 @@ const ChangePassword = () => {
   const [showCon, setShowCon]       = useState(false);
   const [error, setError]           = useState("");
   const [loading, setLoading]       = useState(false);
-
-  if (!authenticated || !currentUser) {
-    navigate("/login");
-    return null;
-  }
 
   const strength = {
     hasLen:   newPass.length >= 6,
@@ -54,8 +47,11 @@ const ChangePassword = () => {
     try {
       await changePassword({ currentPassword: currentPass, newPassword: newPass });
       setStep("success");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Something went wrong. Please try again.");
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err)
+        ? err.response?.data?.message || "Something went wrong. Please try again."
+        : "Something went wrong. Please try again.";
+      setError(message);
     } finally {
       setLoading(false);
     }

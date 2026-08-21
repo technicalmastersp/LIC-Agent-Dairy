@@ -12,7 +12,6 @@ import {
   HeartPulse, ShieldCheck, History, IdCard, ListChecks,
   LucideIcon,
 } from "lucide-react";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import Footer from "@/components/Footer";
 import siteConfig from "@/config/siteConfig";
@@ -58,14 +57,6 @@ const AddRecord = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
-  const currentUser = getCurrentUser();
-  const authenticated = isAuthenticated();
-
-  useEffect(() => {
-    if (!authenticated || !currentUser) {
-      navigate("/login");
-    }
-  }, [authenticated, currentUser, navigate]);
 
   // Insurance type selection — drives which type-specific fields (or the
   // custom field builder, for "Other") render below the common form.
@@ -239,10 +230,6 @@ const AddRecord = () => {
       }
     });
   };
-
-  if (!authenticated || !currentUser) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-muted/30">

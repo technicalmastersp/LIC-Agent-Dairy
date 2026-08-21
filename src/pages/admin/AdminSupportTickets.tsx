@@ -1,13 +1,13 @@
 import AdminLayout from "./AdminLayout";
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { getSupportTickets, replyToTicket, getPendingCounts } from "../../../services/adminService";
 import { RefreshCw, Reply, Mail, User as UserIcon } from "lucide-react";
 
@@ -24,41 +24,41 @@ const statusStyle: Record<string, string> = {
 
 const STATUS_OPTIONS = ["all", "open", "in_progress", "resolved", "closed"] as const;
 
+interface SupportTicket {
+  ticketId: string;
+  name: string;
+  email: string;
+  createdAt?: string;
+  isGuest?: boolean;
+  guestMatchedAccount?: boolean;
+  status: string;
+  category: string;
+  message: string;
+  adminReply?: string;
+}
+
 const AdminSupportTickets = () => {
-  const navigate      = useNavigate();
   const { toast }     = useToast();
-  const currentUser   = getCurrentUser();
-  const authenticated = isAuthenticated();
 
   const [tab, setTab]         = useState<"high" | "normal">("high");
   const [statusFilter, setStatusFilter] = useState<typeof STATUS_OPTIONS[number]>("all");
-  const [tickets, setTickets] = useState<any[]>([]);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [counts, setCounts]   = useState({ high: 0, normal: 0 });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!authenticated || !currentUser) { navigate("/login"); return; }
-    if (currentUser?.role !== "admin" && currentUser?.role !== "superadmin") { navigate("/"); return; }
-    fetchCounts();
-  }, []);
-
-  useEffect(() => {
-    fetchTickets();
-  }, [tab, statusFilter]);
-
-  const fetchCounts = async () => {
+  const fetchCounts = useCallback(async () => {
     try {
       const data = await getPendingCounts();
       setCounts({ high: data.supportTickets ?? 0, normal: data.supportTicketsNormal ?? 0 });
     } catch { /* non-fatal */ }
-  };
+  }, []);
 
-  const fetchTickets = async (isRefresh = false) => {
+  const fetchTickets = useCallback(async (isRefresh = false) => {
     try {
-      isRefresh ? setRefreshing(true) : setLoading(true);
+      if (isRefresh) { setRefreshing(true); } else { setLoading(true); }
       const data = await getSupportTickets(tab, statusFilter === "all" ? undefined : statusFilter);
       setTickets(data);
     } catch {
@@ -67,7 +67,15 @@ const AdminSupportTickets = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [tab, statusFilter]);
+
+  useEffect(() => {
+    fetchCounts();
+  }, [fetchCounts]);
+
+  useEffect(() => {
+    fetchTickets();
+  }, [fetchTickets]);
 
   const handleReply = async (ticketId: string, status: string) => {
     const reply = replyDrafts[ticketId]?.trim();
@@ -77,8 +85,9 @@ const AdminSupportTickets = () => {
       toast({ title: "Updated", description: reply ? "Reply sent to the user." : "Status updated." });
       setReplyDrafts(p => ({ ...p, [ticketId]: "" }));
       fetchTickets(true);
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setSaving(null); }
   };
 
