@@ -8,7 +8,7 @@ import { Check } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { getCurrentUser, updateUserSubscription, setCurrentUser } from "@/utils/auth";
+import { getCurrentUser, setCurrentUser } from "@/utils/auth";
 import { useToast } from "@/hooks/use-toast";
 import { changePlan, createCheckoutOrder, verifyPayment, getSubscription } from "../../services/subscriptionService";
 import { getReferralConfig } from "../../services/configService";
