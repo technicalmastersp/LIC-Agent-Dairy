@@ -5,6 +5,11 @@ applicant details, track policy/premium due dates, monitor missed and
 upcoming payments, and (for admins) oversee users, revenue, support
 tickets, and subscriptions.
 
+<!-- Replace <owner>/<repo> below with this repo's actual GitHub path once
+     pushed — the badge can't be filled in automatically since no git
+     remote or `repository` field in package.json is available here. -->
+[![CI](https://github.com/<owner>/<repo>/actions/workflows/ci.yml/badge.svg)](https://github.com/<owner>/<repo>/actions/workflows/ci.yml)
+
 [Live Demo ›](https://lic-agent-dairy.vercel.app/)
 
 ---

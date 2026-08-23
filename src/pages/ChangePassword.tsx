@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,20 +13,31 @@ import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { changePassword } from "../../services/userService";
+import { changePasswordSchema, type ChangePasswordFormValues } from "@/schemas/changePasswordSchema";
 
 const ChangePassword = () => {
   const navigate   = useNavigate();
   const { toast }  = useToast();
 
-  const [step, setStep]             = useState<"form" | "success">("form");
-  const [currentPass, setCurrentPass] = useState("");
-  const [newPass, setNewPass]       = useState("");
-  const [confirmPass, setConfirm]   = useState("");
-  const [showCur, setShowCur]       = useState(false);
-  const [showNew, setShowNew]       = useState(false);
-  const [showCon, setShowCon]       = useState(false);
-  const [error, setError]           = useState("");
-  const [loading, setLoading]       = useState(false);
+  const [step, setStep]       = useState<"form" | "success">("form");
+  const [showCur, setShowCur] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showCon, setShowCon] = useState(false);
+  const [error, setError]     = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<ChangePasswordFormValues>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
+  });
+
+  const newPass = watch("newPassword");
+  const confirmPass = watch("confirmPassword");
 
   const strength = {
     hasLen:   newPass.length >= 6,
@@ -36,16 +49,11 @@ const ChangePassword = () => {
   const strengthColor = ["", "bg-red-400", "bg-yellow-400", "bg-green-500"][strength.score];
   const strengthWidth = ["0%", "33%", "66%", "100%"][strength.score];
 
-  const handleSubmit = async () => {
+  const onSubmit = async (data: ChangePasswordFormValues) => {
     setError("");
-    if (!currentPass)         { setError("Please enter your current password.");        return; }
-    if (newPass.length < 6)   { setError("New password must be at least 6 characters."); return; }
-    if (newPass !== confirmPass){ setError("Passwords do not match.");                   return; }
-    if (currentPass === newPass){ setError("New password must differ from current.");    return; }
-
     setLoading(true);
     try {
-      await changePassword({ currentPassword: currentPass, newPassword: newPass });
+      await changePassword({ currentPassword: data.currentPassword, newPassword: data.newPassword });
       setStep("success");
     } catch (err: unknown) {
       const message = axios.isAxiosError(err)
@@ -89,71 +97,81 @@ const ChangePassword = () => {
                     </Alert>
                   )}
 
-                  {/* Current password */}
-                  <div className="space-y-2">
-                    <Label htmlFor="cur">Current password</Label>
-                    <div className="relative">
-                      <Input id="cur" type={showCur ? "text" : "password"}
-                        placeholder="Your current password" className="pr-10"
-                        value={currentPass} onChange={e => setCurrentPass(e.target.value)} />
-                      <EyeToggle show={showCur} onToggle={() => setShowCur(!showCur)} />
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    {/* Current password */}
+                    <div className="space-y-2">
+                      <Label htmlFor="cur">Current password</Label>
+                      <div className="relative">
+                        <Input id="cur" type={showCur ? "text" : "password"}
+                          placeholder="Your current password" className="pr-10"
+                          {...register("currentPassword")} />
+                        <EyeToggle show={showCur} onToggle={() => setShowCur(!showCur)} />
+                      </div>
+                      {errors.currentPassword && (
+                        <p className="text-xs text-destructive">{errors.currentPassword.message}</p>
+                      )}
                     </div>
-                  </div>
 
-                  {/* New password */}
-                  <div className="space-y-2">
-                    <Label htmlFor="np">New password</Label>
-                    <div className="relative">
-                      <Input id="np" type={showNew ? "text" : "password"}
-                        placeholder="Min. 6 characters" className="pr-10"
-                        value={newPass} onChange={e => setNewPass(e.target.value)} />
-                      <EyeToggle show={showNew} onToggle={() => setShowNew(!showNew)} />
+                    {/* New password */}
+                    <div className="space-y-2">
+                      <Label htmlFor="np">New password</Label>
+                      <div className="relative">
+                        <Input id="np" type={showNew ? "text" : "password"}
+                          placeholder="Min. 6 characters" className="pr-10"
+                          {...register("newPassword")} />
+                        <EyeToggle show={showNew} onToggle={() => setShowNew(!showNew)} />
+                      </div>
+                      {errors.newPassword && (
+                        <p className="text-xs text-destructive">{errors.newPassword.message}</p>
+                      )}
+                      {/* Strength bar */}
+                      <div className="h-1 rounded-full bg-muted overflow-hidden">
+                        <div className={`h-full rounded-full transition-all ${strengthColor}`}
+                          style={{ width: strengthWidth }} />
+                      </div>
+                      {/* Requirements */}
+                      <div className="space-y-1">
+                        {[
+                          { ok: strength.hasLen,   label: "At least 6 characters" },
+                          { ok: strength.hasUpper, label: "One uppercase letter"  },
+                          { ok: strength.hasNum,   label: "One number"            },
+                        ].map(({ ok, label }) => (
+                          <div key={label}
+                            className={`flex items-center gap-1.5 text-xs transition-colors ${ok ? "text-green-600" : "text-muted-foreground"}`}>
+                            {ok
+                              ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                              : <Circle       className="w-3.5 h-3.5 shrink-0" />}
+                            {label}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    {/* Strength bar */}
-                    <div className="h-1 rounded-full bg-muted overflow-hidden">
-                      <div className={`h-full rounded-full transition-all ${strengthColor}`}
-                        style={{ width: strengthWidth }} />
-                    </div>
-                    {/* Requirements */}
-                    <div className="space-y-1">
-                      {[
-                        { ok: strength.hasLen,   label: "At least 6 characters" },
-                        { ok: strength.hasUpper, label: "One uppercase letter"  },
-                        { ok: strength.hasNum,   label: "One number"            },
-                      ].map(({ ok, label }) => (
-                        <div key={label}
-                          className={`flex items-center gap-1.5 text-xs transition-colors ${ok ? "text-green-600" : "text-muted-foreground"}`}>
-                          {ok
-                            ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                            : <Circle       className="w-3.5 h-3.5 shrink-0" />}
-                          {label}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
 
-                  {/* Confirm password */}
-                  <div className="space-y-2">
-                    <Label htmlFor="cp">Confirm new password</Label>
-                    <div className="relative">
-                      <Input id="cp" type={showCon ? "text" : "password"}
-                        placeholder="Re-enter new password" className="pr-10"
-                        value={confirmPass} onChange={e => setConfirm(e.target.value)} />
-                      <EyeToggle show={showCon} onToggle={() => setShowCon(!showCon)} />
+                    {/* Confirm password */}
+                    <div className="space-y-2">
+                      <Label htmlFor="cp">Confirm new password</Label>
+                      <div className="relative">
+                        <Input id="cp" type={showCon ? "text" : "password"}
+                          placeholder="Re-enter new password" className="pr-10"
+                          {...register("confirmPassword")} />
+                        <EyeToggle show={showCon} onToggle={() => setShowCon(!showCon)} />
+                      </div>
+                      {errors.confirmPassword ? (
+                        <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
+                      ) : confirmPass && (
+                        <p className={`text-xs ${newPass === confirmPass ? "text-green-600" : "text-red-500"}`}>
+                          {newPass === confirmPass ? "✓ Passwords match" : "✗ Passwords do not match"}
+                        </p>
+                      )}
                     </div>
-                    {confirmPass && (
-                      <p className={`text-xs ${newPass === confirmPass ? "text-green-600" : "text-red-500"}`}>
-                        {newPass === confirmPass ? "✓ Passwords match" : "✗ Passwords do not match"}
-                      </p>
-                    )}
-                  </div>
 
-                  <Button className="w-full" onClick={handleSubmit} disabled={loading}>
-                    {loading ? "Updating…" : "Update password"}
-                  </Button>
-                  <Button variant="outline" className="w-full" onClick={() => navigate("/profile")}>
-                    Cancel
-                  </Button>
+                    <Button type="submit" className="w-full" disabled={loading}>
+                      {loading ? "Updating…" : "Update password"}
+                    </Button>
+                    <Button type="button" variant="outline" className="w-full" onClick={() => navigate("/profile")}>
+                      Cancel
+                    </Button>
+                  </form>
                 </CardContent>
               </>
             )}

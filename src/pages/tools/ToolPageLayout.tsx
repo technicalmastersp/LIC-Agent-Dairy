@@ -1,9 +1,10 @@
 import { ReactNode } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import SEO from "@/components/SEO";
+import siteConfig from "@/config/siteConfig";
 
 interface ToolPageLayoutProps {
   icon: React.ElementType;
@@ -15,6 +16,23 @@ interface ToolPageLayoutProps {
 
 const ToolPageLayout = ({ icon: Icon, title, description, children, accent }: ToolPageLayoutProps) => {
   const iconBg = accent ? `bg-${accent}-100 text-${accent}-700` : "bg-primary/10 text-primary";
+  const { pathname } = useLocation();
+
+  // Every calculator tool page is a free, browser-based WebApplication —
+  // this is the schema.org type Google's rich-results docs recommend for
+  // that shape of page. One JSON-LD block here covers all six calculators
+  // without duplicating it per page.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: title,
+    description,
+    url: `${siteConfig.productionUrl}${pathname}`,
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Any",
+    isAccessibleForFree: true,
+    offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -22,7 +40,7 @@ const ToolPageLayout = ({ icon: Icon, title, description, children, accent }: To
           on-page heading — reused here as the SEO title/meta description too,
           so each calculator gets genuinely different search/social copy
           without duplicating it in every individual page file. */}
-      <SEO title={title} description={description} />
+      <SEO title={title} description={description} jsonLd={jsonLd} />
       <Navigation />
       <main className="flex-1">
         <section className="relative bg-gradient-to-b from-primary/5 via-background to-background overflow-hidden">

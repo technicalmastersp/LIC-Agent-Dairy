@@ -30,7 +30,7 @@
     --muted-foreground: 220 15% 40%;
 
     --accent: 195 75% 92%;
-    /* --accent-foreground: 195 85% 25%; */
+    --accent-foreground: 195 85% 25%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
@@ -72,7 +72,7 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     /* ########################################## Custom ############################################## */
-    --accent-foreground: 195 28.57% 83.53%;
+    /* --accent-foreground: 195 28.57% 83.53%; */
 
   }
 

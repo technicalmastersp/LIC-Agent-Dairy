@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +25,7 @@ import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
 import {
   isOtherInsuranceType, emptyTypeSpecificData, type CustomFieldValue,
 } from "@/config/insuranceTypes";
+import { policyRecordSchema, type PolicyRecordFormValues } from "@/schemas/policyRecordSchema.js";
 
 interface FamilyMember {
   relationship: string;
@@ -84,40 +87,48 @@ const AddRecord = () => {
   };
 
   // Basic Information
-  const [formData, setFormData] = useState({
-    date: new Date().toISOString(),
-    aadhaarNumber: "",
-    panNumber: "",
-    email: "",
+  const {
+    register,
+    handleSubmit: rhfHandleSubmit,
+    formState: { errors },
+  } = useForm<PolicyRecordFormValues>({
+    resolver: zodResolver(policyRecordSchema),
+    defaultValues: {
+      date: new Date().toISOString(),
+      aadhaarNumber: "",
+      panNumber: "",
+      email: "",
 
-    name: "",
-    birthPlace: "",
-    fatherName: "",
-    motherName: "",
-    spouseName: "",
-    address: "",
-    dateOfBirth: "",
-    age: "",
-    occupation: "",
-    educationalQualification: "",
-    designationOfPolicyHolder: "",
-    annualIncome: "",
-    periodOfService: "",
-    employerName: "",
-    aadhaarLinkedMobileNumber: "",
-    nameOfNominee: "",
-    ageOfNominee: "",
-    relationName: "",
-    lastChildBirthDate: "",
-    height: "",
-    weight: "",
-    bankAccountNumber: "",
-    ifscCode: "",
-    bankName: "",
-    branchName: "",
+      name: "",
+      birthPlace: "",
+      fatherName: "",
+      motherName: "",
+      spouseName: "",
+      address: "",
+      dateOfBirth: "",
+      age: "",
+      occupation: "",
+      educationalQualification: "",
+      designationOfPolicyHolder: "",
+      annualIncome: "",
+      periodOfService: "",
+      employerName: "",
+      aadhaarLinkedMobileNumber: "",
+      nameOfNominee: "",
+      ageOfNominee: "",
+      relationName: "",
+      lastChildBirthDate: "",
+      height: "",
+      weight: "",
+      bankAccountNumber: "",
+      ifscCode: "",
+      bankName: "",
+      branchName: "",
+    },
   });
 
-  // Policy Details Tables
+  // Policy Details Tables — no validation rules exist for these today, so
+  // they stay plain useState rather than joining the zod-validated form.
   const [currentPolicy, setCurrentPolicy] = useState<PolicyDetail>({
     policyNumber: "",
     planAndTerm: "",
@@ -136,17 +147,15 @@ const AddRecord = () => {
     lastPaymentDate: "",
   });
 
-  // Tracks whether the Name field should show the red "required" border,
-  // and lets us scroll/focus straight to it when validation fails on submit.
-  const [nameError, setNameError] = useState(false);
-  const nameInputRef = useRef<HTMLInputElement>(null);
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (field === "name" && value.trim()) {
-      setNameError(false);
-    }
-  };
+  // The Name field still needs a plain DOM ref for scrollIntoView on a
+  // failed submit — react-hook-form's own ref is merged onto the same
+  // element (see the Name <Input> below) so both work together.
+  // `HTMLInputElement | null` (not just `HTMLInputElement`) is required
+  // here so TS picks React's MutableRefObject overload — otherwise
+  // .current is read-only and the manual assignment in the merged ref
+  // callback below fails under strictNullChecks.
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
+  const { ref: nameFieldRef, ...nameField } = register("name");
 
   const handlePolicyChange = (type: 'current' | 'previous', field: keyof PolicyDetail, value: string) => {
     if (type === 'current') {
@@ -180,9 +189,12 @@ const AddRecord = () => {
     setFamilyMembers(updatedMembers);
   };
 
-  const handleSubmit = () => {
-    if (!formData.name.trim()) {
-      setNameError(true);
+  // Fires when zod validation fails. Name is the only field that ever
+  // blocked submission before, so it's the only one that gets the
+  // toast + scroll-into-view + focus treatment, matching the exact
+  // pre-migration UX.
+  const onInvalid = () => {
+    if (errors.name) {
       toast({
         title: "Error",
         description: "Please enter the applicant's name",
@@ -190,10 +202,10 @@ const AddRecord = () => {
       });
       nameInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       nameInputRef.current?.focus();
-      return;
     }
-    setNameError(false);
+  };
 
+  const onValid = (formData: PolicyRecordFormValues) => {
     if (isOtherInsuranceType(insuranceType) && !customInsuranceTypeName.trim()) {
       toast({
         title: "Error",
@@ -218,6 +230,7 @@ const AddRecord = () => {
       toast({
         title: "Success",
         description: "Record saved successfully",
+
       });
       navigate("/view-records");
     }).then( (error) => {
@@ -306,8 +319,7 @@ const AddRecord = () => {
                   <Input 
                     id="date"
                     type="date"
-                    value={formData.date}
-                    onChange={(e) => handleInputChange("date", e.target.value)}
+                    {...register("date")}
                     className="mt-1"
                   />
                 </div>
@@ -316,32 +328,38 @@ const AddRecord = () => {
                   <Input 
                     id="aadhaarNumber" 
                     placeholder="12-digit Aadhaar number"
-                    value={formData.aadhaarNumber}
-                    onChange={(e) => handleInputChange("aadhaarNumber", e.target.value)}
+                    {...register("aadhaarNumber")}
                     className="mt-1"
                     maxLength={12}
                   />
+                  {errors.aadhaarNumber && (
+                    <p className="text-xs text-destructive mt-1">{errors.aadhaarNumber.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="panNumber">Pan Number</Label>
                   <Input 
                     id="panNumber" 
                     placeholder="e.g. ABCDE1234F"
-                    value={formData.panNumber}
-                    onChange={(e) => handleInputChange("panNumber", e.target.value)}
+                    {...register("panNumber")}
                     className="mt-1 uppercase"
                     maxLength={10}
                   />
+                  {errors.panNumber && (
+                    <p className="text-xs text-destructive mt-1">{errors.panNumber.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="email">Email ID</Label>
                   <Input 
                     id="email" 
                     type="email" 
-                    value={formData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    {...register("email")}
                     className="mt-1"
                   />
+                  {errors.email && (
+                    <p className="text-xs text-destructive mt-1">{errors.email.message}</p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -358,19 +376,20 @@ const AddRecord = () => {
                   <Label htmlFor="name">1. Name</Label>
                   <Input 
                     id="name" 
-                    ref={nameInputRef}
                     placeholder="Enter applicant's full name"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    className={`mt-1 ${nameError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    {...nameField}
+                    ref={(el) => { nameFieldRef(el); nameInputRef.current = el; }}
+                    className={`mt-1 ${errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                   />
+                  {errors.name && (
+                    <p className="text-xs text-destructive mt-1">{errors.name.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="birthPlace">1a. Birth Place</Label>
                   <Input 
                     id="birthPlace" 
-                    value={formData.birthPlace}
-                    onChange={(e) => handleInputChange("birthPlace", e.target.value)}
+                    {...register("birthPlace")}
                     className="mt-1"
                   />
                 </div>
@@ -378,8 +397,7 @@ const AddRecord = () => {
                   <Label htmlFor="fatherName">2. Father's Name</Label>
                   <Input 
                     id="fatherName" 
-                    value={formData.fatherName}
-                    onChange={(e) => handleInputChange("fatherName", e.target.value)}
+                    {...register("fatherName")}
                     className="mt-1"
                   />
                 </div>
@@ -387,8 +405,7 @@ const AddRecord = () => {
                   <Label htmlFor="motherName">3. Mother's Name</Label>
                   <Input 
                     id="motherName" 
-                    value={formData.motherName}
-                    onChange={(e) => handleInputChange("motherName", e.target.value)}
+                    {...register("motherName")}
                     className="mt-1"
                   />
                 </div>
@@ -396,8 +413,7 @@ const AddRecord = () => {
                   <Label htmlFor="spouseName">4. Spouse's Name</Label>
                   <Input 
                     id="spouseName" 
-                    value={formData.spouseName}
-                    onChange={(e) => handleInputChange("spouseName", e.target.value)}
+                    {...register("spouseName")}
                     className="mt-1"
                   />
                 </div>
@@ -405,8 +421,7 @@ const AddRecord = () => {
                   <Label htmlFor="address">5. Address</Label>
                   <Input 
                     id="address" 
-                    value={formData.address}
-                    onChange={(e) => handleInputChange("address", e.target.value)}
+                    {...register("address")}
                     className="mt-1"
                   />
                 </div>
@@ -415,8 +430,7 @@ const AddRecord = () => {
                   <Input 
                     id="dateOfBirth" 
                     type="date"
-                    value={formData.dateOfBirth}
-                    onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
+                    {...register("dateOfBirth")}
                     className="mt-1"
                   />
                 </div>
@@ -424,8 +438,7 @@ const AddRecord = () => {
                   <Label htmlFor="age">6a. Age</Label>
                   <Input 
                     id="age" 
-                    value={formData.age}
-                    onChange={(e) => handleInputChange("age", e.target.value)}
+                    {...register("age")}
                     className="mt-1"
                   />
                 </div>
@@ -433,8 +446,7 @@ const AddRecord = () => {
                   <Label htmlFor="education">7. Educational Qualification</Label>
                   <Input 
                     id="education" 
-                    value={formData.educationalQualification}
-                    onChange={(e) => handleInputChange("educationalQualification", e.target.value)}
+                    {...register("educationalQualification")}
                     className="mt-1"
                   />
                 </div>
@@ -442,8 +454,7 @@ const AddRecord = () => {
                   <Label htmlFor="occupation">7a. Occupation</Label>
                   <Input 
                     id="occupation" 
-                    value={formData.occupation || ""}
-                    onChange={(e) => handleInputChange("occupation", e.target.value)}
+                    {...register("occupation")}
                     className="mt-1"
                   />
                 </div>
@@ -451,8 +462,7 @@ const AddRecord = () => {
                   <Label htmlFor="DesignationName">7b. Designation</Label>
                   <Input 
                     id="DesignationName" 
-                    value={formData.designationOfPolicyHolder}
-                    onChange={(e) => handleInputChange("designationOfPolicyHolder", e.target.value)}
+                    {...register("designationOfPolicyHolder")}
                     className="mt-1"
                   />
                 </div>
@@ -460,8 +470,7 @@ const AddRecord = () => {
                   <Label htmlFor="income">7c. Annual Income</Label>
                   <Input 
                     id="income" 
-                    value={formData.annualIncome || ""}
-                    onChange={(e) => handleInputChange("annualIncome", e.target.value)}
+                    {...register("annualIncome")}
                     className="mt-1"
                   />
                 </div>
@@ -469,8 +478,7 @@ const AddRecord = () => {
                   <Label htmlFor="servicePeriod">7d. Period Of Service</Label>
                   <Input 
                     id="servicePeriod" 
-                    value={formData.periodOfService}
-                    onChange={(e) => handleInputChange("periodOfService", e.target.value)}
+                    {...register("periodOfService")}
                     className="mt-1"
                   />
                 </div>
@@ -478,8 +486,7 @@ const AddRecord = () => {
                   <Label htmlFor="employer">7e. Employer's Name</Label>
                   <Input 
                     id="employer" 
-                    value={formData.employerName}
-                    onChange={(e) => handleInputChange("employerName", e.target.value)}
+                    {...register("employerName")}
                     className="mt-1"
                   />
                 </div>
@@ -487,8 +494,7 @@ const AddRecord = () => {
                   <Label htmlFor="mobileNumberLinkedAadhaar">7f. Aadhaar Linked Mobile Number </Label>
                   <Input 
                     id="mobileNumberLinkedAadhaar" 
-                    value={formData.aadhaarLinkedMobileNumber || ""}
-                    onChange={(e) => handleInputChange("aadhaarLinkedMobileNumber", e.target.value)}
+                    {...register("aadhaarLinkedMobileNumber")}
                     className="mt-1"
                   />
                 </div>
@@ -496,8 +502,7 @@ const AddRecord = () => {
                   <Label htmlFor="nominee">8. Name of Nominee</Label>
                   <Input 
                     id="nominee" 
-                    value={formData.nameOfNominee}
-                    onChange={(e) => handleInputChange("nameOfNominee", e.target.value)}
+                    {...register("nameOfNominee")}
                     className="mt-1"
                   />
                 </div>
@@ -505,8 +510,7 @@ const AddRecord = () => {
                   <Label htmlFor="nomineeAge">8a. Age of Nominee</Label>
                   <Input 
                     id="nomineeAge" 
-                    value={formData.ageOfNominee}
-                    onChange={(e) => handleInputChange("ageOfNominee", e.target.value)}
+                    {...register("ageOfNominee")}
                     className="mt-1"
                   />
                 </div>
@@ -514,8 +518,7 @@ const AddRecord = () => {
                   <Label htmlFor="relation">8b. Relation</Label>
                   <Input 
                     id="relation" 
-                    value={formData.relationName}
-                    onChange={(e) => handleInputChange("relationName", e.target.value)}
+                    {...register("relationName")}
                     className="mt-1"
                   />
                 </div>
@@ -634,8 +637,7 @@ const AddRecord = () => {
                   <Input 
                     id="height" 
                     placeholder="Height in cm"
-                    value={formData.height}
-                    onChange={(e) => handleInputChange("height", e.target.value)}
+                    {...register("height")}
                     className="mt-1"
                   />
                 </div>
@@ -644,8 +646,7 @@ const AddRecord = () => {
                   <Input 
                     id="weight" 
                     placeholder="Weight in kg"
-                    value={formData.weight}
-                    onChange={(e) => handleInputChange("weight", e.target.value)}
+                    {...register("weight")}
                     className="mt-1"
                   />
                 </div>
@@ -654,8 +655,7 @@ const AddRecord = () => {
                   <Input 
                     id="childrenDate" 
                     type="date"
-                    value={formData.lastChildBirthDate}
-                    onChange={(e) => handleInputChange("lastChildBirthDate", e.target.value)}
+                    {...register("lastChildBirthDate")}
                     className="mt-1"
                   />
                 </div>
@@ -664,8 +664,7 @@ const AddRecord = () => {
                   <Input 
                     id="bankAccount" 
                     placeholder="Enter bank account number"
-                    value={formData.bankAccountNumber}
-                    onChange={(e) => handleInputChange("bankAccountNumber", e.target.value)}
+                    {...register("bankAccountNumber")}
                     className="mt-1"
                   />
                 </div>
@@ -674,8 +673,7 @@ const AddRecord = () => {
                   <Input 
                     id="ifsc" 
                     placeholder="e.g. SBIN0001234"
-                    value={formData.ifscCode}
-                    onChange={(e) => handleInputChange("ifscCode", e.target.value)}
+                    {...register("ifscCode")}
                     className="mt-1"
                   />
                 </div>
@@ -683,8 +681,7 @@ const AddRecord = () => {
                   <Label htmlFor="bankName">12b. Bank Name</Label>
                   <Input 
                     id="bankName" 
-                    value={formData.bankName}
-                    onChange={(e) => handleInputChange("bankName", e.target.value)}
+                    {...register("bankName")}
                     className="mt-1"
                   />
                 </div>
@@ -692,8 +689,7 @@ const AddRecord = () => {
                   <Label htmlFor="branchName">12c. Branch Name</Label>
                   <Input 
                     id="branchName" 
-                    value={formData.branchName}
-                    onChange={(e) => handleInputChange("branchName", e.target.value)}
+                    {...register("branchName")}
                     className="mt-1"
                   />
                 </div>
@@ -871,7 +867,7 @@ const AddRecord = () => {
 
           {/* Action Buttons */}
           <div className="flex justify-center space-x-4 pt-2 pb-8">
-            <Button onClick={handleSubmit} className="bg-primary hover:bg-primary-light text-primary-foreground shadow-sm">
+            <Button onClick={rhfHandleSubmit(onValid, onInvalid)} className="bg-primary hover:bg-primary-light text-primary-foreground shadow-sm">
               <Save className="w-4 h-4 mr-2" />
               Save Record
             </Button>

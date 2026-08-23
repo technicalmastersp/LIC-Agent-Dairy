@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,19 +21,9 @@ import { createCheckoutOrder, verifyPayment } from "../../services/subscriptionS
 import { setToken } from "../../utils/localStorageHelper";
 import { setCurrentUser } from "@/utils/auth";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
+import { signUpSchema, type SignUpFormValues } from "@/schemas/signUpSchema";
 
 const SignUp = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    fullAddress: "",
-    mobileNumber: "",
-    // designation: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    selectedPlan: "",
-    referralCode: ""
-  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [generatedIds, setGeneratedIds] = useState<{autoId: string, easyId: string} | null>(null);
@@ -42,16 +35,41 @@ const SignUp = () => {
     L1_COMMISSION_PCT:      5,
     L2_COMMISSION_PCT:      2,
   });
-  
+
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { toast } = useToast();
 
+  const {
+    register,
+    control,
+    handleSubmit,
+    watch,
+    getValues,
+    formState: { errors },
+  } = useForm<SignUpFormValues>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: "",
+      fullAddress: "",
+      mobileNumber: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      selectedPlan: "",
+      referralCode: "",
+    },
+  });
+
+  const password = watch("password");
+  const selectedPlanId = watch("selectedPlan");
+  const referralCodeValue = watch("referralCode") || "";
+
   // Same standard used on the Change Password page: 6+ chars, one uppercase, one number.
   const passwordStrength = {
-    hasLen:   formData.password.length >= 6,
-    hasUpper: /[A-Z]/.test(formData.password),
-    hasNum:   /\d/.test(formData.password),
+    hasLen:   password.length >= 6,
+    hasUpper: /[A-Z]/.test(password),
+    hasNum:   /\d/.test(password),
     get score() { return [this.hasLen, this.hasUpper, this.hasNum].filter(Boolean).length; },
   };
   const strengthColor = ["", "bg-red-400", "bg-yellow-400", "bg-green-500"][passwordStrength.score];
@@ -69,83 +87,46 @@ const SignUp = () => {
     getReferralConfig().then(setReferralConfig).catch(() => {});
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Validate referral code
-    if (name === 'referralCode') {
-      setIsValidReferralCode(checkReferralCode(value));
-    }
-  };
-
   const getSelectedPlan = () => {
-    return plans.find(plan => plan.id === formData.selectedPlan);
+    return plans.find(plan => plan.id === selectedPlanId);
   };
 
   const calculateFinalPrice = () => {
     const selectedPlan = getSelectedPlan();
     if (!selectedPlan) return 0;
-    
-    const discount = isValidReferralCode && formData.referralCode ? referralConfig.SIGNUP_DISCOUNT_AMOUNT : 0;
+
+    const discount = isValidReferralCode && referralCodeValue ? referralConfig.SIGNUP_DISCOUNT_AMOUNT : 0;
     return Math.max(0, selectedPlan.price - discount);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (formData: SignUpFormValues) => {
     setIsLoading(true);
     setError("");
 
-    // Validation
-    if (formData.password.length < 6 || !/[A-Z]/.test(formData.password) || !/\d/.test(formData.password)) {
-      setError("Password must be at least 6 characters and include an uppercase letter and a number");
-      setIsLoading(false);
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
-      return;
-    }
-
-    if (formData.mobileNumber.length !== 10) {
-      setError("Mobile number must be 10 digits");
-      setIsLoading(false);
-      return;
-    }
-
-    if (formData.referralCode != "" && !isValidReferralCode) {
+    // Everything zod could check statically (password rules, match,
+    // 10-digit mobile, plan selected) has already passed by the time
+    // react-hook-form calls this. The one thing that still needs a
+    // manual guard is referral-code *validity*, since that's an async
+    // backend check tied to the separate "Validate" button, not
+    // something a sync schema can express.
+    if (formData.referralCode && !isValidReferralCode) {
       setError("Invalid Referral Code, Please Re-Validate and Try Again");
       setIsLoading(false);
       return;
     }
 
-    if (!formData.selectedPlan) {
-      setError("Please select a subscription plan");
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      /* const autoId = generateAutoUserId();
-      const easyId = generateEasyUserId(formData.name, formData.mobileNumber, formData.fullAddress);
-      const userReferralCode = generateReferralCode(formData.name, autoId); */
-
       const selectedPlanData = plans.find(plan => plan.id === formData.selectedPlan);
       const planDurationMonths = parseInt(formData.selectedPlan.replace('months', ''));
-      
+
       const newUser: User = {
-        // id: autoId,
-        // easyId: easyId,
         name: formData.name,
         fullAddress: formData.fullAddress,
         mobileNumber: formData.mobileNumber,
-        // designation: formData.designation,
         email: formData.email,
         password: formData.password,
         createdAt: new Date().toISOString(),
-        // referralCode: userReferralCode,
+        isActive: true,
         referredBy: formData.referralCode || undefined,
         subscription: selectedPlanData ? {
           planId: selectedPlanData.id,
@@ -159,7 +140,6 @@ const SignUp = () => {
         profileImage: ""
       };
 
-      // const success = saveUser(newUser);
       const success = await createUser(newUser);
 
       if (success) {
@@ -211,8 +191,9 @@ const SignUp = () => {
       } else {
         setError(t('userExists'));
       }
-    } catch (err) {
-      setError(err.response.data.message || "Failed to create account. Please try again.");
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      setError(message || "Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -274,34 +255,34 @@ const SignUp = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">{t('name')} <span className="text-[#ff0000]">*</span></Label>
                   <Input
                     id="name"
-                    name="name"
                     type="text"
                     placeholder={t('name')}
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
+                    {...register("name")}
                   />
+                  {errors.name && (
+                    <p className="text-xs text-destructive">{errors.name.message}</p>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="mobileNumber">{t('mobileNumber')} <span className="text-[#ff0000]">*</span></Label>
                   <Input
                     id="mobileNumber"
-                    name="mobileNumber"
                     type="tel"
                     placeholder="10-digit mobile number"
-                    value={formData.mobileNumber}
-                    onChange={handleInputChange}
                     pattern="[0-9]{10}"
                     maxLength={10}
-                    required
+                    {...register("mobileNumber")}
                   />
+                  {errors.mobileNumber && (
+                    <p className="text-xs text-destructive">{errors.mobileNumber.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -309,42 +290,27 @@ const SignUp = () => {
                 <Label htmlFor="fullAddress">{t('fullAddress')} <span className="text-[#ff0000]">*</span></Label>
                 <Input
                   id="fullAddress"
-                  name="fullAddress"
                   type="text"
                   placeholder={t('fullAddress')}
-                  value={formData.fullAddress}
-                  onChange={handleInputChange}
-                  required
+                  {...register("fullAddress")}
                 />
+                {errors.fullAddress && (
+                  <p className="text-xs text-destructive">{errors.fullAddress.message}</p>
+                )}
               </div>
 
-              {/* <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="designation">{t('designation')} <span className="text-[#ff0000]">*</span></Label>
-                  <Input
-                    id="designation"
-                    name="designation"
-                    type="text"
-                    placeholder={t('designation')}
-                    value={formData.designation}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div> */}
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">{t('email')} <span className="text-[#ff0000]">*</span></Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder={t('email')}
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-              {/* </div> */}
+              <div className="space-y-2">
+                <Label htmlFor="email">{t('email')} <span className="text-[#ff0000]">*</span></Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder={t('email')}
+                  {...register("email")}
+                />
+                {errors.email && (
+                  <p className="text-xs text-destructive">{errors.email.message}</p>
+                )}
+              </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -352,18 +318,18 @@ const SignUp = () => {
                   <div className="relative">
                     <Input
                       id="password"
-                      name="password"
                       type={showNew ? "text" : "password"}
                       placeholder={t('password')}
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      required
+                      {...register("password")}
                     />
                     <button type="button" onClick={() => setShowNew(!showNew)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
+                  {errors.password && (
+                    <p className="text-xs text-destructive">{errors.password.message}</p>
+                  )}
                   {/* Strength bar */}
                   <div className="h-1 rounded-full bg-muted overflow-hidden">
                     <div className={`h-full rounded-full transition-all ${strengthColor}`}
@@ -392,47 +358,53 @@ const SignUp = () => {
                   <div className="relative">
                     <Input
                       id="confirmPassword"
-                      name="confirmPassword"
                       type={showConfirm ? "text" : "password"}
                       placeholder={t('confirmPassword')}
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      required
+                      {...register("confirmPassword")}
                     />
                     <button type="button" onClick={() => setShowConfirm(!showConfirm)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
+                  {errors.confirmPassword && (
+                    <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
+                  )}
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="selectedPlan">{t('SelectSubscriptionPlan')} <span className="text-[#ff0000]">*</span></Label>
-                  <Select 
-                    value={formData.selectedPlan} 
-                    onValueChange={(value) => setFormData({ ...formData, selectedPlan: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('SelectSubscriptionPlan')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {plans.map((plan) => (
-                        <SelectItem key={plan.id} value={plan.id}>
-                          <div className="flex items-center justify-between w-full">
-                            <span>{plan.name}</span>
-                            <div className="flex items-center gap-2 ml-4">
-                              <Badge variant="outline">₹{plan.price}</Badge>
-                              {plan.originalPrice && (
-                                <span className="text-xs text-muted-foreground line-through">₹{plan.originalPrice}</span>
-                              )}
-                            </div>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="selectedPlan"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger id="selectedPlan">
+                          <SelectValue placeholder={t('SelectSubscriptionPlan')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {plans.map((plan) => (
+                            <SelectItem key={plan.id} value={plan.id}>
+                              <div className="flex items-center justify-between w-full">
+                                <span>{plan.name}</span>
+                                <div className="flex items-center gap-2 ml-4">
+                                  <Badge variant="outline">₹{plan.price}</Badge>
+                                  {plan.originalPrice && (
+                                    <span className="text-xs text-muted-foreground line-through">₹{plan.originalPrice}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.selectedPlan && (
+                    <p className="text-xs text-destructive">{errors.selectedPlan.message}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -440,25 +412,25 @@ const SignUp = () => {
                   <div className="flex gap-2">
                     <Input
                       id="referralCode"
-                      name="referralCode"
                       type="text"
                       placeholder={t('ReferralCode') + ' (' + t('Optional') + ')'}
-                      value={formData.referralCode}
-                      onChange={(e) => {
-                        const value = e.target.value.toUpperCase();
-                        setFormData({ ...formData, referralCode: value });
-                        setIsValidReferralCode(false);
-                      }}
                       className="flex-1"
                       maxLength={7}
                       disabled={isValidReferralCode}
+                      {...register("referralCode", {
+                        onChange: (e) => {
+                          e.target.value = e.target.value.toUpperCase();
+                          setIsValidReferralCode(false);
+                        },
+                      })}
                     />
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={async () => {
-                        const isValid = await checkReferralCode(formData.referralCode);
+                        const code = getValues("referralCode") || "";
+                        const isValid = await checkReferralCode(code);
                         setIsValidReferralCode(isValid);
 
                         if (isValid) {
@@ -478,7 +450,7 @@ const SignUp = () => {
                           });
                         }
                       }}
-                      disabled={!formData.referralCode || isValidReferralCode}
+                      disabled={!referralCodeValue || isValidReferralCode}
                       className={`whitespace-nowrap transition-colors ${
                         isValidReferralCode
                           ? "bg-green-100 text-green-700 border-green-500 hover:bg-green-100"
@@ -495,7 +467,10 @@ const SignUp = () => {
                       )}
                     </Button>
                   </div>
-                  {formData.referralCode && !isValidReferralCode && (
+                  {errors.referralCode && (
+                    <p className="text-xs text-destructive">{errors.referralCode.message}</p>
+                  )}
+                  {referralCodeValue && !isValidReferralCode && (
                     <p className="text-xs text-muted-foreground">
                       Click 'Validate' to check your referral code
                     </p>
@@ -504,7 +479,7 @@ const SignUp = () => {
               </div>
 
               <div className="grid lg:grid-cols-2 gap-4">
-                {formData.selectedPlan && formData.selectedPlan !== '1month-free' && (
+                {selectedPlanId && selectedPlanId !== '1month-free' && (
                   <div className="lg:col-span-2">
                     <Card className="bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20 shadow-lg">
                       <CardHeader className="pb-3">
@@ -530,7 +505,7 @@ const SignUp = () => {
                           </div>
                         </div>
 
-                        {!isValidReferralCode && !formData.referralCode && (
+                        {!isValidReferralCode && !referralCodeValue && (
                           <div className="bg-accent/90 border border-accent/60 rounded-lg p-3">
                             <p className="text-sm text-foreground/80 flex items-center gap-2">
                               💡 <span><strong>Pro Tip:</strong> Enter a valid referral code to get an instant ₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} discount!</span>
@@ -538,14 +513,14 @@ const SignUp = () => {
                           </div>
                         )}
 
-                        {isValidReferralCode && formData.referralCode && (
+                        {isValidReferralCode && referralCodeValue && (
                           <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
                             <div className="flex justify-between items-center mb-2">
                               <span className="text-sm font-medium text-green-800 dark:text-green-300">Referral Discount:</span>
                               <span className="font-semibold text-green-800 dark:text-green-300">-₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT}</span>
                             </div>
                             <p className="text-xs text-green-700 dark:text-green-400 flex items-center gap-1">
-                              🎉 <span>Congratulations! You've received ₹100 discount with referral code: <strong>{formData.referralCode}</strong></span>
+                              🎉 <span>Congratulations! You've received ₹100 discount with referral code: <strong>{referralCodeValue}</strong></span>
                             </p>
                             {(() => {
                               const pendingReferral = JSON.parse(localStorage.getItem('pendingReferral') || '{}');
@@ -563,7 +538,7 @@ const SignUp = () => {
                             <span className="text-lg font-semibold">Total Amount:</span>
                             <span className="text-2xl font-bold text-primary">₹{calculateFinalPrice()}</span>
                           </div>
-                          {isValidReferralCode && formData.referralCode && (
+                          {isValidReferralCode && referralCodeValue && (
                             <div className="text-xs text-muted-foreground mt-1 text-right">
                               You saved ₹100!
                             </div>
@@ -574,19 +549,6 @@ const SignUp = () => {
                   </div>
                 )}
               </div>
-
-              {/* Preview Generated IDs */}
-              {/* {generatedIds && (
-                <Card className="bg-accent/50">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm text-form-subheader">Generated User IDs (Preview)</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-xs space-y-1">
-                    <p><strong>{t('autoGeneratedId')}:</strong> {generatedIds.autoId}</p>
-                    <p><strong>{t('easyRememberId')}:</strong> {generatedIds.easyId}</p>
-                  </CardContent>
-                </Card>
-              )} */}
 
               <div
                 className={`rounded-lg border p-3 text-sm ${
@@ -616,7 +578,7 @@ const SignUp = () => {
               )}
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? t('loading') : formData.selectedPlan !== '1month-free' && formData.selectedPlan.trim() != ''  ? t('makePaymentCreateAccount') : t('createAccount')}
+                {isLoading ? t('loading') : selectedPlanId !== '1month-free' && selectedPlanId?.trim() !== ''  ? t('makePaymentCreateAccount') : t('createAccount')}
               </Button>
             </form>
 
@@ -628,7 +590,7 @@ const SignUp = () => {
                 </Link>
               </p>
               <p className="text-sm text-muted-foreground">
-                {/* {t('dontHaveAccount')}{" "} */}Explore &nbsp;  
+                Explore &nbsp;  
                 <Link to="/our-plans" className="text-primary hover:underline">
                   Our Plans
                 </Link>

@@ -164,11 +164,35 @@ const LicInfoHub: React.FC = () => {
     data.LIC_Abbreviations.length + data.LIC_Internal_Codes.length +
     data.Private_Insurers.length + data.Common_Policy_Terms.length;
 
+  // This page is a searchable glossary (term → full form → definition),
+  // not Q&A content, so FAQPage schema would misrepresent it to Google
+  // (and risks a structured-data manual action for content-mismatch).
+  // DefinedTermSet/DefinedTerm is schema.org's purpose-built type for
+  // exactly this shape — a curated list of terms with definitions.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "DefinedTermSet",
+    name: "LIC Info Hub — Insurance Abbreviations & Terms Glossary",
+    description: "Glossary of LIC abbreviations, internal codes, private insurer names, and common life-insurance policy terms.",
+    hasDefinedTerm: [
+      ...data.LIC_Abbreviations,
+      ...data.LIC_Internal_Codes,
+      ...data.Private_Insurers,
+      ...data.Common_Policy_Terms,
+    ].map(item => ({
+      "@type": "DefinedTerm",
+      name: item.abbreviation,
+      alternateName: item.full_form !== "—" ? item.full_form : undefined,
+      description: item.description || undefined,
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
       <SEO
         title="LIC Info Hub — Insurance Abbreviations & Terms Explained"
         description="Look up LIC abbreviations, internal codes, private insurer names, and common policy terms — a searchable glossary built for life insurance agents."
+        jsonLd={jsonLd}
       />
       <Navigation />
 

@@ -8,6 +8,8 @@ interface SEOProps {
   description: string;
   /** Absolute image URL for og:image/twitter:image. Defaults to the site logo. */
   image?: string;
+  /** Optional schema.org structured data, rendered as a JSON-LD <script> tag. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const DEFAULT_IMAGE = `${siteConfig.productionUrl}${siteConfig.logo_medium_size}`;
@@ -16,7 +18,7 @@ const DEFAULT_IMAGE = `${siteConfig.productionUrl}${siteConfig.logo_medium_size}
  * Sets the browser-tab title and social/search meta tags for a single page.
  * Drop one <SEO .../> near the top of any page component's JSX.
  */
-const SEO = ({ title, description, image }: SEOProps) => {
+const SEO = ({ title, description, image, jsonLd }: SEOProps) => {
   const fullTitle = `${title} | ${siteConfig.title}`;
   const resolvedImage = image ?? DEFAULT_IMAGE;
 
@@ -32,6 +34,12 @@ const SEO = ({ title, description, image }: SEOProps) => {
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={resolvedImage} />
+
+      {jsonLd && (
+        <script type="application/ld+json">
+          {JSON.stringify(jsonLd)}
+        </script>
+      )}
     </Helmet>
   );
 };

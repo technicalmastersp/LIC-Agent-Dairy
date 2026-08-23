@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -66,8 +67,6 @@ const ViewRecords = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<Record | null>(null);
-  const [records, setRecords] = useState<Record[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Mirrors the backend: an expired/cancelled plan still gets full read access
   // to this list (requireSubscriptionForViewing), but add/edit/delete stay
@@ -76,22 +75,20 @@ const ViewRecords = () => {
   const subStatus = currentUser?.subscription?.status;
   const isReadOnly = subStatus === "expired" || subStatus === "cancelled";
 
-  const fetchRecords = async () => {
-    try {
-      setIsLoading(true);
-      const userRecords = await getAllRecords();
-      setRecords(dedupeRecords(userRecords ?? []));
-    } catch (error) {
-      console.error(error);
-      setRecords([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetchRecords();
-  }, []);
+  const {
+    data: records = [],
+    isLoading,
+  } = useQuery<Record[]>({
+    queryKey: ["records"],
+    queryFn: getAllRecords,
+    // The dedupe step is pure post-processing of whatever the API returns —
+    // `select` keeps the cached data itself as the API shape, and only
+    // transforms it for this component, same as the old
+    // setRecords(dedupeRecords(...)) did.
+    select: (data) => dedupeRecords(data ?? []),
+  });
 
   const filteredAndSortedRecords = useMemo(() => {
     if (!records || records.length === 0) return [];
@@ -207,7 +204,7 @@ const ViewRecords = () => {
   const handleDeleteRecord = async (recordId: string) => {
     const success = await deleteRecord(recordId);
     if (success) {
-      setRecords(dedupeRecords(await getAllRecords()));
+      queryClient.invalidateQueries({ queryKey: ["records"] });
       toast({
         title: "Success",
         description: "Record deleted successfully",
@@ -229,7 +226,7 @@ const ViewRecords = () => {
   };
 
   const handleUpdateRecord = async () => {
-    await fetchRecords();
+    queryClient.invalidateQueries({ queryKey: ["records"] });
   };
 
   const SortableHeader = ({ field, children }: { field: keyof Record; children: React.ReactNode }) => (
@@ -546,7 +543,7 @@ const ViewRecords = () => {
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false);
-          fetchRecords();
+          queryClient.invalidateQueries({ queryKey: ["records"] });
         }}
         onUpdate={handleUpdateRecord}
       />

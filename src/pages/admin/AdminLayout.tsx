@@ -131,7 +131,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   // Filter nav based on role AND live permissions
   const visibleNav = NAV.filter((n) => {
-    if (!n.roles.includes(role)) return false;
+    if (!n.roles.includes(role ?? "user")) return false;
     if (role === "superadmin") return true;          // superadmin sees everything
     if (!n.permission) return true;                  // no permission required
     return permissions?.[n.permission] === true;     // check live permission

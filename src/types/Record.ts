@@ -1,3 +1,13 @@
+import type { CustomFieldValue } from "@/config/insuranceTypes";
+
+interface FamilyMember {
+  relationship: string;
+  currentAge: string;
+  health: string;
+  deathAge: string;
+  reason: string;
+}
+
 export interface Record {
   id: string;
   _id?: string;
@@ -31,6 +41,7 @@ export interface Record {
   bankName: string;
   branchName: string;
   recordId?: string;
+  familyMembers?: FamilyMember[];
 
   currentPolicy : {
     policyNumber: string;
@@ -54,5 +65,5 @@ export interface Record {
   insuranceType?: string;
   customInsuranceTypeName?: string;
   typeSpecificData?: globalThis.Record<string, string>;
-  customFields?: { key: string; label: string; fieldType: string; options?: string[]; value: string }[];
+  customFields?: CustomFieldValue[];
 }

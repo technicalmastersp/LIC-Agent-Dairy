@@ -17,9 +17,13 @@ describe("convertDateToIndianFormat", () => {
   });
 
   it("returns an empty string for an undefined input", () => {
-    // @ts-expect-error - exercising the runtime guard for a caller that
-    // skips the type system (e.g. an untyped .js call site).
-    expect(convertDateToIndianFormat(undefined)).toBe("");
+    // Exercises the runtime guard for a caller that skips the type system
+    // (e.g. an untyped .js call site). Cast through `unknown` here rather
+    // than suppressing a compiler error inline, since whether this line
+    // actually type-errors depends on strictNullChecks — which varies as
+    // that setting gets incrementally turned on across the codebase — and
+    // an unused suppression directive is itself flagged as an error.
+    expect(convertDateToIndianFormat(undefined as unknown as string)).toBe("");
   });
 
   it("returns an empty string for an unparseable date string", () => {
