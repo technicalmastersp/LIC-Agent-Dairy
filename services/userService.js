@@ -1,5 +1,4 @@
 import apiClient from '../api/apiClient';
-import { setToken, clearToken } from '../utils/localStorageHelper';
 
 export const createUser = async (userData) => {
   const res = await apiClient.post('/auth/register', userData);
@@ -22,7 +21,9 @@ export const login = async (credentials) => {
   // console.log('login responce : ', res.data);
   
   if(res.data.status !== 'error') {
-    setToken(res.data.token)
+    // No setToken() anymore — the backend's Set-Cookie header on this same
+    // response already put the httpOnly auth cookie in place; there's
+    // nothing left for the client to store.
     localStorage.removeItem('userName')
     return res.data;
   } else {
@@ -51,11 +52,19 @@ export const removeProfileImage = async () => {
   return res.data;
 };
 
-export const logoutCurrentUser = () => {
+export const logoutCurrentUser = async () => {
   const user = JSON.parse(localStorage.getItem('currentUser'))
-  localStorage.setItem('userName', user.name)
+  if (user?.name) localStorage.setItem('userName', user.name)
   localStorage.removeItem('currentUser');
-  clearToken()
+  // No clearToken() anymore — there's no client-readable token to clear.
+  // The httpOnly cookie can only be removed by the server, hence this call.
+  try {
+    await apiClient.post('/auth/logout');
+  } catch {
+    // Best-effort — if this fails the cookie just sits until its own
+    // expiry. Either way the local session state above is already
+    // cleared, so the app treats the user as logged out regardless.
+  }
 };
 
 export const forgotPassword = async (data) => {

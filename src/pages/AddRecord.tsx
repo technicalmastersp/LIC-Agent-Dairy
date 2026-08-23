@@ -25,7 +25,7 @@ import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
 import {
   isOtherInsuranceType, emptyTypeSpecificData, type CustomFieldValue,
 } from "@/config/insuranceTypes";
-import { policyRecordSchema, type PolicyRecordFormValues } from "@/schemas/policyRecordSchema.js";
+import { policyRecordSchema, type PolicyRecordFormValues } from "@/schemas/policyRecordSchema";
 
 interface FamilyMember {
   relationship: string;

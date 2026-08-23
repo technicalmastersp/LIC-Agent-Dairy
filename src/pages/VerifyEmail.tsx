@@ -33,7 +33,7 @@ const VerifyEmail = () => {
         } else {
           setVerifyStatus("invalid");
           setEmail(getCurrentUser()?.email || ""); // prefill email if we have user info
-          logoutCurrentUser();
+          await logoutCurrentUser();
           return;
         }
 
@@ -41,11 +41,11 @@ const VerifyEmail = () => {
         const result = await verifyEmail(tokenToUse);
         setVerifyStatus(result.status as VerifyStatus);
 
-        logoutCurrentUser(); // Clear any existing session after verification attempt
+        await logoutCurrentUser(); // Clear any existing session after verification attempt
       } catch (error) {
         console.error(error);
         setVerifyStatus("invalid");
-        logoutCurrentUser();
+        await logoutCurrentUser();
       }
     };
 
@@ -60,7 +60,7 @@ const VerifyEmail = () => {
     setResendMsg(result.resendMsg);
     setResending(result.isResendng); // false after call
     setVerifyStatus("resendedMail");
-    logoutCurrentUser(); // Clear session to ensure user goes through login flow again
+    await logoutCurrentUser(); // Clear session to ensure user goes through login flow again
   };
 
   const states: Record<VerifyStatus, { icon: JSX.Element; bg: string; title: string; desc: string }> = {
