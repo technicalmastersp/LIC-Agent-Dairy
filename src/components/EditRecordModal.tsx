@@ -10,6 +10,7 @@ import { getCurrentUser } from "@/utils/auth";
 import {
   Save, Plus, Trash2, User, X,
   IdCard, Users, HeartPulse, ShieldCheck, History,
+  LucideIcon
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { updateRecord } from "../../services/recordService";
@@ -95,7 +96,7 @@ interface EditRecordModalProps {
   onUpdate: () => void;
 }
 
-const SectionTitle = ({ icon: Icon, children }: { icon: any; children: React.ReactNode }) => (
+const SectionTitle = ({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNode }) => (
   <CardTitle className="text-form-header text-lg flex items-center gap-2.5">
     <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
       <Icon className="w-3.5 h-3.5 text-primary" />
@@ -365,11 +366,13 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
             <User className="w-5 h-5" />
             Edit Record — {record.name}
           </DialogTitle>
-          <DialogDescription>
-            <p>Update invoice details and save changes.</p>
-            <p>* Please ensure all required fields are filled out correctly before saving.</p>
-            <p>* Changes will be reflected immediately in the record list after saving.</p>
-            <p>* Date fields should be in the format MM/DD/YYYY. For example, 03/26/2001.</p>
+          <DialogDescription asChild>
+            <div>
+              <p>Update invoice details and save changes.</p>
+              <p>* Please ensure all required fields are filled out correctly before saving.</p>
+              <p>* Changes will be reflected immediately in the record list after saving.</p>
+              <p>* Date fields should be in the format MM/DD/YYYY. For example, 03/26/2001.</p>
+            </div>
           </DialogDescription>
         </DialogHeader>
         

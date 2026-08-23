@@ -24,7 +24,10 @@
     --secondary-foreground: 220 20% 15%;
 
     --muted: 210 20% 96%;
-    --muted-foreground: 220 15% 55%;
+    /* Darkened from 55% -> 40% lightness so text-muted-foreground clears
+       WCAG AA's 4.5:1 contrast ratio against --background (was ~3.6:1,
+       now ~6.2:1) — same hue/saturation, just less washed out. */
+    --muted-foreground: 220 15% 40%;
 
     --accent: 195 75% 92%;
     --accent-foreground: 195 85% 25%;

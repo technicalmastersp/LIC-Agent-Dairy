@@ -15,6 +15,7 @@ import { getProfile } from "../../services/userService";
 import { getReferralDashboard } from "../../services/referralService";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
 import { Link } from "lucide-react";
+import SEO from "@/components/SEO";
 
 interface Plan {
   id: string;
@@ -172,16 +173,23 @@ const OurPlans = () => {
 
       toast({ title: "Payment Successful", description: "Your plan has been activated." });
       navigate("/");
-    } catch (err: any) {
-      if (err.message === "PAYMENT_CANCELLED") {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message === "PAYMENT_CANCELLED") {
         toast({ title: "Payment Cancelled", description: "You can try again anytime." });
         return;
       }
-      if (err.message === "PAYMENT_FAILED") {
+      if (err instanceof Error && err.message === "PAYMENT_FAILED") {
         toast({ title: "Payment Failed", description: "Your payment could not be completed. Please try again.", variant: "destructive" });
         return;
       }
-      toast({ title: "Error", description: err.response?.data?.message || "Something went wrong.", variant: "destructive" });
+      const errorResponse = err as {
+        response?: {
+          data?: {
+            message?: string;
+          };
+        };
+      };
+      toast({ title: "Error", description: errorResponse.response?.data?.message || "Something went wrong.", variant: "destructive" });
     }
   };
 
@@ -212,6 +220,10 @@ const OurPlans = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Subscription Plans & Pricing"
+        description="Compare Life Insurance Records subscription plans — from a free 1-month trial to 24-month options — and pick the right fit for how many client records you manage."
+      />
       <Navigation />
 
       {reason === "expired" && (

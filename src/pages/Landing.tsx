@@ -13,6 +13,7 @@ import {
   TrendingUp, CircleDot, Bell, Languages,
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
+import SEO from "@/components/SEO";
 
 const plans = [
   { id: "1month-free", name: "1 Month", price: "Free", tag: "Try it out", color: "bg-gray-50 border-gray-200", accent: "text-gray-600" },
@@ -33,6 +34,10 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Life Insurance Policy Record Management for Agents"
+        description="Track every client's policy, due date, and payment status in one place. Add records in seconds, search instantly, and never miss a renewal — built for LIC and life insurance agents."
+      />
 
       <Navigation />
 
@@ -241,7 +246,7 @@ const Landing = () => {
                 {/* Referral wallet */}
                 <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
                   <div className="mb-4 bg-emerald-50 rounded-xl p-4">
-                    <p className="text-[10px] text-emerald-700/70 mb-1">Available balance</p>
+                    <p className="text-[10px] text-emerald-700 mb-1">Available balance</p>
                     <p className="text-lg font-bold text-emerald-700">₹4,250</p>
                   </div>
                   <Wallet className="w-5 h-5 text-primary mb-2" />

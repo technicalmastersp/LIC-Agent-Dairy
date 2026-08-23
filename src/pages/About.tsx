@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
 import {
   ShieldCheck,
   FileText,
@@ -89,6 +90,10 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="About Us"
+        description="Learn who builds Life Insurance Records, why we built a dedicated record-keeping tool for LIC and life insurance agents, and how we keep client data secure."
+      />
       <Navigation />
 
       <main className="flex-1">

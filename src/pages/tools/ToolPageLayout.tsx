@@ -3,6 +3,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
+import SEO from "@/components/SEO";
 
 interface ToolPageLayoutProps {
   icon: React.ElementType;
@@ -17,6 +18,11 @@ const ToolPageLayout = ({ icon: Icon, title, description, children, accent }: To
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Every tool page already passes a distinct title/description for its
+          on-page heading — reused here as the SEO title/meta description too,
+          so each calculator gets genuinely different search/social copy
+          without duplicating it in every individual page file. */}
+      <SEO title={title} description={description} />
       <Navigation />
       <main className="flex-1">
         <section className="relative bg-gradient-to-b from-primary/5 via-background to-background overflow-hidden">

@@ -1,6 +1,7 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
 import {
   Cake, TrendingUp, Receipt, Home, ShieldCheck, LineChart, ArrowRight,
 } from "lucide-react";
@@ -17,6 +18,10 @@ const TOOLS = [
 const ToolsHub = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Free Financial Calculators"
+        description="Free calculators for age, SIP returns, income tax, home loan EMI, term insurance cover, and inflation — quick tools for agents and clients alike."
+      />
       <Navigation />
       <main className="flex-1">
         <section className="relative bg-gradient-to-b from-primary/5 via-background to-background overflow-hidden">
