@@ -2,6 +2,19 @@
 import { processReferral } from "./referral";
 import { clearToken } from '../../utils/localStorageHelper.js'
 
+export interface PaymentDetails {
+  upiId?: string;
+  upiVerified?: boolean;
+  upiRejectionReason?: string;
+  accountNumber?: string;
+  ifscCode?: string;
+  accountHolder?: string;
+  bankName?: string;
+  branchName?: string;
+  bankVerified?: boolean;
+  updatedAt?: string;
+}
+
 export interface User {
   profileImage: string;
   id?: string;
@@ -20,6 +33,9 @@ export interface User {
   isEmailVerified?: boolean;
   emailVerificationToken?: string;
   role?: 'user' | 'admin' | 'superadmin';
+  isActive: boolean;
+  permissions?: Record<string, boolean>;
+  paymentDetails?: PaymentDetails | null;
 }
 
 export interface UserSubscription {
@@ -37,44 +53,6 @@ export interface LoginCredentials {
   password: string;
 }
 
-// Generate auto User ID
-/* export const generateAutoUserId = (): string => {
-  const timestamp = Date.now().toString().slice(-6);
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-  return `UID${timestamp}${random}`;
-};
-
-// Generate easy-to-remember User ID
-export const generateEasyUserId = (name: string, mobile: string, address: string): string => {
-  const nameClean = name.toLowerCase().replace(/[^a-z]/g, '').slice(0, 6);
-  const mobileEnd = mobile.slice(-3);
-  const addressClean = address.toLowerCase().replace(/[^a-z]/g, '').slice(0, 5);
-  return `${nameClean}${mobileEnd}${addressClean}`;
-};
-
-// Save user to customers-list
-export const saveUser = (user: User): boolean => {
-  try {
-    const customersList = getCustomersList();
-    
-    // Check if email or mobile already exists
-    const existingUser = customersList.find(u => 
-      u.email === user.email || u.mobileNumber === user.mobileNumber
-    );
-    
-    if (existingUser) {
-      return false; // User already exists
-    }
-    
-    customersList.push(user);
-    localStorage.setItem('customers-list', JSON.stringify(customersList));
-    return true;
-  } catch (error) {
-    console.error('Error saving user:', error);
-    return false;
-  }
-}; */
-
 // Get all customers
 export const getCustomersList = (): User[] => {
   try {
@@ -85,21 +63,6 @@ export const getCustomersList = (): User[] => {
     return [];
   }
 };
-
-/* // Validate login credentials
-export const validateLogin = (credentials: LoginCredentials): User | null => {
-  try {
-    const customersList = getCustomersList();
-    const user = customersList.find(u => 
-      (u.id === credentials.userId || u.easyId === credentials.userId) && 
-      u.password === credentials.password
-    );
-    return user || null;
-  } catch (error) {
-    console.error('Error validating login:', error);
-    return null;
-  }
-}; */
 
 // Set current user session
 export const setCurrentUser = (user: User): void => {
@@ -117,106 +80,10 @@ export const getCurrentUser = (): User | null => {
   }
 };
 
-/* // Logout user
-export const logoutCurrentUser = (): void => {
-  const user = JSON.parse(localStorage.getItem('currentUser'))
-  localStorage.setItem('userName', user.name)
-  localStorage.removeItem('currentUser');
-  clearToken()
-  window.location.href = '/login'; // Redirect to login page
-}; */
-
 // Check if user is authenticated
 export const isAuthenticated = (): boolean => {
   return getCurrentUser() !== null;
 };
-
-/* // Initialize test user credentials
-export const initializeTestUser = (): void => {
-  const testUser: User = {
-    id: 'UID123456',
-    easyId: 'test123demo',
-    name: 'Test User',
-    fullAddress: '123 Demo Street, Test City, Demo State - 123456',
-    mobileNumber: '9876543210',
-    // designation: 'Software Developer',
-    email: 'test@demo.com',
-    password: 'test123',
-    createdAt: new Date().toISOString()
-  };
-
-  const customersList = getCustomersList();
-  const existingTest = customersList.find(u => u.id === testUser.id);
-  
-  if (!existingTest) {
-    customersList.push(testUser);
-    localStorage.setItem('customers-list', JSON.stringify(customersList));
-  }
-}; */
-
-/* // Save user records to dedicated folder simulation
-export const saveUserRecord = async (userId?: string, record?: any) => {
-  try {
-    const res = await apiClient.post('/user/createNewRecord', record);
-    // const userRecordsKey = `customers-record-lists-${userId}`;
-    // const existingRecords = JSON.parse(localStorage.getItem(userRecordsKey) || '[]');
-    
-    // const recordWithId = {
-    //   ...record,
-    //   id: Date.now().toString(),
-    //   userId: userId,
-    //   createdAt: new Date().toISOString()
-    // };
-    
-    // existingRecords.push(recordWithId);
-    // localStorage.setItem(userRecordsKey, JSON.stringify(existingRecords));
-    return true;
-  } catch (error) {
-    console.error('Error saving user record:', error);
-    return false;
-  }
-}; */
-
-// Get user records
-/* export const getUserRecords = async (page?: any, limit?: any) => {
-  try {
-    const res = await apiClient.post('/user/getAllPolicyRecords', {page: "all", limit: "all"});
-    return res.data.records;
-  } catch (error) {
-    console.error('Error loading user records:', error);
-    return [];
-  }
-}; */
-
-/* // Delete user record
-export const deleteUserRecord = (userId: string, recordId: string): boolean => {
-  try {
-    const userRecordsKey = `customers-record-lists-${userId}`;
-    const existingRecords = JSON.parse(localStorage.getItem(userRecordsKey) || '[]');
-    const filteredRecords = existingRecords.filter((record: any) => record.id !== recordId);
-    localStorage.setItem(userRecordsKey, JSON.stringify(filteredRecords));
-    return true;
-  } catch (error) {
-    console.error('Error deleting user record:', error);
-    return false;
-  }
-}; */
-
-// Update user record
-/* export const updateUserRecord = (userId: string, recordId: string, updatedData: any): boolean => {
-  try {
-    const userRecordsKey = `customers-record-lists-${userId}`;
-    const existingRecords = JSON.parse(localStorage.getItem(userRecordsKey) || '[]');
-    const updatedRecords = existingRecords.map((record: any) => 
-      record.id === recordId ? { ...record, ...updatedData } : record
-    );
-    localStorage.setItem(userRecordsKey, JSON.stringify(updatedRecords));
-    return true;
-  } catch (error) {
-    console.error('Error updating user record:', error);
-    return false;
-  }
-}; */
 
 // Update user subscription
 export const updateUserSubscription = (userId: string, subscription: UserSubscription): boolean => {

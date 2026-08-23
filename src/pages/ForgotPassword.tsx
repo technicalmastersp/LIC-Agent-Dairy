@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +11,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock, Mail, ShieldCheck, Eye, EyeOff, CheckCircle2, Circle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { forgotPassword, verifyOTP, resetPassword } from "../../services/userService";
+import {
+  forgotPasswordEmailSchema, type ForgotPasswordEmailValues,
+  resetPasswordSchema, type ResetPasswordValues,
+} from "@/schemas/forgotPasswordSchema";
 
 type Step = "email" | "otp" | "password" | "success";
 
@@ -18,8 +25,6 @@ const ForgotPassword = () => {
   const [step, setStep]           = useState<Step>("email");
   const [email, setEmail]         = useState("");
   const [otp, setOtp]             = useState(["", "", "", "", "", ""]);
-  const [newPassword, setNew]     = useState("");
-  const [confirmPass, setConfirm] = useState("");
   const [showNew, setShowNew]     = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError]         = useState("");
@@ -27,6 +32,18 @@ const ForgotPassword = () => {
   const [timer, setTimer]         = useState(30);
   const [canResend, setCanResend] = useState(false);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const emailForm = useForm<ForgotPasswordEmailValues>({
+    resolver: zodResolver(forgotPasswordEmailSchema),
+    defaultValues: { email: "" },
+  });
+
+  const passwordForm = useForm<ResetPasswordValues>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: { newPassword: "", confirmPassword: "" },
+  });
+  const newPassword = passwordForm.watch("newPassword");
+  const confirmPass = passwordForm.watch("confirmPassword");
 
   // Countdown timer
   useEffect(() => {
@@ -63,12 +80,25 @@ const ForgotPassword = () => {
 
   const strengthColor = ["", "bg-red-400", "bg-yellow-400", "bg-green-500"][strength.score];
 
-  const handleSendOTP = async () => {
-    if (!email || !email.includes("@")) { setError("Please enter a valid email address."); return; }
+  const handleSendOTP = async (data: ForgotPasswordEmailValues) => {
+    setLoading(true); setError("");
+    try {
+      await forgotPassword({ email: data.email });
+      setEmail(data.email);
+      setStep("otp");
+      setTimeout(() => otpRefs.current[0]?.focus(), 100);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally { setLoading(false); }
+  };
+
+  // "Resend OTP" (step 2) re-sends to the already-captured email — no form
+  // to (re)validate at that point, unlike the initial send in step 1.
+  const handleResendOTP = async () => {
     setLoading(true); setError("");
     try {
       await forgotPassword({ email });
-      setStep("otp");
+      setOtp(["", "", "", "", "", ""]);
       setTimeout(() => otpRefs.current[0]?.focus(), 100);
     } catch {
       setError("Something went wrong. Please try again.");
@@ -89,9 +119,9 @@ const ForgotPassword = () => {
       await verifyOTP({ email, otp: otpValue });
       // ✅ OTP valid — proceed to password step
       setStep("password");
-    } catch (err: any) {
-      const code    = err.response?.data?.code;
-      const message = err.response?.data?.message;
+    } catch (err: unknown) {
+      const code    = axios.isAxiosError(err) ? err.response?.data?.code : undefined;
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
 
       if (code === "OTP_EXPIRED") {
       // Clear boxes and tell user to resend
@@ -111,15 +141,14 @@ const ForgotPassword = () => {
     }
   };
 
-  const handleResetPassword = async () => {
-    if (newPassword.length < 6)    { setError("Password must be at least 6 characters."); return; }
-    if (newPassword !== confirmPass){ setError("Passwords do not match."); return; }
+  const handleResetPassword = async (data: ResetPasswordValues) => {
     setLoading(true); setError("");
     try {
-      await resetPassword({ email, otp: otp.join(""), newPassword });
+      await resetPassword({ email, otp: otp.join(""), newPassword: data.newPassword });
       setStep("success");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Invalid OTP or request expired.");
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      setError(message || "Invalid OTP or request expired.");
     } finally { setLoading(false); }
   };
 
@@ -140,15 +169,19 @@ const ForgotPassword = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email address</Label>
-                  <Input id="email" type="email" placeholder="you@example.com"
-                    value={email} onChange={e => setEmail(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && handleSendOTP()} />
-                </div>
-                <Button className="w-full" onClick={handleSendOTP} disabled={loading}>
-                  {loading ? "Sending…" : "Send OTP"}
-                </Button>
+                <form onSubmit={emailForm.handleSubmit(handleSendOTP)} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email address</Label>
+                    <Input id="email" type="email" placeholder="you@example.com"
+                      {...emailForm.register("email")} />
+                    {emailForm.formState.errors.email && (
+                      <p className="text-xs text-destructive">{emailForm.formState.errors.email.message}</p>
+                    )}
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? "Sending…" : "Send OTP"}
+                  </Button>
+                </form>
                 <div className="text-center">
                   <Link to="/login" className="text-sm text-primary hover:underline">Back to login</Link>
                 </div>
@@ -184,7 +217,7 @@ const ForgotPassword = () => {
                 <p className="text-xs text-center text-muted-foreground">
                   Didn't receive it?{" "}
                   {canResend
-                    ? <button onClick={handleSendOTP} className="text-primary hover:underline">Resend OTP</button>
+                    ? <button onClick={handleResendOTP} className="text-primary hover:underline">Resend OTP</button>
                     : <span>Resend in {timer}s</span>
                   }
                 </p>
@@ -212,56 +245,63 @@ const ForgotPassword = () => {
               <CardContent className="space-y-4">
                 {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
 
-                <div className="space-y-2">
-                  <Label htmlFor="np">New password</Label>
-                  <div className="relative">
-                    <Input id="np" type={showNew ? "text" : "password"} placeholder="Min. 6 characters"
-                      value={newPassword} onChange={e => setNew(e.target.value)} className="pr-10" />
-                    <button type="button" onClick={() => setShowNew(!showNew)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                      {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
+                <form onSubmit={passwordForm.handleSubmit(handleResetPassword)} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="np">New password</Label>
+                    <div className="relative">
+                      <Input id="np" type={showNew ? "text" : "password"} placeholder="Min. 6 characters"
+                        className="pr-10" {...passwordForm.register("newPassword")} />
+                      <button type="button" onClick={() => setShowNew(!showNew)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                        {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {passwordForm.formState.errors.newPassword && (
+                      <p className="text-xs text-destructive">{passwordForm.formState.errors.newPassword.message}</p>
+                    )}
+                    {/* Strength bar */}
+                    <div className="h-1 rounded-full bg-muted overflow-hidden">
+                      <div className={`h-full rounded-full transition-all ${strengthColor}`}
+                        style={{ width: `${(strength.score / 3) * 100}%` }} />
+                    </div>
+                    {/* Requirements */}
+                    <div className="space-y-1 text-xs">
+                      {[
+                        { ok: strength.hasLen,   label: "At least 6 characters" },
+                        { ok: strength.hasUpper, label: "One uppercase letter"  },
+                        { ok: strength.hasNum,   label: "One number"            },
+                      ].map(({ ok, label }) => (
+                        <div key={label} className={`flex items-center gap-1.5 ${ok ? "text-green-600" : "text-muted-foreground"}`}>
+                          {ok ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
+                          {label}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  {/* Strength bar */}
-                  <div className="h-1 rounded-full bg-muted overflow-hidden">
-                    <div className={`h-full rounded-full transition-all ${strengthColor}`}
-                      style={{ width: `${(strength.score / 3) * 100}%` }} />
-                  </div>
-                  {/* Requirements */}
-                  <div className="space-y-1 text-xs">
-                    {[
-                      { ok: strength.hasLen,   label: "At least 6 characters" },
-                      { ok: strength.hasUpper, label: "One uppercase letter"  },
-                      { ok: strength.hasNum,   label: "One number"            },
-                    ].map(({ ok, label }) => (
-                      <div key={label} className={`flex items-center gap-1.5 ${ok ? "text-green-600" : "text-muted-foreground"}`}>
-                        {ok ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
-                        {label}
-                      </div>
-                    ))}
-                  </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="cp">Confirm password</Label>
-                  <div className="relative">
-                    <Input id="cp" type={showConfirm ? "text" : "password"} placeholder="Re-enter password"
-                      value={confirmPass} onChange={e => setConfirm(e.target.value)} className="pr-10" />
-                    <button type="button" onClick={() => setShowConfirm(!showConfirm)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                      {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
+                  <div className="space-y-2">
+                    <Label htmlFor="cp">Confirm password</Label>
+                    <div className="relative">
+                      <Input id="cp" type={showConfirm ? "text" : "password"} placeholder="Re-enter password"
+                        className="pr-10" {...passwordForm.register("confirmPassword")} />
+                      <button type="button" onClick={() => setShowConfirm(!showConfirm)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                        {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {passwordForm.formState.errors.confirmPassword ? (
+                      <p className="text-xs text-destructive">{passwordForm.formState.errors.confirmPassword.message}</p>
+                    ) : confirmPass && (
+                      <p className={`text-xs ${newPassword === confirmPass ? "text-green-600" : "text-red-500"}`}>
+                        {newPassword === confirmPass ? "✓ Passwords match" : "✗ Passwords do not match"}
+                      </p>
+                    )}
                   </div>
-                  {confirmPass && (
-                    <p className={`text-xs ${newPassword === confirmPass ? "text-green-600" : "text-red-500"}`}>
-                      {newPassword === confirmPass ? "✓ Passwords match" : "✗ Passwords do not match"}
-                    </p>
-                  )}
-                </div>
 
-                <Button className="w-full" onClick={handleResetPassword} disabled={loading}>
-                  {loading ? "Resetting…" : "Reset password"}
-                </Button>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? "Resetting…" : "Reset password"}
+                  </Button>
+                </form>
               </CardContent>
             </>
           )}

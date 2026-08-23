@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef }  from "react";
+import axios from "axios";
 import { useNavigate, Link }            from "react-router-dom";
 import Navigation                        from "@/components/Navigation";
 import Footer                            from "@/components/Footer";
 import { useLanguage }                   from "@/hooks/useLanguage";
-import { getCurrentUser, setCurrentUser, isAuthenticated } from "@/utils/auth";
+import { getCurrentUser, setCurrentUser, type User } from "@/utils/auth";
 import { Button }    from "@/components/ui/button";
 import { Input }     from "@/components/ui/input";
 import { Label }     from "@/components/ui/label";
@@ -30,15 +31,22 @@ const roleLabel: Record<string, string> = {
   user:       "Policy agent",
 };
 
+interface ReferralDashboardData {
+  totalL1?: number;
+  totalL2?: number;
+  availableBalance?: number;
+  pendingEarnings?: number;
+  totalEarned?: number;
+}
+
 const Profile = () => {
   const navigate      = useNavigate();
   const { t }         = useLanguage();
   const { toast }     = useToast();
-  const authenticated = isAuthenticated();
   const fileRef       = useRef<HTMLInputElement>(null);
 
-  const [user,       setUser]       = useState<any>(getCurrentUser());
-  const [referral,   setReferral]   = useState<any>(null);
+  const [user,       setUser]       = useState<User | null>(getCurrentUser());
+  const [referral,   setReferral]   = useState<ReferralDashboardData | null>(null);
   const [isEditing,  setIsEditing]  = useState(false);
   const [saving,     setSaving]     = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -49,7 +57,6 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    if (!authenticated) { navigate("/login"); return; }
     load();
   }, []);
 
@@ -77,7 +84,7 @@ const Profile = () => {
     }
   };
 
-  if (!authenticated || !user) return null;
+  if (!user) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -124,12 +131,13 @@ const Profile = () => {
       setAvatar(resized);
       await updateProfileImage(resized);
       toast({ title: "Photo updated", description: "Profile photo saved." });
-    } catch (err: any) {
-      if (err.response?.data?.code === "EMAIL_ALREADY_IN_USE") {
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data?.code === "EMAIL_ALREADY_IN_USE") {
         toast({ title: "Email already in use", description: "That email belongs to another account. Try a different one.", variant: "destructive" });
         return;
       }
-      toast({ title: "Error", description: err.response?.data?.message || "Something went wrong.", variant: "destructive" });
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message || "Something went wrong.", variant: "destructive" });
     }
   };
 

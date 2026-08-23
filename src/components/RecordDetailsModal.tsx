@@ -16,13 +16,79 @@ import siteConfig from "@/config/siteConfig";
 import { convertDateToIndianFormat } from "@/utils/tools";
 import { getInsuranceTypeDef, isOtherInsuranceType } from "@/config/insuranceTypes";
 
+interface FamilyMember {
+  relationship?: string;
+  currentAge?: string | number;
+  health?: string;
+  deathAge?: string | number;
+  reason?: string;
+}
+
+interface PolicyDetails {
+  policyNumber?: string;
+  planAndTerm?: string;
+  sumAssured?: string | number;
+  modeOfPayment?: string;
+  branch?: string;
+  lastPaymentDate?: string;
+  nextDueDate?: string;
+}
+
+interface CustomFieldValue {
+  key: string;
+  label: string;
+  value?: string | number;
+}
+
+export interface DisplayRecord {
+  name?: string;
+  date?: string;
+  aadhaarNumber?: string;
+  panNumber?: string;
+  email?: string;
+  birthPlace?: string;
+  fatherName?: string;
+  motherName?: string;
+  spouseName?: string;
+  address?: string;
+  dateOfBirth?: string;
+  age?: string;
+  aadhaarLinkedMobileNumber?: string;
+  nameOfNominee?: string;
+  ageOfNominee?: string;
+  relationName?: string;
+  educationalQualification?: string;
+  occupation?: string;
+  designationOfPolicyHolder?: string;
+  annualIncome?: string;
+  periodOfService?: string;
+  employerName?: string;
+  height?: string;
+  weight?: string;
+  lastChildBirthDate?: string;
+  bankAccountNumber?: string;
+  ifscCode?: string;
+  bankName?: string;
+  branchName?: string;
+  createdAt?: string;
+  insuranceType?: string;
+  customInsuranceTypeName?: string;
+  customFields?: CustomFieldValue[];
+  typeSpecificData?: Record<string, string>;
+  familyMembers?: FamilyMember[];
+  currentPolicy?: PolicyDetails;
+  previousPolicy?: PolicyDetails;
+}
+
 interface RecordDetailsModalProps {
-  record: any;
+  record: DisplayRecord | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const SectionTitle = ({ icon: Icon, children }: { icon: any; children: React.ReactNode }) => (
+type IconType = React.ComponentType<{ className?: string }>;
+
+const SectionTitle = ({ icon: Icon, children }: { icon: IconType; children: React.ReactNode }) => (
   <CardTitle className="text-form-header flex items-center gap-2.5">
     <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
       <Icon className="w-3.5 h-3.5 text-primary" />
@@ -34,7 +100,7 @@ const SectionTitle = ({ icon: Icon, children }: { icon: any; children: React.Rea
 const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps) => {
   if (!record) return null;
 
-  const InfoItem = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
+  const InfoItem = ({ icon: Icon, label, value }: { icon: IconType; label: string; value?: string }) => (
     <div className="flex items-start space-x-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
       <Icon className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
       <div className="min-w-0 flex-1">
@@ -109,7 +175,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {record.customFields.map((f: any) => (
+                    {record.customFields.map((f: CustomFieldValue) => (
                       <InfoItem key={f.key} icon={IdCard} label={f.label} value={String(f.value ?? "")} />
                     ))}
                   </div>
@@ -117,7 +183,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
               </Card>
             )
           ) : (
-            record.typeSpecificData && Object.values(record.typeSpecificData).some((v: any) => v) && (
+            record.typeSpecificData && Object.values(record.typeSpecificData).some((v: string) => v) && (
               <Card>
                 <CardHeader>
                   <SectionTitle icon={ShieldCheck}>
@@ -228,7 +294,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {record.familyMembers.map((member: any, index: number) => (
+                      {record.familyMembers.map((member: FamilyMember, index: number) => (
                         <TableRow key={index} className="hover:bg-muted/40">
                           <TableCell className="border border-table-border font-medium">
                             {member.relationship}

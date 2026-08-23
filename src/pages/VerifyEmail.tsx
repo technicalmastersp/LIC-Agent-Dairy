@@ -50,6 +50,7 @@ const VerifyEmail = () => {
     };
 
     fetchAndVerify();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleResend = async () => {

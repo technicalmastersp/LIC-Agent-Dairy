@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate, Link }   from "react-router-dom";
 import AdminLayout  from "./AdminLayout";
 import { Badge }    from "@/components/ui/badge";
 import { Button }   from "@/components/ui/button";
 import { Input }   from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
+import { getCurrentUser } from "@/utils/auth";
 import {
   getDashboardStats, forceLogoutGroup, getMyPermissions,
   triggerNextMonthDueReminders, triggerMissedPaymentReminders,
@@ -50,14 +51,40 @@ const fmtTime = (d?: string) => d
     })
   : "—";
 
+interface ActivityLogItem {
+  action: string;
+  adminName?: string;
+  targetName?: string;
+  createdAt?: string;
+}
+
+interface RecentUserItem {
+  name: string;
+  email: string;
+  planId: string;
+  planType: string;
+  createdAt: string;
+}
+
+interface DashboardStats {
+  users: { total: number; newThisMonth: number; growthPct: number; deactivated: number };
+  subscriptions: { active: number; paid: number; freeTrial: number; expired: number };
+  revenue: { total?: number; thisMonthIncome?: number };
+  withdrawals: { pending: number; pendingAmount: number; processedAmount: number };
+  referrals: { totalEarnings: number };
+  recentActivity: ActivityLogItem[];
+  recentUsers: RecentUserItem[];
+  paymentVerifications?: { pendingUpi?: number };
+  support?: { openHighPriority?: number; openGuest?: number; newSuggestions?: number };
+}
+
 const AdminDashboard = () => {
   const [permissions, setPermissions] = useState<Record<string, boolean> | null>(null);
   const { toast }   = useToast();
   const navigate    = useNavigate();
   const currentUser = getCurrentUser();
-  const authenticated = isAuthenticated();
 
-  const [stats,     setStats]     = useState<any>(null);
+  const [stats,     setStats]     = useState<DashboardStats | null>(null);
   const [loading,   setLoading]   = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -79,15 +106,13 @@ const AdminDashboard = () => {
       toast({ title: "Done", description: res.message });
       setGroupLogoutModal(null);
       setGroupLogoutReason("");
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setGroupLoggingOut(false); }
   };
 
   useEffect(() => {
-    if (!authenticated || !["admin","superadmin"].includes(currentUser?.role)) {
-      navigate("/"); return;
-    }
     getMyPermissions().then(d => setPermissions(d.permissions)).catch(() => {});
     fetchStats();
   }, []);
@@ -97,8 +122,9 @@ const AdminDashboard = () => {
     try {
       const res = await triggerNextMonthDueReminders();
       toast({ title: "Reminders sent", description: `Sent to ${res.data.sent} agent(s) with policies due next month.` });
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setSendingNextMonth(false); }
   };
 
@@ -107,14 +133,15 @@ const AdminDashboard = () => {
     try {
       const res = await triggerMissedPaymentReminders();
       toast({ title: "Reminders sent", description: `Sent to ${res.data.sent} agent(s) with overdue policies.` });
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setSendingMissed(false); }
   };
 
   const fetchStats = async (isRefresh = false) => {
     try {
-      isRefresh ? setRefreshing(true) : setLoading(true);
+      if (isRefresh) { setRefreshing(true); } else { setLoading(true); }
       setStats(await getDashboardStats());
     } catch (err) { console.error(err); }
     finally { setLoading(false); setRefreshing(false); }
@@ -413,7 +440,7 @@ const AdminDashboard = () => {
                 <p className="text-sm text-muted-foreground text-center py-4">No activity yet.</p>
               ) : (
                 <div>
-                  {recentActivity.map((log: any, i: number) => (
+                  {recentActivity.map((log: ActivityLogItem, i: number) => (
                     <div key={i} className="flex items-start gap-2.5 py-2.5 border-b border-border last:border-0">
                       <Badge className={`text-xs shrink-0 mt-0.5 ${ACTION_COLORS[log.action] || "bg-gray-100 text-gray-600"}`}>
                         {log.action.replace(/_/g," ")}
@@ -445,7 +472,7 @@ const AdminDashboard = () => {
                 <p className="text-sm text-muted-foreground text-center py-4">No users yet.</p>
               ) : (
                 <div>
-                  {recentUsers.map((u: any, i: number) => (
+                  {recentUsers.map((u: RecentUserItem, i: number) => (
                     <div key={i} className="flex items-center gap-2.5 py-2.5 border-b border-border last:border-0">
                       <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-medium shrink-0">
                         {u.name.split(" ").map((w: string) => w[0]).join("").slice(0,2).toUpperCase()}

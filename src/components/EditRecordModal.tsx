@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,76 +23,11 @@ import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
 import {
   isOtherInsuranceType, emptyTypeSpecificData, type CustomFieldValue,
 } from "@/config/insuranceTypes";
-
-interface FamilyMember {
-  relationship: string;
-  currentAge: string;
-  health: string;
-  deathAge: string;
-  reason: string;
-}
-
-interface Record {
-  id: string;
-  date: string;
-  aadhaarNumber: string;
-  panNumber: string;
-  email: string;
-  name: string;
-  birthPlace: string;
-  fatherName: string;
-  motherName: string;
-  spouseName: string;
-  address: string;
-  dateOfBirth: string;
-  age: string;
-  occupation: string;
-  educationalQualification: string;
-  designationOfPolicyHolder: string;
-  annualIncome: string;
-  periodOfService: string;
-  employerName: string;
-  aadhaarLinkedMobileNumber: string;
-  nameOfNominee: string;
-  ageOfNominee: string;
-  relationName: string;
-  lastChildBirthDate: string;
-  height: string;
-  weight: string;
-  bankAccountNumber: string;
-  ifscCode: string;
-  bankName: string;
-  branchName: string;
-  recordId?: string;
-
-  familyMembers?: FamilyMember[];
-
-  currentPolicy : {
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-
-  previousPolicy : {
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-
-  insuranceType?: string;
-  customInsuranceTypeName?: string;
-  typeSpecificData?: Record<string, string>;
-  customFields?: CustomFieldValue[];
-}
+import { policyRecordSchema, type PolicyRecordFormValues } from "@/schemas/policyRecordSchema";
+import type { Record as RecordData } from "@/types/Record";
 
 interface EditRecordModalProps {
-  record: Record | null;
+  record: RecordData | null;
   isOpen: boolean;
   onClose: () => void;
   onUpdate: () => void;
@@ -131,62 +68,41 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     setTypeSpecificData((prev) => ({ ...prev, [key]: value }));
   };
   
-  const [formData, setFormData] = useState({
-    date: "",
-    aadhaarNumber: "",
-    panNumber: "",
-    email: "",
-
-    name: "",
-    birthPlace: "",
-    fatherName: "",
-    motherName: "",
-    spouseName: "",
-    address: "",
-    dateOfBirth: "",
-    age: "",
-    occupation: "",
-    educationalQualification: "",
-    designationOfPolicyHolder: "",
-    annualIncome: "",
-    periodOfService: "",
-    employerName: "",
-    aadhaarLinkedMobileNumber: "",
-    nameOfNominee: "",
-    ageOfNominee: "",
-    relationName: "",
-    lastChildBirthDate: "",
-    height: "",
-    weight: "",
-    bankAccountNumber: "",
-    ifscCode: "",
-    bankName: "",
-    branchName: "",
-
-    currentPolicy : {
-      policyNumber: "",
-      planAndTerm: "",
-      sumAssured: "",
-      modeOfPayment: "",
-      branch: "",
-      lastPaymentDate: "",
+  const {
+    register,
+    handleSubmit: rhfHandleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<PolicyRecordFormValues>({
+    resolver: zodResolver(policyRecordSchema),
+    defaultValues: {
+      date: "", aadhaarNumber: "", panNumber: "", email: "",
+      name: "", birthPlace: "", fatherName: "", motherName: "", spouseName: "",
+      address: "", dateOfBirth: "", age: "", occupation: "",
+      educationalQualification: "", designationOfPolicyHolder: "",
+      annualIncome: "", periodOfService: "", employerName: "",
+      aadhaarLinkedMobileNumber: "", nameOfNominee: "", ageOfNominee: "",
+      relationName: "", lastChildBirthDate: "", height: "", weight: "",
+      bankAccountNumber: "", ifscCode: "", bankName: "", branchName: "",
     },
+  });
 
-    previousPolicy : {
-      policyNumber: "",
-      planAndTerm: "",
-      sumAssured: "",
-      modeOfPayment: "",
-      branch: "",
-      lastPaymentDate: "",
-    }
+  // Policy Details Tables — same as AddRecord.tsx, no validation rules
+  // exist for these today, so they stay plain useState rather than
+  // joining the zod-validated form.
+  const [currentPolicy, setCurrentPolicy] = useState({
+    policyNumber: "", planAndTerm: "", sumAssured: "",
+    modeOfPayment: "", branch: "", lastPaymentDate: "",
+  });
+  const [previousPolicy, setPreviousPolicy] = useState({
+    policyNumber: "", planAndTerm: "", sumAssured: "",
+    modeOfPayment: "", branch: "", lastPaymentDate: "",
   });
 
   useEffect(() => {
     if (record) {
-      setNameError(false);
-      setFormData({
-        date: record.date,
+      reset({
+        date: convertDateToIndianFormat(record.date, "input"),
         aadhaarNumber: record.aadhaarNumber,
         panNumber: record.panNumber,
         email: record.email,
@@ -196,7 +112,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
         motherName: record.motherName,
         spouseName: record.spouseName,
         address: record.address,
-        dateOfBirth: record.dateOfBirth,
+        dateOfBirth: convertDateToIndianFormat(record.dateOfBirth, "input"),
         age: record.age,
         occupation: record.occupation,
         educationalQualification: record.educationalQualification,
@@ -208,31 +124,31 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
         nameOfNominee: record.nameOfNominee,
         ageOfNominee: record.ageOfNominee,
         relationName: record.relationName,
-        lastChildBirthDate: record.lastChildBirthDate,
+        lastChildBirthDate: convertDateToIndianFormat(record.lastChildBirthDate, "input") || "",
         height: record.height,
         weight: record.weight,
         bankAccountNumber: record.bankAccountNumber,
         ifscCode: record.ifscCode,
         bankName: record.bankName,
         branchName: record.branchName,
+      });
 
-        previousPolicy : {
-          policyNumber: record.previousPolicy.policyNumber,
-          planAndTerm: record.previousPolicy.planAndTerm,
-          sumAssured: record.previousPolicy.sumAssured,
-          modeOfPayment: record.previousPolicy.modeOfPayment,
-          branch: record.previousPolicy.branch,
-          lastPaymentDate: record.previousPolicy.lastPaymentDate,
-        },
+      setPreviousPolicy({
+        policyNumber: record.previousPolicy.policyNumber,
+        planAndTerm: record.previousPolicy.planAndTerm,
+        sumAssured: record.previousPolicy.sumAssured,
+        modeOfPayment: record.previousPolicy.modeOfPayment,
+        branch: record.previousPolicy.branch,
+        lastPaymentDate: record.previousPolicy.lastPaymentDate,
+      });
 
-        currentPolicy : {
-          policyNumber: record.currentPolicy.policyNumber,
-          planAndTerm: record.currentPolicy.planAndTerm,
-          sumAssured: record.currentPolicy.sumAssured,
-          modeOfPayment: record.currentPolicy.modeOfPayment,
-          branch: record.currentPolicy.branch,
-          lastPaymentDate: record.currentPolicy.lastPaymentDate,
-        },
+      setCurrentPolicy({
+        policyNumber: record.currentPolicy.policyNumber,
+        planAndTerm: record.currentPolicy.planAndTerm,
+        sumAssured: record.currentPolicy.sumAssured,
+        modeOfPayment: record.currentPolicy.modeOfPayment,
+        branch: record.currentPolicy.branch,
+        lastPaymentDate: record.currentPolicy.lastPaymentDate,
       });
 
       setFamilyMembers(record.familyMembers);
@@ -249,7 +165,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
         setCustomFields([]);
       }
     }
-  }, [record]);
+  }, [record, reset]);
 
   const [familyMembers, setFamilyMembers] = useState([
     { relationship: "Father", currentAge: "", health: "", deathAge: "", reason: "" },
@@ -280,36 +196,24 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     field: string,
     value: string
   ) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: value,
-      },
-    }));
-  };
-
-  // Tracks whether the Name field should show the red "required" border,
-  // and lets us scroll/focus straight to it when validation fails on save.
-  const [nameError, setNameError] = useState(false);
-  const nameInputRef = useRef<HTMLInputElement>(null);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    if (name === "name" && value.trim()) {
-      setNameError(false);
+    if (section === "currentPolicy") {
+      setCurrentPolicy(prev => ({ ...prev, [field]: value }));
+    } else {
+      setPreviousPolicy(prev => ({ ...prev, [field]: value }));
     }
   };
 
-  const handleSave = async () => {
-    if (!currentUser || !record) return;
+  // The Name field still needs a plain DOM ref for scrollIntoView on a
+  // failed save — react-hook-form's own ref is merged onto the same
+  // element (see the Name <Input> below) so both work together.
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const { ref: nameFieldRef, ...nameField } = register("name");
 
-    if (!formData.name.trim()) {
-      setNameError(true);
+  // Fires when zod validation fails. Name is the only field that ever
+  // blocked saving before, so it's the only one that gets the toast +
+  // scroll-into-view + focus treatment, matching the exact pre-migration UX.
+  const onInvalid = () => {
+    if (errors.name) {
       toast({
         title: "Error",
         description: "Please enter the applicant's name",
@@ -317,9 +221,11 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
       });
       nameInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       nameInputRef.current?.focus();
-      return;
     }
-    setNameError(false);
+  };
+
+  const onValid = async (formData: PolicyRecordFormValues) => {
+    if (!currentUser || !record) return;
 
     if (isOtherInsuranceType(insuranceType) && !customInsuranceTypeName.trim()) {
       toast({
@@ -334,6 +240,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
       const res = await updateRecord({
         ...formData,
         familyMembers,
+        currentPolicy,
+        previousPolicy,
         insuranceType,
         customInsuranceTypeName: isOtherInsuranceType(insuranceType) ? customInsuranceTypeName.trim() : null,
         typeSpecificData: isOtherInsuranceType(insuranceType) ? {} : typeSpecificData,
@@ -429,8 +337,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     name="date"
                     type="date"
-                    value={convertDateToIndianFormat(formData.date, 'input')}
-                    onChange={handleInputChange}
+                    {...register("date")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -438,8 +345,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="aadhaarNumber" 
                     name="aadhaarNumber" 
-                    value={formData.aadhaarNumber}
-                    onChange={handleInputChange}
+                    {...register("aadhaarNumber")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -447,8 +353,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="panNumber" 
                     name="panNumber" 
-                    value={formData.panNumber}
-                    onChange={handleInputChange}
+                    {...register("panNumber")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -457,8 +362,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="email" 
                     name="email" 
                     type="email" 
-                    value={formData.email}
-                    onChange={handleInputChange}
+                    {...register("email")}
                   />
                 </div>
               </div>
@@ -476,21 +380,21 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="name">1. Name</Label>
                   <Input 
                     id="name" 
-                    name="name" 
-                    ref={nameInputRef}
                     placeholder="Enter applicant's full name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className={nameError ? "border-red-500 focus-visible:ring-red-500" : ""}
+                    {...nameField}
+                    ref={(el) => { nameFieldRef(el); nameInputRef.current = el; }}
+                    className={errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
                   />
+                  {errors.name && (
+                    <p className="text-xs text-destructive mt-1">{errors.name.message}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="birthPlace">1a. Birth Place</Label>
                   <Input 
                     id="birthPlace" 
                     name="birthPlace" 
-                    value={formData.birthPlace}
-                    onChange={handleInputChange}
+                    {...register("birthPlace")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -498,8 +402,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="fatherName" 
                     name="fatherName" 
-                    value={formData.fatherName}
-                    onChange={handleInputChange}
+                    {...register("fatherName")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -507,8 +410,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="motherName" 
                     name="motherName" 
-                    value={formData.motherName}
-                    onChange={handleInputChange}
+                    {...register("motherName")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -516,8 +418,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="spouseName" 
                     name="spouseName" 
-                    value={formData.spouseName}
-                    onChange={handleInputChange}
+                    {...register("spouseName")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -525,8 +426,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="address" 
                     name="address" 
-                    value={formData.address}
-                    onChange={handleInputChange}
+                    {...register("address")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -535,8 +435,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="dateOfBirth" 
                     name="dateOfBirth" 
                     type="date"
-                    value={convertDateToIndianFormat(formData.dateOfBirth, 'input')}
-                    onChange={handleInputChange}
+                    {...register("dateOfBirth")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -544,8 +443,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="age" 
                     name="age" 
-                    value={formData.age}
-                    onChange={handleInputChange}
+                    {...register("age")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -553,8 +451,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="educationalQualification" 
                     name="educationalQualification" 
-                    value={formData.educationalQualification || ""}
-                    onChange={handleInputChange}
+                    {...register("educationalQualification")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -562,8 +459,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="occupation" 
                     name="occupation" 
-                    value={formData.occupation}
-                    onChange={handleInputChange}
+                    {...register("occupation")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -571,8 +467,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="designationOfPolicyHolder" 
                     name="designationOfPolicyHolder" 
-                    value={formData.designationOfPolicyHolder}
-                    onChange={handleInputChange}
+                    {...register("designationOfPolicyHolder")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -580,8 +475,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="annualIncome" 
                     name="annualIncome" 
-                    value={formData.annualIncome|| ""}
-                    onChange={handleInputChange}
+                    {...register("annualIncome")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -589,8 +483,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="periodOfService" 
                     name="periodOfService" 
-                    value={formData.periodOfService}
-                    onChange={handleInputChange}
+                    {...register("periodOfService")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -598,8 +491,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="employerName" 
                     name="employerName" 
-                    value={formData.employerName}
-                    onChange={handleInputChange}
+                    {...register("employerName")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -607,8 +499,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="aadhaarLinkedMobileNumber" 
                     name="aadhaarLinkedMobileNumber" 
-                    value={formData.aadhaarLinkedMobileNumber || ""}
-                    onChange={handleInputChange}
+                    {...register("aadhaarLinkedMobileNumber")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -616,8 +507,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="nameOfNominee" 
                     name="nameOfNominee" 
-                    value={formData.nameOfNominee}
-                    onChange={handleInputChange}
+                    {...register("nameOfNominee")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -625,8 +515,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="ageOfNominee" 
                     name="ageOfNominee" 
-                    value={formData.ageOfNominee}
-                    onChange={handleInputChange}
+                    {...register("ageOfNominee")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -634,8 +523,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="relationName" 
                     name="relationName" 
-                    value={formData.relationName}
-                    onChange={handleInputChange}
+                    {...register("relationName")}
                   />
                 </div>
               </div>
@@ -750,8 +638,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="height" 
                     name="height" 
                     placeholder="Height in cm"
-                    value={formData.height}
-                    onChange={handleInputChange}
+                    {...register("height")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -760,8 +647,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="weight" 
                     name="weight" 
                     placeholder="Weight in kg"
-                    value={formData.weight}
-                    onChange={handleInputChange}
+                    {...register("weight")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -770,8 +656,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="lastChildBirthDate" 
                     name="lastChildBirthDate" 
                     type="date"
-                    value={convertDateToIndianFormat(formData.lastChildBirthDate, 'input') || ""}
-                    onChange={handleInputChange}
+                    {...register("lastChildBirthDate")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -780,8 +665,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="bankAccountNumber" 
                     name="bankAccountNumber" 
                     placeholder="Enter bank account number"
-                    value={formData.bankAccountNumber}
-                    onChange={handleInputChange}
+                    {...register("bankAccountNumber")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -790,8 +674,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="ifscCode" 
                     name="ifscCode" 
                     placeholder="e.g. SBIN0001234"
-                    value={formData.ifscCode}
-                    onChange={handleInputChange}
+                    {...register("ifscCode")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -799,8 +682,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="bankName" 
                     name="bankName" 
-                    value={formData.bankName}
-                    onChange={handleInputChange}
+                    {...register("bankName")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -808,8 +690,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="branchName" 
                     name="branchName" 
-                    value={formData.branchName}
-                    onChange={handleInputChange}
+                    {...register("branchName")}
                   />
                 </div>
               </div>
@@ -826,7 +707,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="policyNumber">Policy Number</Label>
                   <Input
-                    value={formData.currentPolicy.policyNumber}
+                    value={currentPolicy.policyNumber}
                     onChange={(e) => handlePolicyChange("currentPolicy", "policyNumber", e.target.value)}
                   />
                 </div>
@@ -834,7 +715,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="planAndTerm">Plan & Term</Label>
                   <Input
-                    value={formData.currentPolicy.planAndTerm}
+                    value={currentPolicy.planAndTerm}
                     onChange={(e) => handlePolicyChange("currentPolicy", "planAndTerm", e.target.value)}
                   />
                 </div>
@@ -842,7 +723,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="sumAssured">Sum Assured</Label>
                   <Input
-                    value={formData.currentPolicy.sumAssured}
+                    value={currentPolicy.sumAssured}
                     onChange={(e) => handlePolicyChange("currentPolicy", "sumAssured", e.target.value)}
                   />
                 </div>
@@ -850,7 +731,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="modeOfPayment">Mode of Payment</Label>
                   <Select
-                    value={formData.currentPolicy.modeOfPayment || ""}
+                    value={currentPolicy.modeOfPayment || ""}
                     onValueChange={(value) => handlePolicyChange("currentPolicy", "modeOfPayment", value)}
                   >
                     <SelectTrigger>
@@ -868,7 +749,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="branch">Branch</Label>
                   <Input
-                    value={formData.currentPolicy.branch}
+                    value={currentPolicy.branch}
                     onChange={(e) => handlePolicyChange("currentPolicy", "branch", e.target.value)}
                   />
                 </div>
@@ -877,7 +758,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="lastPaymentDate">Last Payment Date</Label>
                   <Input
                     type="date"
-                    value={convertDateToIndianFormat(formData.currentPolicy.lastPaymentDate, 'input')}
+                    value={convertDateToIndianFormat(currentPolicy.lastPaymentDate, 'input')}
                     onChange={(e) => handlePolicyChange("currentPolicy", "lastPaymentDate", e.target.value)}
                   />
                 </div>
@@ -895,7 +776,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="policyNumber_previousPolicy">Policy Number</Label>
                   <Input
-                    value={formData.previousPolicy.policyNumber}
+                    value={previousPolicy.policyNumber}
                     onChange={(e) => handlePolicyChange("previousPolicy", "policyNumber", e.target.value)}
                   />
                 </div>
@@ -903,7 +784,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="planAndTerm_previousPolicy">Plan & Term</Label>
                   <Input
-                    value={formData.previousPolicy.planAndTerm}
+                    value={previousPolicy.planAndTerm}
                     onChange={(e) => handlePolicyChange("previousPolicy", "planAndTerm", e.target.value)}
                   />
                 </div>
@@ -911,7 +792,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="sumAssured_previousPolicy">Sum Assured</Label>
                   <Input
-                    value={formData.previousPolicy.sumAssured}
+                    value={previousPolicy.sumAssured}
                     onChange={(e) => handlePolicyChange("previousPolicy", "sumAssured", e.target.value)}
                   />
                 </div>
@@ -919,7 +800,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="modeOfInstallment_previousPolicy">Mode of Payment</Label>
                   <Select
-                    value={formData.previousPolicy.modeOfPayment || ""}
+                    value={previousPolicy.modeOfPayment || ""}
                     onValueChange={(value) => handlePolicyChange("previousPolicy", "modeOfPayment", value)}
                   >
                     <SelectTrigger>
@@ -937,7 +818,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="branch_previousPolicy">Branch</Label>
                   <Input
-                    value={formData.previousPolicy.branch}
+                    value={previousPolicy.branch}
                     onChange={(e) => handlePolicyChange("previousPolicy", "branch", e.target.value)}
                   />
                 </div>
@@ -946,7 +827,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="lastPaymentDate_previousPolicy">Last Payment Date</Label>
                   <Input
                     type="date"
-                    value={convertDateToIndianFormat(formData.previousPolicy.lastPaymentDate, 'input')}
+                    value={convertDateToIndianFormat(previousPolicy.lastPaymentDate, 'input')}
                     onChange={(e) => handlePolicyChange("previousPolicy", "lastPaymentDate", e.target.value)}
                   />
                 </div>
@@ -960,7 +841,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
               <X className="w-4 h-4 mr-2" />
               Cancel
             </Button>
-            <Button onClick={handleSave} className="bg-primary hover:bg-primary-light shadow-sm">
+            <Button onClick={rhfHandleSubmit(onValid, onInvalid)} className="bg-primary hover:bg-primary-light shadow-sm">
               <Save className="w-4 h-4 mr-2" />
               Save Changes
             </Button>

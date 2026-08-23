@@ -10,6 +10,7 @@ const GlobalToastListener = () => {
     toastEmitter.register(({ title, description, variant }) => {
       toast({ title, description, variant });
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null; // renders nothing

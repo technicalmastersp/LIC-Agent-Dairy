@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -15,72 +16,17 @@ import {
   FileText, IndianRupee, CalendarPlus, FolderOpen, ShieldCheck, Lock,
   Download,
 } from "lucide-react";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
+import { getCurrentUser } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import { getAllRecords, deleteRecord } from "../../services/recordService";
+import { dedupeRecords } from "@/utils/recordDedupe";
 import { convertDateToIndianFormat } from "@/utils/tools";
 import { INSURANCE_TYPES, getInsuranceTypeDef } from "@/config/insuranceTypes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Record } from "@/types/Record";
 
-export interface Record {
-  id: string;
-  _id?: string;
-  date: string;
-  aadhaarNumber: string;
-  panNumber: string;
-  email: string;
-  name: string;
-  birthPlace: string;
-  fatherName: string;
-  motherName: string;
-  spouseName: string;
-  address: string;
-  dateOfBirth: string;
-  age: string;
-  occupation: string;
-  educationalQualification: string;
-  designationOfPolicyHolder: string;
-  annualIncome: string;
-  periodOfService: string;
-  employerName: string;
-  aadhaarLinkedMobileNumber: string;
-  nameOfNominee: string;
-  ageOfNominee: string;
-  relationName: string;
-  lastChildBirthDate: string;
-  height: string;
-  weight: string;
-  bankAccountNumber: string;
-  ifscCode: string;
-  bankName: string;
-  branchName: string;
-  recordId?: string;
-
-  currentPolicy : {
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-
-  previousPolicy : {
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-  createdAt: string;
-
-  insuranceType?: string;
-  customInsuranceTypeName?: string;
-  typeSpecificData?: Record<string, string>;
-  customFields?: { key: string; label: string; fieldType: string; options?: string[]; value: string }[];
-}
+export type { Record };
 
 // Deterministic soft color for an avatar chip, derived from the name itself
 const avatarPalette = [
@@ -106,31 +52,11 @@ const recordTypeLabel = (record: Record) => {
   return getInsuranceTypeDef(type)?.shortLabel || type;
 };
 
-// The API can occasionally return the same underlying record more than once
-// in `recordLists` (e.g. a retried save, or an id collision from the record
-// id generator) — that duplication is invisible in the unfiltered table
-// (paged out of view) but becomes obvious once a search narrows the list
-// down. Collapse to one entry per recordId (falling back to the Mongo _id,
-// then a JSON fingerprint) before it ever reaches component state.
-export const dedupeRecords = (list: Record[]): Record[] => {
-  const seen = new Set<string>();
-  const result: Record[] = [];
-  for (const record of list) {
-    const key = record.recordId || record._id || JSON.stringify(record);
-    if (!seen.has(key)) {
-      seen.add(key);
-      result.push(record);
-    }
-  }
-  return result;
-};
-
 const ViewRecords = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { toast } = useToast();
   const currentUser = getCurrentUser();
-  const authenticated = isAuthenticated();
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
@@ -141,8 +67,6 @@ const ViewRecords = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<Record | null>(null);
-  const [records, setRecords] = useState<Record[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Mirrors the backend: an expired/cancelled plan still gets full read access
   // to this list (requireSubscriptionForViewing), but add/edit/delete stay
@@ -151,26 +75,20 @@ const ViewRecords = () => {
   const subStatus = currentUser?.subscription?.status;
   const isReadOnly = subStatus === "expired" || subStatus === "cancelled";
 
-  const fetchRecords = async () => {
-    try {
-      setIsLoading(true);
-      const userRecords = await getAllRecords();
-      setRecords(dedupeRecords(userRecords ?? []));
-    } catch (error) {
-      console.error(error);
-      setRecords([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!authenticated || !currentUser) {
-      navigate("/login");
-      return;
-    }
-    fetchRecords();
-  }, []);
+  const {
+    data: records = [],
+    isLoading,
+  } = useQuery<Record[]>({
+    queryKey: ["records"],
+    queryFn: getAllRecords,
+    // The dedupe step is pure post-processing of whatever the API returns —
+    // `select` keeps the cached data itself as the API shape, and only
+    // transforms it for this component, same as the old
+    // setRecords(dedupeRecords(...)) did.
+    select: (data) => dedupeRecords(data ?? []),
+  });
 
   const filteredAndSortedRecords = useMemo(() => {
     if (!records || records.length === 0) return [];
@@ -286,7 +204,7 @@ const ViewRecords = () => {
   const handleDeleteRecord = async (recordId: string) => {
     const success = await deleteRecord(recordId);
     if (success) {
-      setRecords(dedupeRecords(await getAllRecords()));
+      queryClient.invalidateQueries({ queryKey: ["records"] });
       toast({
         title: "Success",
         description: "Record deleted successfully",
@@ -308,7 +226,7 @@ const ViewRecords = () => {
   };
 
   const handleUpdateRecord = async () => {
-    await fetchRecords();
+    queryClient.invalidateQueries({ queryKey: ["records"] });
   };
 
   const SortableHeader = ({ field, children }: { field: keyof Record; children: React.ReactNode }) => (
@@ -322,10 +240,6 @@ const ViewRecords = () => {
       </div>
     </TableHead>
   );
-
-  if (!authenticated || !currentUser) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
@@ -629,7 +543,7 @@ const ViewRecords = () => {
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false);
-          fetchRecords();
+          queryClient.invalidateQueries({ queryKey: ["records"] });
         }}
         onUpdate={handleUpdateRecord}
       />

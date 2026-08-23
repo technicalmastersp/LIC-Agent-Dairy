@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,6 @@ import Footer from "@/components/Footer";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
 import EditRecordModal from "@/components/EditRecordModal";
 import { Search, Eye, ArrowUpDown, FileClock, AlertCircle, CalendarClock, Users, FolderOpen } from "lucide-react";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { dueNextMonth } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
@@ -90,10 +88,7 @@ const initials = (name: string) =>
 
 
 const UpcomingDuePolicies = () => {
-  const navigate = useNavigate();
   const { t } = useLanguage();
-  const authenticated = isAuthenticated();
-  const currentUser = getCurrentUser();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof Record>("name");
@@ -122,16 +117,13 @@ const UpcomingDuePolicies = () => {
   };
 
   useEffect(() => {
-    if (!authenticated || !currentUser) { navigate("/login"); return; }
     fetchRecords();
   }, []);
-
-  if (!authenticated || !currentUser) return null;
 
   const filteredAndSortedRecords = useMemo(() => {
     if (!records || records.length === 0) return [];
     
-    let filtered = records.filter(record =>
+    const filtered = records.filter(record =>
       record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.fatherName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.occupation.toLowerCase().includes(searchTerm.toLowerCase()) ||

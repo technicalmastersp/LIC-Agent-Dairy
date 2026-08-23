@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "@/utils/auth";
 import { getMyPermissions, getPendingCounts } from "../../../services/adminService";
@@ -95,6 +96,30 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   // Mobile sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const fetchCounts = useCallback(async () => {
+    try {
+      const data = await getPendingCounts();
+      setCounts(data);
+    } catch {
+      // non-fatal — sidebar just shows no badge
+    }
+  }, []);
+
+  const fetchPermissions = useCallback(async () => {
+    try {
+      const data = await getMyPermissions();
+      setPermissions(data.permissions);
+    } catch (err: unknown) {
+      // If 403 ACCOUNT_DEACTIVATED — force logout
+      if (axios.isAxiosError(err) && err.response?.data?.code === "ACCOUNT_DEACTIVATED") {
+        localStorage.clear();
+        navigate("/login");
+      }
+    } finally {
+      setLoadingPerms(false);
+    }
+  }, [navigate]);
+
   useEffect(() => {
     fetchPermissions();
     fetchCounts();
@@ -102,35 +127,11 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     // ✅ Poll every 30 seconds so permission changes reflect without logout
     // const interval = setInterval(fetchPermissions, 30_000);
     // return () => clearInterval(interval);
-  }, []);
-
-  const fetchCounts = async () => {
-    try {
-      const data = await getPendingCounts();
-      setCounts(data);
-    } catch {
-      // non-fatal — sidebar just shows no badge
-    }
-  };
-
-  const fetchPermissions = async () => {
-    try {
-      const data = await getMyPermissions();
-      setPermissions(data.permissions);
-    } catch (err: any) {
-      // If 403 ACCOUNT_DEACTIVATED — force logout
-      if (err.response?.data?.code === "ACCOUNT_DEACTIVATED") {
-        localStorage.clear();
-        navigate("/login");
-      }
-    } finally {
-      setLoadingPerms(false);
-    }
-  };
+  }, [fetchPermissions, fetchCounts]);
 
   // Filter nav based on role AND live permissions
   const visibleNav = NAV.filter((n) => {
-    if (!n.roles.includes(role)) return false;
+    if (!n.roles.includes(role ?? "user")) return false;
     if (role === "superadmin") return true;          // superadmin sees everything
     if (!n.permission) return true;                  // no permission required
     return permissions?.[n.permission] === true;     // check live permission
@@ -249,7 +250,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            visibleNav.map(({ path, label, icon: Icon, countKey }: any) => {
+            visibleNav.map(({ path, label, icon: Icon, countKey }: (typeof NAV)[number]) => {
               const active = location.pathname === path ||
                 (path !== "/admin" && location.pathname.startsWith(path));
               const badgeCount = countKey ? counts[countKey as keyof typeof counts] : 0;

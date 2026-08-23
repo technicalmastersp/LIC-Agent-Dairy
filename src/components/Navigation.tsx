@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage }   from "@/hooks/useLanguage";
+import type { Translations } from "@/utils/translations";
 import LanguageSwitcher  from "./LanguageSwitcher";
 import { cn }            from "@/lib/utils";
 import siteConfig        from "@/config/siteConfig";
@@ -27,21 +28,19 @@ import { logoutCurrentUser } from "../../services/userService";
    NAV CONFIG
 ───────────────────────────────────────────── */
 
-type TranslateFunction = (key: string) => string;
-
-const getNavItems = (t: TranslateFunction) => [
+const getNavItems = (t: (key: keyof Translations) => string) => [
   { to: "/",             label: t("home"),        icon: Home        },
   { to: "/add-record",   label: t("addRecord"),   icon: Plus        },
   { to: "/view-records", label: t("viewRecords"), icon: Table       },
 ];
 
-const getNavItemsMobile = (t: TranslateFunction) => [
+const getNavItemsMobile = (t: (key: keyof Translations) => string) => [
   { to: "/",             label: t("home"),        icon: Home        },
   { to: "/add-record",   label: t("addRecord"),   icon: Plus        },
   { to: "/view-records", label: t("viewRecords"), icon: Table       },
 ];
 
-const getAdminNavItems = (t: TranslateFunction) => [
+const getAdminNavItems = (t: (key: keyof Translations) => string) => [
   { to: "/admin", label: "Admin Panel", icon: UserRoundCog },
 ];
 

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "./AdminLayout";
 import { Button }  from "@/components/ui/button";
@@ -7,9 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input }   from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { getCurrentUser } from "@/utils/auth";
+import { getCurrentUser, type User } from "@/utils/auth";
 import { getUserDetails, deleteUser, changeUserSubscription, forceLogoutUser } from "../../../services/adminService";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
+import type { Record as PolicyRecord } from "@/types/Record";
 import { ArrowLeft, Trash2, RefreshCw, Eye, LogOut, Building2, Smartphone, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
@@ -28,13 +30,25 @@ const PLANS = [
   { id: "24months",    label: "Premium — 24 Months"  },
 ];
 
+interface AdminUserDetailData extends User {
+  userId: string;
+  records?: PolicyRecord[];
+  referral?: {
+    totalEarned: number;
+    availableBalance: number;
+    totalWithdrawn: number;
+    totalL1: number;
+    totalL2: number;
+  };
+}
+
 const AdminUserDetail = () => {
   const { userId }  = useParams();
   const navigate    = useNavigate();
   const { toast }   = useToast();
   const currentUser = getCurrentUser();
 
-  const [user,          setUser]          = useState<any>(null);
+  const [user,          setUser]          = useState<AdminUserDetailData | null>(null);
   const [loading,       setLoading]       = useState(true);
   const [selectedPlan,  setSelectedPlan]  = useState("");
   const [planReason,    setPlanReason]    = useState("");
@@ -42,7 +56,7 @@ const AdminUserDetail = () => {
   const [deleteModal,   setDeleteModal]   = useState(false);
   const [deleteReason,  setDeleteReason]  = useState("");
   const [deleting,      setDeleting]      = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<any>(null);
+  const [selectedRecord, setSelectedRecord] = useState<PolicyRecord | null>(null);
 
   const [logoutModal,  setLogoutModal]  = useState(false);
   const [logoutReason, setLogoutReason] = useState("");
@@ -53,17 +67,16 @@ const AdminUserDetail = () => {
     setLoggingOut(true);
     try {
       await forceLogoutUser(userId!, logoutReason || "Session ended by admin.");
-      toast({ title: "Logged out", description: `${user.name}'s session has been ended.` });
+      toast({ title: "Logged out", description: `${user?.name}'s session has been ended.` });
       setLogoutModal(false);
       setLogoutReason("");
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setLoggingOut(false); }
   };
 
-  useEffect(() => { fetchUser(); }, [userId]);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getUserDetails(userId!);
@@ -71,7 +84,9 @@ const AdminUserDetail = () => {
       setSelectedPlan(data.subscription?.planId || "");
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  };
+  }, [userId]);
+
+  useEffect(() => { fetchUser(); }, [fetchUser]);
 
   const handleChangePlan = async () => {
     if (!selectedPlan) return;
@@ -80,8 +95,9 @@ const AdminUserDetail = () => {
       await changeUserSubscription(userId!, selectedPlan, planReason);
       toast({ title: "Plan updated", description: `Subscription changed to ${selectedPlan}.` });
       fetchUser();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setChangingPlan(false); }
   };
 
@@ -95,8 +111,9 @@ const AdminUserDetail = () => {
       await deleteUser(userId!, deleteReason);
       toast({ title: "Deleted", description: "User permanently deleted." });
       navigate("/admin/users");
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setDeleting(false); }
   };
 
@@ -333,7 +350,7 @@ const AdminUserDetail = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {user.records.map((r: any, i: number) => (
+                    {(user.records ?? []).map((r: PolicyRecord, i: number) => (
                       <tr key={i} className="border-b border-border last:border-0 hover:bg-muted/50">
                         <td className="p-2.5 font-medium">{r.name}</td>
                         <td className="p-2.5">

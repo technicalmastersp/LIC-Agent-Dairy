@@ -1,13 +1,12 @@
 import AdminLayout  from "./AdminLayout";
 import { useState, useEffect } from "react";
-import { useNavigate }   from "react-router-dom";
+import axios from "axios";
 import { Button }        from "@/components/ui/button";
 import { Badge }         from "@/components/ui/badge";
 import { Input }         from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast }      from "@/hooks/use-toast";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { getPendingUpiVerifications, verifyUpiId, rejectUpiId } from "../../../services/adminService";
 import { CheckCircle2, XCircle, RefreshCw } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -19,13 +18,21 @@ const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
   : "—";
 
-const PaymentVerifications = () => {
-  const navigate       = useNavigate();
-  const { toast }      = useToast();
-  const currentUser    = getCurrentUser();
-  const authenticated  = isAuthenticated();
+interface PendingUpiVerification {
+  userId: string;
+  userName: string;
+  userEasyId?: string;
+  userEmail?: string;
+  userProfileImage?: string;
+  upiId: string;
+  upiRejectionReason?: string;
+  updatedAt?: string;
+}
 
-  const [pending, setPending]     = useState<any[]>([]);
+const PaymentVerifications = () => {
+  const { toast }      = useToast();
+
+  const [pending, setPending]     = useState<PendingUpiVerification[]>([]);
   const [loading, setLoading]     = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [processing, setProcessing] = useState<string | null>(null);
@@ -34,15 +41,12 @@ const PaymentVerifications = () => {
   const [rejectReason, setRejectReason] = useState("");
 
   useEffect(() => {
-    if (!authenticated || !currentUser) { navigate("/login"); return; }
-    const role = currentUser?.role;
-    if (role !== "admin" && role !== "superadmin") { navigate("/"); return; }
     fetchPending();
   }, []);
 
   const fetchPending = async (isRefresh = false) => {
     try {
-      isRefresh ? setRefreshing(true) : setLoading(true);
+      if (isRefresh) { setRefreshing(true); } else { setLoading(true); }
       const data = await getPendingUpiVerifications();
       setPending(data.pending ?? []);
     } catch (err) {
@@ -60,8 +64,9 @@ const PaymentVerifications = () => {
       await verifyUpiId(userId);
       toast({ title: "Verified!", description: "UPI ID marked as verified." });
       setPending(prev => prev.filter(p => p.userId !== userId));
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setProcessing(null); }
   };
 
@@ -77,8 +82,9 @@ const PaymentVerifications = () => {
       setPending(prev => prev.filter(p => p.userId !== rejectModal.userId));
       setRejectModal(null);
       setRejectReason("");
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setProcessing(null); }
   };
 

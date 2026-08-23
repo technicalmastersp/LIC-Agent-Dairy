@@ -5,6 +5,11 @@ applicant details, track policy/premium due dates, monitor missed and
 upcoming payments, and (for admins) oversee users, revenue, support
 tickets, and subscriptions.
 
+<!-- Replace <owner>/<repo> below with this repo's actual GitHub path once
+     pushed — the badge can't be filled in automatically since no git
+     remote or `repository` field in package.json is available here. -->
+[![CI](https://github.com/<owner>/<repo>/actions/workflows/ci.yml/badge.svg)](https://github.com/<owner>/<repo>/actions/workflows/ci.yml)
+
 [Live Demo ›](https://lic-agent-dairy.vercel.app/)
 
 ---
@@ -95,6 +100,7 @@ Copy `.env.example` to `.env` and set:
 | `npm run preview` | Locally preview the production build output. |
 | `npm run test` | Run the Vitest test suite once (CI mode). |
 | `npm run test:watch` | Run Vitest in watch mode while developing. |
+| `npm run test:e2e` | Run the Playwright end-to-end suite (starts the dev server automatically). |
 
 ---
 

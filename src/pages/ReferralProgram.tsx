@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +13,7 @@ import { validateUpiId, validateIfsc, validateAccountNumber } from "../../utils/
 // import { INDIAN_BANKS } from "../../utils/indianBanks";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { getCurrentUser, isAuthenticated } from "@/utils/auth";
+import { getCurrentUser } from "@/utils/auth";
 import { getReferralDashboard, withdrawEarnings, updatePaymentDetails, lookupIfsc } from "../../services/referralService";
 import {
   Copy, Share, Users, TrendingUp, Gift, Crown,
@@ -106,7 +107,13 @@ const fmt = (date?: string) =>
 const initials = (name: string) =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
-const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: any) => (
+interface WithdrawalRowProps {
+  w: WithdrawalRecord;
+  fmt: (date?: string) => string;
+  withdrawStatusStyle: Record<string, string>;
+}
+
+const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: WithdrawalRowProps) => (
   <div className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
     <div className="flex-1">
       <div className="flex items-center gap-2 flex-wrap">
@@ -135,7 +142,14 @@ const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: any) => (
   </div>
 );
 
-const ReferralRow = ({ u, fmt, initials, statusStyle }: any) => (
+interface ReferralRowProps {
+  u: ReferredUser;
+  fmt: (date?: string) => string;
+  initials: (name: string) => string;
+  statusStyle: Record<string, string>;
+}
+
+const ReferralRow = ({ u, fmt, initials, statusStyle }: ReferralRowProps) => (
   <div className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
     <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium shrink-0 ${
       u.level === 1 ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
@@ -178,7 +192,6 @@ const ReferralProgram = () => {
   const navigate      = useNavigate();
   const { toast }     = useToast();
   const currentUser   = getCurrentUser();
-  const authenticated = isAuthenticated();
 
   const [dashboard,   setDashboard]   = useState<Dashboard | null>(null);
   const [loading,     setLoading]     = useState(true);
@@ -206,8 +219,6 @@ const ReferralProgram = () => {
 
   useEffect(() => {
     getReferralConfig().then(setConfig).catch(() => {});
-
-    if (!authenticated || !currentUser) { navigate("/login"); return; }
     fetchDashboard();
   }, []);
 
@@ -311,8 +322,9 @@ const ReferralProgram = () => {
       toast({ title: "Saved!", description: "Payment details updated." });
       setEditingBank(false);
       fetchDashboard();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally { setSavingBank(false); }
   };
 
@@ -335,12 +347,13 @@ const ReferralProgram = () => {
       await withdrawEarnings();
       toast({ title: "Requested!", description: "Withdrawal will be processed in 3–5 business days." });
       fetchDashboard();
-    } catch (err: any) {
-      toast({ title: "Failed", description: err.response?.data?.message, variant: "destructive" });
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast({ title: "Failed", description: message, variant: "destructive" });
     } finally { setWithdrawing(false); }
   };
 
-  if (!authenticated || !currentUser) return null;
+  if (!currentUser) return null;
 
   if (loading) return (
     <div className="min-h-screen bg-muted/30 flex flex-col">

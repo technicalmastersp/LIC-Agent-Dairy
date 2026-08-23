@@ -5,7 +5,7 @@ import { Badge }      from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navigation     from "@/components/Navigation";
 import Footer         from "@/components/Footer";
-import { getCurrentUser, setCurrentUser, isAuthenticated } from "@/utils/auth";
+import { getCurrentUser, setCurrentUser } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { dueThisMonth, dueNextMonth, getMonthlyTrend, getRecordsWithoutLastPayment } from "../../services/recordService";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
@@ -28,22 +28,34 @@ const getGreeting = () => {
 const fmt = (d?: string) =>
   d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
+interface MonthlyTrendPoint {
+  label: string;
+  recordsAdded: number;
+  duePolicies: number;
+}
+
+interface ReferralDashboardData {
+  totalL1?: number;
+  totalL2?: number;
+  availableBalance?: number;
+  pendingEarnings?: number;
+  totalEarned?: number;
+}
+
 const Home = () => {
   const navigate      = useNavigate();
   const { t }         = useLanguage();
-  const authenticated = isAuthenticated();
-  let currentUser     = getCurrentUser();
+  const currentUser   = getCurrentUser();
 
   const [dueCount,        setDueCount]        = useState(0);
   const [upcomingDueCount, setUpcomingDueCount] = useState(0);
   const [missedCount,     setMissedCount]     = useState(0);
-  const [trendData, setTrendData] = useState<any[]>([]);
+  const [trendData, setTrendData] = useState<MonthlyTrendPoint[]>([]);
   const [currentMonth, setCurrentMonth] = useState("");
-  const [referralData, setReferralData] = useState<any>(null);
+  const [referralData, setReferralData] = useState<ReferralDashboardData | null>(null);
   const [loading,      setLoading]      = useState(true);
 
   useEffect(() => {
-    if (!authenticated) { navigate("/login"); return; }
     const load = async () => {
       try {
         const [user, due, upcoming, missed, referral, trend] = await Promise.all([
@@ -56,7 +68,6 @@ const Home = () => {
         ]);
         setTrendData(trend);
         setCurrentUser(user);
-        currentUser = getCurrentUser();
         setReferralData(referral);
         setDueCount(due.totalDue ?? 0);
         setUpcomingDueCount(upcoming.totalDue ?? 0);
@@ -69,9 +80,9 @@ const Home = () => {
       }
     };
     load();
-  }, [authenticated, navigate]);
+  }, []);
 
-  if (!authenticated || !currentUser) return null;
+  if (!currentUser) return null;
 
   const sub        = currentUser.subscription;
   const daysLeft   = sub?.endDate
