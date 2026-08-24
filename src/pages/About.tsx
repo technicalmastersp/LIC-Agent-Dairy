@@ -99,7 +99,7 @@ const About = () => {
       <main className="flex-1">
 
         {/* ══════════ HERO — split layout, visual right side ══════════ */}
-        <section className="relative bg-gradient-to-br from-form-header via-form-header to-form-subheader text-white overflow-hidden">
+        <section className="relative bg-gradient-to-br from-form-header via-form-header to-form-subheader text-primary-foreground overflow-hidden">
           {/* ambient glow */}
           <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
           <div className="absolute bottom-0 left-1/3 w-64 h-64 rounded-full bg-primary/20 blur-3xl" />
@@ -109,26 +109,26 @@ const About = () => {
 
               {/* Left: message */}
               <div className="space-y-6">
-                <div className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider bg-white/10 text-white/90 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                <div className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider bg-white/10 text-primary-foreground/90 px-3 py-1.5 rounded-full backdrop-blur-sm">
                   <Sparkles className="w-3.5 h-3.5" />
                   Trusted by policy agents every day
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
                   One Platform For Every Policy You Manage.
                 </h1>
-                <p className="text-lg text-white/80 leading-relaxed max-w-lg">
+                <p className="text-lg text-primary-foreground/80 leading-relaxed max-w-lg">
                   {siteConfig.title} replaces spreadsheets and paper registers with a single, secure
                   workspace — built for life, health, motor, and general insurance agents who want
                   their entire book of business organized, backed up, and a search away.
                 </p>
                 <div className="flex flex-wrap gap-3 pt-2">
                   <Link to="/view-records">
-                    <Button size="lg" className="bg-white text-form-header hover:bg-white/90 font-medium">
+                    <Button size="lg" className="bg-white text-[hsl(195,90%,15%)] hover:bg-white/90 font-medium">
                       Manage your policies <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   </Link>
                   <Link to="/add-record">
-                    <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 hover:text-white">
+                    <Button size="lg" variant="outline" className="border-primary-foreground/30 text-[hsl(195,90%,15%)] hover:bg-primary-foreground/10 hover:text-primary-foreground">
                       Add a record
                     </Button>
                   </Link>
@@ -165,13 +165,13 @@ const About = () => {
         </section>
 
         {/* ══════════ TRUST STRIP — full width stat bar ══════════ */}
-        <section className="bg-form-subheader text-white">
+        <section className="bg-form-subheader text-primary-foreground">
           <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-white/15">
+            <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-primary-foreground/15">
               {trustStats.map(({ value, label }) => (
                 <div key={label} className="px-4 py-6 text-center">
                   <p className="text-2xl md:text-3xl font-bold">{value}</p>
-                  <p className="text-xs text-white/70 mt-1">{label}</p>
+                  <p className="text-xs text-primary-foreground/70 mt-1">{label}</p>
                 </div>
               ))}
             </div>
@@ -243,14 +243,14 @@ const About = () => {
         </section>
 
         {/* ══════════ DATA PROTECTION — dark panel, icon medallions ══════════ */}
-        <section className="bg-form-header text-white py-16 md:py-20 relative overflow-hidden">
+        <section className="bg-form-header text-primary-foreground py-16 md:py-20 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
           <div className="container mx-auto px-4 relative">
             <div className="max-w-6xl mx-auto">
               <div className="max-w-xl mb-14">
-                <p className="text-xs font-medium uppercase tracking-wider text-white/60 mb-2">Security & reliability</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary-foreground/60 mb-2">Security & reliability</p>
                 <h2 className="text-3xl font-bold mb-3">Your data is too safe to worry about.</h2>
-                <p className="text-white/70 leading-relaxed">
+                <p className="text-primary-foreground/70 leading-relaxed">
                   Policy and policyholder data is sensitive, and we treat it that way. Security
                   isn't an afterthought here — it's built into how the platform stores, backs up,
                   and protects every record you enter, day after day.
@@ -283,7 +283,7 @@ const About = () => {
                       <Icon className="w-5 h-5 text-primary-foreground" />
                     </div>
                     <h3 className="font-semibold mb-2">{title}</h3>
-                    <p className="text-sm text-white/70 leading-relaxed">{description}</p>
+                    <p className="text-sm text-primary-foreground/70 leading-relaxed">{description}</p>
                   </div>
                 ))}
               </div>
@@ -351,10 +351,10 @@ const About = () => {
             <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold mb-1">Ready to bring order to your policy book?</h2>
-                <p className="text-white/90">Join agents already managing every policy type, safely, in one place.</p>
+                <p className="text-primary-foreground/90">Join agents already managing every policy type, safely, in one place.</p>
               </div>
               <Link to="/add-record" className="shrink-0">
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-medium">
+                <Button size="lg" className="bg-white text-[hsl(195,85%,25%)] hover:bg-white/90 font-medium">
                   Add your first record <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>

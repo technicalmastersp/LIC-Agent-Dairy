@@ -251,7 +251,7 @@ const AddRecord = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Header */}
-          <Card className="bg-gradient-to-r from-form-header to-form-subheader text-white border-0 overflow-hidden">
+          <Card className="bg-gradient-to-r from-form-header to-form-subheader text-primary-foreground border-0 overflow-hidden">
             <CardHeader className="text-center relative">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 ring-4 ring-white/10">
                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
@@ -261,8 +261,8 @@ const AddRecord = () => {
               <CardTitle className="text-2xl font-bold">
                 {siteConfig.title}
               </CardTitle>
-              <p className="text-white/90">{t("addRecord")}</p>
-              <p className="text-white/60 text-xs mt-1">Fill in the sections below to create a new policy record</p>
+              <p className="text-primary-foreground/90">{t("addRecord")}</p>
+              <p className="text-primary-foreground/60 text-xs mt-1">Fill in the sections below to create a new policy record</p>
             </CardHeader>
           </Card>
 

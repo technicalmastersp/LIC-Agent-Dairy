@@ -446,7 +446,7 @@ const AdminRevenue = () => {
                   <Textarea rows={2} value={refundReason} onChange={(e) => setRefundReason(e.target.value)} placeholder="e.g. Customer requested cancellation" />
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1 bg-red-600 hover:bg-red-700 text-white" onClick={handleRefund} disabled={refunding}>
+                  <Button className="flex-1 bg-red-600 hover:bg-red-700 text-primary-foreground" onClick={handleRefund} disabled={refunding}>
                     {refunding ? "Processing…" : "Confirm refund"}
                   </Button>
                   <Button variant="outline" className="flex-1" onClick={() => setRefundModal(null)}>Cancel</Button>

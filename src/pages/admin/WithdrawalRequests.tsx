@@ -418,7 +418,7 @@ const WithdrawalRequests = () => {
                                 <div className="flex gap-2">
                                   <Button
                                     size="sm"
-                                    className="h-7 text-xs bg-green-600 hover:bg-green-700 text-white"
+                                    className="h-7 text-xs bg-green-600 hover:bg-green-700 text-primary-foreground"
                                     disabled={processing === w.withdrawalId}
                                     onClick={() => setApproveModal({
                                       referralId:   w.referralId,
@@ -479,7 +479,7 @@ const WithdrawalRequests = () => {
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-primary-foreground"
                     onClick={handleApprove}
                     disabled={!!processing}
                   >
@@ -520,7 +520,7 @@ const WithdrawalRequests = () => {
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-primary-foreground"
                     onClick={handleReject}
                     disabled={!!processing}
                   >

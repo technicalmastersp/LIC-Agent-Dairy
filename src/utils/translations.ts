@@ -74,6 +74,14 @@ export interface Translations {
   mobileNumber: string;
   designation: string;
   createAccount: string;
+
+  referralDiscountNote1: string;
+  referralDiscountNote2: string;
+  referralDiscountNote3: string;
+  referralDiscountNote4: string;
+  referralDiscountNote5: string;
+  referralDiscountNote6: string;
+
   makePaymentCreateAccount: string;
   alreadyHaveAccount: string;
   dontHaveAccount: string;
@@ -186,6 +194,14 @@ export const translations: Record<string, Translations> = {
     mobileNumber: "Mobile Number",
     designation: "Designation",
     createAccount: "Create Account",
+
+    referralDiscountNote1: "💰 Enter a valid",
+    referralDiscountNote2: "Referral Code",
+    referralDiscountNote3: "and get an instant",
+    referralDiscountNote4: " ",
+    referralDiscountNote5: "discount",
+    referralDiscountNote6: "on any paid subscription plan.",
+
     makePaymentCreateAccount: "Make Payment & Create Account",
     alreadyHaveAccount: "Already have an account?",
     dontHaveAccount: "Don't have an account?",
@@ -298,6 +314,14 @@ export const translations: Record<string, Translations> = {
     mobileNumber: "मोबाइल नंबर",
     designation: "पदनाम",
     createAccount: "खाता बनाएं",
+    
+    referralDiscountNote1: "💰 एक मान्य",
+    referralDiscountNote2: "रेफ़रल कोड",
+    referralDiscountNote3: "दर्ज करें और किसी भी पेड सब्सक्रिप्शन प्लान पर तुरंत",
+    referralDiscountNote4: "",
+    referralDiscountNote5: "की छूट पाएं।",
+    referralDiscountNote6: " ",
+
     makePaymentCreateAccount: "भुगतान करें और खाता बनाएं",
     alreadyHaveAccount: "पहले से खाता है?",
     dontHaveAccount: "खाता नहीं है?",

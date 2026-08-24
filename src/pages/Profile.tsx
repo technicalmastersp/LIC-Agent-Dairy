@@ -190,14 +190,14 @@ const Profile = () => {
                     }
                   </div>
                   <div className="absolute bottom-0 right-0 w-[22px] h-[22px] rounded-full bg-primary border-2 border-white flex items-center justify-center">
-                    <Camera className="w-3 h-3 text-white" />
+                    <Camera className="w-3 h-3 text-primary-foreground" />
                   </div>
                   <input ref={fileRef} type="file" accept="image/*" className="hidden"
                     onChange={handleAvatarChange} />
                 </div>
               </div>
               {sub?.status === "active" && (
-                <Badge className="absolute top-3 right-3 bg-white/15 text-white border border-white/25 text-[10px] backdrop-blur-sm">
+                <Badge className="absolute top-3 right-3 bg-primary-foreground/15 text-primary-foreground border border-primary-foreground/25 text-[10px] backdrop-blur-sm">
                   <ShieldCheck className="w-3 h-3 mr-1" /> Active member
                 </Badge>
               )}
