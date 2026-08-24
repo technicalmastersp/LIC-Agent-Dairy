@@ -18,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import { createUser, checkReferralCode, getProfile } from "../../services/userService";
 import { getReferralConfig } from "../../services/configService";
 import { createCheckoutOrder, verifyPayment } from "../../services/subscriptionService";
-import { setToken } from "../../utils/localStorageHelper";
 import { setCurrentUser } from "@/utils/auth";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
 import { signUpSchema, type SignUpFormValues } from "@/schemas/signUpSchema";
@@ -146,10 +145,12 @@ const SignUp = () => {
         const registeredUser = success.user;
         const needsPayment = registeredUser?.subscription?.status === "pending_payment";
 
-        if (needsPayment && registeredUser?.token) {
-          // Paid plan chosen at signup — log the user in with the token already
-          // issued at registration, then continue straight into checkout.
-          setToken(registeredUser.token);
+        if (needsPayment) {
+          // Paid plan chosen at signup — the register response already set
+          // the httpOnly auth cookie (see backend authController.js), so
+          // the very next request (createCheckoutOrder) is automatically
+          // authenticated via that cookie. No client-side token handling
+          // needed anymore.
 
           try {
             const order = await createCheckoutOrder(formData.selectedPlan);

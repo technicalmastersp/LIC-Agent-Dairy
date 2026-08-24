@@ -1,6 +1,5 @@
 // Authentication utilities and user management
 import { processReferral } from "./referral";
-import { clearToken } from '../../utils/localStorageHelper.js'
 
 export interface PaymentDetails {
   upiId?: string;

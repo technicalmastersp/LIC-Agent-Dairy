@@ -1,22 +1,40 @@
 import axios from "axios";
-import { getToken } from "../utils/localStorageHelper";
 import { toastEmitter } from "../utils/toastEmitter";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: { "Content-Type": "application/json" },
   timeout: 10000,
+  // Auth now lives in an httpOnly cookie set by the backend (see
+  // authController.js's setTokenCookie) instead of a token the frontend
+  // reads and attaches itself — withCredentials tells the browser to send
+  // that cookie on every request and to accept Set-Cookie from responses.
+  // Requires the backend's CORS config to echo back a specific origin
+  // (never "*") with credentials: true — see app.js.
+  withCredentials: true,
 });
 
-// ── Request: attach token ─────────────────────────────────────────────────────
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = getToken();
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// No request interceptor needed anymore — the browser attaches the auth
+// cookie automatically on every request to the API's origin.
+
+// Auth now lives in an httpOnly cookie the browser controls — client JS
+// can no longer read or clear it directly (that's the whole point of
+// httpOnly). So wherever this file used to just localStorage.clear() and
+// redirect on a 401, it now also has to ask the server to clear the
+// cookie via /auth/logout, or the browser keeps sending the stale cookie
+// on every request after the "logged out" redirect. Fired via plain
+// fetch() (not apiClient) so it can't recurse into this same interceptor.
+const clearServerSession = () => {
+  fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  }).catch(() => {
+    // Best-effort — if this fails the cookie just sits until its own
+    // expiry; the server still rejects it on every request in the
+    // SESSION_INVALIDATED (tokenVersion mismatch) case, so there's no
+    // security regression, only slightly untidy browser state.
+  });
+};
 
 // ── Response: global error handling ──────────────────────────────────────────
 apiClient.interceptors.response.use(
@@ -43,6 +61,7 @@ apiClient.interceptors.response.use(
 
       if (code === "SESSION_INVALIDATED") {
         // Clear everything and redirect with a message
+        clearServerSession();
         localStorage.clear();
         window.location.href = "/login?reason=session_ended";
         return Promise.reject(error);
@@ -53,6 +72,7 @@ apiClient.interceptors.response.use(
         description: "Please login again.",
         variant:     "destructive",
       });
+      clearServerSession();
       localStorage.clear();
       window.location.href = "/login";
       return Promise.reject(error);
