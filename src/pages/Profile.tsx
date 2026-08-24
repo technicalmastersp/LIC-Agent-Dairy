@@ -179,7 +179,7 @@ const Profile = () => {
         <div className="max-w-5xl mx-auto space-y-4">
 
           {/* ── Cover + Hero ── */}
-          <div className="bg-white border border-border rounded-xl overflow-hidden">
+          <div className="bg-card border border-border rounded-xl overflow-hidden">
             <div className="h-20 sm:h-24 bg-gradient-to-r from-form-header via-form-header to-primary relative">
               <div className="absolute -bottom-8 left-4 sm:left-6">
                 <div className="relative shrink-0 cursor-pointer" onClick={() => fileRef.current?.click()}>
@@ -260,7 +260,7 @@ const Profile = () => {
               <Link
                 key={label}
                 to={to}
-                className="bg-white border border-border rounded-xl p-3 flex flex-col items-center text-center gap-1.5 hover:border-primary/40 hover:shadow-sm transition-all"
+                className="bg-card border border-border rounded-xl p-3 flex flex-col items-center text-center gap-1.5 hover:border-primary/40 hover:shadow-sm transition-all"
               >
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Icon className="w-4 h-4 text-primary" />
@@ -271,7 +271,7 @@ const Profile = () => {
           </div>
 
           {/* ── Profile completion bar ── */}
-          <div className="bg-white border border-border rounded-xl px-4 py-3.5">
+          <div className="bg-card border border-border rounded-xl px-4 py-3.5">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium flex items-center gap-1.5">
                 <Gauge className="w-4 h-4 text-primary" /> Profile Completion
@@ -301,7 +301,7 @@ const Profile = () => {
           {/* ── Main two-column ── */}
           <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4">
 
-            <div className="bg-white border border-border rounded-xl p-4">
+            <div className="bg-card border border-border rounded-xl p-4">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
                 <Crown className="w-3.5 h-3.5 text-primary" /> Account
               </p>
@@ -353,7 +353,7 @@ const Profile = () => {
               </button>
             </div>
 
-            <div className="bg-white border border-border rounded-xl p-4">
+            <div className="bg-card border border-border rounded-xl p-4">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
                 <UserCircle2 className="w-3.5 h-3.5 text-primary" /> Profile information
               </p>
@@ -428,7 +428,7 @@ const Profile = () => {
 
           {/* ── Referral summary ── */}
           {referral && (
-            <div className="bg-white border border-border rounded-xl p-4">
+            <div className="bg-card border border-border rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
                   <Wallet2 className="w-3.5 h-3.5 text-primary" /> Referral summary

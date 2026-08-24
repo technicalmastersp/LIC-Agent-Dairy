@@ -20,6 +20,7 @@ import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage }   from "@/hooks/useLanguage";
 import type { Translations } from "@/utils/translations";
 import LanguageSwitcher  from "./LanguageSwitcher";
+import ThemeToggle        from "./ThemeToggle";
 import { cn }            from "@/lib/utils";
 import siteConfig        from "@/config/siteConfig";
 import { logoutCurrentUser } from "../../services/userService";
@@ -276,8 +277,9 @@ const Navigation = () => {
               </button>
               
               
-              <div className="hidden md:block min-w-24">
+              <div className="hidden md:flex items-center gap-2 min-w-24">
               <LanguageSwitcher />
+              <ThemeToggle type="icon" />
               </div>
 
               <Link to="/login">
@@ -322,8 +324,9 @@ const Navigation = () => {
                   </Button>
                 </Link>
               </div>
-              <div className="px-1 pt-1">
-                <LanguageSwitcher type="mobile" />
+              <div className="px-1 pt-1 flex gap-2">
+                <div className="flex-1"><LanguageSwitcher type="mobile" /></div>
+                <div className="flex-1"><ThemeToggle type="mobile" /></div>
               </div>
             </div>
           </div>
@@ -380,11 +383,12 @@ const Navigation = () => {
 
             <ToolsDropdown dark />
 
-            {/* Language switcher */}
-            <div className="pl-1.5 ml-1 border-l border-primary-foreground/15 shrink-0 flex items-center">
+            {/* Language switcher + theme toggle */}
+            <div className="pl-1.5 ml-1 border-l border-primary-foreground/15 shrink-0 flex items-center gap-2">
               <div className="xl:block">
                 <LanguageSwitcher />
               </div>
+              <ThemeToggle type="icon" />
             </div>
 
             {/* User dropdown */}
@@ -523,9 +527,10 @@ const Navigation = () => {
               </Button>
             </div>
 
-            {/* Language */}
-            <div className="pt-2 px-1">
-              <LanguageSwitcher type="mobile" />
+            {/* Language + theme */}
+            <div className="pt-2 px-1 flex gap-2">
+              <div className="flex-1"><LanguageSwitcher type="mobile" /></div>
+              <div className="flex-1"><ThemeToggle type="mobile" /></div>
             </div>
           </div>
         </div>

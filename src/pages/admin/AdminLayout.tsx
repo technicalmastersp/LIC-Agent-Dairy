@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "@/utils/auth";
+import ThemeToggle from "@/components/ThemeToggle";
 import { getMyPermissions, getPendingCounts } from "../../../services/adminService";
 import {
   Users,
@@ -232,15 +233,20 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           </button>
         </div>
 
-        {/* Role */}
-        <div className="px-4 py-3 border-b border-border">
-          <p className="text-xs text-muted-foreground">
-            Signed in as
-          </p>
+        {/* Role + theme toggle — no separate desktop header bar exists in
+            this layout (only the mobile-only <header> above), so the
+            toggle lives here in the sidebar instead. */}
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+          <div>
+            <p className="text-xs text-muted-foreground">
+              Signed in as
+            </p>
 
-          <p className="text-sm font-medium capitalize mt-0.5">
-            {role}
-          </p>
+            <p className="text-sm font-medium capitalize mt-0.5">
+              {role}
+            </p>
+          </div>
+          <ThemeToggle type="icon" />
         </div>
 
         {/* ====================== NAVIGATION ====================== */}

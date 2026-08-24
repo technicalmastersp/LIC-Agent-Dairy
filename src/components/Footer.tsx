@@ -18,7 +18,7 @@ interface FooterSectionProps {
 
 const FooterSection = ({ title, icon: Icon, links, children }: FooterSectionProps) => (
   <div>
-    <h3 className="text-sm font-semibold mb-4 text-white flex items-center gap-2">
+    <h3 className="text-sm font-semibold mb-4 text-primary-foreground flex items-center gap-2">
       {Icon && <Icon className="w-4 h-4 text-accent" />}
       {title}
     </h3>
@@ -28,14 +28,14 @@ const FooterSection = ({ title, icon: Icon, links, children }: FooterSectionProp
           <Link
             key={link.to}
             to={link.to}
-            className="block text-white/75 hover:text-accent transition-colors"
+            className="block text-primary-foreground/75 hover:text-accent transition-colors"
           >
             {link.label}
           </Link>
         ))}
       </div>
     )}
-    {children && <div className="text-sm mt-1 text-white/75">{children}</div>}
+    {children && <div className="text-sm mt-1 text-primary-foreground/75">{children}</div>}
   </div>
 );
 
@@ -87,7 +87,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-primary text-white mt-auto">
+    <footer className="bg-primary text-primary-foreground mt-auto">
       <div className="container mx-auto px-4 py-10">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
           <FooterSection title={t("quickLinks")} icon={Compass} links={quickLinks} />
@@ -124,20 +124,20 @@ const Footer = () => {
             <p className="mb-4 leading-relaxed">
               {t("companyDescription")}
             </p>
-            <div className="text-xs text-white/70">
+            <div className="text-xs text-primary-foreground/70">
               <p>© 2025 - {currentYear} {siteConfig.companyName}</p>
               <p>{t("allRightsReserved")}</p>
             </div>
           </FooterSection>
         </div>
 
-        <div className="border-t border-white/15 mt-8 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-white/70">
+        <div className="border-t border-primary-foreground/15 mt-8 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-primary-foreground/70">
           <p>{t("footerTagline")}</p>
           <div className="flex items-center gap-4">
-            <Link to="/privacy-policy" className="hover:text-white transition-colors">
+            <Link to="/privacy-policy" className="hover:text-primary-foreground transition-colors">
               Privacy Policy
             </Link>
-            <Link to="/terms-of-service" className="hover:text-white transition-colors">
+            <Link to="/terms-of-service" className="hover:text-primary-foreground transition-colors">
               Terms of Service
             </Link>
           </div>

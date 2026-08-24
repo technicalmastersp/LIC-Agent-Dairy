@@ -406,7 +406,7 @@ const AdminAdmins = () => {
         {selectedAdmin && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
-              <CardHeader className="pb-3 sticky top-0 bg-white z-10 border-b border-border">
+              <CardHeader className="pb-3 sticky top-0 bg-card z-10 border-b border-border">
                 <CardTitle className="text-base flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-blue-600" />

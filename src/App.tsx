@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -63,6 +64,14 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <ErrorBoundary>
+    {/* Outermost provider (aside from ErrorBoundary) — Sonner already
+        calls next-themes' useTheme() from inside LanguageProvider below,
+        so ThemeProvider must wrap at least that deep. Placed at the very
+        top instead so the `dark` class lands on <html> as early as
+        possible in the render, avoiding a flash of the wrong theme. It
+        has no dependency on QueryClientProvider/LanguageProvider, so the
+        ordering relative to them doesn't otherwise matter. */}
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <LanguageProvider>
@@ -131,6 +140,7 @@ const App = () => (
         </LanguageProvider>
       </TooltipProvider>
     </QueryClientProvider>
+    </ThemeProvider>
   </ErrorBoundary>
 );
 

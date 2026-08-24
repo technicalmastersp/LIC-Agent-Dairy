@@ -71,18 +71,18 @@ const categories = [
 ];
 
 const ticketStatusStyle: Record<string, string> = {
-  open:        "bg-blue-100 text-blue-700 border border-blue-200",
-  in_progress: "bg-amber-100 text-amber-700 border border-amber-200",
-  resolved:    "bg-green-100 text-green-700 border border-green-200",
-  closed:      "bg-gray-100 text-gray-600 border border-gray-200",
+  open:        "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900",
+  in_progress: "bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900",
+  resolved:    "bg-green-100 text-green-700 border border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900",
+  closed:      "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border",
 };
 
 const suggestionStatusStyle: Record<string, string> = {
-  new:          "bg-blue-100 text-blue-700 border border-blue-200",
-  under_review: "bg-amber-100 text-amber-700 border border-amber-200",
-  planned:      "bg-purple-100 text-purple-700 border border-purple-200",
-  implemented:  "bg-green-100 text-green-700 border border-green-200",
-  declined:     "bg-gray-100 text-gray-600 border border-gray-200",
+  new:          "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900",
+  under_review: "bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900",
+  planned:      "bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-900",
+  implemented:  "bg-green-100 text-green-700 border border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900",
+  declined:     "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border",
 };
 
 const fmt = (d?: string) => d

@@ -679,7 +679,7 @@ const ReferralProgram = () => {
                 <p className="text-xs text-muted-foreground mb-1">Referral code</p>
                 <p className="text-xl font-mono font-medium text-blue-600 tracking-widest flex items-center justify-between gap-2">
                   {currentUser.referralCode}
-                  <Button size="sm" className="border bottom-1 bg-transparent text-black" onClick={copyCode}><Copy className="w-3.5 h-3.5 mr-1.5" />Copy</Button>
+                  <Button size="sm" className="border bottom-1 bg-transparent text-foreground" onClick={copyCode}><Copy className="w-3.5 h-3.5 mr-1.5" />Copy</Button>
                 </p>
               </div>
               <div className="bg-muted rounded-lg p-3">

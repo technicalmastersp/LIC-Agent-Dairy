@@ -9,22 +9,22 @@ import { getActivityLogs } from "../../../services/adminService";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const ACTION_COLORS: Record<string, string> = {
-  WITHDRAWAL_APPROVED: "bg-green-100 text-green-700",
-  WITHDRAWAL_REJECTED: "bg-red-100 text-red-700",
-  USER_DEACTIVATED:    "bg-orange-100 text-orange-700",
-  USER_REACTIVATED:    "bg-blue-100 text-blue-700",
-  USER_DELETED:        "bg-red-100 text-red-700",
-  SUBSCRIPTION_CHANGED:"bg-purple-100 text-purple-700",
-  ADMIN_CREATED:       "bg-blue-100 text-blue-700",
-  ADMIN_DEACTIVATED:   "bg-orange-100 text-orange-700",
-  RECORD_DELETED:      "bg-red-100 text-red-700",
-  ADMIN_PERMISSIONS_UPDATED: "bg-indigo-100 text-indigo-700",
-  UPI_VERIFIED:        "bg-green-100 text-green-700",
-  UPI_REJECTED:        "bg-red-100 text-red-700",
-  ADMIN_PROMOTED_TO_SUPERADMIN: "bg-red-100 text-red-700",
-  SUPERADMIN_DEMOTED_TO_ADMIN: "bg-red-100 text-red-700",
-  FORCE_LOGOUT: "bg-red-100 text-red-700",
-  FORCE_LOGOUT_GROUP: "bg-red-100 text-red-700",
+  WITHDRAWAL_APPROVED: "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
+  WITHDRAWAL_REJECTED: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  USER_DEACTIVATED:    "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400",
+  USER_REACTIVATED:    "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  USER_DELETED:        "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  SUBSCRIPTION_CHANGED:"bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400",
+  ADMIN_CREATED:       "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  ADMIN_DEACTIVATED:   "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400",
+  RECORD_DELETED:      "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  ADMIN_PERMISSIONS_UPDATED: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400",
+  UPI_VERIFIED:        "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
+  UPI_REJECTED:        "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  ADMIN_PROMOTED_TO_SUPERADMIN: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  SUPERADMIN_DEMOTED_TO_ADMIN: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  FORCE_LOGOUT: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  FORCE_LOGOUT_GROUP: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
 };
 
 const ACTIONS = Object.keys(ACTION_COLORS);
@@ -130,7 +130,7 @@ const AdminLogs = () => {
                     onClick={() => setExpanded(expanded === log._id ? null : log._id)}>
                     <div className="flex items-start gap-3">
                       {/* Action badge */}
-                      <Badge className={`text-xs shrink-0 mt-0.5 ${ACTION_COLORS[log.action] || "bg-gray-100 text-gray-600"}`}>
+                      <Badge className={`text-xs shrink-0 mt-0.5 ${ACTION_COLORS[log.action] || "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground"}`}>
                         {log.action.replace(/_/g," ")}
                       </Badge>
                       <div className="flex-1 min-w-0">
