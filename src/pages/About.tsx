@@ -36,10 +36,10 @@ const About = () => {
   const { t } = useLanguage();
 
   const policyTypes = [
-    { label: "Life", icon: ShieldCheck, rotate: "-rotate-6", offset: "translate-y-2", bg: "bg-blue-50", accent: "text-blue-600", chip: "Active" },
-    { label: "Health", icon: HeartPulse, rotate: "rotate-3", offset: "-translate-y-3", bg: "bg-emerald-50", accent: "text-emerald-600", chip: "Due soon" },
-    { label: "Motor", icon: Car, rotate: "-rotate-2", offset: "translate-y-4", bg: "bg-amber-50", accent: "text-amber-600", chip: "Active" },
-    { label: "General", icon: HomeIcon, rotate: "rotate-6", offset: "-translate-y-1", bg: "bg-violet-50", accent: "text-violet-600", chip: "Renewed" },
+    { label: "Life", icon: ShieldCheck, rotate: "-rotate-6", offset: "translate-y-2", bg: "bg-blue-50 dark:bg-blue-950/40", accent: "text-blue-600 dark:text-blue-400", chip: "Active" },
+    { label: "Health", icon: HeartPulse, rotate: "rotate-3", offset: "-translate-y-3", bg: "bg-emerald-50 dark:bg-emerald-950/40", accent: "text-emerald-600 dark:text-emerald-400", chip: "Due soon" },
+    { label: "Motor", icon: Car, rotate: "-rotate-2", offset: "translate-y-4", bg: "bg-amber-50 dark:bg-amber-950/40", accent: "text-amber-600 dark:text-amber-400", chip: "Active" },
+    { label: "General", icon: HomeIcon, rotate: "rotate-6", offset: "-translate-y-1", bg: "bg-violet-50 dark:bg-violet-950/40", accent: "text-violet-600 dark:text-violet-400", chip: "Renewed" },
   ];
 
   const trustStats = [
@@ -128,7 +128,7 @@ const About = () => {
                     </Button>
                   </Link>
                   <Link to="/add-record">
-                    <Button size="lg" variant="outline" className="border-white/30 text-black hover:bg-white/10 hover:text-white">
+                    <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 hover:text-white">
                       Add a record
                     </Button>
                   </Link>
@@ -148,10 +148,10 @@ const About = () => {
                     }}
                   >
                     <div className="flex items-center justify-between mb-4">
-                      <div className={`w-9 h-9 rounded-lg bg-white flex items-center justify-center shadow-sm`}>
+                      <div className={`w-9 h-9 rounded-lg bg-white dark:bg-background flex items-center justify-center shadow-sm`}>
                         <Icon className={`w-4.5 h-4.5 ${accent}`} />
                       </div>
-                      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground bg-white/70 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground bg-white/70 dark:bg-background/70 px-2 py-0.5 rounded-full">
                         {chip}
                       </span>
                     </div>
@@ -186,7 +186,7 @@ const About = () => {
                 <div className="grid grid-cols-2 gap-4">
                   {policyTypes.map(({ label, icon: Icon, bg, accent }) => (
                     <div key={label} className={`${bg} rounded-2xl p-5 flex items-center gap-3`}>
-                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-white dark:bg-background flex items-center justify-center shadow-sm shrink-0">
                         <Icon className={`w-5 h-5 ${accent}`} />
                       </div>
                       <span className="font-medium text-form-header text-sm">{label} Insurance</span>

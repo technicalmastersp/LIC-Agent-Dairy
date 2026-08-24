@@ -131,7 +131,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 &nbsp;{siteConfig.title}
               </CardTitle>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                <Badge variant="outline" className="bg-white/60 border-primary/30 text-form-header font-medium">
+                <Badge variant="outline" className="bg-background/60 border-primary/30 text-form-header font-medium">
                   {isOtherInsuranceType(record.insuranceType)
                     ? (record.customInsuranceTypeName || "Custom Insurance")
                     : (getInsuranceTypeDef(record.insuranceType)?.label || record.insuranceType || "Life Insurance")}

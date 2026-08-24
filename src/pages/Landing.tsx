@@ -16,10 +16,10 @@ import siteConfig from "@/config/siteConfig";
 import SEO from "@/components/SEO";
 
 const plans = [
-  { id: "1month-free", name: "1 Month", price: "Free", tag: "Try it out", color: "bg-gray-50 border-gray-200", accent: "text-gray-600" },
-  { id: "6months", name: "6 Months", price: "For starting agents", tag: "", color: "bg-violet-50 border-violet-200", accent: "text-violet-700" },
-  { id: "12months", name: "12 Months", price: "Most popular", tag: "Recommended", color: "bg-blue-50 border-blue-300 ring-2 ring-blue-200", accent: "text-blue-700" },
-  { id: "24months", name: "24 Months", price: "Best value", tag: "", color: "bg-amber-50 border-amber-200", accent: "text-amber-700" },
+  { id: "1month-free", name: "1 Month", price: "Free", tag: "Try it out", color: "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border", accent: "text-gray-600 dark:text-muted-foreground" },
+  { id: "6months", name: "6 Months", price: "For starting agents", tag: "", color: "bg-violet-50 border-violet-200 dark:bg-violet-950/40 dark:border-violet-900", accent: "text-violet-700 dark:text-violet-400" },
+  { id: "12months", name: "12 Months", price: "Most popular", tag: "Recommended", color: "bg-blue-50 border-blue-300 ring-2 ring-blue-200 dark:bg-blue-950/40 dark:border-blue-800 dark:ring-blue-900", accent: "text-blue-700 dark:text-blue-400" },
+  { id: "24months", name: "24 Months", price: "Best value", tag: "", color: "bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900", accent: "text-amber-700 dark:text-amber-400" },
 ];
 
 const Landing = () => {
@@ -83,7 +83,7 @@ const Landing = () => {
 
               {/* Right: single contained dashboard mockup — badges anchored to its own box, can't drift into text */}
               <div className="relative mx-auto w-full max-w-md py-6">
-                <div className="relative rounded-2xl border border-border bg-white shadow-2xl overflow-hidden">
+                <div className="relative rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
                   {/* window chrome */}
                   <div className="flex items-center gap-1.5 px-4 py-3 border-b border-border bg-muted/40">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-300" />
@@ -96,9 +96,9 @@ const Landing = () => {
                     {/* mini stat row */}
                     <div className="grid grid-cols-3 gap-2">
                       {[
-                        { label: "Records", val: "128", bg: "bg-blue-50", color: "text-blue-700" },
-                        { label: "Due", val: "12", bg: "bg-amber-50", color: "text-amber-700" },
-                        { label: "Backed up", val: "Today", bg: "bg-emerald-50", color: "text-emerald-700" },
+                        { label: "Records", val: "128", bg: "bg-blue-50 dark:bg-blue-950/40", color: "text-blue-700 dark:text-blue-400" },
+                        { label: "Due", val: "12", bg: "bg-amber-50 dark:bg-amber-950/40", color: "text-amber-700 dark:text-amber-400" },
+                        { label: "Backed up", val: "Today", bg: "bg-emerald-50 dark:bg-emerald-950/40", color: "text-emerald-700 dark:text-emerald-400" },
                       ].map(({ label, val, bg, color }) => (
                         <div key={label} className={`${bg} rounded-lg p-2.5 text-center`}>
                           <p className={`text-sm font-semibold ${color}`}>{val}</p>
@@ -113,9 +113,9 @@ const Landing = () => {
                         <span>Name</span><span>Policy</span><span className="text-right">Status</span>
                       </div>
                       {[
-                        { name: "R. Sharma", policy: "LIC-2291", status: "Active", color: "bg-emerald-100 text-emerald-700" },
-                        { name: "A. Verma", policy: "HDFC-8823", status: "Due", color: "bg-amber-100 text-amber-700" },
-                        { name: "S. Iyer", policy: "ICICI-4410", status: "Active", color: "bg-emerald-100 text-emerald-700" },
+                        { name: "R. Sharma", policy: "LIC-2291", status: "Active", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
+                        { name: "A. Verma", policy: "HDFC-8823", status: "Due", color: "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400" },
+                        { name: "S. Iyer", policy: "ICICI-4410", status: "Active", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
                       ].map((row) => (
                         <div key={row.name} className="grid grid-cols-3 items-center px-3 py-2 text-xs border-t border-border">
                           <span className="text-form-header font-medium">{row.name}</span>
@@ -129,18 +129,18 @@ const Landing = () => {
                   </div>
 
                   {/* badge anchored to card's own top-right corner — contained, can't overlap text column */}
-                  <div className="absolute -top-3 -right-3 bg-white shadow-lg border border-border rounded-full pl-1.5 pr-5 pt-3 pb-1.5 flex items-center gap-1.5 z-10">
-                    <span className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  <div className="absolute -top-3 -right-3 bg-card shadow-lg border border-border rounded-full pl-1.5 pr-5 pt-3 pb-1.5 flex items-center gap-1.5 z-10">
+                    <span className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                     </span>
                     <span className="text-[11px] font-medium text-form-header">Backed up 2m ago</span>
                   </div>
                 </div>
 
                 {/* second badge sits below the card in normal flow, not absolutely positioned — zero overlap risk */}
-                <div className="mt-4 mx-auto w-fit bg-white shadow-lg border border-border rounded-xl px-4 py-2.5 flex items-center gap-2.5">
-                  <span className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
-                    <Bell className="w-3.5 h-3.5 text-amber-600" />
+                <div className="mt-4 mx-auto w-fit bg-card shadow-lg border border-border rounded-xl px-4 py-2.5 flex items-center gap-2.5">
+                  <span className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center shrink-0">
+                    <Bell className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                   </span>
                   <span className="text-xs text-form-header">
                     <span className="font-semibold">3 payments</span>
@@ -230,9 +230,9 @@ const Landing = () => {
 
                 {/* Due tracking */}
                 <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
-                  <div className="mb-4 bg-amber-50 rounded-xl p-3 space-y-1.5">
+                  <div className="mb-4 bg-amber-50 dark:bg-amber-950/40 rounded-xl p-3 space-y-1.5">
                     {["Due 3 Aug", "Due 9 Aug"].map((d) => (
-                      <div key={d} className="flex items-center justify-between bg-white rounded-md px-2.5 py-1.5">
+                      <div key={d} className="flex items-center justify-between bg-white dark:bg-background rounded-md px-2.5 py-1.5">
                         <span className="text-[10px] text-form-header font-medium">{d}</span>
                         <BellRing className="w-3 h-3 text-amber-500" />
                       </div>
@@ -245,9 +245,9 @@ const Landing = () => {
 
                 {/* Referral wallet */}
                 <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
-                  <div className="mb-4 bg-emerald-50 rounded-xl p-4">
-                    <p className="text-[10px] text-emerald-700 mb-1">Available balance</p>
-                    <p className="text-lg font-bold text-emerald-700">₹4,250</p>
+                  <div className="mb-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl p-4">
+                    <p className="text-[10px] text-emerald-700 dark:text-emerald-400 mb-1">Available balance</p>
+                    <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400">₹4,250</p>
                   </div>
                   <Wallet className="w-5 h-5 text-primary mb-2" />
                   <h3 className="font-semibold text-form-header mb-1.5">Referral wallet</h3>
@@ -256,13 +256,13 @@ const Landing = () => {
 
                 {/* Search */}
                 <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
-                  <div className="mb-4 bg-violet-50 rounded-xl p-3">
-                    <div className="flex items-center gap-2 bg-white rounded-md px-2.5 py-1.5 mb-2">
+                  <div className="mb-4 bg-violet-50 dark:bg-violet-950/40 rounded-xl p-3">
+                    <div className="flex items-center gap-2 bg-white dark:bg-background rounded-md px-2.5 py-1.5 mb-2">
                       <Search className="w-3 h-3 text-muted-foreground" />
                       <span className="text-[10px] text-muted-foreground">Sharma...</span>
                     </div>
-                    <div className="h-1.5 w-3/4 rounded bg-violet-200/60 mb-1.5" />
-                    <div className="h-1.5 w-1/2 rounded bg-violet-200/40" />
+                    <div className="h-1.5 w-3/4 rounded bg-violet-200/60 dark:bg-violet-800/40 mb-1.5" />
+                    <div className="h-1.5 w-1/2 rounded bg-violet-200/40 dark:bg-violet-800/25" />
                   </div>
                   <Search className="w-5 h-5 text-primary mb-2" />
                   <h3 className="font-semibold text-form-header mb-1.5">Instant search & sort</h3>
@@ -271,9 +271,9 @@ const Landing = () => {
 
                 {/* Multi-language */}
                 <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
-                  <div className="mb-4 bg-rose-50 rounded-xl p-3 flex items-center gap-2">
-                    <span className="text-[11px] font-medium bg-white text-form-header rounded-full px-3 py-1 shadow-sm">English</span>
-                    <span className="text-[11px] font-medium bg-rose-200/60 text-rose-700 rounded-full px-3 py-1">हिंदी</span>
+                  <div className="mb-4 bg-rose-50 dark:bg-rose-950/40 rounded-xl p-3 flex items-center gap-2">
+                    <span className="text-[11px] font-medium bg-white dark:bg-background text-form-header rounded-full px-3 py-1 shadow-sm">English</span>
+                    <span className="text-[11px] font-medium bg-rose-200/60 dark:bg-rose-800/40 text-rose-700 dark:text-rose-300 rounded-full px-3 py-1">हिंदी</span>
                   </div>
                   <Languages className="w-5 h-5 text-primary mb-2" />
                   <h3 className="font-semibold text-form-header mb-1.5">English & Hindi</h3>
@@ -282,10 +282,10 @@ const Landing = () => {
 
                 {/* Mobile */}
                 <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
-                  <div className="mb-4 bg-cyan-50 rounded-xl p-3 flex justify-center">
-                    <div className="w-14 h-24 rounded-xl border-2 border-cyan-300 bg-white p-1.5 flex flex-col gap-1">
-                      <div className="h-1.5 w-6 mx-auto rounded-full bg-cyan-200" />
-                      <div className="flex-1 rounded-md bg-cyan-50 mt-1" />
+                  <div className="mb-4 bg-cyan-50 dark:bg-cyan-950/40 rounded-xl p-3 flex justify-center">
+                    <div className="w-14 h-24 rounded-xl border-2 border-cyan-300 dark:border-cyan-800 bg-white dark:bg-background p-1.5 flex flex-col gap-1">
+                      <div className="h-1.5 w-6 mx-auto rounded-full bg-cyan-200 dark:bg-cyan-800" />
+                      <div className="flex-1 rounded-md bg-cyan-50 dark:bg-cyan-950/40 mt-1" />
                     </div>
                   </div>
                   <Smartphone className="w-5 h-5 text-primary mb-2" />

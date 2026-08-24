@@ -20,24 +20,24 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 const ACTION_COLORS: Record<string, string> = {
-  WITHDRAWAL_APPROVED:       "bg-green-100 text-green-700",
-  WITHDRAWAL_REJECTED:       "bg-red-100 text-red-700",
-  USER_DEACTIVATED:          "bg-orange-100 text-orange-700",
-  USER_REACTIVATED:          "bg-blue-100 text-blue-700",
-  USER_DELETED:              "bg-red-100 text-red-700",
-  SUBSCRIPTION_CHANGED:      "bg-purple-100 text-purple-700",
-  ADMIN_CREATED:             "bg-blue-100 text-blue-700",
-  ADMIN_DEACTIVATED:         "bg-orange-100 text-orange-700",
-  ADMIN_PERMISSIONS_UPDATED: "bg-indigo-100 text-indigo-700",
-  UPI_VERIFIED:              "bg-green-100 text-green-700",
-  UPI_REJECTED:              "bg-red-100 text-red-700",
+  WITHDRAWAL_APPROVED:       "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
+  WITHDRAWAL_REJECTED:       "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  USER_DEACTIVATED:          "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400",
+  USER_REACTIVATED:          "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  USER_DELETED:              "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  SUBSCRIPTION_CHANGED:      "bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400",
+  ADMIN_CREATED:             "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  ADMIN_DEACTIVATED:         "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400",
+  ADMIN_PERMISSIONS_UPDATED: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400",
+  UPI_VERIFIED:              "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
+  UPI_REJECTED:              "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
 };
 
 const PLAN_COLOR: Record<string, string> = {
-  "1month-free": "bg-gray-100 text-gray-600",
-  "6months":     "bg-violet-100 text-violet-700",
-  "12months":    "bg-blue-100 text-blue-700",
-  "24months":    "bg-amber-100 text-amber-700",
+  "1month-free": "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground",
+  "6months":     "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400",
+  "12months":    "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  "24months":    "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
 };
 
 const fmt = (d?: string) => d
@@ -204,7 +204,7 @@ const AdminDashboard = () => {
               label:   "Total revenue",
               val:     `₹${(revenue.total ?? 0).toLocaleString("en-IN")}`,
               icon:    <TrendingUp className="w-5 h-5 text-purple-600" />,
-              bg:      "bg-purple-50 border-purple-200",
+              bg:      "bg-purple-50 border-purple-200 dark:bg-purple-950/40 dark:border-purple-900",
               sub:     `${subscriptions.paid} paid users`,
               link:    null,
             },
@@ -212,7 +212,7 @@ const AdminDashboard = () => {
               label:   "Pending withdrawals",
               val:     withdrawals.pending,
               icon:    <Clock className="w-5 h-5 text-amber-600" />,
-              bg:      `border ${withdrawals.pending > 0 ? "bg-amber-50 border-amber-300" : "bg-gray-50 border-gray-200"}`,
+              bg:      `border ${withdrawals.pending > 0 ? "bg-amber-50 border-amber-300 dark:bg-amber-950/40 dark:border-amber-800" : "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border"}`,
               sub:     `₹${withdrawals.pendingAmount.toLocaleString("en-IN")} pending`,
               link:    "/admin/withdrawals",
               urgent:  withdrawals.pending > 0,
@@ -221,7 +221,7 @@ const AdminDashboard = () => {
               label:   "Pending UPI verifications",
               val:     stats.paymentVerifications?.pendingUpi ?? 0,
               icon:    <BadgeCheck className="w-5 h-5 text-blue-600" />,
-              bg:      `border ${(stats.paymentVerifications?.pendingUpi ?? 0) > 0 ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-gray-200"}`,
+              bg:      `border ${(stats.paymentVerifications?.pendingUpi ?? 0) > 0 ? "bg-blue-50 border-blue-300 dark:bg-blue-950/40 dark:border-blue-800" : "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border"}`,
               sub:     "Awaiting manual review",
               link:    "/admin/payment-verifications",
               urgent:  (stats.paymentVerifications?.pendingUpi ?? 0) > 0,
@@ -231,7 +231,7 @@ const AdminDashboard = () => {
                 label:   "Open support tickets",
                 val:     (stats.support?.openHighPriority ?? 0) + (stats.support?.openGuest ?? 0),
                 icon:    <LifeBuoy className="w-5 h-5 text-orange-600" />,
-                bg:      `border ${(stats.support?.openHighPriority ?? 0) > 0 ? "bg-orange-50 border-orange-300" : "bg-gray-50 border-gray-200"}`,
+                bg:      `border ${(stats.support?.openHighPriority ?? 0) > 0 ? "bg-orange-50 border-orange-300 dark:bg-orange-950/40 dark:border-orange-800" : "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border"}`,
                 sub:     `${stats.support?.openHighPriority ?? 0} high · ${stats.support?.openGuest ?? 0} guest`,
                 link:    "/admin/support",
                 urgent:  (stats.support?.openHighPriority ?? 0) > 0,
@@ -240,7 +240,7 @@ const AdminDashboard = () => {
                 label:   "New suggestions",
                 val:     stats.support?.newSuggestions ?? 0,
                 icon:    <Lightbulb className="w-5 h-5 text-purple-600" />,
-                bg:      `border ${(stats.support?.newSuggestions ?? 0) > 0 ? "bg-purple-50 border-purple-300" : "bg-gray-50 border-gray-200"}`,
+                bg:      `border ${(stats.support?.newSuggestions ?? 0) > 0 ? "bg-purple-50 border-purple-300 dark:bg-purple-950/40 dark:border-purple-800" : "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border"}`,
                 sub:     "Awaiting review",
                 link:    "/admin/suggestions",
                 urgent:  false,
@@ -250,7 +250,7 @@ const AdminDashboard = () => {
               label:   "This month's income",
               val:     `₹${(stats.revenue?.thisMonthIncome ?? 0).toLocaleString("en-IN")}`,
               icon:    <IndianRupee className="w-5 h-5 text-green-600" />,
-              bg:      "border bg-green-50 border-green-200",
+              bg:      "border bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-900",
               sub:     "View full revenue report",
               link:    "/admin/revenue",
               urgent:  false,
@@ -261,7 +261,7 @@ const AdminDashboard = () => {
               onClick={() => link && navigate(link)}>
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-2">
-                  <div className="w-9 h-9 rounded-lg bg-white border border-border flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-lg bg-white dark:bg-background border border-border flex items-center justify-center">
                     {icon}
                   </div>
                   {trend !== undefined && (
@@ -442,7 +442,7 @@ const AdminDashboard = () => {
                 <div>
                   {recentActivity.map((log: ActivityLogItem, i: number) => (
                     <div key={i} className="flex items-start gap-2.5 py-2.5 border-b border-border last:border-0">
-                      <Badge className={`text-xs shrink-0 mt-0.5 ${ACTION_COLORS[log.action] || "bg-gray-100 text-gray-600"}`}>
+                      <Badge className={`text-xs shrink-0 mt-0.5 ${ACTION_COLORS[log.action] || "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground"}`}>
                         {log.action.replace(/_/g," ")}
                       </Badge>
                       <div className="flex-1 min-w-0">
@@ -482,7 +482,7 @@ const AdminDashboard = () => {
                         <p className="text-xs text-muted-foreground truncate">{u.email}</p>
                       </div>
                       <div className="shrink-0 text-right">
-                        <Badge className={`text-xs ${PLAN_COLOR[u.planId] || "bg-gray-100 text-gray-600"}`}>
+                        <Badge className={`text-xs ${PLAN_COLOR[u.planId] || "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground"}`}>
                           {u.planType}
                         </Badge>
                         <p className="text-xs text-muted-foreground mt-0.5">{fmt(u.createdAt)}</p>

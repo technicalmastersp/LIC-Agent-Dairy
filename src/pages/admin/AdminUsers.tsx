@@ -21,10 +21,10 @@ const fmt = (d?: string) => d
   : "—";
 
 const planColor: Record<string, string> = {
-  "1month-free": "bg-gray-100 text-gray-600",
-  "6months":     "bg-violet-100 text-violet-700",
-  "12months":    "bg-blue-100 text-blue-700",
-  "24months":    "bg-amber-100 text-amber-700",
+  "1month-free": "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground",
+  "6months":     "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400",
+  "12months":    "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  "24months":    "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
 };
 
 const PAGE_SIZE = 20;
@@ -309,7 +309,7 @@ const AdminUsers = () => {
                           <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{u.easyId}</span>
                         </TableCell>
                         <TableCell>
-                          <Badge className={`text-xs ${planColor[u.subscription?.planId] || "bg-gray-100 text-gray-600"}`}>
+                          <Badge className={`text-xs ${planColor[u.subscription?.planId] || "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground"}`}>
                             {u.subscription?.planType || "—"}
                           </Badge>
                           {u.subscription?.status === "expired" && (

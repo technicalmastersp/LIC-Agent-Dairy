@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as Sentry from "@sentry/react";
 import { toastEmitter } from "../utils/toastEmitter";
 
 const apiClient = axios.create({
@@ -118,6 +119,16 @@ apiClient.interceptors.response.use(
 
     // 500+ — server errors
     if (status >= 500) {
+      // Report to Sentry with request context — a no-op if Sentry.init()
+      // was never called (dev, or VITE_SENTRY_DSN unset).
+      Sentry.captureException(error, {
+        extra: {
+          url:      error.config?.url,
+          method:   error.config?.method,
+          status,
+          responseData: error.response?.data,
+        },
+      });
       toastEmitter.emit({
         title:       "Server Error",
         description: "Something went wrong on our end. Please try again later.",
