@@ -206,19 +206,19 @@ const HelpSupport = () => {
       <main className="flex-1">
 
         {/* ══════════ HERO ══════════ */}
-        <section className="relative bg-gradient-to-br from-form-header via-form-header to-form-subheader text-white overflow-hidden">
+        <section className="relative bg-gradient-to-br from-form-header via-form-header to-form-subheader text-primary-foreground overflow-hidden">
           <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
           <div className="absolute bottom-0 left-1/3 w-64 h-64 rounded-full bg-primary/20 blur-3xl" />
 
           <div className="container mx-auto px-4 relative">
             <div className="max-w-3xl mx-auto text-center py-16 md:py-20 space-y-5">
               <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mx-auto backdrop-blur-sm">
-                <LifeBuoy className="w-7 h-7 text-white" />
+                <LifeBuoy className="w-7 h-7 text-primary-foreground" />
               </div>
               <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
                 How can we help?
               </h1>
-              <p className="text-lg text-white/80 leading-relaxed max-w-xl mx-auto">
+              <p className="text-lg text-primary-foreground/80 leading-relaxed max-w-xl mx-auto">
                 Search our help articles, browse frequently asked questions, or reach the support
                 team directly — most queries are answered within a few hours.
               </p>
@@ -230,7 +230,7 @@ const HelpSupport = () => {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search help articles…"
-                  className="pl-11 h-12 bg-white text-form-header border-0 shadow-lg"
+                  className="pl-11 h-12 bg-white text-[hsl(195,90%,15%)] border-0 shadow-lg"
                 />
               </div>
             </div>
@@ -238,9 +238,9 @@ const HelpSupport = () => {
         </section>
 
         {/* ══════════ TRUST STRIP ══════════ */}
-        <section className="bg-form-subheader text-white">
+        <section className="bg-form-subheader text-primary-foreground">
           <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-white/15">
+            <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-primary-foreground/15">
               {[
                 { icon: Timer, value: "< few hrs", label: "Typical response time" },
                 { icon: CheckCircle2, value: "0", label: "Queries pending overnight" },
@@ -248,9 +248,9 @@ const HelpSupport = () => {
                 { icon: ShieldCheck, value: "Any", label: "Policy type supported" },
               ].map(({ icon: Icon, value, label }) => (
                 <div key={label} className="px-4 py-6 text-center">
-                  <Icon className="w-4 h-4 mx-auto mb-1.5 text-white/70" />
+                  <Icon className="w-4 h-4 mx-auto mb-1.5 text-primary-foreground/70" />
                   <p className="text-xl md:text-2xl font-bold">{value}</p>
-                  <p className="text-xs text-white/70 mt-1">{label}</p>
+                  <p className="text-xs text-primary-foreground/70 mt-1">{label}</p>
                 </div>
               ))}
             </div>
@@ -607,10 +607,10 @@ const HelpSupport = () => {
             <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold mb-1">Looking for policy terms & codes?</h2>
-                <p className="text-white/90">Check the Insurance Abbreviations & Codes reference for quick lookups.</p>
+                <p className="text-primary-foreground/90">Check the Insurance Abbreviations & Codes reference for quick lookups.</p>
               </div>
               <Link to="/lic-info-hub" className="shrink-0">
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-medium">
+                <Button size="lg" className="bg-white text-[hsl(195,85%,25%)] hover:bg-white/90 font-medium">
                   <BookOpenText className="w-4 h-4 mr-2" />
                   Open reference
                 </Button>

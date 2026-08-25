@@ -217,6 +217,7 @@ const Navigation = () => {
   };
 
   const publicLinks = [
+    { href: "/tools",     label: "Tools"          },
     { href: "/our-plans",     label: "Plans"          },
     { href: "/lic-info-hub",  label: "Best Info Hub"  },
     // { href: "#Career",  label: "Career"   },
@@ -243,7 +244,7 @@ const Navigation = () => {
 
             {/* Desktop links */}
             <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground mx-2">
-              <ToolsDropdown />
+              {/* <ToolsDropdown /> */}
               {publicLinks.map(({ href, label }) =>
                 href.startsWith("#") ? (
                   <a key={label} href={href}
@@ -299,10 +300,10 @@ const Navigation = () => {
             isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           )}>
             <div className="space-y-1 pb-4 pt-2 border-t border-border">
-              <p className="px-4 pt-1 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tools</p>
+              {/* <p className="px-4 pt-1 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tools</p>
               {TOOLS.map(({ to, label }) => (
                 <PublicMobileLink key={to} href={to} label={label} onClick={closeMobileMenu} />
-              ))}
+              ))} */}
               <p className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Menu</p>
               {publicLinks.map(({ href, label }) => (
                 <PublicMobileLink
@@ -312,7 +313,7 @@ const Navigation = () => {
                   onClick={closeMobileMenu}
                 />
               ))}
-              <div className="px-1 pt-2 flex gap-2">
+              {/* <div className="px-1 pt-2 flex gap-2">
                 <Link to="/login" className="flex-1" onClick={closeMobileMenu}>
                   <Button variant="outline" size="sm" className="w-full">
                     Log in
@@ -323,7 +324,7 @@ const Navigation = () => {
                     Sign up free
                   </Button>
                 </Link>
-              </div>
+              </div> */}
               <div className="px-1 pt-1 flex gap-2">
                 <div className="flex-1"><LanguageSwitcher type="mobile" /></div>
                 <div className="flex-1"><ThemeToggle type="mobile" /></div>
@@ -520,7 +521,7 @@ const Navigation = () => {
                 variant="outline"
                 size="sm"
                 onClick={handleLogout}
-                className="w-full bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-red-600 hover:border-red-600 hover:text-white"
+                className="w-full bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-red-600 hover:border-red-600 hover:text-primary-foreground"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 {t("logout")}

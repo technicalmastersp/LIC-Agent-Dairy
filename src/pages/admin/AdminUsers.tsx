@@ -388,7 +388,7 @@ const AdminUsers = () => {
                 <p className="text-xs text-green-600 mt-0.5">User will be able to login again after this.</p>
               </div>
               <div className="flex gap-2">
-                <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                <Button className="flex-1 bg-green-600 hover:bg-green-700 text-primary-foreground"
                   onClick={handleReactivate} disabled={!!acting}>
                   {acting ? "Reactivating…" : "Confirm reactivate"}
                 </Button>
@@ -420,7 +420,7 @@ const AdminUsers = () => {
                   value={deactivateNote} onChange={e => setDeactivateNote(e.target.value)} />
               </div>
               <div className="flex gap-2">
-                <Button className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                <Button className="flex-1 bg-red-600 hover:bg-red-700 text-primary-foreground"
                   onClick={handleDeactivate} disabled={!!acting}>
                   {acting ? "Deactivating…" : "Confirm deactivate"}
                 </Button>

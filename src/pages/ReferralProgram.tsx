@@ -425,7 +425,7 @@ const ReferralProgram = () => {
                   )}
                   <Button
                     size="sm"
-                    className="mt-3 bg-green-600 hover:bg-green-700 text-white text-xs w-full"
+                    className="mt-3 bg-green-600 hover:bg-green-700 text-primary-foreground text-xs w-full"
                     onClick={handleWithdraw}
                     disabled={withdrawing || d.availableBalance < config.MIN_WITHDRAWAL}
                   >
@@ -483,14 +483,14 @@ const ReferralProgram = () => {
               {!editingBank && d.hasPaymentDetails && (
                 <div className="space-y-4">
                   {d.paymentDetails?.accountNumber && (
-                    <div className="relative rounded-2xl p-5 text-white overflow-hidden shadow-lg"
+                    <div className="relative rounded-2xl p-5 text-primary-foreground overflow-hidden shadow-lg"
                       style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #1e40af 45%, #2563eb 100%)" }}>
                       <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10" />
                       <div className="absolute -right-2 top-12 w-20 h-20 rounded-full bg-white/5" />
                       <div className="relative flex items-center justify-between mb-6">
                         <Building2 className="w-7 h-7 opacity-90" />
                         {d.paymentDetails.bankVerified ? (
-                          <Badge className="bg-white/15 text-white border-0 text-[10px] backdrop-blur-sm">
+                          <Badge className="bg-white/15 text-primary-foreground border-0 text-[10px] backdrop-blur-sm">
                             <CheckCircle2 className="w-3 h-3 mr-1" /> Verified
                           </Badge>
                         ) : (
@@ -504,28 +504,28 @@ const ReferralProgram = () => {
                       </p>
                       <div className="flex items-end justify-between">
                         <div>
-                          <p className="text-[10px] uppercase tracking-wide text-white/60 mb-0.5">Account holder</p>
+                          <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60 mb-0.5">Account holder</p>
                           <p className="text-sm font-medium uppercase">{d.paymentDetails.accountHolder || "—"}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[10px] uppercase tracking-wide text-white/60 mb-0.5">{d.paymentDetails.bankName || "Bank"}</p>
-                          <p className="text-xs text-white/80">{d.paymentDetails.ifscCode}</p>
+                          <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60 mb-0.5">{d.paymentDetails.bankName || "Bank"}</p>
+                          <p className="text-xs text-primary-foreground/80">{d.paymentDetails.ifscCode}</p>
                         </div>
                       </div>
                       {d.paymentDetails.branchName && (
-                        <p className="text-[10px] text-white/50 mt-2">{d.paymentDetails.branchName} branch</p>
+                        <p className="text-[10px] text-primary-foreground/50 mt-2">{d.paymentDetails.branchName} branch</p>
                       )}
                     </div>
                   )}
 
                   {d.paymentDetails?.upiId && (
-                    <div className="relative rounded-2xl p-5 text-white overflow-hidden shadow-lg"
+                    <div className="relative rounded-2xl p-5 text-primary-foreground overflow-hidden shadow-lg"
                       style={{ background: "linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%)" }}>
                       <div className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-white/10" />
                       <div className="relative flex items-center justify-between mb-6">
                         <Smartphone className="w-7 h-7 opacity-90" />
                         {d.paymentDetails.upiVerified ? (
-                          <Badge className="bg-white/15 text-white border-0 text-[10px] backdrop-blur-sm">
+                          <Badge className="bg-white/15 text-primary-foreground border-0 text-[10px] backdrop-blur-sm">
                             <CheckCircle2 className="w-3 h-3 mr-1" /> Verified
                           </Badge>
                         ) : d.paymentDetails.upiRejectionReason ? (
@@ -539,14 +539,14 @@ const ReferralProgram = () => {
                         )}
                       </div>
                       <p className="font-mono text-lg mb-1">••••••{d.paymentDetails.upiId.slice(6)}</p>
-                      <p className="text-[10px] uppercase tracking-wide text-white/60">UPI ID</p>
+                      <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60">UPI ID</p>
                       {d.paymentDetails.upiRejectionReason && (
                         <p className="text-xs text-red-100 mt-2 bg-red-950/30 rounded px-2 py-1">
                           {d.paymentDetails.upiRejectionReason}
                         </p>
                       )}
                       {!d.paymentDetails.upiVerified && !d.paymentDetails.upiRejectionReason && (
-                        <p className="text-[10px] text-white/60 mt-2">
+                        <p className="text-[10px] text-primary-foreground/60 mt-2">
                           Validated within 24 hours by admin. Must be your own UPI ID.
                         </p>
                       )}

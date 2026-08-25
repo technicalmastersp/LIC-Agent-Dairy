@@ -271,7 +271,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                   <Icon className="w-4 h-4 shrink-0" />
                   <span>{label}</span>
                   {badgeCount > 0 && (
-                    <span className="ml-auto bg-amber-500 text-white text-[10px] font-medium rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                    <span className="ml-auto bg-amber-500 text-primary-foreground text-[10px] font-medium rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                       {badgeCount > 99 ? "99+" : badgeCount}
                     </span>
                   )}

@@ -380,7 +380,7 @@ const AdminDashboard = () => {
                     onChange={e => setGroupLogoutReason(e.target.value)} />
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                  <Button className="flex-1 bg-red-600 hover:bg-red-700 text-primary-foreground"
                     onClick={handleGroupLogout} disabled={groupLoggingOut}>
                     {groupLoggingOut ? "Processing…" : "Confirm logout"}
                   </Button>
@@ -410,7 +410,7 @@ const AdminDashboard = () => {
               ].filter(a => a.show).map(({ label, path, urgent }) => (
                 <Button key={label} size="sm"
                   variant={urgent ? "default" : "outline"}
-                  className={urgent ? "bg-amber-500 hover:bg-amber-600 text-white" : ""}
+                  className={urgent ? "bg-amber-500 hover:bg-amber-600 text-primary-foreground" : ""}
                   onClick={() => navigate(path)}>
                   {urgent && <Clock className="w-3.5 h-3.5 mr-1.5" />}
                   {label}

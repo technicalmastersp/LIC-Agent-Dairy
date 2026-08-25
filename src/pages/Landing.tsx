@@ -389,20 +389,20 @@ const Landing = () => {
         <section className="bg-[linear-gradient(to_bottom,#0a5b76,#0e7ca1,#0a5b76)] text-primary-foreground py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center space-y-6">
-              <TrendingUp className="w-10 h-10 mx-auto text-white/90" />
+              <TrendingUp className="w-10 h-10 mx-auto text-primary-foreground/90" />
               <h2 className="text-3xl md:text-4xl font-bold">Bring order to your policy book today.</h2>
-              <p className="text-white/90 text-lg">
+              <p className="text-primary-foreground/90 text-lg">
                 Free for your first month. No setup fees, no long-term commitment required.
               </p>
               <div className="flex flex-wrap justify-center gap-3 pt-2">
                 <Link to="/signup">
-                  <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-medium">
+                  <Button size="lg" className="bg-white text-[hsl(195,85%,25%)] hover:bg-white/90 font-medium">
                     <UserPlus className="w-4 h-4 mr-2" />
                     Create your free account
                   </Button>
                 </Link>
                 <Link to="/about">
-                  <Button size="lg" variant="outline" className="bg-transparent border-white/50 text-white hover:bg-white/10">
+                  <Button size="lg" variant="outline" className="bg-transparent border-white/50 text-primary-foreground hover:bg-white/10">
                     Learn more <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>

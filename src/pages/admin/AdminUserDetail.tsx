@@ -253,13 +253,13 @@ const AdminUserDetail = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {user.paymentDetails.accountNumber && (
-                    <div className="relative rounded-2xl p-4 text-white overflow-hidden shadow-md"
+                    <div className="relative rounded-2xl p-4 text-primary-foreground overflow-hidden shadow-md"
                       style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #1e40af 45%, #2563eb 100%)" }}>
                       <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/10" />
                       <div className="relative flex items-center justify-between mb-4">
                         <Building2 className="w-5 h-5 opacity-90" />
                         {user.paymentDetails.bankVerified ? (
-                          <Badge className="bg-white/15 text-white border-0 text-[10px]"><CheckCircle2 className="w-3 h-3 mr-1" />Verified</Badge>
+                          <Badge className="bg-white/15 text-primary-foreground border-0 text-[10px]"><CheckCircle2 className="w-3 h-3 mr-1" />Verified</Badge>
                         ) : (
                           <Badge className="bg-amber-400/90 text-amber-950 border-0 text-[10px]"><Clock className="w-3 h-3 mr-1" />Pending</Badge>
                         )}
@@ -267,24 +267,24 @@ const AdminUserDetail = () => {
                       <p className="font-mono text-base tracking-[0.15em] mb-3">•••• •••• •••• {user.paymentDetails.accountNumber.slice(-4)}</p>
                       <div className="flex items-end justify-between text-xs">
                         <div>
-                          <p className="text-[9px] uppercase text-white/60">Holder</p>
+                          <p className="text-[9px] uppercase text-primary-foreground/60">Holder</p>
                           <p className="uppercase">{user.paymentDetails.accountHolder || "—"}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[9px] uppercase text-white/60">{user.paymentDetails.bankName || "Bank"}</p>
-                          <p className="text-white/80">{user.paymentDetails.ifscCode}{user.paymentDetails.branchName ? ` · ${user.paymentDetails.branchName}` : ""}</p>
+                          <p className="text-[9px] uppercase text-primary-foreground/60">{user.paymentDetails.bankName || "Bank"}</p>
+                          <p className="text-primary-foreground/80">{user.paymentDetails.ifscCode}{user.paymentDetails.branchName ? ` · ${user.paymentDetails.branchName}` : ""}</p>
                         </div>
                       </div>
                     </div>
                   )}
                   {user.paymentDetails.upiId && (
-                    <div className="relative rounded-2xl p-4 text-white overflow-hidden shadow-md"
+                    <div className="relative rounded-2xl p-4 text-primary-foreground overflow-hidden shadow-md"
                       style={{ background: "linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%)" }}>
                       <div className="absolute -right-4 -bottom-4 w-20 h-20 rounded-full bg-white/10" />
                       <div className="relative flex items-center justify-between mb-4">
                         <Smartphone className="w-5 h-5 opacity-90" />
                         {user.paymentDetails.upiVerified ? (
-                          <Badge className="bg-white/15 text-white border-0 text-[10px]"><CheckCircle2 className="w-3 h-3 mr-1" />Verified via IFSC</Badge>
+                          <Badge className="bg-white/15 text-primary-foreground border-0 text-[10px]"><CheckCircle2 className="w-3 h-3 mr-1" />Verified via IFSC</Badge>
                         ) : user.paymentDetails.upiRejectionReason ? (
                           <Badge className="bg-red-400/90 text-red-950 border-0 text-[10px]"><AlertCircle className="w-3 h-3 mr-1" />Rejected</Badge>
                         ) : (
@@ -408,7 +408,7 @@ const AdminUserDetail = () => {
                   onChange={e => setDeleteReason(e.target.value)} />
               </div>
               <div className="flex gap-2">
-                <Button className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                <Button className="flex-1 bg-red-600 hover:bg-red-700 text-primary-foreground"
                   onClick={handleDelete} disabled={deleting}>
                   {deleting ? "Deleting…" : "Confirm delete"}
                 </Button>
@@ -444,7 +444,7 @@ const AdminUserDetail = () => {
                   value={logoutReason} onChange={e => setLogoutReason(e.target.value)} />
               </div>
               <div className="flex gap-2">
-                <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+                <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-primary-foreground"
                   onClick={handleForceLogout} disabled={loggingOut}>
                   {loggingOut ? "Logging out…" : "Confirm force logout"}
                 </Button>

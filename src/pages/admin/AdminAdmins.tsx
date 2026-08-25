@@ -518,7 +518,7 @@ const AdminAdmins = () => {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                  <Button className="flex-1 bg-red-600 hover:bg-red-700 text-primary-foreground"
                     onClick={handleDeactivate} disabled={!!acting}>
                     {acting ? "Deactivating…" : "Confirm deactivate"}
                   </Button>
@@ -544,7 +544,7 @@ const AdminAdmins = () => {
                   <p className="text-xs text-green-600 mt-0.5">This admin will be able to login again immediately.</p>
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  <Button className="flex-1 bg-green-600 hover:bg-green-700 text-primary-foreground"
                     onClick={handleReactivate} disabled={!!acting}>
                     {acting ? "Reactivating…" : "Confirm reactivate"}
                   </Button>
@@ -580,7 +580,7 @@ const AdminAdmins = () => {
                     value={logoutReason} onChange={e => setLogoutReason(e.target.value)} />
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+                  <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-primary-foreground"
                     onClick={handleForceLogout} disabled={loggingOut}>
                     {loggingOut ? "Logging out…" : "Confirm force logout"}
                   </Button>
@@ -638,7 +638,7 @@ const AdminAdmins = () => {
                     value={promoteReason} onChange={e => setPromoteReason(e.target.value)} />
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white"
+                  <Button className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-primary-foreground"
                     onClick={handlePromote} disabled={promoting}>
                     {promoting ? "Promoting…" : "Confirm promote"}
                   </Button>

@@ -566,8 +566,8 @@ const SignUp = () => {
                   </p>
                 ) : (
                   <p>
-                    💰 Enter a valid <strong>Referral Code</strong> and get an instant{" "}
-                    <strong>₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} discount</strong> on any paid subscription plan.
+                    {t("referralDiscountNote1")} <strong>{t("referralDiscountNote2")}</strong> {t("referralDiscountNote3")}{" "}
+                    <strong>₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} {t("referralDiscountNote5")}</strong> {t("referralDiscountNote6")}
                   </p>
                 )}
               </div>

@@ -43,14 +43,14 @@ const TermsOfService = () => {
       <Navigation />
 
       <main className="flex-1">
-        <section className="bg-gradient-to-br from-form-header via-form-header to-form-subheader text-white">
+        <section className="bg-gradient-to-br from-form-header via-form-header to-form-subheader text-primary-foreground">
           <div className="container mx-auto px-4 py-12 md:py-16">
             <div className="max-w-3xl mx-auto text-center">
               <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-5">
                 <FileText className="w-7 h-7" />
               </div>
               <h1 className="text-3xl md:text-4xl font-bold mb-3">Terms of Service</h1>
-              <p className="text-white/75">Last updated: {lastUpdated}</p>
+              <p className="text-primary-foreground/75">Last updated: {lastUpdated}</p>
             </div>
           </div>
         </section>
