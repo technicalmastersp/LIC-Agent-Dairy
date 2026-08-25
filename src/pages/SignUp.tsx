@@ -98,6 +98,11 @@ const SignUp = () => {
     return Math.max(0, selectedPlan.price - discount);
   };
 
+  // Signup sends a password to the backend; the client-side `User` type
+  // (auth.ts) intentionally has no password field for the session object,
+  // so the registration payload needs its own type.
+  type SignUpRequest = User & { password: string };
+
   const onSubmit = async (formData: SignUpFormValues) => {
     setIsLoading(true);
     setError("");
@@ -118,7 +123,7 @@ const SignUp = () => {
       const selectedPlanData = plans.find(plan => plan.id === formData.selectedPlan);
       const planDurationMonths = parseInt(formData.selectedPlan.replace('months', ''));
 
-      const newUser: User = {
+      const newUser: SignUpRequest = {
         name: formData.name,
         fullAddress: formData.fullAddress,
         mobileNumber: formData.mobileNumber,

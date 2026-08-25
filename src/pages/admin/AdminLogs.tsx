@@ -144,7 +144,7 @@ const AdminLogs = () => {
                         <p className="text-xs text-muted-foreground mt-0.5">{fmt(log.createdAt)}</p>
 
                         {/* Expanded details */}
-                        {expanded === log._id && log.details && (
+                        {expanded === log._id && !!log.details && (
                           <div className="mt-2 bg-muted rounded-lg p-2.5 text-xs font-mono text-muted-foreground overflow-auto">
                             {JSON.stringify(log.details, null, 2)}
                           </div>

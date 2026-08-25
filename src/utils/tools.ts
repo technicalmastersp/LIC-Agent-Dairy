@@ -1,4 +1,10 @@
-export const convertDateToIndianFormat = (date: string, type?: string) => {
+export const convertDateToIndianFormat = (date: string | undefined, type?: string) => {
+    // Record date fields (createdAt, dateOfBirth, lastPaymentDate, etc.)
+    // are optional on the Record type, and several call sites pass them
+    // straight through without a fallback — this already returns '' for
+    // any falsy input at runtime, so widening the param type to match
+    // reality (rather than adding `|| ""` at every call site) is the
+    // correct fix.
     if (!date) return '';
     
     if (!type) {

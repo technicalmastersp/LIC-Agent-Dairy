@@ -206,7 +206,7 @@ const Profile = () => {
             <div className="pt-10 pb-4 px-4 sm:px-6">
               <h1 className="text-xl font-medium leading-tight">{form.name || "—"}</h1>
               <div className="flex items-center gap-2 flex-wrap mt-1 text-sm text-muted-foreground">
-                <span>{roleLabel[user.role] ?? "Policy agent"}</span>
+                <span>{roleLabel[user.role ?? "user"] ?? "Policy agent"}</span>
                 <span className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5">
                   {user.easyId}
                 </span>

@@ -126,7 +126,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
             <CardHeader>
               <CardTitle className="text-lg text-form-header flex items-center space-x-2">
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <img src={siteConfig.logo_medium_size} alt="site-logo" />
+                  <img src={siteConfig.logo_icon} alt="site-logo" />
                 </div>
                 &nbsp;{siteConfig.title}
               </CardTitle>

@@ -4,15 +4,13 @@ const siteConfig = {
   companyName: "LIC Agent Dairy",
 
   // on root location
-  logo_basic_size: "/logos/logo_basic_size.png",
-  logo_medium_size: "/logos/logo_medium_size.png",
-  logo_full_size: "/logos/logo_full_size.png",
-  
-  // in public folder location
-  // logo_basic_size: "/public/logos/logo_basic_size.png",
-  // logo_medium_size: "/public/logos/logo_medium_size.png",
-  // logo_full_size: "/public/logos/logo_full_size.png",
-  
+  // Small UI icon (128x128 WebP, ~7KB) — used everywhere the logo renders
+  // at 32-48px (Navigation, RecordDetailsModal, AddRecord header).
+  logo_icon: "/logos/logo_icon.webp",
+  // Social-share size (512x512 PNG, ~256KB) — used for og:image/twitter:image
+  // where crawlers need a real raster image, not a tiny icon.
+  logo_social: "/logos/logo_social.png",
+
   description: "This is an awesome React web application.",
   author: "Mr. Shashank S Pandey",
   version: "1.0.0",

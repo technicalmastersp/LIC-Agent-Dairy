@@ -237,7 +237,7 @@ const Navigation = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <img src={siteConfig.logo_medium_size} alt="logo" className="w-5 h-5" />
+                <img src={siteConfig.logo_icon} alt="logo" className="w-5 h-5" />
               </div>
               <span className="font-semibold text-form-header">{siteConfig.title}</span>
             </Link>
@@ -353,7 +353,7 @@ const Navigation = () => {
             className="flex items-center space-x-2 shrink-0 min-w-0"
           >
             <div className="w-8 h-8 bg-primary-foreground rounded-full flex items-center justify-center overflow-hidden shrink-0">
-              <img src={siteConfig.logo_medium_size} alt="logo" />
+              <img src={siteConfig.logo_icon} alt="logo" />
             </div>
             <span className="text-primary-foreground font-semibold text-lg sm:max-w-none">
               {siteConfig.title}

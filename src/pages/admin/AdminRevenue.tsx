@@ -38,7 +38,7 @@ const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: 5 }, (_, i) => currentYear - i);
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-const inr = (n: number) => `₹${(n ?? 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+const inr = (n: number | undefined) => `₹${(n ?? 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
   : "—";
@@ -258,7 +258,7 @@ const AdminRevenue = () => {
             )}
 
             {/* Expense breakdown */}
-            {summary && (summary.expenseBreakdown?.length > 0 || summary.gatewayFees > 0 || summary.refunds > 0 || summary.referralPayouts > 0) && (
+            {summary && ((summary.expenseBreakdown?.length ?? 0) > 0 || (summary.gatewayFees ?? 0) > 0 || (summary.refunds ?? 0) > 0 || (summary.referralPayouts ?? 0) > 0) && (
               <Card>
                 <CardHeader className="pb-3"><CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">Expense breakdown</CardTitle></CardHeader>
                 <CardContent className="space-y-0">
@@ -268,7 +268,7 @@ const AdminRevenue = () => {
                     { label: "Referral payouts",      val: summary.referralPayouts },
                     { label: "Wallet redemptions",    val: summary.walletRedemptions },
                     ...(summary.expenseBreakdown ?? []).map((e: ExpenseBreakdownItem) => ({ label: e.category, val: e.amount })),
-                  ].filter(r => r.val > 0).map(({ label, val }) => (
+                  ].filter(r => (r.val ?? 0) > 0).map(({ label, val }) => (
                     <div key={label} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
                       <span className="text-sm text-muted-foreground">{label}</span>
                       <span className="text-sm font-medium">{inr(val)}</span>

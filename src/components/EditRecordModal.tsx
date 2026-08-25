@@ -151,7 +151,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
         lastPaymentDate: record.currentPolicy.lastPaymentDate,
       });
 
-      setFamilyMembers(record.familyMembers);
+      setFamilyMembers(record.familyMembers || []);
 
       const loadedType = record.insuranceType || "Life Insurance";
       setInsuranceType(loadedType);
@@ -206,7 +206,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
   // The Name field still needs a plain DOM ref for scrollIntoView on a
   // failed save — react-hook-form's own ref is merged onto the same
   // element (see the Name <Input> below) so both work together.
-  const nameInputRef = useRef<HTMLInputElement>(null);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
   const { ref: nameFieldRef, ...nameField } = register("name");
 
   // Fires when zod validation fails. Name is the only field that ever
@@ -335,7 +335,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <div className="space-y-2">
                   <Label htmlFor="date">Date</Label>
                   <Input 
-                    name="date"
                     type="date"
                     {...register("date")}
                   />
@@ -344,7 +343,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="aadhaarNumber">Aadhaar Number</Label>
                   <Input 
                     id="aadhaarNumber" 
-                    name="aadhaarNumber" 
                     {...register("aadhaarNumber")}
                   />
                 </div>
@@ -352,7 +350,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="panNumber">Pan Number</Label>
                   <Input 
                     id="panNumber" 
-                    name="panNumber" 
                     {...register("panNumber")}
                   />
                 </div>
@@ -360,7 +357,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="email">Email ID</Label>
                   <Input 
                     id="email" 
-                    name="email" 
                     type="email" 
                     {...register("email")}
                   />
@@ -393,7 +389,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="birthPlace">1a. Birth Place</Label>
                   <Input 
                     id="birthPlace" 
-                    name="birthPlace" 
                     {...register("birthPlace")}
                   />
                 </div>
@@ -401,7 +396,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="fatherName">2. Father's Name</Label>
                   <Input 
                     id="fatherName" 
-                    name="fatherName" 
                     {...register("fatherName")}
                   />
                 </div>
@@ -409,7 +403,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="motherName">3. Mother's Name</Label>
                   <Input 
                     id="motherName" 
-                    name="motherName" 
                     {...register("motherName")}
                   />
                 </div>
@@ -417,7 +410,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="spouseName">4. Spouse's Name</Label>
                   <Input 
                     id="spouseName" 
-                    name="spouseName" 
                     {...register("spouseName")}
                   />
                 </div>
@@ -425,7 +417,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="address">5. Address</Label>
                   <Input 
                     id="address" 
-                    name="address" 
                     {...register("address")}
                   />
                 </div>
@@ -433,7 +424,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="dateOfBirth">6. Date of Birth</Label>
                   <Input 
                     id="dateOfBirth" 
-                    name="dateOfBirth" 
                     type="date"
                     {...register("dateOfBirth")}
                   />
@@ -442,7 +432,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="age">6a. Age</Label>
                   <Input 
                     id="age" 
-                    name="age" 
                     {...register("age")}
                   />
                 </div>
@@ -450,7 +439,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="educationalQualification">7. Educational Qualification</Label>
                   <Input 
                     id="educationalQualification" 
-                    name="educationalQualification" 
                     {...register("educationalQualification")}
                   />
                 </div>
@@ -458,7 +446,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="occupation">7a. Occupation</Label>
                   <Input 
                     id="occupation" 
-                    name="occupation" 
                     {...register("occupation")}
                   />
                 </div>
@@ -466,7 +453,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="designationOfPolicyHolder">7b. Designation</Label>
                   <Input 
                     id="designationOfPolicyHolder" 
-                    name="designationOfPolicyHolder" 
                     {...register("designationOfPolicyHolder")}
                   />
                 </div>
@@ -474,7 +460,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="annualIncome">7c. Annual Income</Label>
                   <Input 
                     id="annualIncome" 
-                    name="annualIncome" 
                     {...register("annualIncome")}
                   />
                 </div>
@@ -482,7 +467,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="periodOfService">7d. Period Of Service</Label>
                   <Input 
                     id="periodOfService" 
-                    name="periodOfService" 
                     {...register("periodOfService")}
                   />
                 </div>
@@ -490,7 +474,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="employerName">7e. Employer's Name</Label>
                   <Input 
                     id="employerName" 
-                    name="employerName" 
                     {...register("employerName")}
                   />
                 </div>
@@ -498,7 +481,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="aadhaarLinkedMobileNumber">7f. Aadhaar Linked Mobile Number </Label>
                   <Input 
                     id="aadhaarLinkedMobileNumber" 
-                    name="aadhaarLinkedMobileNumber" 
                     {...register("aadhaarLinkedMobileNumber")}
                   />
                 </div>
@@ -506,7 +488,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="nameOfNominee">8. Name of Nominee</Label>
                   <Input 
                     id="nameOfNominee" 
-                    name="nameOfNominee" 
                     {...register("nameOfNominee")}
                   />
                 </div>
@@ -514,7 +495,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="ageOfNominee">8a. Age of Nominee</Label>
                   <Input 
                     id="ageOfNominee" 
-                    name="ageOfNominee" 
                     {...register("ageOfNominee")}
                   />
                 </div>
@@ -522,7 +502,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="relationName">8b. Relation</Label>
                   <Input 
                     id="relationName" 
-                    name="relationName" 
                     {...register("relationName")}
                   />
                 </div>
@@ -636,7 +615,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="height">10. Height</Label>
                   <Input 
                     id="height" 
-                    name="height" 
                     placeholder="Height in cm"
                     {...register("height")}
                   />
@@ -645,7 +623,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="weight">10a. Weight</Label>
                   <Input 
                     id="weight" 
-                    name="weight" 
                     placeholder="Weight in kg"
                     {...register("weight")}
                   />
@@ -654,7 +631,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="lastChildBirthDate">11. Last Child Birth Date &#40;Only for Women&#41;</Label>
                   <Input 
                     id="lastChildBirthDate" 
-                    name="lastChildBirthDate" 
                     type="date"
                     {...register("lastChildBirthDate")}
                   />
@@ -663,7 +639,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="bankAccountNumber">12. Bank Account Number</Label>
                   <Input 
                     id="bankAccountNumber" 
-                    name="bankAccountNumber" 
                     placeholder="Enter bank account number"
                     {...register("bankAccountNumber")}
                   />
@@ -672,7 +647,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="ifscCode">12a. IFSC Code</Label>
                   <Input 
                     id="ifscCode" 
-                    name="ifscCode" 
                     placeholder="e.g. SBIN0001234"
                     {...register("ifscCode")}
                   />
@@ -681,7 +655,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="bankName">12b. Bank Name</Label>
                   <Input 
                     id="bankName" 
-                    name="bankName" 
                     {...register("bankName")}
                   />
                 </div>
@@ -689,7 +662,6 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="branchName">12c. Branch Name</Label>
                   <Input 
                     id="branchName" 
-                    name="branchName" 
                     {...register("branchName")}
                   />
                 </div>

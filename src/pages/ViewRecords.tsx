@@ -510,7 +510,7 @@ const ViewRecords = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleDeleteRecord(record.recordId)}
+                                onClick={() => handleDeleteRecord(record.recordId ?? record._id ?? record.id)}
                                 disabled
                                 className="h-8 w-8 p-0 opacity-50 cursor-not-allowed"
                                 title="Delete Record (Disabled)"

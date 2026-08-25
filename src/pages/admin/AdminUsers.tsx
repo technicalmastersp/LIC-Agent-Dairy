@@ -167,8 +167,8 @@ const AdminUsers = () => {
     if (planSort !== "default") {
       const order = PLAN_SORT_OPTIONS[planSort].order as readonly string[];
       result = [...result].sort((a, b) => {
-        const rankA = order.indexOf(a.subscription?.planId);
-        const rankB = order.indexOf(b.subscription?.planId);
+        const rankA = order.indexOf(a.subscription?.planId ?? "");
+        const rankB = order.indexOf(b.subscription?.planId ?? "");
         return (rankA === -1 ? 99 : rankA) - (rankB === -1 ? 99 : rankB);
       });
     }
@@ -309,7 +309,7 @@ const AdminUsers = () => {
                           <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{u.easyId}</span>
                         </TableCell>
                         <TableCell>
-                          <Badge className={`text-xs ${planColor[u.subscription?.planId] || "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground"}`}>
+                          <Badge className={`text-xs ${planColor[u.subscription?.planId ?? ""] || "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground"}`}>
                             {u.subscription?.planType || "—"}
                           </Badge>
                           {u.subscription?.status === "expired" && (
