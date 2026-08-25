@@ -124,3 +124,24 @@ export const resendVerification = async (email) => {
   } finally { isResendng = false; }
   return { resendMsg, isResendng };
 };
+
+export const getMyActivity = async (params = {}) => {
+  const q = new URLSearchParams(params).toString();
+  const res = await apiClient.get(`/user/my-activity?${q}`);
+  return res.data.data; // { logs, pagination }
+};
+
+export const getMySessions = async () => {
+  const res = await apiClient.get("/user/sessions");
+  return res.data.data; // array of { sessionId, device, ip, createdAt, isCurrent }
+};
+
+export const revokeSession = async (sessionId) => {
+  const res = await apiClient.delete(`/user/sessions/${sessionId}`);
+  return res.data;
+};
+
+export const revokeOtherSessions = async () => {
+  const res = await apiClient.post("/user/sessions/logout-others");
+  return res.data;
+};
