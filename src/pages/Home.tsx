@@ -5,6 +5,7 @@ import { Badge }      from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navigation     from "@/components/Navigation";
 import Footer         from "@/components/Footer";
+import OnboardingTour from "@/components/OnboardingTour";
 import { getCurrentUser, setCurrentUser } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { dueThisMonth, dueNextMonth, getMonthlyTrend, getRecordsWithoutLastPayment } from "../../services/recordService";
@@ -132,7 +133,8 @@ const Home = () => {
       color: upcomingDueCount > 0 ? "text-emerald-600" : "text-foreground",
       sub:   "Due next month",
       link:  "/view-upcoming-due",
-      bg: "bg-emerald-50"
+      bg: "bg-emerald-50",
+      tourId: "tour-upcoming-due",
     },
     {
       label: "Referrals",
@@ -153,6 +155,7 @@ const Home = () => {
       label: "Add new record",
       link:  "/add-record",
       badge: <Badge className="text-xs bg-blue-100 text-blue-700 border border-blue-200">New</Badge>,
+      tourId: "tour-add-record",
     },
     {
       title: "All records",
@@ -161,6 +164,7 @@ const Home = () => {
       label: "View all records",
       link:  "/view-records",
       badge: <Badge variant="secondary" className="text-xs">{currentUser.totalRecords ?? 0} total</Badge>,
+      tourId: "tour-view-records",
     },
     {
       title: "Due this month",
@@ -171,6 +175,7 @@ const Home = () => {
       badge: dueCount > 0
         ? <Badge className="text-xs bg-yellow-100 text-yellow-700 border border-yellow-200">{dueCount} due</Badge>
         : null,
+      tourId: "tour-due-this-month",
     },
     {
       title: "Missed payments",
@@ -181,6 +186,7 @@ const Home = () => {
       badge: missedCount > 0
         ? <Badge variant="destructive" className="text-xs">{missedCount} missed</Badge>
         : null,
+      tourId: "tour-missed-payments",
     },
   ];
 
@@ -192,6 +198,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
+      <OnboardingTour />
       <Navigation />
 
       <main className="container mx-auto px-4 py-8 flex-1">
@@ -222,8 +229,9 @@ const Home = () => {
 
           {/* ── Stat cards ── */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            {stats.map(({ label, val, icon, color, sub, link, bg }) => (
+            {stats.map(({ label, val, icon, color, sub, link, bg, tourId }) => (
               <Card key={label}
+                data-tour={tourId}
                 className={`cursor-pointer ${bg} hover:border-blue-300 transition-colors`}
                 onClick={() => navigate(link)}>
                 <CardContent className="p-4">
@@ -258,8 +266,8 @@ const Home = () => {
 
           {/* ── Action cards ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {actions.map(({ title, icon, desc, label, link, badge }) => (
-              <Card key={title} className="hover:border-blue-300 transition-colors">
+            {actions.map(({ title, icon, desc, label, link, badge, tourId }) => (
+              <Card key={title} data-tour={tourId} className="hover:border-blue-300 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2 font-medium text-sm">
@@ -282,7 +290,7 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
             {/* Subscription */}
-            <Card>
+            <Card data-tour="tour-your-plan">
               <CardHeader className="pb-3">
                 <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2">
                   <Crown className="w-4 h-4" /> Your plan
@@ -321,7 +329,7 @@ const Home = () => {
             </Card>
 
             {/* Referral wallet */}
-            <Card>
+            <Card data-tour="tour-referral-wallet">
               <CardHeader className="pb-3">
                 <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2">
                   <Wallet className="w-4 h-4" /> Referral wallet

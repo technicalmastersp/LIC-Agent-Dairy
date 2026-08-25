@@ -183,7 +183,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
               </Card>
             )
           ) : (
-            record.typeSpecificData && Object.values(record.typeSpecificData).some((v: string) => v) && (
+            (getInsuranceTypeDef(record.insuranceType)?.fields.length ?? 0) > 0 && (
               <Card>
                 <CardHeader>
                   <SectionTitle icon={ShieldCheck}>
@@ -197,7 +197,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                         key={field.key}
                         icon={IdCard}
                         label={field.label}
-                        value={String(record.typeSpecificData?.[field.key] ?? "")}
+                        value={record.typeSpecificData?.[field.key] ? String(record.typeSpecificData[field.key]) : undefined}
                       />
                     ))}
                   </div>

@@ -209,7 +209,7 @@ const UpcomingDuePolicies = () => {
                 <CalendarClock className="w-5 h-5 text-emerald-700" />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold text-form-header">Upcoming Month Due Date</h1>
+                <h1 className="text-2xl font-semibold text-form-header">Upcoming Month Due</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">
                   Policies with payments due next month — plan ahead before they're due.
                 </p>
