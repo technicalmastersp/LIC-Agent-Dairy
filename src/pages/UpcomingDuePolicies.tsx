@@ -7,15 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
-import EditRecordModal from "@/components/EditRecordModal";
-import { Search, Eye, ArrowUpDown, FileClock, AlertCircle, CalendarClock, Users, FolderOpen } from "lucide-react";
+import PaymentUpdateModal from "@/components/PaymentUpdateModal";
+import ContactActionModal from "@/components/ContactActionModal";
+import { Search, Eye, ArrowUpDown, FileClock, AlertCircle, CalendarClock, Users, FolderOpen, MessageSquare } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { dueNextMonth } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
 
 // NOTE: copy CurrentMonthDue.tsx's Record interface, search/sort state,
-// SortableHeader, table body, and RecordDetailsModal/EditRecordModal usage
-// into this file — omitted here to avoid guessing at exact JSX you already have.
+// SortableHeader, table body, and RecordDetailsModal/PaymentUpdateModal/
+// ContactActionModal usage into this file — omitted here to avoid
+// guessing at exact JSX you already have.
 
 interface Record {
   id: string;
@@ -95,8 +97,10 @@ const UpcomingDuePolicies = () => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<Record | null>(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [payingRecord, setPayingRecord] = useState<Record | null>(null);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [contactingRecord, setContactingRecord] = useState<Record | null>(null);
   const [records, setRecords] = useState<Record[]>([]);
   const [currentMonth, setCurrentMonth] = useState("");
   const [month, setMonth] = useState("");
@@ -175,9 +179,14 @@ const UpcomingDuePolicies = () => {
     setIsModalOpen(true);
   };
 
-  const handleEditRecord = (record: Record) => {
-    setEditingRecord(record);
-    setIsEditModalOpen(true);
+  const handlePayRecord = (record: Record) => {
+    setPayingRecord(record);
+    setIsPaymentModalOpen(true);
+  };
+
+  const handleContactRecord = (record: Record) => {
+    setContactingRecord(record);
+    setIsContactModalOpen(true);
   };
 
   const handleUpdateRecord = async () => {
@@ -359,11 +368,20 @@ const UpcomingDuePolicies = () => {
                                   >
                                   <Eye className="w-4 h-4" />
                                   </Button>
+                                  <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleContactRecord(record)}
+                                  className="h-8 w-8 p-0"
+                                  title="Contact"
+                                  >
+                                  <MessageSquare className="w-4 h-4" />
+                                  </Button>
                                   <Badge
                                   variant="destructive"
                                   className="ml-2 cursor-pointer"
-                                  title="Add Payment Details"
-                                  onClick={() => handleEditRecord(record)}
+                                  title="Update Last Payment Date"
+                                  onClick={() => handlePayRecord(record)}
                                   >
                                   Pay
                                   </Badge>
@@ -387,14 +405,18 @@ const UpcomingDuePolicies = () => {
         onClose={() => setIsModalOpen(false)}
       />
 
-      <EditRecordModal
-        record={editingRecord}
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          fetchRecords();
-        }}
+      <PaymentUpdateModal
+        record={payingRecord}
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
         onUpdate={handleUpdateRecord}
+      />
+
+      <ContactActionModal
+        phone={contactingRecord?.aadhaarLinkedMobileNumber}
+        name={contactingRecord?.name}
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
       />
 
       <Footer />

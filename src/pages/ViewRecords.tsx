@@ -11,10 +11,11 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
 import EditRecordModal from "@/components/EditRecordModal";
+import ContactActionModal from "@/components/ContactActionModal";
 import {
   Search, Eye, Trash2, ArrowUpDown, Plus, Edit,
   FileText, IndianRupee, CalendarPlus, FolderOpen, ShieldCheck, Lock,
-  Download,
+  Download, MessageSquare
 } from "lucide-react";
 import { getCurrentUser } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -67,6 +68,8 @@ const ViewRecords = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<Record | null>(null);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [contactingRecord, setContactingRecord] = useState<Record | null>(null);
 
   // Mirrors the backend: an expired/cancelled plan still gets full read access
   // to this list (requireSubscriptionForViewing), but add/edit/delete stay
@@ -223,6 +226,11 @@ const ViewRecords = () => {
     }
     setEditingRecord(record);
     setIsEditModalOpen(true);
+  };
+
+  const handleContactRecord = (record: Record) => {
+    setContactingRecord(record);
+    setIsContactModalOpen(true);
   };
 
   const handleUpdateRecord = async () => {
@@ -510,6 +518,15 @@ const ViewRecords = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
+                                onClick={() => handleContactRecord(record)}
+                                className="h-8 w-8 p-0"
+                                title="Contact"
+                              >
+                                <MessageSquare className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
                                 onClick={() => handleDeleteRecord(record.recordId ?? record._id ?? record.id)}
                                 disabled
                                 className="h-8 w-8 p-0 opacity-50 cursor-not-allowed"
@@ -548,6 +565,13 @@ const ViewRecords = () => {
         onUpdate={handleUpdateRecord}
       />
 
+      {/* Contact Action Modal */}
+      <ContactActionModal
+        phone={contactingRecord?.aadhaarLinkedMobileNumber}
+        name={contactingRecord?.name}
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+      />
       <Footer />
     </div>
   );
