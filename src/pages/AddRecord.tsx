@@ -255,7 +255,7 @@ const AddRecord = () => {
             <CardHeader className="text-center relative">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 ring-4 ring-white/10">
                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-                  <img src={siteConfig.logo_medium_size} alt="site-logo" />
+                  <img src={siteConfig.logo_icon} alt="site-logo" />
                 </div>
               </div>
               <CardTitle className="text-2xl font-bold">

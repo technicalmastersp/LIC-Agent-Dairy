@@ -12,7 +12,9 @@ interface SEOProps {
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const DEFAULT_IMAGE = `${siteConfig.productionUrl}${siteConfig.logo_medium_size}`;
+// Social/crawler images need a real raster size (not the 128px UI icon),
+// so this points at the dedicated 512x512 social asset.
+const DEFAULT_IMAGE = `${siteConfig.productionUrl}${siteConfig.logo_social}`;
 
 /**
  * Sets the browser-tab title and social/search meta tags for a single page.

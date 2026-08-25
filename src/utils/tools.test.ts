@@ -17,13 +17,10 @@ describe("convertDateToIndianFormat", () => {
   });
 
   it("returns an empty string for an undefined input", () => {
-    // Exercises the runtime guard for a caller that skips the type system
-    // (e.g. an untyped .js call site). Cast through `unknown` here rather
-    // than suppressing a compiler error inline, since whether this line
-    // actually type-errors depends on strictNullChecks — which varies as
-    // that setting gets incrementally turned on across the codebase — and
-    // an unused suppression directive is itself flagged as an error.
-    expect(convertDateToIndianFormat(undefined as unknown as string)).toBe("");
+    // Record date fields (createdAt, dateOfBirth, lastPaymentDate, etc.)
+    // are optional, so callers legitimately pass `undefined` here —
+    // the param type is `string | undefined` to match.
+    expect(convertDateToIndianFormat(undefined)).toBe("");
   });
 
   it("returns an empty string for an unparseable date string", () => {

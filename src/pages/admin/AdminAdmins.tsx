@@ -285,10 +285,11 @@ const AdminAdmins = () => {
             ) : (
               <div>
                 {superadmins.map((s, i) => {
-                  const isTemp   = !!s.tempSuperadmin;
-                  const expired  = isTemp && new Date(s.tempSuperadmin?.expiresAt) < new Date();
-                  const timeLeft = isTemp && !expired
-                    ? Math.ceil((new Date(s.tempSuperadmin.expiresAt).getTime() - Date.now()) / 3600000)
+                  const expiresAt = s.tempSuperadmin?.expiresAt;
+                  const isTemp   = !!expiresAt;
+                  const expired  = expiresAt ? new Date(expiresAt) < new Date() : false;
+                  const timeLeft = expiresAt && !expired
+                    ? Math.ceil((new Date(expiresAt).getTime() - Date.now()) / 3600000)
                     : null;
 
                   return (

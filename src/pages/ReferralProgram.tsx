@@ -256,6 +256,7 @@ const ReferralProgram = () => {
   const referralUrl = `${window.location.origin}?ref=${currentUser?.referralCode}`;
 
   const copyCode = async () => {
+    if (!currentUser?.referralCode) return;
     await navigator.clipboard.writeText(currentUser?.referralCode);
     toast({ title: "Code Copied!", description: "Referral code copied." });
   };
