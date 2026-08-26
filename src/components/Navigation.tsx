@@ -385,7 +385,7 @@ const Navigation = () => {
             <ToolsDropdown dark />
 
             {/* Language switcher + theme toggle */}
-            <div className="pl-1.5 ml-1 border-l border-primary-foreground/15 shrink-0 flex items-center gap-2">
+            <div data-tour="tour-language-switcher" className="pl-1.5 ml-1 border-l border-primary-foreground/15 shrink-0 flex items-center gap-2">
               <div className="xl:block">
                 <LanguageSwitcher />
               </div>

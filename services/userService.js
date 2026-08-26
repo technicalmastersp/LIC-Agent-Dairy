@@ -42,6 +42,11 @@ export const updateProfile = async (profileData) => {
   return res.data; // { statusCode, message, emailChanged, userInfo }
 };
 
+export const completeOnboarding = async () => {
+  const res = await apiClient.post('/auth/complete-onboarding');
+  return res.data;
+};
+
 export const updateProfileImage = async (image) => {
   const res = await apiClient.put("/user/profile-image", { image });
   return res.data;
@@ -119,4 +124,3 @@ export const resendVerification = async (email) => {
   } finally { isResendng = false; }
   return { resendMsg, isResendng };
 };
-

@@ -33,6 +33,7 @@ export interface User {
   isActive: boolean;
   permissions?: Record<string, boolean>;
   paymentDetails?: PaymentDetails | null;
+  hasSeenOnboarding?: boolean;
 }
 
 export interface UserSubscription {

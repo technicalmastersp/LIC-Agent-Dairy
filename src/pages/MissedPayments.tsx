@@ -8,8 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
-import EditRecordModal from "@/components/EditRecordModal";
-import { Search, Eye, Trash2, ArrowUpDown, ReceiptText, AlertTriangle, FolderOpen, Ban, Edit } from "lucide-react";
+import PaymentUpdateModal from "@/components/PaymentUpdateModal";
+import ContactActionModal from "@/components/ContactActionModal";
+import { Search, Eye, Trash2, ArrowUpDown, ReceiptText, AlertTriangle, FolderOpen, Ban, Edit, MessageSquare } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import { getRecordsWithoutLastPayment, deleteRecord } from "../../services/recordService";
@@ -93,6 +94,10 @@ const MissedPayments = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<Record | null>(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [payingRecord, setPayingRecord] = useState<Record | null>(null);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [contactingRecord, setContactingRecord] = useState<Record | null>(null);
   const [records, setRecords] = useState<Record[]>([]);
   const [currentMonth, setCurrentMonth] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -166,20 +171,15 @@ const MissedPayments = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteRecord = async (recordId: string) => {
-    const success = await deleteRecord( recordId);
-    if (success) {
-      setRecords(await getRecordsWithoutLastPayment());
-      toast({
-        title: "Success", 
-        description: "Record deleted successfully",
-      });
-    }
+
+  const handlePayRecord = (record: Record) => {
+    setPayingRecord(record);
+    setIsPaymentModalOpen(true);
   };
 
-  const handleEditRecord = (record: Record) => {
-    setEditingRecord(record);
-    setIsEditModalOpen(true);
+  const handleContactRecord = (record: Record) => {
+    setContactingRecord(record);
+    setIsContactModalOpen(true);
   };
 
   const handleUpdateRecord = async () => {
@@ -348,21 +348,21 @@ const MissedPayments = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleEditRecord(record)}
+                                onClick={() => handleContactRecord(record)}
                                 className="h-8 w-8 p-0"
-                                title="Edit Record"
+                                title="Contact"
                               >
-                                <Edit className="w-4 h-4" />
+                                <MessageSquare className="w-4 h-4" />
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                disabled
-                                className="h-8 w-8 p-0 opacity-50 cursor-not-allowed"
-                                title="Delete Record (Disabled)"
+                              
+                              <Badge
+                                variant="destructive"
+                                className="ml-2 cursor-pointer"
+                                title="Update Last Payment Date"
+                                onClick={() => handlePayRecord(record)}
                               >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                                Pay
+                              </Badge>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -382,14 +382,19 @@ const MissedPayments = () => {
         onClose={() => setIsModalOpen(false)}
       />
 
-      <EditRecordModal
-        record={editingRecord}
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          fetchRecords();
-        }}
+
+      <PaymentUpdateModal
+        record={payingRecord}
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
         onUpdate={handleUpdateRecord}
+      />
+
+      <ContactActionModal
+        phone={contactingRecord?.aadhaarLinkedMobileNumber}
+        name={contactingRecord?.name}
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
       />
 
       <Footer />
