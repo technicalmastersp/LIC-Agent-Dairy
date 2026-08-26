@@ -15,7 +15,7 @@ import ContactActionModal from "@/components/ContactActionModal";
 import {
   Search, Eye, Trash2, ArrowUpDown, Plus, Edit,
   FileText, IndianRupee, CalendarPlus, FolderOpen, ShieldCheck, Lock,
-  Download, MessageSquare
+  Download, FileDown, MessageSquare
 } from "lucide-react";
 import { getCurrentUser } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -26,6 +26,8 @@ import { convertDateToIndianFormat } from "@/utils/tools";
 import { INSURANCE_TYPES, getInsuranceTypeDef } from "@/config/insuranceTypes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Record } from "@/types/Record";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export type { Record };
 
@@ -196,6 +198,49 @@ const ViewRecords = () => {
     toast({
       title: "Export complete",
       description: `${filteredAndSortedRecords.length} record${filteredAndSortedRecords.length !== 1 ? "s" : ""} exported to CSV.`,
+    });
+  };
+
+  // ── PDF export of the currently filtered/searched records ──
+  // Same column set and same filtered/sorted source as the CSV export above,
+  // so the two exports always agree on what "the current view" means.
+  const handleExportPdf = () => {
+    const doc = new jsPDF({ orientation: "landscape" });
+    const dateStamp = new Date().toISOString().slice(0, 10);
+
+    doc.setFontSize(14);
+    doc.text("Policy Records", 14, 15);
+    doc.setFontSize(9);
+    doc.setTextColor(120);
+    doc.text(
+      `Exported ${convertDateToIndianFormat(new Date().toISOString())} · ${filteredAndSortedRecords.length} record${filteredAndSortedRecords.length !== 1 ? "s" : ""}`,
+      14,
+      21
+    );
+
+    autoTable(doc, {
+      startY: 26,
+      head: [["Name", "Type", "Father's Name", "Age", "Policy Number", "Sum Assured", "Branch", "Created Date"]],
+      body: filteredAndSortedRecords.map((record) => [
+        record.name ?? "—",
+        recordTypeLabel(record),
+        record.fatherName ?? "—",
+        record.age ?? "—",
+        record.currentPolicy?.policyNumber ?? "—",
+        record.currentPolicy?.sumAssured ?? "—",
+        record.currentPolicy?.branch ?? "—",
+        convertDateToIndianFormat(record.createdAt),
+      ]),
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [37, 99, 235] }, // matches the app's primary blue
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+    });
+
+    doc.save(`policy-records-${dateStamp}.pdf`);
+
+    toast({
+      title: "Export complete",
+      description: `${filteredAndSortedRecords.length} record${filteredAndSortedRecords.length !== 1 ? "s" : ""} exported to PDF.`,
     });
   };
 
@@ -387,6 +432,15 @@ const ViewRecords = () => {
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Export CSV
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleExportPdf}
+                    disabled={filteredAndSortedRecords.length === 0}
+                    className="shrink-0"
+                  >
+                    <FileDown className="w-4 h-4 mr-2" />
+                    Export PDF
                   </Button>
                 </div>
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">

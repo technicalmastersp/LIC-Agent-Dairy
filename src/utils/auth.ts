@@ -34,6 +34,10 @@ export interface User {
   permissions?: Record<string, boolean>;
   paymentDetails?: PaymentDetails | null;
   hasSeenOnboarding?: boolean;
+  notificationPreferences?: {
+    policyDueReminders: boolean;
+    subscriptionReminders: boolean;
+  };
 }
 
 export interface UserSubscription {

@@ -131,6 +131,17 @@ export const getMyActivity = async (params = {}) => {
   return res.data.data; // { logs, pagination }
 };
 
+export const getNotificationPreferences = async () => {
+  const res = await apiClient.get("/user/notification-preferences");
+  return res.data.data; // { policyDueReminders, subscriptionReminders }
+};
+
+export const updateNotificationPreferences = async (prefs) => {
+  // prefs: { policyDueReminders?: boolean, subscriptionReminders?: boolean }
+  const res = await apiClient.put("/user/notification-preferences", prefs);
+  return res.data; // { statusCode, message, data }
+};
+
 export const getMySessions = async () => {
   const res = await apiClient.get("/user/sessions");
   return res.data.data; // array of { sessionId, device, ip, createdAt, isCurrent }
