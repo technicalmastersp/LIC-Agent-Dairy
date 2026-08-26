@@ -1,15 +1,53 @@
 import { defineConfig } from "vitest/config";
+import { loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  // VITE_API_URL historically pointed at the full API base *including* the
+  // /api prefix (e.g. https://.../api) — strip that suffix here since the
+  // proxy below forwards the /api/* path itself; keeping it would double up
+  // into /api/api/*. Falls back to the same Railway URL vercel.json's
+  // production rewrite points at, so dev works even with no .env set.
+  const backendOrigin = (
+    env.VITE_API_URL || "https://lic-agent-dairy-backend-production.up.railway.app/api"
+  ).replace(/\/api\/?$/, "");
+
+  return {
   base: '/',
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      // Mirrors vercel.json's "/api/:path* -> Railway" rewrite for local
+      // dev. Without this, apiClient.js's baseURL: "/api" resolves to
+      // localhost:8080/api/*, which nothing is listening on outside of
+      // Vercel — this is what broke local API calls after the same-origin
+      // cookie fix. changeOrigin rewrites the Host header to match the
+      // target so the backend doesn't see "localhost" as the request host.
+      "/api": {
+        target: backendOrigin,
+        changeOrigin: true,
+        secure: true,
+        // The source file api/apiClient.js sits at the project root, so
+        // Vite's dev server serves it (unbundled, dev-only) at the exact
+        // URL path /api/apiClient.js — colliding with this proxy rule,
+        // which otherwise swallows it and tries forwarding it to Railway
+        // instead of letting Vite serve your own code. Real backend routes
+        // (e.g. /api/auth/login) never end in a file extension, so bypass
+        // hands anything that looks like a JS/TS module request back to
+        // Vite's own server instead of proxying it.
+        bypass: (req) => {
+          if (/\.(js|mjs|jsx|ts|tsx|map)(\?.*)?$/.test(req.url || "")) {
+            return req.url;
+          }
+        },
+      },
+    },
   },
   plugins: [
     react(),
@@ -108,4 +146,5 @@ export default defineConfig(({ mode }) => ({
     // exclusion `vitest run` picks them up and fails immediately.
     exclude: ["**/node_modules/**", "**/dist/**", "e2e/**"],
   },
-}));
+  };
+});
