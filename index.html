@@ -16,6 +16,14 @@
     <meta name="twitter:site" content="@dev" />
     <meta name="twitter:image" content="https://lic-agent-dairy.vercel.app/logos/logo_icon.png" />
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <!-- PWA: iOS doesn't read the web manifest for its home-screen icon or
+         status-bar color, so these need to be explicit here even though
+         vite-plugin-pwa auto-injects the manifest link for everyone else. -->
+    <meta name="theme-color" content="#0A5B76" />
+    <link rel="apple-touch-icon" href="/pwa-icons/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="LIC Records" />
   </head>
 
   <body>
