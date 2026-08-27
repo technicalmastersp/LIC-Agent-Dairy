@@ -3,15 +3,22 @@ import * as Sentry from "@sentry/react";
 import { toastEmitter } from "../utils/toastEmitter";
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  // Same-origin path, not the Railway URL directly. vercel.json rewrites
+  // /api/* to the Railway backend server-side, so from the browser's
+  // point of view every request stays on this site's own origin. That
+  // matters for the auth cookie: a cookie set via a cross-origin request
+  // (even with SameSite=None; Secure) is still a *third-party* cookie,
+  // which Chrome Incognito, Safari Private Browsing, and Firefox's
+  // tracking protection block outright regardless of SameSite. Routing
+  // through a same-origin path makes it a first-party cookie everywhere.
+  baseURL: "/api",
   headers: { "Content-Type": "application/json" },
   timeout: 10000,
-  // Auth now lives in an httpOnly cookie set by the backend (see
-  // authController.js's setTokenCookie) instead of a token the frontend
-  // reads and attaches itself — withCredentials tells the browser to send
-  // that cookie on every request and to accept Set-Cookie from responses.
-  // Requires the backend's CORS config to echo back a specific origin
-  // (never "*") with credentials: true — see app.js.
+  // Still needed even same-origin — withCredentials controls whether the
+  // browser attaches/accepts cookies on this axios instance's requests at
+  // all. Backend CORS (app.js) also still needs credentials: true, even
+  // though the browser now only ever talks to the proxy, not Railway
+  // directly.
   withCredentials: true,
 });
 
@@ -26,7 +33,7 @@ const apiClient = axios.create({
 // on every request after the "logged out" redirect. Fired via plain
 // fetch() (not apiClient) so it can't recurse into this same interceptor.
 const clearServerSession = () => {
-  fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+  fetch("/api/auth/logout", {
     method: "POST",
     credentials: "include",
   }).catch(() => {

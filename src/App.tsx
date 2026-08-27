@@ -48,6 +48,9 @@ const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const HelpSupport = lazy(() => import("./pages/HelpSupport"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const MyActivity = lazy(() => import("./pages/MyActivity"));
+const SessionManagement = lazy(() => import("./pages/SessionManagement"));
+const NotificationPreferences = lazy(() => import("./pages/NotificationPreferences"));
 
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminUserDetail = lazy(() => import("./pages/admin/AdminUserDetail"));
@@ -113,6 +116,9 @@ const App = () => (
                   <Route path="/referral-program" element={<ProtectedRoute><ReferralProgram /></ProtectedRoute>} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
+                  <Route path="/my-activity" element={<ProtectedRoute><MyActivity /></ProtectedRoute>} />
+                  <Route path="/sessions" element={<ProtectedRoute><SessionManagement /></ProtectedRoute>} />
+                  <Route path="/notification-preferences" element={<ProtectedRoute><NotificationPreferences /></ProtectedRoute>} />
                   <Route path="/verify-email" element={<VerifyEmail />} />
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />

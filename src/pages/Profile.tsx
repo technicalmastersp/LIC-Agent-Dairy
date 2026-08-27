@@ -15,7 +15,7 @@ import {
   Edit, Save, X, KeyRound, Users, Camera,
   Crown, CheckCircle2, XCircle, ArrowRight,
   RefreshCw, ChevronRight, UserCircle2, Wallet2, Gauge,
-  FileText, PlusCircle, BellRing, ShieldCheck,
+  FileText, PlusCircle, BellRing, Bell, ShieldCheck, History, Monitor,
 } from "lucide-react";
 import { getProfile, updateProfile, updateProfileImage } from "../../services/userService";
 import { resizeImageToSquare } from "@/utils/imageResize";
@@ -169,6 +169,9 @@ const Profile = () => {
     { icon: PlusCircle, label: "Add record",         to: "/add-record" },
     { icon: BellRing,   label: "Due this month",     to: "/view-due-policies" },
     { icon: Crown,      label: "Plans & billing",    to: "/our-plans" },
+    { icon: History,    label: "My activity",        to: "/my-activity" },
+    { icon: Monitor,    label: "Sessions & devices",  to: "/sessions" },
+    { icon: Bell,       label: "Notifications",       to: "/notification-preferences" },
   ];
 
   return (

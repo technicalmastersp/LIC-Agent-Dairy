@@ -85,6 +85,8 @@ const Home = () => {
 
   if (!currentUser) return null;
 
+  const isFirstTimeUser = !loading && (currentUser.totalRecords ?? 0) === 0;
+
   const sub        = currentUser.subscription;
   const daysLeft   = sub?.endDate
     ? Math.max(0, Math.ceil((new Date(sub.endDate).getTime() - Date.now()) / 86400000))
@@ -215,8 +217,27 @@ const Home = () => {
             </p>
           </div>
 
+          {/* ── First-time welcome banner ── */}
+          {isFirstTimeUser && (
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-gradient-to-r from-blue-50 to-form-header/5 border border-blue-200 rounded-lg px-5 py-5">
+              <div className="flex-1">
+                <p className="text-base font-medium text-form-header">Welcome to your policy diary 👋</p>
+                <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                  You haven't added any policy records yet. Add your first one to start tracking due dates,
+                  payments, and everything else on this dashboard.
+                </p>
+              </div>
+              <Link to="/add-record" className="shrink-0">
+                <Button data-tour="tour-add-record-banner">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add your first record
+                </Button>
+              </Link>
+            </div>
+          )}
+
           {/* ── Alert banner ── */}
-          {missedCount > 0 && (
+          {!isFirstTimeUser && missedCount > 0 && (
             <div className="flex items-start gap-3 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
               <AlertTriangle className="w-4 h-4 text-yellow-600 shrink-0 mt-0.5" />
               <p className="text-sm text-yellow-800">
@@ -250,17 +271,26 @@ const Home = () => {
               <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">Last 6 months</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={260}>
-                <LineChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="recordsAdded" stroke="#2563eb" name="Records added" strokeWidth={2} />
-                  <Line type="monotone" dataKey="duePolicies" stroke="#f97316" name="Policies due" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
+              {isFirstTimeUser ? (
+                <div className="flex flex-col items-center justify-center text-center py-14 px-4">
+                  <TrendingUp className="w-8 h-8 text-muted-foreground/50 mb-3" />
+                  <p className="text-sm text-muted-foreground">
+                    Your activity trend will show up here once you've added a few records.
+                  </p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={260}>
+                  <LineChart data={trendData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="recordsAdded" stroke="#2563eb" name="Records added" strokeWidth={2} />
+                    <Line type="monotone" dataKey="duePolicies" stroke="#f97316" name="Policies due" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
 

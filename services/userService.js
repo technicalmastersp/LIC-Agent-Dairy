@@ -124,3 +124,35 @@ export const resendVerification = async (email) => {
   } finally { isResendng = false; }
   return { resendMsg, isResendng };
 };
+
+export const getMyActivity = async (params = {}) => {
+  const q = new URLSearchParams(params).toString();
+  const res = await apiClient.get(`/user/my-activity?${q}`);
+  return res.data.data; // { logs, pagination }
+};
+
+export const getNotificationPreferences = async () => {
+  const res = await apiClient.get("/user/notification-preferences");
+  return res.data.data; // { policyDueReminders, subscriptionReminders }
+};
+
+export const updateNotificationPreferences = async (prefs) => {
+  // prefs: { policyDueReminders?: boolean, subscriptionReminders?: boolean }
+  const res = await apiClient.put("/user/notification-preferences", prefs);
+  return res.data; // { statusCode, message, data }
+};
+
+export const getMySessions = async () => {
+  const res = await apiClient.get("/user/sessions");
+  return res.data.data; // array of { sessionId, device, ip, createdAt, isCurrent }
+};
+
+export const revokeSession = async (sessionId) => {
+  const res = await apiClient.delete(`/user/sessions/${sessionId}`);
+  return res.data;
+};
+
+export const revokeOtherSessions = async () => {
+  const res = await apiClient.post("/user/sessions/logout-others");
+  return res.data;
+};
