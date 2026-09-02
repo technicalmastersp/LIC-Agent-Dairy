@@ -48,6 +48,9 @@ const AddRecord = () => {
   // custom field builder, for "Other") render below the common form.
   // Defaults to "Life Insurance" since that's what this form has always been.
   const [insuranceType, setInsuranceType] = useState("Life Insurance");
+  // Guards the submit button against double-click / rapid re-submits
+  // firing multiple createRecord calls for the same form.
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [customInsuranceTypeName, setCustomInsuranceTypeName] = useState("");
   const [typeSpecificData, setTypeSpecificData] = useState<Record<string, string>>(
     emptyTypeSpecificData("Life Insurance")
@@ -188,7 +191,9 @@ const AddRecord = () => {
     }
   };
 
-  const onValid = (formData: PolicyRecordFormValues) => {
+  const onValid = async (formData: PolicyRecordFormValues) => {
+    if (isSubmitting) return; // already saving — ignore extra clicks
+
     if (isOtherInsuranceType(insuranceType) && !customInsuranceTypeName.trim()) {
       toast({
         title: "Error",
@@ -209,22 +214,23 @@ const AddRecord = () => {
       customFields: isOtherInsuranceType(insuranceType) ? customFields : [],
     };
 
-    const success = createRecord(record).then((success)=> {
+    setIsSubmitting(true);
+    try {
+      await createRecord(record);
       toast({
         title: "Success",
         description: "Record saved successfully",
-
       });
       navigate("/view-records");
-    }).then( (error) => {
-      if (error !== null && error !== undefined) {
-        toast({
-          title: "Error",
-          description: "Failed to save record",
-          variant: "destructive",
-        });
-      }
-    });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save record",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -555,7 +561,7 @@ const AddRecord = () => {
                             value={member.currentAge}
                             onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
                             aria-label={`Current age for family member ${index + 1}`}
-                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                            className="w-full border border-input bg-background focus-visible:border-primary"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -574,7 +580,7 @@ const AddRecord = () => {
                             value={member.deathAge}
                             onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
                             aria-label={`Age at death or year for family member ${index + 1}`}
-                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                            className="w-full border border-input bg-background focus-visible:border-primary"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -582,7 +588,7 @@ const AddRecord = () => {
                             value={member.reason}
                             onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
                             aria-label={`Reason for family member ${index + 1}`}
-                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                            className="w-full border border-input bg-background focus-visible:border-primary"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -705,7 +711,7 @@ const AddRecord = () => {
                           value={currentPolicy.policyNumber}
                           onChange={(e) => handlePolicyChange("current", "policyNumber", e.target.value)}
                           aria-label="Policy Number"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -713,7 +719,7 @@ const AddRecord = () => {
                           value={currentPolicy.planAndTerm}
                           onChange={(e) => handlePolicyChange("current", "planAndTerm", e.target.value)}
                           aria-label="Plan and Term"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -721,7 +727,7 @@ const AddRecord = () => {
                           value={currentPolicy.sumAssured}
                           onChange={(e) => handlePolicyChange("current", "sumAssured", e.target.value)}
                           aria-label="Sum Assured"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -745,7 +751,7 @@ const AddRecord = () => {
                           value={currentPolicy.branch}
                           onChange={(e) => handlePolicyChange("current", "branch", e.target.value)}
                           aria-label="Branch"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -754,7 +760,7 @@ const AddRecord = () => {
                           value={currentPolicy.lastPaymentDate}
                           onChange={(e) => handlePolicyChange("current", "lastPaymentDate", e.target.value)}
                           aria-label="Last Payment Date"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                     </TableRow>
@@ -789,7 +795,7 @@ const AddRecord = () => {
                           value={previousPolicy.policyNumber}
                           onChange={(e) => handlePolicyChange("previous", "policyNumber", e.target.value)}
                           aria-label="Previous Policy Number"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -797,7 +803,7 @@ const AddRecord = () => {
                           value={previousPolicy.planAndTerm}
                           onChange={(e) => handlePolicyChange("previous", "planAndTerm", e.target.value)}
                           aria-label="Previous Plan and Term"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -805,7 +811,7 @@ const AddRecord = () => {
                           value={previousPolicy.sumAssured}
                           onChange={(e) => handlePolicyChange("previous", "sumAssured", e.target.value)}
                           aria-label="Previous Sum Assured"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -829,7 +835,7 @@ const AddRecord = () => {
                           value={previousPolicy.branch}
                           onChange={(e) => handlePolicyChange("previous", "branch", e.target.value)}
                           aria-label="Previous Branch"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -838,7 +844,7 @@ const AddRecord = () => {
                           value={previousPolicy.lastPaymentDate}
                           onChange={(e) => handlePolicyChange("previous", "lastPaymentDate", e.target.value)}
                           aria-label="Previous Last Payment Date"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                     </TableRow>
@@ -850,14 +856,15 @@ const AddRecord = () => {
 
           {/* Action Buttons */}
           <div className="flex justify-center space-x-4 pt-2 pb-8">
-            <Button onClick={rhfHandleSubmit(onValid, onInvalid)} className="bg-primary hover:bg-primary-light text-primary-foreground shadow-sm">
+            <Button onClick={rhfHandleSubmit(onValid, onInvalid)} className="bg-primary hover:bg-primary-light text-primary-foreground shadow-sm" disabled={isSubmitting}>
               <Save className="w-4 h-4 mr-2" />
-              Save Record
+              {isSubmitting ? "Saving…" : "Save Record"}
             </Button>
             <Button 
               variant="outline" 
               onClick={() => navigate("/")}
               className="border-primary text-primary hover:bg-primary/5"
+              disabled={isSubmitting}
             >
               Cancel
             </Button>

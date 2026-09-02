@@ -23,6 +23,10 @@ const OurPlans = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<string>("");
+  // Tracks which plan's checkout is currently in flight so Select Plan /
+  // Complete Payment can't be double-clicked into firing a second
+  // Razorpay checkout or a second verifyPayment call.
+  const [processingPlanId, setProcessingPlanId] = useState<string | null>(null);
   const [referralConfig, setReferralConfig] = useState({ SIGNUP_DISCOUNT_AMOUNT: 100 });
   const [walletBalance, setWalletBalance] = useState(0);
   const [useWallet, setUseWallet] = useState(false);
@@ -116,6 +120,7 @@ const OurPlans = () => {
   const plans = allPlans.filter(p => p.id !== "1month-free" || !hasHadPaidPlan);
 
   const handleSelectPlan = async (planId: string) => {
+    if (processingPlanId) return; // already checking out a plan — ignore extra clicks
     if (!currentUser) { navigate("/signup"); return; }
     if (currentUser.role === "admin" || currentUser.role === "superadmin") {
       toast({ title: "Not applicable", description: "Admin accounts don't use subscription plans." });
@@ -123,6 +128,7 @@ const OurPlans = () => {
     }
 
     const plan = plans.find(p => p.id === planId);
+    setProcessingPlanId(planId);
 
     try {
       if (!plan || plan.price === 0) {
@@ -175,6 +181,8 @@ const OurPlans = () => {
       }
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
       toast({ title: "Error", description: message || "Something went wrong.", variant: "destructive" });
+    } finally {
+      setProcessingPlanId(null);
     }
   };
 
@@ -326,16 +334,18 @@ const OurPlans = () => {
                     className="w-full"
                     variant="default"
                     onClick={() => handleSelectPlan(plan.id)}
+                    disabled={!!processingPlanId}
                   >
-                    Complete Payment
+                    {processingPlanId === plan.id ? "Processing…" : "Complete Payment"}
                   </Button>
                 ) : (
                   <Button
                     className="w-full"
                     variant={plan.popular ? "default" : "outline"}
                     onClick={() => handleSelectPlan(plan.id)}
+                    disabled={!!processingPlanId}
                   >
-                    Select Plan
+                    {processingPlanId === plan.id ? "Processing…" : "Select Plan"}
                   </Button>
                 )}
               </CardFooter>
