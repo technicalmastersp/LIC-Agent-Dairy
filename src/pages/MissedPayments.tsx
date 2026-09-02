@@ -14,60 +14,7 @@ import { Search, Eye, Trash2, ArrowUpDown, ReceiptText, AlertTriangle, FolderOpe
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import { getRecordsWithoutLastPayment, deleteRecord } from "../../services/recordService";
-
-interface Record {
-  id: string;
-  date: string;
-  aadhaarNumber: string;
-  panNumber: string;
-  email: string;
-  name: string;
-  birthPlace: string;
-  fatherName: string;
-  motherName: string;
-  spouseName: string;
-  address: string;
-  dateOfBirth: string;
-  age: string;
-  occupation: string;
-  educationalQualification: string;
-  designationOfPolicyHolder: string;
-  annualIncome: string;
-  periodOfService: string;
-  employerName: string;
-  aadhaarLinkedMobileNumber: string;
-  nameOfNominee: string;
-  ageOfNominee: string;
-  relationName: string;
-  lastChildBirthDate: string;
-  height: string;
-  weight: string;
-  bankAccountNumber: string;
-  ifscCode: string;
-  bankName: string;
-  branchName: string;
-  recordId?: string;
-
-  currentPolicy : {
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-
-  previousPolicy : {
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-  createdAt: string;
-}
-
+import type { Record } from "@/types/pages/MissedPayments.types";
 const avatarPalette = [
   "bg-blue-100 text-blue-700",
   "bg-violet-100 text-violet-700",
@@ -297,7 +244,7 @@ const MissedPayments = () => {
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Policy Number</TableHead>
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Mode Of Payment</TableHead>
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Branch</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Last Payment Date</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground min-w-32">Last Payment Date</TableHead>
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Actions</TableHead>
                       </TableRow>
                     </TableHeader>

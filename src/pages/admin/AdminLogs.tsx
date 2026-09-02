@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getActivityLogs } from "../../../services/adminService";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { ActivityLog, Pagination } from "@/types/pages/admin/AdminLogs.types";
 
 const ACTION_COLORS: Record<string, string> = {
   WITHDRAWAL_APPROVED: "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
@@ -35,23 +36,6 @@ const fmt = (d?: string) => d
       hour:"2-digit", minute:"2-digit"
     })
   : "—";
-
-interface ActivityLog {
-  _id: string;
-  action: string;
-  adminName?: string;
-  adminRole?: string;
-  targetUserName?: string;
-  createdAt?: string;
-  details?: unknown;
-}
-
-interface Pagination {
-  page: number;
-  totalPages: number;
-  total: number;
-}
-
 const AdminLogs = () => {
   const [logs,       setLogs]       = useState<ActivityLog[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);

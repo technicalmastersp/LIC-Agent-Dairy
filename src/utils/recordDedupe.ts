@@ -1,4 +1,4 @@
-import type { Record } from "@/pages/ViewRecords";
+import type { Record } from "@/types/Record";
 
 // The API can occasionally return the same underlying record more than once
 // in `recordLists` (e.g. a retried save, or an id collision from the record

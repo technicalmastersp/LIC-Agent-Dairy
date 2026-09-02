@@ -4,7 +4,8 @@ import { useNavigate, Link }            from "react-router-dom";
 import Navigation                        from "@/components/Navigation";
 import Footer                            from "@/components/Footer";
 import { useLanguage }                   from "@/hooks/useLanguage";
-import { getCurrentUser, setCurrentUser, type User } from "@/utils/auth";
+import { getCurrentUser, setCurrentUser } from "@/utils/auth";
+import type { User } from "@/types/utils/auth.types";
 import { Button }    from "@/components/ui/button";
 import { Input }     from "@/components/ui/input";
 import { Label }     from "@/components/ui/label";
@@ -21,6 +22,7 @@ import { getProfile, updateProfile, updateProfileImage } from "../../services/us
 import { resizeImageToSquare } from "@/utils/imageResize";
 import { getReferralDashboard }        from "../../services/referralService";
 import { convertDateToIndianFormat }   from "@/utils/tools";
+import type { ReferralDashboardData } from "@/types/pages/Profile.types";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() || "?";
@@ -30,15 +32,6 @@ const roleLabel: Record<string, string> = {
   admin:      "Admin",
   user:       "Policy agent",
 };
-
-interface ReferralDashboardData {
-  totalL1?: number;
-  totalL2?: number;
-  availableBalance?: number;
-  pendingEarnings?: number;
-  totalEarned?: number;
-}
-
 const Profile = () => {
   const navigate      = useNavigate();
   const { t }         = useLanguage();

@@ -1,12 +1,6 @@
 import { INSURANCE_TYPES } from "@/config/insuranceTypes";
 import { Check } from "lucide-react";
-
-interface InsuranceTypeSelectorProps {
-  value: string;
-  onChange: (id: string) => void;
-  disabled?: boolean;
-}
-
+import type { InsuranceTypeSelectorProps } from "@/types/components/InsuranceTypeSelector.types";
 // Card grid used on Add Record (and available for Edit) to pick which of
 // the 6 built-in insurance types — or "Other (Custom)" — a record belongs
 // to. Selecting a card is what drives which type-specific fields render

@@ -10,6 +10,7 @@ import { useToast }      from "@/hooks/use-toast";
 import { getPendingUpiVerifications, verifyUpiId, rejectUpiId } from "../../../services/adminService";
 import { CheckCircle2, XCircle, RefreshCw } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import type { PendingUpiVerification } from "@/types/pages/admin/PaymentVerifications.types";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -17,18 +18,6 @@ const initials = (name = "") =>
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
   : "—";
-
-interface PendingUpiVerification {
-  userId: string;
-  userName: string;
-  userEasyId?: string;
-  userEmail?: string;
-  userProfileImage?: string;
-  upiId: string;
-  upiRejectionReason?: string;
-  updatedAt?: string;
-}
-
 const PaymentVerifications = () => {
   const { toast }      = useToast();
 

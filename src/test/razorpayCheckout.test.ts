@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Mock } from "vitest";
+import type { RazorpayOptions, RazorpayInstance } from "@/types/test/razorpayCheckout.test.types";
 
 vi.mock("./loadRazorpay", () => ({
   loadRazorpayScript: vi.fn().mockResolvedValue(undefined),
@@ -12,15 +13,6 @@ const order = {
 // Matches window.Razorpay's declared constructor type in loadRazorpay.ts —
 // reusing that shape here instead of `any` keeps this test honest about
 // what the real constructor options/instance actually look like.
-interface RazorpayOptions {
-  handler: (response: Record<string, string>) => void;
-  modal: { ondismiss: () => void };
-}
-interface RazorpayInstance {
-  open: () => void;
-  on: (event: string, cb: () => void) => void;
-}
-
 describe("openRazorpayCheckout", () => {
   let RazorpayMock: Mock<(opts: RazorpayOptions) => RazorpayInstance>;
 

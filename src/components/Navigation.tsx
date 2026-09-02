@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage }   from "@/hooks/useLanguage";
-import type { Translations } from "@/utils/translations";
+import type { Translations } from "@/types/utils/translations.types";
 import LanguageSwitcher  from "./LanguageSwitcher";
 import ThemeToggle        from "./ThemeToggle";
 import { cn }            from "@/lib/utils";

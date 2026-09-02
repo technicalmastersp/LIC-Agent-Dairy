@@ -1,5 +1,4 @@
-import type { CustomFieldValue } from "@/config/insuranceTypes";
-
+import type { CustomFieldValue } from "@/types/config/insuranceTypes.types";
 interface FamilyMember {
   relationship: string;
   currentAge: string;

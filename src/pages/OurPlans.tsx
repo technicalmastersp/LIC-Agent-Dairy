@@ -17,17 +17,7 @@ import { getReferralDashboard } from "../../services/referralService";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
 import { Link } from "lucide-react";
 import SEO from "@/components/SEO";
-
-interface Plan {
-  id: string;
-  planType?: string;
-  duration: string;
-  price: number;
-  originalPrice?: number;
-  features: string[];
-  popular?: boolean;
-}
-
+import type { Plan } from "@/types/pages/OurPlans.types";
 const OurPlans = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -235,8 +225,8 @@ const OurPlans = () => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-primary mb-4">Choose Your Plan</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-4">Choose Your Plan</h1>
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
             Choose the plan that fits your needs. Upgrade or downgrade anytime.
           </p>
         </div>

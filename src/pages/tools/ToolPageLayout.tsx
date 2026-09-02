@@ -5,15 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import SEO from "@/components/SEO";
 import siteConfig from "@/config/siteConfig";
-
-interface ToolPageLayoutProps {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  children: ReactNode;
-  accent?: string; // tailwind color stem, e.g. "blue", "emerald" — defaults to primary
-}
-
+import type { ToolPageLayoutProps } from "@/types/pages/tools/ToolPageLayout.types";
 const ToolPageLayout = ({ icon: Icon, title, description, children, accent }: ToolPageLayoutProps) => {
   const iconBg = accent ? `bg-${accent}-100 text-${accent}-700` : "bg-primary/10 text-primary";
   const { pathname } = useLocation();

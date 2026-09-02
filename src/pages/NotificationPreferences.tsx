@@ -6,12 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { getNotificationPreferences, updateNotificationPreferences } from "../../services/userService";
 import { Bell, CalendarClock, CreditCard } from "lucide-react";
-
-interface Preferences {
-  policyDueReminders: boolean;
-  subscriptionReminders: boolean;
-}
-
+import type { Preferences } from "@/types/pages/NotificationPreferences.types";
 const DEFAULT_PREFS: Preferences = {
   policyDueReminders: true,
   subscriptionReminders: true,

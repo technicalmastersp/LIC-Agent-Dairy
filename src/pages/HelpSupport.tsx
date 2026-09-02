@@ -28,25 +28,7 @@ import siteConfig from "@/config/siteConfig";
 import { createTicket, getMyTickets } from "../../services/supportService";
 import { createSuggestion, getMySuggestions } from "../../services/suggestionService";
 import axios from "axios";
-
-type Ticket = {
-  ticketId: string;
-  category: string;
-  createdAt?: string;
-  status: string;
-  message: string;
-  adminReply?: string;
-};
-
-type Suggestion = {
-  _id: string;
-  title: string;
-  message: string;
-  status: string;
-};
-
-type FaqItem = { q: string; a: string; category: string };
-
+import type { Ticket, Suggestion, FaqItem } from "@/types/pages/HelpSupport.types";
 const faqs: FaqItem[] = [
   { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. Your remaining days on the current plan are handled automatically when you switch." },
   { category: "Account & Billing", q: "What happens when my plan expires?", a: "Your records stay safe and backed up, but you'll need to renew to add new records or access due/missed payment tracking again." },

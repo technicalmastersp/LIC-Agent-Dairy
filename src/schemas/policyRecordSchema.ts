@@ -48,5 +48,3 @@ export const policyRecordSchema = z.object({
   bankName: z.string().max(200),
   branchName: z.string().max(200),
 });
-
-export type PolicyRecordFormValues = z.infer<typeof policyRecordSchema>;

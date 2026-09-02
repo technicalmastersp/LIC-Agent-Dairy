@@ -6,9 +6,7 @@ import { Input } from "@/components/ui/input";
 import { CheckCircle2, XCircle, Loader2, MailCheck } from "lucide-react";
 import { verifyEmail, resendVerification, logoutCurrentUser } from "../../services/userService";
 import { getCurrentUser } from "@/utils/auth";
-
-type VerifyStatus = "verifying" | "success" | "expired" | "invalid" | "already" | "resendedMail";
-
+import type { VerifyStatus } from "@/types/pages/VerifyEmail.types";
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const navigate       = useNavigate();

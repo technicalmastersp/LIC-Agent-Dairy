@@ -8,12 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input }   from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { getCurrentUser, type User } from "@/utils/auth";
+import { getCurrentUser } from "@/utils/auth";
+import type { User } from "@/types/utils/auth.types";
 import { getUserDetails, deleteUser, changeUserSubscription, forceLogoutUser } from "../../../services/adminService";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
 import type { Record as PolicyRecord } from "@/types/Record";
 import { ArrowLeft, Trash2, RefreshCw, Eye, LogOut, Building2, Smartphone, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import type { AdminUserDetailData } from "@/types/pages/admin/AdminUserDetail.types";
 
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })
@@ -29,19 +31,6 @@ const PLANS = [
   { id: "12months",    label: "Standard — 12 Months" },
   { id: "24months",    label: "Premium — 24 Months"  },
 ];
-
-interface AdminUserDetailData extends User {
-  userId: string;
-  records?: PolicyRecord[];
-  referral?: {
-    totalEarned: number;
-    availableBalance: number;
-    totalWithdrawn: number;
-    totalL1: number;
-    totalL2: number;
-  };
-}
-
 const AdminUserDetail = () => {
   const { userId }  = useParams();
   const navigate    = useNavigate();

@@ -29,8 +29,6 @@ import type { Record } from "@/types/Record";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export type { Record };
-
 // Deterministic soft color for an avatar chip, derived from the name itself
 const avatarPalette = [
   "bg-blue-100 text-blue-700",

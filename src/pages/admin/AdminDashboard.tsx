@@ -18,6 +18,7 @@ import {
   BadgeCheck, LifeBuoy, Lightbulb, IndianRupee, CalendarClock, Mail,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import type { ActivityLogItem, RecentUserItem, DashboardStats } from "@/types/pages/admin/AdminDashboard.types";
 
 const ACTION_COLORS: Record<string, string> = {
   WITHDRAWAL_APPROVED:       "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
@@ -50,34 +51,6 @@ const fmtTime = (d?: string) => d
       hour:"2-digit", minute:"2-digit"
     })
   : "—";
-
-interface ActivityLogItem {
-  action: string;
-  adminName?: string;
-  targetName?: string;
-  createdAt?: string;
-}
-
-interface RecentUserItem {
-  name: string;
-  email: string;
-  planId: string;
-  planType: string;
-  createdAt: string;
-}
-
-interface DashboardStats {
-  users: { total: number; newThisMonth: number; growthPct: number; deactivated: number };
-  subscriptions: { active: number; paid: number; freeTrial: number; expired: number };
-  revenue: { total?: number; thisMonthIncome?: number };
-  withdrawals: { pending: number; pendingAmount: number; processedAmount: number };
-  referrals: { totalEarnings: number };
-  recentActivity: ActivityLogItem[];
-  recentUsers: RecentUserItem[];
-  paymentVerifications?: { pendingUpi?: number };
-  support?: { openHighPriority?: number; openGuest?: number; newSuggestions?: number };
-}
-
 const AdminDashboard = () => {
   const [permissions, setPermissions] = useState<Record<string, boolean> | null>(null);
   const { toast }   = useToast();
