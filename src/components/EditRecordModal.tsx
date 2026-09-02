@@ -261,11 +261,11 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="text-form-header text-xl flex items-center gap-2">
-            <User className="w-5 h-5" />
-            Edit Record — {record.name}
+          <DialogTitle className="text-form-header text-xl flex flex-wrap items-center gap-2">
+            <User className="w-5 h-5 shrink-0" />
+            <span className="break-words">Edit Record — {record.name}</span>
           </DialogTitle>
           <DialogDescription asChild>
             <div>
@@ -514,7 +514,82 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
               </div>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto rounded-lg border border-table-border">
+              {/* Mobile: stacked, editable cards (no horizontal scrolling) */}
+              <div className="md:hidden space-y-3">
+                {familyMembers.map((member, index) => (
+                  <div key={index} className="rounded-lg border border-table-border p-3 bg-muted/20 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium text-muted-foreground">Member {index + 1}</span>
+                      <Button
+                        type="button"
+                        onClick={() => removeFamilyMember(index)}
+                        variant="destructive"
+                        size="sm"
+                        disabled={familyMembers.length <= 1}
+                        className={familyMembers.length <= 1 ? "opacity-50" : ""}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Remove
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Relationship</Label>
+                      <Select value={member.relationship || ""} onValueChange={(value) => handleFamilyMemberChange(index, 'relationship', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select relationship" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {relationOptions.map((relationship) => (
+                            <SelectItem key={relationship} value={relationship || ""}>
+                              {relationship.charAt(0).toUpperCase() + relationship.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label className="text-xs">Current Age</Label>
+                        <Input
+                          value={member.currentAge}
+                          onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs">Health</Label>
+                        <Select value={member.health} onValueChange={(value) => handleFamilyMemberChange(index, 'health', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Health" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem key="Good" value="Good">Good</SelectItem>
+                            <SelectItem key="Not Good" value="Not Good">Not Good</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label className="text-xs">Age at Death/Year</Label>
+                        <Input
+                          value={member.deathAge}
+                          onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs">Reason</Label>
+                        <Input
+                          value={member.reason}
+                          onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop: table */}
+              <div className="hidden md:block overflow-x-auto rounded-lg border border-table-border">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-table-header">

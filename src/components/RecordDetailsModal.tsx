@@ -40,11 +40,11 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2 text-form-header">
-            <User className="w-5 h-5" />
-            <span>Record Details - {record.name}</span>
+          <DialogTitle className="flex flex-wrap items-center gap-2 text-form-header">
+            <User className="w-5 h-5 shrink-0" />
+            <span className="break-words">Record Details - {record.name}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -210,7 +210,38 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 <SectionTitle icon={Users}>Family Details</SectionTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto rounded-lg border border-table-border">
+                {/* Mobile: stacked cards (no horizontal scrolling) */}
+                <div className="md:hidden space-y-3">
+                  {record.familyMembers.map((member: FamilyMember, index: number) => (
+                    <div key={index} className="rounded-lg border border-table-border p-3 bg-muted/20 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm font-medium">{member.relationship || `Member ${index + 1}`}</span>
+                        {member.health === "Good" ? (
+                          <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs">Good</Badge>
+                        ) : member.health === "Not Good" ? (
+                          <Badge className="bg-red-100 text-red-700 border border-red-200 text-xs">Not Good</Badge>
+                        ) : null}
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Current Age</p>
+                          <p className="mt-0.5">{member.currentAge || "-"}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Age at Death/Year</p>
+                          <p className="mt-0.5">{member.deathAge || "-"}</p>
+                        </div>
+                        <div className="col-span-2">
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Reason</p>
+                          <p className="mt-0.5 break-words">{member.reason || "-"}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop: table */}
+                <div className="hidden md:block overflow-x-auto rounded-lg border border-table-border">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
@@ -259,7 +290,38 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 <SectionTitle icon={ShieldCheck}>Current Policy Details</SectionTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto rounded-lg border border-table-border">
+                {/* Mobile: stacked card */}
+                <div className="md:hidden rounded-lg border border-table-border p-3 bg-muted/20 space-y-3">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <Badge variant="outline" className="font-mono">
+                      {record.currentPolicy.policyNumber || "N/A"}
+                    </Badge>
+                    <span className="text-sm font-medium text-emerald-700">
+                      ₹{record.currentPolicy.sumAssured || "0"}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Plan & Term</p>
+                      <p className="mt-0.5 break-words">{record.currentPolicy.planAndTerm || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Mode of Payment</p>
+                      <p className="mt-0.5">{record.currentPolicy.modeOfPayment || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Branch</p>
+                      <p className="mt-0.5 break-words">{record.currentPolicy.branch || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Last Payment</p>
+                      <p className="mt-0.5">{convertDateToIndianFormat(record.currentPolicy.lastPaymentDate) || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop: table */}
+                <div className="hidden md:block overflow-x-auto rounded-lg border border-table-border">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
@@ -308,7 +370,38 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 <SectionTitle icon={History}>Previous Policy Details</SectionTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto rounded-lg border border-table-border">
+                {/* Mobile: stacked card */}
+                <div className="md:hidden rounded-lg border border-table-border p-3 bg-muted/20 space-y-3">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <Badge variant="outline" className="font-mono">
+                      {record.previousPolicy.policyNumber || "N/A"}
+                    </Badge>
+                    <span className="text-sm font-medium">
+                      ₹{record.previousPolicy.sumAssured || "0"}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Plan & Term</p>
+                      <p className="mt-0.5 break-words">{record.previousPolicy.planAndTerm || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Mode of Payment</p>
+                      <p className="mt-0.5">{record.previousPolicy.modeOfPayment || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Branch</p>
+                      <p className="mt-0.5 break-words">{record.previousPolicy.branch || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Last Payment</p>
+                      <p className="mt-0.5">{convertDateToIndianFormat(record.previousPolicy.lastPaymentDate) || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop: table */}
+                <div className="hidden md:block overflow-x-auto rounded-lg border border-table-border">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">

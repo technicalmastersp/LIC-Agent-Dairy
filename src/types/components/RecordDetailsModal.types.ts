@@ -1,4 +1,3 @@
-
 export interface FamilyMember {
   relationship?: string;
   currentAge?: string | number;
