@@ -555,7 +555,7 @@ const AddRecord = () => {
                             value={member.currentAge}
                             onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
                             aria-label={`Current age for family member ${index + 1}`}
-                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                            className="w-full border border-input bg-background focus-visible:border-primary"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -574,7 +574,7 @@ const AddRecord = () => {
                             value={member.deathAge}
                             onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
                             aria-label={`Age at death or year for family member ${index + 1}`}
-                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                            className="w-full border border-input bg-background focus-visible:border-primary"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -582,7 +582,7 @@ const AddRecord = () => {
                             value={member.reason}
                             onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
                             aria-label={`Reason for family member ${index + 1}`}
-                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                            className="w-full border border-input bg-background focus-visible:border-primary"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -705,7 +705,7 @@ const AddRecord = () => {
                           value={currentPolicy.policyNumber}
                           onChange={(e) => handlePolicyChange("current", "policyNumber", e.target.value)}
                           aria-label="Policy Number"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -713,7 +713,7 @@ const AddRecord = () => {
                           value={currentPolicy.planAndTerm}
                           onChange={(e) => handlePolicyChange("current", "planAndTerm", e.target.value)}
                           aria-label="Plan and Term"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -721,7 +721,7 @@ const AddRecord = () => {
                           value={currentPolicy.sumAssured}
                           onChange={(e) => handlePolicyChange("current", "sumAssured", e.target.value)}
                           aria-label="Sum Assured"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -745,7 +745,7 @@ const AddRecord = () => {
                           value={currentPolicy.branch}
                           onChange={(e) => handlePolicyChange("current", "branch", e.target.value)}
                           aria-label="Branch"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -754,7 +754,7 @@ const AddRecord = () => {
                           value={currentPolicy.lastPaymentDate}
                           onChange={(e) => handlePolicyChange("current", "lastPaymentDate", e.target.value)}
                           aria-label="Last Payment Date"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                     </TableRow>
@@ -789,7 +789,7 @@ const AddRecord = () => {
                           value={previousPolicy.policyNumber}
                           onChange={(e) => handlePolicyChange("previous", "policyNumber", e.target.value)}
                           aria-label="Previous Policy Number"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -797,7 +797,7 @@ const AddRecord = () => {
                           value={previousPolicy.planAndTerm}
                           onChange={(e) => handlePolicyChange("previous", "planAndTerm", e.target.value)}
                           aria-label="Previous Plan and Term"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -805,7 +805,7 @@ const AddRecord = () => {
                           value={previousPolicy.sumAssured}
                           onChange={(e) => handlePolicyChange("previous", "sumAssured", e.target.value)}
                           aria-label="Previous Sum Assured"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -829,7 +829,7 @@ const AddRecord = () => {
                           value={previousPolicy.branch}
                           onChange={(e) => handlePolicyChange("previous", "branch", e.target.value)}
                           aria-label="Previous Branch"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -838,7 +838,7 @@ const AddRecord = () => {
                           value={previousPolicy.lastPaymentDate}
                           onChange={(e) => handlePolicyChange("previous", "lastPaymentDate", e.target.value)}
                           aria-label="Previous Last Payment Date"
-                          className="border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                          className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
                     </TableRow>

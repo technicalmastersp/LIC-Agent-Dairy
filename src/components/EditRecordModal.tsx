@@ -622,7 +622,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                           <Input 
                             value={member.currentAge}
                             onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
-                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                            className="w-full border border-input bg-background focus-visible:border-primary"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -640,14 +640,14 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                           <Input 
                             value={member.deathAge}
                             onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
-                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                            className="w-full border border-input bg-background focus-visible:border-primary"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Input 
                             value={member.reason}
                             onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
-                            className="w-full border border-input/40 bg-background hover:border-input focus-visible:border-input"
+                            className="w-full border border-input bg-background focus-visible:border-primary"
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">

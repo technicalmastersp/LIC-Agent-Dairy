@@ -44,7 +44,12 @@
     /* --border: 220 20% 88%; */
     --border: 30.8 79.57% 53.92%;
 
-    --input: 220 20% 95%;
+    /* Was 220 20% 95% — nearly the same lightness as --background/--card
+       (both 100%), so inputs, selects, textareas, and outline buttons
+       (all styled with border-input) were almost invisible against the
+       page. Matched to --table-border, which already gives clearly
+       visible, neutral borders elsewhere in this file. */
+    --input: 220 15% 75%;
     --ring: 195 85% 25%;
 
     /* Form specific colors */
@@ -109,7 +114,10 @@
     --destructive-foreground: 220 25% 8%;
 
     --border: 220 15% 25%;
-    --input: 220 15% 22%;
+    /* Was 220 15% 22% — too close to --background (8%) and --card (12%).
+       Matched to dark --table-border (below) for a visible, consistent
+       neutral border. */
+    --input: 220 15% 35%;
     --ring: 195 85% 65%;
 
     --form-header: 195 85% 65%;
