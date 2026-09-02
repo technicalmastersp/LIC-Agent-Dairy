@@ -244,7 +244,7 @@ const MissedPayments = () => {
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Policy Number</TableHead>
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Mode Of Payment</TableHead>
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Branch</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Last Payment Date</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground min-w-32">Last Payment Date</TableHead>
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Actions</TableHead>
                       </TableRow>
                     </TableHeader>

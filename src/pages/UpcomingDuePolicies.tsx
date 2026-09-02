@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import RecordDetailsModal from "@/components/RecordDetailsModal";
-import PaymentUpdateModal from "@/components/PaymentUpdateModal";
 import ContactActionModal from "@/components/ContactActionModal";
 import { Search, Eye, ArrowUpDown, FileClock, AlertCircle, CalendarClock, Users, FolderOpen, MessageSquare } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -43,8 +42,6 @@ const UpcomingDuePolicies = () => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [payingRecord, setPayingRecord] = useState<Record | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [contactingRecord, setContactingRecord] = useState<Record | null>(null);
   const [records, setRecords] = useState<Record[]>([]);
@@ -125,18 +122,9 @@ const UpcomingDuePolicies = () => {
     setIsModalOpen(true);
   };
 
-  const handlePayRecord = (record: Record) => {
-    setPayingRecord(record);
-    setIsPaymentModalOpen(true);
-  };
-
   const handleContactRecord = (record: Record) => {
     setContactingRecord(record);
     setIsContactModalOpen(true);
-  };
-
-  const handleUpdateRecord = async () => {
-    await fetchRecords();
   };
 
   const SortableHeader = ({ field, children }: { field: keyof Record; children: React.ReactNode }) => (
@@ -254,8 +242,8 @@ const UpcomingDuePolicies = () => {
                           <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Policy Number</TableHead>
                           <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Mode Of Payment</TableHead>
                           <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Branch</TableHead>
-                          <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Last Payment Date</TableHead>
-                          <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Due Date</TableHead>
+                          <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground min-w-32">Last Payment Date</TableHead>
+                          <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground min-w-32">Due Date</TableHead>
                           <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Actions</TableHead>
                       </TableRow>
                       </TableHeader>
@@ -323,14 +311,6 @@ const UpcomingDuePolicies = () => {
                                   >
                                   <MessageSquare className="w-4 h-4" />
                                   </Button>
-                                  <Badge
-                                  variant="destructive"
-                                  className="ml-2 cursor-pointer"
-                                  title="Update Last Payment Date"
-                                  onClick={() => handlePayRecord(record)}
-                                  >
-                                  Pay
-                                  </Badge>
                               </div>
                               </TableCell>
                           </TableRow>
@@ -349,13 +329,6 @@ const UpcomingDuePolicies = () => {
         record={selectedRecord}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-      />
-
-      <PaymentUpdateModal
-        record={payingRecord}
-        isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
-        onUpdate={handleUpdateRecord}
       />
 
       <ContactActionModal
