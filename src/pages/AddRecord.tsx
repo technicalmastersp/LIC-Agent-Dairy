@@ -48,6 +48,9 @@ const AddRecord = () => {
   // custom field builder, for "Other") render below the common form.
   // Defaults to "Life Insurance" since that's what this form has always been.
   const [insuranceType, setInsuranceType] = useState("Life Insurance");
+  // Guards the submit button against double-click / rapid re-submits
+  // firing multiple createRecord calls for the same form.
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [customInsuranceTypeName, setCustomInsuranceTypeName] = useState("");
   const [typeSpecificData, setTypeSpecificData] = useState<Record<string, string>>(
     emptyTypeSpecificData("Life Insurance")
@@ -188,7 +191,9 @@ const AddRecord = () => {
     }
   };
 
-  const onValid = (formData: PolicyRecordFormValues) => {
+  const onValid = async (formData: PolicyRecordFormValues) => {
+    if (isSubmitting) return; // already saving — ignore extra clicks
+
     if (isOtherInsuranceType(insuranceType) && !customInsuranceTypeName.trim()) {
       toast({
         title: "Error",
@@ -209,22 +214,23 @@ const AddRecord = () => {
       customFields: isOtherInsuranceType(insuranceType) ? customFields : [],
     };
 
-    const success = createRecord(record).then((success)=> {
+    setIsSubmitting(true);
+    try {
+      await createRecord(record);
       toast({
         title: "Success",
         description: "Record saved successfully",
-
       });
       navigate("/view-records");
-    }).then( (error) => {
-      if (error !== null && error !== undefined) {
-        toast({
-          title: "Error",
-          description: "Failed to save record",
-          variant: "destructive",
-        });
-      }
-    });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save record",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -850,14 +856,15 @@ const AddRecord = () => {
 
           {/* Action Buttons */}
           <div className="flex justify-center space-x-4 pt-2 pb-8">
-            <Button onClick={rhfHandleSubmit(onValid, onInvalid)} className="bg-primary hover:bg-primary-light text-primary-foreground shadow-sm">
+            <Button onClick={rhfHandleSubmit(onValid, onInvalid)} className="bg-primary hover:bg-primary-light text-primary-foreground shadow-sm" disabled={isSubmitting}>
               <Save className="w-4 h-4 mr-2" />
-              Save Record
+              {isSubmitting ? "Saving…" : "Save Record"}
             </Button>
             <Button 
               variant="outline" 
               onClick={() => navigate("/")}
               className="border-primary text-primary hover:bg-primary/5"
+              disabled={isSubmitting}
             >
               Cancel
             </Button>

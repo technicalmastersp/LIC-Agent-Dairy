@@ -42,6 +42,9 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
   // Insurance type editing — same shape/behavior as AddRecord. Defaults to
   // Life Insurance until the record loads and overrides it in the effect below.
   const [insuranceType, setInsuranceType] = useState("Life Insurance");
+  // Guards the Save button against double-click / rapid re-submits firing
+  // multiple updateRecord calls for the same record.
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [customInsuranceTypeName, setCustomInsuranceTypeName] = useState("");
   const [typeSpecificData, setTypeSpecificData] = useState<Record<string, string>>({});
   const [customFields, setCustomFields] = useState<CustomFieldValue[]>([]);
@@ -218,6 +221,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
   };
 
   const onValid = async (formData: PolicyRecordFormValues) => {
+    if (isSubmitting) return; // already saving — ignore extra clicks
     if (!currentUser || !record) return;
 
     if (isOtherInsuranceType(insuranceType) && !customInsuranceTypeName.trim()) {
@@ -229,6 +233,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const res = await updateRecord({
         ...formData,
@@ -254,6 +259,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
         description: "Failed to update record. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -877,13 +884,13 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-2 pt-4">
-            <Button onClick={onClose} variant="outline">
+            <Button onClick={onClose} variant="outline" disabled={isSubmitting}>
               <X className="w-4 h-4 mr-2" />
               Cancel
             </Button>
-            <Button onClick={rhfHandleSubmit(onValid, onInvalid)} className="bg-primary hover:bg-primary-light shadow-sm">
+            <Button onClick={rhfHandleSubmit(onValid, onInvalid)} className="bg-primary hover:bg-primary-light shadow-sm" disabled={isSubmitting}>
               <Save className="w-4 h-4 mr-2" />
-              Save Changes
+              {isSubmitting ? "Saving…" : "Save Changes"}
             </Button>
           </div>
         </div>
