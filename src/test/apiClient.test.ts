@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { AxiosInstance } from "axios";
+import type { RejectedHandler, InterceptorHandlers } from "@/types/test/apiClient.test.types";
 
 const toastEmitterEmit = vi.fn();
 vi.mock("../../utils/toastEmitter", () => ({
@@ -32,15 +33,6 @@ const importApiClient = async () => (await import("../../api/apiClient.js")).def
 // typings — so accessing it needs one narrow, precisely-shaped cast
 // rather than `any`. This shape matches exactly what every test below
 // constructs as its mock error argument.
-interface MockAxiosError {
-  response?: { status: number; data?: Record<string, unknown> };
-  config: Record<string, unknown>;
-}
-type RejectedHandler = (error: MockAxiosError) => Promise<never>;
-interface InterceptorHandlers {
-  handlers: Array<{ rejected: RejectedHandler } | null>;
-}
-
 const getRejectedHandler = (client: AxiosInstance): RejectedHandler => {
   const handlers = (client.interceptors.response as unknown as InterceptorHandlers).handlers;
   return handlers[0]!.rejected;

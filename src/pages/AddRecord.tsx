@@ -22,28 +22,11 @@ import { createRecord } from "../../services/recordService.js";
 import InsuranceTypeSelector from "@/components/InsuranceTypeSelector";
 import TypeSpecificFieldsForm from "@/components/TypeSpecificFieldsForm";
 import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
-import {
-  isOtherInsuranceType, emptyTypeSpecificData, type CustomFieldValue,
-} from "@/config/insuranceTypes";
-import { policyRecordSchema, type PolicyRecordFormValues } from "@/schemas/policyRecordSchema";
-
-interface FamilyMember {
-  relationship: string;
-  currentAge: string;
-  health: string;
-  deathAge: string;
-  reason: string;
-}
-
-interface PolicyDetail {
-  policyNumber: string;
-  planAndTerm: string;
-  sumAssured: string;
-  modeOfPayment: string;
-  branch: string;
-  lastPaymentDate: string;
-}
-
+import { isOtherInsuranceType, emptyTypeSpecificData } from "@/config/insuranceTypes";
+import type { CustomFieldValue } from "@/types/config/insuranceTypes.types";
+import { policyRecordSchema } from "@/schemas/policyRecordSchema";
+import type { PolicyRecordFormValues } from "@/types/schemas/policyRecordSchema.types";
+import type { PolicyDetail } from "@/types/pages/AddRecord.types";
 // Small section header used across the form cards — encodes the actual step
 // number from the intake sheet, so it's real sequence info, not decoration.
 const SectionTitle = ({ icon: Icon, step, children }: { icon: LucideIcon; step?: string; children: React.ReactNode }) => (

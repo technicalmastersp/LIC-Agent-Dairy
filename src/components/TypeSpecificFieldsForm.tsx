@@ -2,14 +2,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getInsuranceTypeDef, type InsuranceFieldDef } from "@/config/insuranceTypes";
-
-interface TypeSpecificFieldsFormProps {
-  insuranceType: string;
-  values: Record<string, string>;
-  onChange: (key: string, value: string) => void;
-}
-
+import { getInsuranceTypeDef } from "@/config/insuranceTypes";
+import type { InsuranceFieldDef } from "@/types/config/insuranceTypes.types";
+import type { TypeSpecificFieldsFormProps } from "@/types/components/TypeSpecificFieldsForm.types";
 // Renders the extra fields particular to the selected built-in insurance
 // type (e.g. IDV + registration number for Vehicle Insurance, trip dates
 // for Travel Insurance) — driven entirely by src/config/insuranceTypes.ts,

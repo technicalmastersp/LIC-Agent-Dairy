@@ -12,6 +12,7 @@ import { getUsers, deactivateUser, reactivateUser } from "../../../services/admi
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Eye, UserX, UserCheck, ChevronLeft, ChevronRight, RefreshCw, ArrowUpDown } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import type { StatusFilter, PlanSort, AdminUserRow, ModalTarget } from "@/types/pages/admin/AdminUsers.types";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -28,42 +29,14 @@ const planColor: Record<string, string> = {
 };
 
 const PAGE_SIZE = 20;
-const STATUS_OPTIONS = ["all", "active", "deactivated", "plan expired"] as const;
-type StatusFilter = typeof STATUS_OPTIONS[number];
-
-const PLAN_SORT_OPTIONS = {
+export const STATUS_OPTIONS = ["all", "active", "deactivated", "plan expired"] as const;
+export const PLAN_SORT_OPTIONS = {
   default: { label: "Latest first", order: null },
   "0st":   { label: "Free Trial → Basic → Standard → Premium", order: ["1month-free", "6months", "12months", "24months"] },
   "1st":   { label: "Basic → Standard → Premium",  order: ["6months", "12months", "24months"] },
   "2nd":   { label: "Standard → Premium → Basic",  order: ["12months", "24months", "6months"] },
   "3rd":   { label: "Premium → Basic → Standard",  order: ["24months", "6months", "12months"] },
 } as const;
-type PlanSort = keyof typeof PLAN_SORT_OPTIONS;
-
-interface UserSubscriptionInfo {
-  planId?: string;
-  planType?: string;
-  status?: string;
-}
-
-interface AdminUserRow {
-  userId: string;
-  name: string;
-  email: string;
-  easyId?: string;
-  mobileNumber?: string;
-  profileImage?: string;
-  isActive: boolean;
-  totalRecords?: number;
-  createdAt?: string;
-  subscription: UserSubscriptionInfo;
-}
-
-interface ModalTarget {
-  userId: string;
-  name: string;
-}
-
 const AdminUsers = () => {
   const navigate    = useNavigate();
   const { toast }   = useToast();

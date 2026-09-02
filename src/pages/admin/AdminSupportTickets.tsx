@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { getSupportTickets, replyToTicket, getPendingCounts } from "../../../services/adminService";
 import { RefreshCw, Reply, Mail, User as UserIcon } from "lucide-react";
+import type { SupportTicket } from "@/types/pages/admin/AdminSupportTickets.types";
 
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
@@ -23,20 +24,6 @@ const statusStyle: Record<string, string> = {
 };
 
 const STATUS_OPTIONS = ["all", "open", "in_progress", "resolved", "closed"] as const;
-
-interface SupportTicket {
-  ticketId: string;
-  name: string;
-  email: string;
-  createdAt?: string;
-  isGuest?: boolean;
-  guestMatchedAccount?: boolean;
-  status: string;
-  category: string;
-  message: string;
-  adminReply?: string;
-}
-
 const AdminSupportTickets = () => {
   const { toast }     = useToast();
 

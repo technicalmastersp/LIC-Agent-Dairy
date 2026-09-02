@@ -23,27 +23,7 @@ import {
   HeartPulse, ShieldCheck, Stethoscope, Users, Car, Plane, Sparkles,
   type LucideIcon,
 } from "lucide-react";
-
-export type InsuranceFieldType = "text" | "number" | "date" | "textarea" | "select";
-
-export interface InsuranceFieldDef {
-  key: string;
-  label: string;
-  type: InsuranceFieldType;
-  options?: string[];
-  placeholder?: string;
-  unit?: string; // shown as a small suffix hint, e.g. "years", "₹"
-}
-
-export interface InsuranceTypeDef {
-  id: string; // must exactly match backend INSURANCE_TYPES
-  label: string;
-  shortLabel: string; // for compact UI (table badges, tabs)
-  description: string;
-  icon: LucideIcon;
-  fields: InsuranceFieldDef[];
-}
-
+import type { InsuranceFieldType, InsuranceTypeDef } from "@/types/config/insuranceTypes.types";
 export const CUSTOM_FIELD_TYPES: InsuranceFieldType[] = ["text", "number", "date", "textarea", "select"];
 
 export const MAX_CUSTOM_FIELDS = 40;
@@ -164,11 +144,3 @@ export const emptyTypeSpecificData = (id: string | undefined | null): Record<str
   if (!def) return {};
   return Object.fromEntries(def.fields.map((f) => [f.key, ""]));
 };
-
-export interface CustomFieldValue {
-  key: string;
-  label: string;
-  fieldType: InsuranceFieldType;
-  options?: string[];
-  value: string;
-}

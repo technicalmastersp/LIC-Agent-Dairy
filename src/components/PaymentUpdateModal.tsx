@@ -12,32 +12,12 @@ import { useToast } from "@/hooks/use-toast";
 import { ShieldCheck, CalendarCheck2, Save, Loader2 } from "lucide-react";
 import { updateRecord } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
+import type { PaymentUpdateModalProps } from "@/types/components/PaymentUpdateModal.types";
 
 // Loosely-typed on purpose: CurrentMonthDue.tsx, MissedPayments.tsx, and
 // UpcomingDuePolicies.tsx each keep their own local `Record` interface
 // (identical shape, not shared), so this accepts anything structurally
 // compatible rather than importing one page's type into the others.
-export interface PaymentUpdateRecord {
-  recordId?: string;
-  name?: string;
-  currentPolicy?: {
-    policyNumber?: string;
-    planAndTerm?: string;
-    sumAssured?: string;
-    modeOfPayment?: string;
-    branch?: string;
-    lastPaymentDate?: string;
-    nextDueDate?: string;
-  };
-}
-
-interface PaymentUpdateModalProps {
-  record: PaymentUpdateRecord | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onUpdate: () => void;
-}
-
 const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate }: PaymentUpdateModalProps) => {
   const { toast } = useToast();
   const [lastPaymentDate, setLastPaymentDate] = useState("");

@@ -18,6 +18,7 @@ import {
   FileText, Users,
 } from "lucide-react";
 import { getReferralDashboard } from "../../services/referralService";
+import type { MonthlyTrendPoint, ReferralDashboardData } from "@/types/pages/Home.types";
 
 const getGreeting = () => {
   const h = new Date().getHours();
@@ -28,21 +29,6 @@ const getGreeting = () => {
 
 const fmt = (d?: string) =>
   d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
-
-interface MonthlyTrendPoint {
-  label: string;
-  recordsAdded: number;
-  duePolicies: number;
-}
-
-interface ReferralDashboardData {
-  totalL1?: number;
-  totalL2?: number;
-  availableBalance?: number;
-  pendingEarnings?: number;
-  totalEarned?: number;
-}
-
 const Home = () => {
   const navigate      = useNavigate();
   const { t }         = useLanguage();

@@ -4,18 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, GripVertical } from "lucide-react";
-import {
-  CUSTOM_FIELD_TYPES, MAX_CUSTOM_FIELDS, MAX_CUSTOM_LABEL_LENGTH, MAX_CUSTOM_TYPE_NAME_LENGTH,
-  type CustomFieldValue, type InsuranceFieldType,
-} from "@/config/insuranceTypes";
-
-interface CustomFieldsBuilderProps {
-  customTypeName: string;
-  onCustomTypeNameChange: (name: string) => void;
-  fields: CustomFieldValue[];
-  onFieldsChange: (fields: CustomFieldValue[]) => void;
-}
-
+import { CUSTOM_FIELD_TYPES, MAX_CUSTOM_FIELDS, MAX_CUSTOM_LABEL_LENGTH, MAX_CUSTOM_TYPE_NAME_LENGTH } from "@/config/insuranceTypes";
+import type { CustomFieldValue, InsuranceFieldType } from "@/types/config/insuranceTypes.types";
+import type { CustomFieldsBuilderProps } from "@/types/components/CustomFieldsBuilder.types";
 const FIELD_TYPE_LABELS: Record<InsuranceFieldType, string> = {
   text: "Short text",
   number: "Number",

@@ -3,19 +3,7 @@ import { Mail, MapPin, Globe, Compass, Link2, Sparkles, Building2 } from "lucide
 import { useLanguage } from "@/hooks/useLanguage";
 import { isAuthenticated } from "@/utils/auth";
 import siteConfig from "@/config/siteConfig";
-
-interface FooterLink {
-  label: string;
-  to: string;
-}
-
-interface FooterSectionProps {
-  title: string;
-  icon?: React.ElementType;
-  links?: FooterLink[];
-  children?: React.ReactNode;
-}
-
+import type { FooterLink, FooterSectionProps } from "@/types/components/Footer.types";
 const FooterSection = ({ title, icon: Icon, links, children }: FooterSectionProps) => (
   <div>
     <h3 className="text-sm font-semibold mb-4 text-primary-foreground flex items-center gap-2">

@@ -4,20 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { BookOpenText, Search, X } from 'lucide-react';
 import SEO from '@/components/SEO';
-
-type AbbreviationItem = {
-  abbreviation: string;
-  full_form: string;
-  description: string;
-};
-
-type LICAbbreviationsData = {
-  LIC_Abbreviations: AbbreviationItem[];
-  LIC_Internal_Codes: AbbreviationItem[];
-  Private_Insurers: AbbreviationItem[];
-  Common_Policy_Terms: AbbreviationItem[];
-};
-
+import type { AbbreviationItem, LICAbbreviationsData } from "@/types/pages/LicInfoHub.types";
 const data: LICAbbreviationsData = {
   LIC_Abbreviations: [
     { abbreviation: 'LIC', full_form: 'Life Insurance Corporation', description: "India's largest government-owned life insurance company" },

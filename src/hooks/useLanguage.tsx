@@ -1,12 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Language, getStoredLanguage, setStoredLanguage, getTranslation, Translations } from '@/utils/translations';
-
-interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  t: (key: keyof Translations) => string;
-}
-
+import { getStoredLanguage, setStoredLanguage, getTranslation } from '@/utils/translations';
+import type { Language, Translations } from "@/types/utils/translations.types";
+import type { LanguageContextType } from "@/types/hooks/useLanguage.types";
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {

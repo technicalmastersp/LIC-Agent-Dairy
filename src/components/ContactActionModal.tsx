@@ -3,14 +3,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Phone, MessageCircle } from "lucide-react";
-
-interface ContactActionModalProps {
-  phone?: string;
-  name?: string;
-  isOpen: boolean;
-  onClose: () => void;
-}
-
+import type { ContactActionModalProps } from "@/types/components/ContactActionModal.types";
 // The stored number (aadhaarLinkedMobileNumber) has no enforced format
 // beyond a max length — see policyRecordSchema.ts — so it's typically a
 // bare 10-digit Indian mobile number with no country code. wa.me needs a

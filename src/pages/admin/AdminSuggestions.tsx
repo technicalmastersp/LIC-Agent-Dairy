@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { getAllSuggestions, updateSuggestionStatus } from "../../../services/adminService";
 import { RefreshCw, User as UserIcon } from "lucide-react";
+import type { Suggestion } from "@/types/pages/admin/AdminSuggestions.types";
 
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
@@ -21,17 +22,6 @@ const statusStyle: Record<string, string> = {
   implemented:    "bg-green-100 text-green-700 border border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900",
   declined:       "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border",
 };
-
-interface Suggestion {
-  _id: string;
-  title: string;
-  name: string;
-  email: string;
-  createdAt?: string;
-  status: string;
-  message: string;
-}
-
 const AdminSuggestions = () => {
   const { toast }     = useToast();
 

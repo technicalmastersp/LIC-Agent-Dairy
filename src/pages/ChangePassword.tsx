@@ -13,7 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { changePassword } from "../../services/userService";
-import { changePasswordSchema, type ChangePasswordFormValues } from "@/schemas/changePasswordSchema";
+import { changePasswordSchema } from "@/schemas/changePasswordSchema";
+import type { ChangePasswordFormValues } from "@/types/schemas/changePasswordSchema.types";
 
 const ChangePassword = () => {
   const navigate   = useNavigate();

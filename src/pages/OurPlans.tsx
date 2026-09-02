@@ -17,17 +17,7 @@ import { getReferralDashboard } from "../../services/referralService";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
 import { Link } from "lucide-react";
 import SEO from "@/components/SEO";
-
-interface Plan {
-  id: string;
-  planType?: string;
-  duration: string;
-  price: number;
-  originalPrice?: number;
-  features: string[];
-  popular?: boolean;
-}
-
+import type { Plan } from "@/types/pages/OurPlans.types";
 const OurPlans = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();

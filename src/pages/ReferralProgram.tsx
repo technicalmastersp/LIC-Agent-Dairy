@@ -22,63 +22,9 @@ import {
   ArrowDownToLine, History, Edit, Save, X
 } from "lucide-react";
 import { getReferralConfig } from "../../services/configService";
+import type { Dashboard, WithdrawalRowProps, ReferralRowProps } from "@/types/pages/ReferralProgram.types";
 
 // ── types ─────────────────────────────────────────────────────────────────────
-interface PaymentDetails {
-  upiId?:              string;
-  upiVerified?:        boolean;
-  upiRejectionReason?: string;
-  accountNumber?:      string;
-  ifscCode?:           string;
-  accountHolder?:      string;
-  bankName?:           string;
-  branchName?:         string;
-  bankVerified?:       boolean;
-  updatedAt?:          string;
-}
-
-interface WithdrawalRecord {
-  amount:        number;
-  status:        "requested" | "processed" | "failed";
-  requestedAt:   string;
-  processedAt?:  string;
-  method:        string;
-  upiId?:        string;
-  accountNumber?: string;
-  bankName?:     string;
-  adminNote?:    string;
-}
-
-interface ReferredUser {
-  name:          string;
-  planType:      string;
-  planId:        string;
-  joinedAt:      string;
-  status:        "active" | "expired" | "trial" | "pending";
-  level:         1 | 2;
-  referredBy?:   string;
-  earning:       number;
-  rewardPaid:    boolean;
-  rewardExpired: boolean;
-  daysLeft?:     number | null;
-}
-
-interface Dashboard {
-  referralCode:      string;
-  totalL1:           number;
-  totalL2:           number;
-  totalEarned:       number;
-  pendingEarnings:   number;
-  availableBalance:  number;
-  totalWithdrawn:    number;
-  hasPaymentDetails: boolean;
-  paymentDetails:    PaymentDetails | null;
-  lastWithdrawal:    { amount: number; status: string; requestedAt: string; method: string } | null;
-  withdrawalHistory: WithdrawalRecord[];
-  referredUsers:     ReferredUser[];
-  earningsHistory:   { date: string; description: string; amount: number; status: string }[];
-}
-
 // ── helpers ───────────────────────────────────────────────────────────────────
 const PLANS = [
   { name: "Basic",    duration: "6 months",  price: 599  },
@@ -106,13 +52,6 @@ const fmt = (date?: string) =>
 
 const initials = (name: string) =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
-
-interface WithdrawalRowProps {
-  w: WithdrawalRecord;
-  fmt: (date?: string) => string;
-  withdrawStatusStyle: Record<string, string>;
-}
-
 const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: WithdrawalRowProps) => (
   <div className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
     <div className="flex-1">
@@ -141,14 +80,6 @@ const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: WithdrawalRowProps) => (
     </div>
   </div>
 );
-
-interface ReferralRowProps {
-  u: ReferredUser;
-  fmt: (date?: string) => string;
-  initials: (name: string) => string;
-  statusStyle: Record<string, string>;
-}
-
 const ReferralRow = ({ u, fmt, initials, statusStyle }: ReferralRowProps) => (
   <div className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
     <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium shrink-0 ${

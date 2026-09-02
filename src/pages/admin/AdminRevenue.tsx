@@ -28,6 +28,7 @@ import {
   ResponsiveContainer, LineChart, Line, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from "recharts";
+import type { ExpenseBreakdownItem, RevenueSummary, RevenueTrendPoint, RevenueTransaction } from "@/types/pages/admin/AdminRevenue.types";
 
 const EXPENSE_CATEGORIES = [
   "Hosting & Infrastructure", "Software & Tools", "Marketing & Ads",
@@ -42,42 +43,6 @@ const inr = (n: number | undefined) => `₹${(n ?? 0).toLocaleString("en-IN", { 
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
   : "—";
-
-interface ExpenseBreakdownItem {
-  category: string;
-  amount: number;
-}
-
-interface RevenueSummary {
-  income: number;
-  totalExpenses: number;
-  totalProfit: number;
-  totalLoss: number;
-  gatewayFees?: number;
-  refunds?: number;
-  referralPayouts?: number;
-  walletRedemptions?: number;
-  expenseBreakdown?: ExpenseBreakdownItem[];
-}
-
-interface RevenueTrendPoint {
-  label: string;
-  income: number;
-  expenses: number;
-  net: number;
-}
-
-interface RevenueTransaction {
-  id: string;
-  kind: "income" | "expense" | "payout";
-  date?: string;
-  description: string;
-  user?: string;
-  amount: number;
-  refundStatus?: "none" | "partial" | "full";
-  refundedAmount?: number;
-}
-
 const AdminRevenue = () => {
   const navigate      = useNavigate();
   const { toast }     = useToast();

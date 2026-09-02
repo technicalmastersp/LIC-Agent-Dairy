@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { type Record } from "./ViewRecords";
+import type { Record } from "@/types/Record";
 import { dedupeRecords } from "@/utils/recordDedupe";
 
 // All the fields below are required by the Record interface but irrelevant

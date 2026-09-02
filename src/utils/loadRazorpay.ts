@@ -1,14 +1,6 @@
 // Dynamically loads the Razorpay Checkout script once, on demand.
+// The `Window.Razorpay` ambient type lives in src/types/global.d.ts.
 let loadingPromise: Promise<void> | null = null;
-
-declare global {
-  interface Window {
-    Razorpay?: new (options: Record<string, unknown>) => {
-      open: () => void;
-      on: (event: string, handler: () => void) => void;
-    };
-  }
-}
 
 export const loadRazorpayScript = (): Promise<void> => {
   if (typeof window !== "undefined" && window.Razorpay) {

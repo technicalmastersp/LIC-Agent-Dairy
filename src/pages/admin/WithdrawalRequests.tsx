@@ -10,6 +10,7 @@ import { useToast }      from "@/hooks/use-toast";
 import { getWithdrawals, approveWithdrawal, rejectWithdrawal } from "../../../services/adminService";
 import { CheckCircle2, XCircle, Eye, Search, ArrowUpDown, X, RefreshCw } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import type { SortField, SortDir, WithdrawalItem } from "@/types/pages/admin/WithdrawalRequests.types";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -23,31 +24,6 @@ const statusStyle: Record<string, string> = {
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
   : "—";
-
-type SortField = "amount" | "requestedAt" | null;
-type SortDir = "asc" | "desc";
-
-interface WithdrawalItem {
-  withdrawalId: string;
-  referralId: string;
-  userId?: string;
-  userName: string;
-  userEasyId?: string;
-  userEmail?: string;
-  userProfileImage?: string;
-  amount: number;
-  method: string;
-  status: "requested" | "processed" | "failed";
-  requestedAt?: string;
-  processedAt?: string;
-  rejectionReason?: string;
-  upiId?: string;
-  accountNumber?: string;
-  accountHolder?: string;
-  bankName?: string;
-  ifscCode?: string;
-}
-
 const WithdrawalRequests = () => {
   const { toast }   = useToast();
 

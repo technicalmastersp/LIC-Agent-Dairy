@@ -12,6 +12,7 @@ import {
 import { ArrowLeft, ArrowRight, Sparkles, X } from "lucide-react";
 import { getCurrentUser, setCurrentUser } from "@/utils/auth";
 import { completeOnboarding } from "../../services/userService";
+import type { TourStep, Rect } from "@/types/components/OnboardingTour.types";
 
 // ── Step config ──────────────────────────────────────────────────────────
 // `target` matches a `data-tour="..."` attribute already placed on the real
@@ -19,12 +20,6 @@ import { completeOnboarding } from "../../services/userService";
 // found in the DOM (e.g. the language switcher is hidden on a narrow mobile
 // viewport), the step still shows as a centered card with no spotlight
 // rather than breaking the tour.
-interface TourStep {
-  target: string;
-  title: string;
-  body: string;
-}
-
 const STEPS: TourStep[] = [
   {
     target: "tour-add-record",
@@ -70,14 +65,6 @@ const STEPS: TourStep[] = [
 
 const CARD_WIDTH = 320;
 const CARD_GAP = 12;
-
-interface Rect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-}
-
 const getTargetRect = (target: string): Rect | null => {
   const el = document.querySelector<HTMLElement>(`[data-tour="${target}"]`);
   if (!el) return null;

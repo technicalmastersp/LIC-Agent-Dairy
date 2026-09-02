@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Languages } from "lucide-react";
-
-type LanguageSwitcherProps = {
-  type?: "icon" | "mobile";
-};
+import type { LanguageSwitcherProps } from "@/types/components/LanguageSwitcher.types";
 const LanguageSwitcher = ({ type }: LanguageSwitcherProps) => {
   const { language, setLanguage } = useLanguage();
 

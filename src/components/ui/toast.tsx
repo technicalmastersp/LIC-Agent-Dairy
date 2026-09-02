@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import type { ToastProps, ToastActionElement } from "@/types/components/ui/toast.types";
 
 const ToastProvider = ToastPrimitives.Provider;
 
@@ -93,11 +94,6 @@ const ToastDescription = React.forwardRef<
   <ToastPrimitives.Description ref={ref} className={cn("text-sm opacity-90", className)} {...props} />
 ));
 ToastDescription.displayName = ToastPrimitives.Description.displayName;
-
-type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
-
-type ToastActionElement = React.ReactElement<typeof ToastAction>;
-
 export {
   type ToastProps,
   type ToastActionElement,

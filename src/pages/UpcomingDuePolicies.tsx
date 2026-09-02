@@ -13,66 +13,12 @@ import { Search, Eye, ArrowUpDown, FileClock, AlertCircle, CalendarClock, Users,
 import { useLanguage } from "@/hooks/useLanguage";
 import { dueNextMonth } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
+import type { Record } from "@/types/pages/UpcomingDuePolicies.types";
 
 // NOTE: copy CurrentMonthDue.tsx's Record interface, search/sort state,
 // SortableHeader, table body, and RecordDetailsModal/PaymentUpdateModal/
 // ContactActionModal usage into this file — omitted here to avoid
 // guessing at exact JSX you already have.
-
-interface Record {
-  id: string;
-  date: string;
-  aadhaarNumber: string;
-  panNumber: string;
-  email: string;
-  name: string;
-  birthPlace: string;
-  fatherName: string;
-  motherName: string;
-  spouseName: string;
-  address: string;
-  dateOfBirth: string;
-  age: string;
-  occupation: string;
-  educationalQualification: string;
-  designationOfPolicyHolder: string;
-  annualIncome: string;
-  periodOfService: string;
-  employerName: string;
-  aadhaarLinkedMobileNumber: string;
-  nameOfNominee: string;
-  ageOfNominee: string;
-  relationName: string;
-  lastChildBirthDate: string;
-  height: string;
-  weight: string;
-  bankAccountNumber: string;
-  ifscCode: string;
-  bankName: string;
-  branchName: string;
-  recordId?: string;
-
-  currentPolicy : {
-    nextDueDate: string;
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-
-  previousPolicy : {
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-  createdAt: string;
-}
-
 const avatarPalette = [
   "bg-blue-100 text-blue-700",
   "bg-violet-100 text-violet-700",

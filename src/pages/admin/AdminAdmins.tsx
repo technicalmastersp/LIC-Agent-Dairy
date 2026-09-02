@@ -13,37 +13,11 @@ import { getCurrentUser } from "@/utils/auth";
 import { getAdmins, createAdmin, deactivateUser, reactivateUser, updateAdminPermissions, forceLogoutUser, getSuperAdmins, promoteAdmin, demoteAdmin } from "../../../services/adminService";
 import { Plus, UserX, UserCheck, X, Shield, ToggleLeft, ToggleRight, LogOut, Crown, Clock } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import type { AdminItem, SuperAdminItem, ModalTarget } from "@/types/pages/admin/AdminAdmins.types";
 
 const fmt = (d?: string) => d
   ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })
   : "—";
-
-interface AdminItem {
-  userId: string;
-  name: string;
-  email: string;
-  easyId?: string;
-  isActive: boolean;
-  deactivatedAt?: string;
-  deactivationNote?: string;
-  profileImage?: string;
-  permissions?: Record<string, boolean>;
-}
-
-interface SuperAdminItem {
-  userId: string;
-  name: string;
-  email: string;
-  easyId?: string;
-  userProfileImage?: string;
-  tempSuperadmin?: { expiresAt: string; reason?: string };
-}
-
-interface ModalTarget {
-  userId: string;
-  name: string;
-}
-
 const AdminAdmins = () => {
   const navigate    = useNavigate();
   const { toast }   = useToast();

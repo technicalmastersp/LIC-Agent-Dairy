@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { getMyActivity } from "../../services/userService";
 import { ChevronLeft, ChevronRight, History } from "lucide-react";
+import type { ActivityLog, Pagination } from "@/types/pages/MyActivity.types";
 
 // Same palette AdminLogs.tsx uses, plus the self-service actions this
 // page can now show (PASSWORD_CHANGED, PROFILE_UPDATED, RECORD_*) that
@@ -52,21 +53,6 @@ const summarize = (action: string, details: unknown): string | null => {
       return null;
   }
 };
-
-interface ActivityLog {
-  _id: string;
-  action: string;
-  targetUserName?: string;
-  createdAt?: string;
-  details?: unknown;
-}
-
-interface Pagination {
-  page: number;
-  totalPages: number;
-  total: number;
-}
-
 const MyActivity = () => {
   const [logs,       setLogs]       = useState<ActivityLog[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);

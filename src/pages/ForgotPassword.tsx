@@ -11,13 +11,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock, Mail, ShieldCheck, Eye, EyeOff, CheckCircle2, Circle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { forgotPassword, verifyOTP, resetPassword } from "../../services/userService";
-import {
-  forgotPasswordEmailSchema, type ForgotPasswordEmailValues,
-  resetPasswordSchema, type ResetPasswordValues,
-} from "@/schemas/forgotPasswordSchema";
-
-type Step = "email" | "otp" | "password" | "success";
-
+import { forgotPasswordEmailSchema, resetPasswordSchema } from "@/schemas/forgotPasswordSchema";
+import type { ForgotPasswordEmailValues, ResetPasswordValues } from "@/types/schemas/forgotPasswordSchema.types";
+import type { Step } from "@/types/pages/ForgotPassword.types";
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const { toast } = useToast();

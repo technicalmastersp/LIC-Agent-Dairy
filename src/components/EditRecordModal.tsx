@@ -20,19 +20,12 @@ import { convertDateToIndianFormat } from "@/utils/tools";
 import InsuranceTypeSelector from "@/components/InsuranceTypeSelector";
 import TypeSpecificFieldsForm from "@/components/TypeSpecificFieldsForm";
 import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
-import {
-  isOtherInsuranceType, emptyTypeSpecificData, type CustomFieldValue,
-} from "@/config/insuranceTypes";
-import { policyRecordSchema, type PolicyRecordFormValues } from "@/schemas/policyRecordSchema";
+import { isOtherInsuranceType, emptyTypeSpecificData } from "@/config/insuranceTypes";
+import type { CustomFieldValue } from "@/types/config/insuranceTypes.types";
+import { policyRecordSchema } from "@/schemas/policyRecordSchema";
+import type { PolicyRecordFormValues } from "@/types/schemas/policyRecordSchema.types";
 import type { Record as RecordData } from "@/types/Record";
-
-interface EditRecordModalProps {
-  record: RecordData | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onUpdate: () => void;
-}
-
+import type { EditRecordModalProps } from "@/types/components/EditRecordModal.types";
 const SectionTitle = ({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNode }) => (
   <CardTitle className="text-form-header text-lg flex items-center gap-2.5">
     <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">

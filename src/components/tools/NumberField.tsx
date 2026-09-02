@@ -1,18 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-
-interface NumberFieldProps {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-  min: number;
-  max: number;
-  step?: number;
-  prefix?: string;
-  suffix?: string;
-}
-
+import type { NumberFieldProps } from "@/types/components/tools/NumberField.types";
 const NumberField = ({ label, value, onChange, min, max, step = 1, prefix, suffix }: NumberFieldProps) => (
   <div className="space-y-2.5">
     <div className="flex items-center justify-between">

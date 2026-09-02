@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { UserPlus, EyeOff, Eye, Check, Home, CheckCircle2, Circle } from "lucide-react";
-import { User } from "@/utils/auth";
+import type { SignUpRequest } from "@/types/pages/SignUp.types";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -20,7 +20,8 @@ import { getReferralConfig } from "../../services/configService";
 import { createCheckoutOrder, verifyPayment } from "../../services/subscriptionService";
 import { setCurrentUser } from "@/utils/auth";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
-import { signUpSchema, type SignUpFormValues } from "@/schemas/signUpSchema";
+import { signUpSchema } from "@/schemas/signUpSchema";
+import type { SignUpFormValues } from "@/types/schemas/signUpSchema.types";
 
 const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -97,11 +98,6 @@ const SignUp = () => {
     const discount = isValidReferralCode && referralCodeValue ? referralConfig.SIGNUP_DISCOUNT_AMOUNT : 0;
     return Math.max(0, selectedPlan.price - discount);
   };
-
-  // Signup sends a password to the backend; the client-side `User` type
-  // (auth.ts) intentionally has no password field for the session object,
-  // so the registration payload needs its own type.
-  type SignUpRequest = User & { password: string };
 
   const onSubmit = async (formData: SignUpFormValues) => {
     setIsLoading(true);

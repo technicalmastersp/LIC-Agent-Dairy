@@ -14,61 +14,7 @@ import { Search, Eye, ArrowUpDown, FileClock, AlertCircle, CalendarClock, Folder
 import { useLanguage } from "@/hooks/useLanguage";
 import { dueThisMonth } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
-
-interface Record {
-  id: string;
-  date: string;
-  aadhaarNumber: string;
-  panNumber: string;
-  email: string;
-  name: string;
-  birthPlace: string;
-  fatherName: string;
-  motherName: string;
-  spouseName: string;
-  address: string;
-  dateOfBirth: string;
-  age: string;
-  occupation: string;
-  educationalQualification: string;
-  designationOfPolicyHolder: string;
-  annualIncome: string;
-  periodOfService: string;
-  employerName: string;
-  aadhaarLinkedMobileNumber: string;
-  nameOfNominee: string;
-  ageOfNominee: string;
-  relationName: string;
-  lastChildBirthDate: string;
-  height: string;
-  weight: string;
-  bankAccountNumber: string;
-  ifscCode: string;
-  bankName: string;
-  branchName: string;
-  recordId?: string;
-
-  currentPolicy : {
-    nextDueDate: string;
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-
-  previousPolicy : {
-    policyNumber: string;
-    planAndTerm: string;
-    sumAssured: string;
-    modeOfPayment: string;
-    branch: string;
-    lastPaymentDate: string;
-  }
-  createdAt: string;
-}
-
+import type { Record } from "@/types/pages/CurrentMonthDue.types";
 const avatarPalette = [
   "bg-blue-100 text-blue-700",
   "bg-violet-100 text-violet-700",

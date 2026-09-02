@@ -4,11 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-
-type ThemeToggleProps = {
-  type?: "icon" | "mobile";
-};
-
+import type { ThemeToggleProps } from "@/types/components/ThemeToggle.types";
 const ThemeToggle = ({ type }: ThemeToggleProps) => {
   const { setTheme } = useTheme();
 
