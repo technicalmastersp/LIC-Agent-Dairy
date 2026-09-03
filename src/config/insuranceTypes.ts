@@ -41,7 +41,7 @@ export const INSURANCE_TYPES: InsuranceTypeDef[] = [
     description: "Whole/endowment life cover — the standard policyholder intake form.",
     icon: ShieldCheck,
     fields: [
-      { key: "policyPurpose", label: "Policy Purpose", type: "select", options: ["Protection", "Investment", "Retirement", "Child Plan"] },
+      { key: "policyPurpose", label: "Policy Purpose", type: "select", options: ["Protection", "Investment", "Investment & Protection", "Pension Plan", "ULIP"] },
       { key: "ridersAttached", label: "Riders Attached", type: "text", placeholder: "e.g. Accidental Death, Critical Illness" },
       { key: "survivalBenefit", label: "Survival Benefit", type: "text" },
     ],

@@ -336,28 +336,28 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="date">Date</Label>
+                  <Label htmlFor="date">1. Date</Label>
                   <Input 
                     type="date"
                     {...register("date")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="aadhaarNumber">Aadhaar Number</Label>
+                  <Label htmlFor="aadhaarNumber">2. Aadhaar Number</Label>
                   <Input 
                     id="aadhaarNumber" 
                     {...register("aadhaarNumber")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="panNumber">Pan Number</Label>
+                  <Label htmlFor="panNumber">3. Pan Number</Label>
                   <Input 
                     id="panNumber" 
                     {...register("panNumber")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email ID</Label>
+                  <Label htmlFor="email">4. Email ID</Label>
                   <Input 
                     id="email" 
                     type="email" 
@@ -389,42 +389,42 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="birthPlace">1a. Birth Place</Label>
+                  <Label htmlFor="birthPlace">2. Birth Place</Label>
                   <Input 
                     id="birthPlace" 
                     {...register("birthPlace")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="fatherName">2. Father's Name</Label>
+                  <Label htmlFor="fatherName">3. Father's Name</Label>
                   <Input 
                     id="fatherName" 
                     {...register("fatherName")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="motherName">3. Mother's Name</Label>
+                  <Label htmlFor="motherName">4. Mother's Name</Label>
                   <Input 
                     id="motherName" 
                     {...register("motherName")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="spouseName">4. Spouse's Name</Label>
+                  <Label htmlFor="spouseName">5. Spouse's Name</Label>
                   <Input 
                     id="spouseName" 
                     {...register("spouseName")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="address">5. Address</Label>
+                  <Label htmlFor="address">6. Address</Label>
                   <Input 
                     id="address" 
                     {...register("address")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth">6. Date of Birth</Label>
+                  <Label htmlFor="dateOfBirth">7. Date of Birth</Label>
                   <Input 
                     id="dateOfBirth" 
                     type="date"
@@ -432,77 +432,77 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="age">6a. Age</Label>
+                  <Label htmlFor="age">8. Age</Label>
                   <Input 
                     id="age" 
                     {...register("age")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="educationalQualification">7. Educational Qualification</Label>
+                  <Label htmlFor="educationalQualification">9. Educational Qualification</Label>
                   <Input 
                     id="educationalQualification" 
                     {...register("educationalQualification")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="occupation">7a. Occupation</Label>
+                  <Label htmlFor="occupation">10. Occupation</Label>
                   <Input 
                     id="occupation" 
                     {...register("occupation")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="designationOfPolicyHolder">7b. Designation</Label>
+                  <Label htmlFor="designationOfPolicyHolder">11. Designation</Label>
                   <Input 
                     id="designationOfPolicyHolder" 
                     {...register("designationOfPolicyHolder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="annualIncome">7c. Annual Income</Label>
+                  <Label htmlFor="annualIncome">12. Annual Income</Label>
                   <Input 
                     id="annualIncome" 
                     {...register("annualIncome")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="periodOfService">7d. Period Of Service</Label>
+                  <Label htmlFor="periodOfService">13. Period Of Service</Label>
                   <Input 
                     id="periodOfService" 
                     {...register("periodOfService")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="employerName">7e. Employer's Name</Label>
+                  <Label htmlFor="employerName">14. Employer's Name</Label>
                   <Input 
                     id="employerName" 
                     {...register("employerName")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="aadhaarLinkedMobileNumber">7f. Aadhaar Linked Mobile Number </Label>
+                  <Label htmlFor="aadhaarLinkedMobileNumber">15. Aadhaar Linked Mobile Number </Label>
                   <Input 
                     id="aadhaarLinkedMobileNumber" 
                     {...register("aadhaarLinkedMobileNumber")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="nameOfNominee">8. Name of Nominee</Label>
+                  <Label htmlFor="nameOfNominee">16. Name of Nominee</Label>
                   <Input 
                     id="nameOfNominee" 
                     {...register("nameOfNominee")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="ageOfNominee">8a. Age of Nominee</Label>
+                  <Label htmlFor="ageOfNominee">17. Age of Nominee</Label>
                   <Input 
                     id="ageOfNominee" 
                     {...register("ageOfNominee")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="relationName">8b. Relation</Label>
+                  <Label htmlFor="relationName">18. Relation</Label>
                   <Input 
                     id="relationName" 
                     {...register("relationName")}
@@ -543,7 +543,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                       </Button>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs">Relationship</Label>
+                      <Label className="text-xs">1. Relationship</Label>
                       <Select value={member.relationship || ""} onValueChange={(value) => handleFamilyMemberChange(index, 'relationship', value)}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select relationship" />
@@ -559,14 +559,14 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <Label className="text-xs">Current Age</Label>
+                        <Label className="text-xs">2. Current Age</Label>
                         <Input
                           value={member.currentAge}
                           onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-xs">Health</Label>
+                        <Label className="text-xs">3. Health</Label>
                         <Select value={member.health} onValueChange={(value) => handleFamilyMemberChange(index, 'health', value)}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select Health" />
@@ -580,14 +580,14 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <Label className="text-xs">Age at Death/Year</Label>
+                        <Label className="text-xs">4. Age at Death/Year</Label>
                         <Input
                           value={member.deathAge}
                           onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-xs">Reason</Label>
+                        <Label className="text-xs">5. Reason</Label>
                         <Input
                           value={member.reason}
                           onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
@@ -603,11 +603,11 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-table-header">
-                      <TableHead className="border border-table-border font-semibold">Relationship</TableHead>
-                      <TableHead className="border border-table-border font-semibold">Current Age</TableHead>
-                      <TableHead className="border border-table-border font-semibold">Health</TableHead>
-                      <TableHead className="border border-table-border font-semibold">Age at Death/Year</TableHead>
-                      <TableHead className="border border-table-border font-semibold">Reason</TableHead>
+                      <TableHead className="border border-table-border font-semibold">1. Relationship</TableHead>
+                      <TableHead className="border border-table-border font-semibold">2. Current Age</TableHead>
+                      <TableHead className="border border-table-border font-semibold">3. Health</TableHead>
+                      <TableHead className="border border-table-border font-semibold">4. Age at Death/Year</TableHead>
+                      <TableHead className="border border-table-border font-semibold">5. Reason</TableHead>
                       <TableHead className="border border-table-border font-semibold">Delete</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -690,7 +690,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
             <CardContent className="pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="height">10. Height</Label>
+                  <Label htmlFor="height">1. Height</Label>
                   <Input 
                     id="height" 
                     placeholder="Height in cm"
@@ -698,7 +698,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="weight">10a. Weight</Label>
+                  <Label htmlFor="weight">2. Weight</Label>
                   <Input 
                     id="weight" 
                     placeholder="Weight in kg"
@@ -706,7 +706,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastChildBirthDate">11. Last Child Birth Date &#40;Only for Women&#41;</Label>
+                  <Label htmlFor="lastChildBirthDate">3. Last Child Birth Date &#40;Only for Women&#41;</Label>
                   <Input 
                     id="lastChildBirthDate" 
                     type="date"
@@ -714,7 +714,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="bankAccountNumber">12. Bank Account Number</Label>
+                  <Label htmlFor="bankAccountNumber">4. Bank Account Number</Label>
                   <Input 
                     id="bankAccountNumber" 
                     placeholder="Enter bank account number"
@@ -722,7 +722,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="ifscCode">12a. IFSC Code</Label>
+                  <Label htmlFor="ifscCode">5. IFSC Code</Label>
                   <Input 
                     id="ifscCode" 
                     placeholder="e.g. SBIN0001234"
@@ -730,14 +730,14 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="bankName">12b. Bank Name</Label>
+                  <Label htmlFor="bankName">6. Bank Name</Label>
                   <Input 
                     id="bankName" 
                     {...register("bankName")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="branchName">12c. Branch Name</Label>
+                  <Label htmlFor="branchName">7. Branch Name</Label>
                   <Input 
                     id="branchName" 
                     {...register("branchName")}
@@ -755,7 +755,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="policyNumber">Policy Number</Label>
+                  <Label htmlFor="policyNumber">1. Policy Number</Label>
                   <Input
                     value={currentPolicy.policyNumber}
                     onChange={(e) => handlePolicyChange("currentPolicy", "policyNumber", e.target.value)}
@@ -763,7 +763,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="planAndTerm">Plan & Term</Label>
+                  <Label htmlFor="planAndTerm">2. Plan & Term</Label>
                   <Input
                     value={currentPolicy.planAndTerm}
                     onChange={(e) => handlePolicyChange("currentPolicy", "planAndTerm", e.target.value)}
@@ -771,7 +771,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="sumAssured">Sum Assured</Label>
+                  <Label htmlFor="sumAssured">3. Sum Assured</Label>
                   <Input
                     value={currentPolicy.sumAssured}
                     onChange={(e) => handlePolicyChange("currentPolicy", "sumAssured", e.target.value)}
@@ -779,7 +779,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="modeOfPayment">Mode of Payment</Label>
+                  <Label htmlFor="modeOfPayment">4. Mode of Payment</Label>
                   <Select
                     value={currentPolicy.modeOfPayment || ""}
                     onValueChange={(value) => handlePolicyChange("currentPolicy", "modeOfPayment", value)}
@@ -797,7 +797,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="branch">Branch</Label>
+                  <Label htmlFor="branch">5. Branch</Label>
                   <Input
                     value={currentPolicy.branch}
                     onChange={(e) => handlePolicyChange("currentPolicy", "branch", e.target.value)}
@@ -805,7 +805,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="lastPaymentDate">Last Payment Date</Label>
+                  <Label htmlFor="lastPaymentDate">6. Last Payment Date</Label>
                   <Input
                     type="date"
                     value={convertDateToIndianFormat(currentPolicy.lastPaymentDate, 'input')}
@@ -824,7 +824,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="policyNumber_previousPolicy">Policy Number</Label>
+                  <Label htmlFor="policyNumber_previousPolicy">1. Policy Number</Label>
                   <Input
                     value={previousPolicy.policyNumber}
                     onChange={(e) => handlePolicyChange("previousPolicy", "policyNumber", e.target.value)}
@@ -832,7 +832,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="planAndTerm_previousPolicy">Plan & Term</Label>
+                  <Label htmlFor="planAndTerm_previousPolicy">2. Plan & Term</Label>
                   <Input
                     value={previousPolicy.planAndTerm}
                     onChange={(e) => handlePolicyChange("previousPolicy", "planAndTerm", e.target.value)}
@@ -840,7 +840,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="sumAssured_previousPolicy">Sum Assured</Label>
+                  <Label htmlFor="sumAssured_previousPolicy">3. Sum Assured</Label>
                   <Input
                     value={previousPolicy.sumAssured}
                     onChange={(e) => handlePolicyChange("previousPolicy", "sumAssured", e.target.value)}
@@ -848,7 +848,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="modeOfInstallment_previousPolicy">Mode of Payment</Label>
+                  <Label htmlFor="modeOfInstallment_previousPolicy">4. Mode of Payment</Label>
                   <Select
                     value={previousPolicy.modeOfPayment || ""}
                     onValueChange={(value) => handlePolicyChange("previousPolicy", "modeOfPayment", value)}
@@ -866,7 +866,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="branch_previousPolicy">Branch</Label>
+                  <Label htmlFor="branch_previousPolicy">5. Branch</Label>
                   <Input
                     value={previousPolicy.branch}
                     onChange={(e) => handlePolicyChange("previousPolicy", "branch", e.target.value)}
@@ -874,7 +874,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="lastPaymentDate_previousPolicy">Last Payment Date</Label>
+                  <Label htmlFor="lastPaymentDate_previousPolicy">6. Last Payment Date</Label>
                   <Input
                     type="date"
                     value={convertDateToIndianFormat(previousPolicy.lastPaymentDate, 'input')}

@@ -305,7 +305,7 @@ const AddRecord = () => {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="date">Date</Label>
+                  <Label htmlFor="date">1. Date</Label>
                   <Input 
                     id="date"
                     type="date"
@@ -314,7 +314,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="aadhaarNumber">Aadhaar Number</Label>
+                  <Label htmlFor="aadhaarNumber">2. Aadhaar Number</Label>
                   <Input 
                     id="aadhaarNumber" 
                     placeholder="12-digit Aadhaar number"
@@ -327,7 +327,7 @@ const AddRecord = () => {
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="panNumber">Pan Number</Label>
+                  <Label htmlFor="panNumber">3. Pan Number</Label>
                   <Input 
                     id="panNumber" 
                     placeholder="e.g. ABCDE1234F"
@@ -340,7 +340,7 @@ const AddRecord = () => {
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="email">Email ID</Label>
+                  <Label htmlFor="email">4. Email ID</Label>
                   <Input 
                     id="email" 
                     type="email" 
@@ -376,7 +376,7 @@ const AddRecord = () => {
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="birthPlace">1a. Birth Place</Label>
+                  <Label htmlFor="birthPlace">2. Birth Place</Label>
                   <Input 
                     id="birthPlace" 
                     {...register("birthPlace")}
@@ -384,7 +384,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="fatherName">2. Father's Name</Label>
+                  <Label htmlFor="fatherName">3. Father's Name</Label>
                   <Input 
                     id="fatherName" 
                     {...register("fatherName")}
@@ -392,7 +392,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="motherName">3. Mother's Name</Label>
+                  <Label htmlFor="motherName">4. Mother's Name</Label>
                   <Input 
                     id="motherName" 
                     {...register("motherName")}
@@ -400,7 +400,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="spouseName">4. Spouse's Name</Label>
+                  <Label htmlFor="spouseName">5. Spouse's Name</Label>
                   <Input 
                     id="spouseName" 
                     {...register("spouseName")}
@@ -408,7 +408,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="address">5. Address</Label>
+                  <Label htmlFor="address">6. Address</Label>
                   <Input 
                     id="address" 
                     {...register("address")}
@@ -416,7 +416,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="dateOfBirth">6. Date of Birth</Label>
+                  <Label htmlFor="dateOfBirth">7. Date of Birth</Label>
                   <Input 
                     id="dateOfBirth" 
                     type="date"
@@ -425,7 +425,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="age">6a. Age</Label>
+                  <Label htmlFor="age">8. Age</Label>
                   <Input 
                     id="age" 
                     {...register("age")}
@@ -433,7 +433,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="education">7. Educational Qualification</Label>
+                  <Label htmlFor="education">9. Educational Qualification</Label>
                   <Input 
                     id="education" 
                     {...register("educationalQualification")}
@@ -441,7 +441,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="occupation">7a. Occupation</Label>
+                  <Label htmlFor="occupation">10. Occupation</Label>
                   <Input 
                     id="occupation" 
                     {...register("occupation")}
@@ -449,7 +449,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="DesignationName">7b. Designation</Label>
+                  <Label htmlFor="DesignationName">11. Designation</Label>
                   <Input 
                     id="DesignationName" 
                     {...register("designationOfPolicyHolder")}
@@ -457,7 +457,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="income">7c. Annual Income</Label>
+                  <Label htmlFor="income">12. Annual Income</Label>
                   <Input 
                     id="income" 
                     {...register("annualIncome")}
@@ -465,7 +465,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="servicePeriod">7d. Period Of Service</Label>
+                  <Label htmlFor="servicePeriod">13. Period Of Service</Label>
                   <Input 
                     id="servicePeriod" 
                     {...register("periodOfService")}
@@ -473,7 +473,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="employer">7e. Employer's Name</Label>
+                  <Label htmlFor="employer">14. Employer's Name</Label>
                   <Input 
                     id="employer" 
                     {...register("employerName")}
@@ -481,7 +481,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="mobileNumberLinkedAadhaar">7f. Aadhaar Linked Mobile Number </Label>
+                  <Label htmlFor="mobileNumberLinkedAadhaar">15. Aadhaar Linked Mobile Number </Label>
                   <Input 
                     id="mobileNumberLinkedAadhaar" 
                     {...register("aadhaarLinkedMobileNumber")}
@@ -489,7 +489,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="nominee">8. Name of Nominee</Label>
+                  <Label htmlFor="nominee">16. Name of Nominee</Label>
                   <Input 
                     id="nominee" 
                     {...register("nameOfNominee")}
@@ -497,7 +497,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="nomineeAge">8a. Age of Nominee</Label>
+                  <Label htmlFor="nomineeAge">17. Age of Nominee</Label>
                   <Input 
                     id="nomineeAge" 
                     {...register("ageOfNominee")}
@@ -505,7 +505,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="relation">8b. Relation</Label>
+                  <Label htmlFor="relation">18. Relation</Label>
                   <Input 
                     id="relation" 
                     {...register("relationName")}
@@ -532,11 +532,11 @@ const AddRecord = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-table-header">
-                      <TableHead className="border border-table-border font-semibold">Relationship</TableHead>
-                      <TableHead className="border border-table-border font-semibold">Current Age</TableHead>
-                      <TableHead className="border border-table-border font-semibold">Health</TableHead>
-                      <TableHead className="border border-table-border font-semibold">Age at Death/Year</TableHead>
-                      <TableHead className="border border-table-border font-semibold">Reason</TableHead>
+                      <TableHead className="border border-table-border font-semibold">1. Relationship</TableHead>
+                      <TableHead className="border border-table-border font-semibold">2. Current Age</TableHead>
+                      <TableHead className="border border-table-border font-semibold">3. Health</TableHead>
+                      <TableHead className="border border-table-border font-semibold">4. Age at Death/Year</TableHead>
+                      <TableHead className="border border-table-border font-semibold">5. Reason</TableHead>
                       <TableHead className="border border-table-border font-semibold">Delete</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -623,7 +623,7 @@ const AddRecord = () => {
             <CardContent className="pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <Label htmlFor="height">10. Height</Label>
+                  <Label htmlFor="height">1. Height</Label>
                   <Input 
                     id="height" 
                     placeholder="Height in cm"
@@ -632,7 +632,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="weight">10a. Weight</Label>
+                  <Label htmlFor="weight">2. Weight</Label>
                   <Input 
                     id="weight" 
                     placeholder="Weight in kg"
@@ -641,7 +641,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="childrenDate">11. Children's Birth Date &#40;Only for Women&#41;</Label>
+                  <Label htmlFor="childrenDate">3. Children's Birth Date &#40;Only for Women&#41;</Label>
                   <Input 
                     id="childrenDate" 
                     type="date"
@@ -650,7 +650,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="bankAccount">12. Bank Account Number</Label>
+                  <Label htmlFor="bankAccount">4. Bank Account Number</Label>
                   <Input 
                     id="bankAccount" 
                     placeholder="Enter bank account number"
@@ -659,7 +659,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="ifsc">12a. IFSC Code</Label>
+                  <Label htmlFor="ifsc">5. IFSC Code</Label>
                   <Input 
                     id="ifsc" 
                     placeholder="e.g. SBIN0001234"
@@ -668,7 +668,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="bankName">12b. Bank Name</Label>
+                  <Label htmlFor="bankName">6. Bank Name</Label>
                   <Input 
                     id="bankName" 
                     {...register("bankName")}
@@ -676,7 +676,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="branchName">12c. Branch Name</Label>
+                  <Label htmlFor="branchName">7. Branch Name</Label>
                   <Input 
                     id="branchName" 
                     {...register("branchName")}
@@ -697,12 +697,12 @@ const AddRecord = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-table-header">
-                      <TableHead className="border border-table-border">Policy Number</TableHead>
-                      <TableHead className="border border-table-border">Plan & Term</TableHead>
-                      <TableHead className="border border-table-border">Sum Assured</TableHead>
-                      <TableHead className="border border-table-border">Mode of Payment</TableHead>
-                      <TableHead className="border border-table-border">Branch</TableHead>
-                      <TableHead className="border border-table-border">Last Payment Date</TableHead>
+                      <TableHead className="border border-table-border">1. Policy Number</TableHead>
+                      <TableHead className="border border-table-border">2. Plan & Term</TableHead>
+                      <TableHead className="border border-table-border">3. Sum Assured</TableHead>
+                      <TableHead className="border border-table-border">4. Mode of Payment</TableHead>
+                      <TableHead className="border border-table-border">5. Branch</TableHead>
+                      <TableHead className="border border-table-border">6. Last Payment Date</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -781,12 +781,12 @@ const AddRecord = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-table-header">
-                      <TableHead className="border border-table-border">Policy Number</TableHead>
-                      <TableHead className="border border-table-border">Plan & Term</TableHead>
-                      <TableHead className="border border-table-border">Sum Assured</TableHead>
-                      <TableHead className="border border-table-border">Mode of Payment</TableHead>
-                      <TableHead className="border border-table-border">Branch</TableHead>
-                      <TableHead className="border border-table-border">Last Payment Date</TableHead>
+                      <TableHead className="border border-table-border">1. Policy Number</TableHead>
+                      <TableHead className="border border-table-border">2. Plan & Term</TableHead>
+                      <TableHead className="border border-table-border">3. Sum Assured</TableHead>
+                      <TableHead className="border border-table-border">4. Mode of Payment</TableHead>
+                      <TableHead className="border border-table-border">5. Branch</TableHead>
+                      <TableHead className="border border-table-border">6. Last Payment Date</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
