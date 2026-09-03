@@ -4,8 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check } from "lucide-react";
-import { useLanguage } from "@/hooks/useLanguage";
+import { Check, Sparkles, Star, Award, Crown, ShieldCheck, Wallet as WalletIcon, RefreshCw, Gift, AlertTriangle, Info, type LucideIcon } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { getCurrentUser, setCurrentUser } from "@/utils/auth";
@@ -15,12 +14,10 @@ import { getReferralConfig } from "../../services/configService";
 import { getProfile } from "../../services/userService";
 import { getReferralDashboard } from "../../services/referralService";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
-import { Link } from "lucide-react";
 import SEO from "@/components/SEO";
 import type { Plan } from "@/types/pages/OurPlans.types";
 const OurPlans = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   // Tracks which plan's checkout is currently in flight so Select Plan /
@@ -212,41 +209,75 @@ const OurPlans = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const planStyle: Record<string, { icon: LucideIcon; accent: string; iconBg: string }> = {
+    Free: { icon: Gift, accent: "text-emerald-600 dark:text-emerald-400", iconBg: "bg-emerald-100 dark:bg-emerald-950/40" },
+    Starter: { icon: Star, accent: "text-blue-600 dark:text-blue-400", iconBg: "bg-blue-100 dark:bg-blue-950/40" },
+    Basic: { icon: ShieldCheck, accent: "text-violet-600 dark:text-violet-400", iconBg: "bg-violet-100 dark:bg-violet-950/40" },
+    Standard: { icon: Award, accent: "text-amber-600 dark:text-amber-400", iconBg: "bg-amber-100 dark:bg-amber-950/40" },
+    Premium: { icon: Crown, accent: "text-rose-600 dark:text-rose-400", iconBg: "bg-rose-100 dark:bg-rose-950/40" },
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <SEO
         title="Subscription Plans & Pricing"
         description="Compare Life Insurance Records subscription plans — from a free 1-month trial to 24-month options — and pick the right fit for how many client records you manage."
       />
       <Navigation />
 
-      {reason === "expired" && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-center py-3 px-4 rounded-lg mb-6">
-          ⚠️ Your subscription has expired. Please renew to continue.
-        </div>
-      )}
-      {reason === "no-plan" && (
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 text-center py-3 px-4 rounded-lg mb-6">
-          👋 Please choose a plan to get started.
-        </div>
-      )}
+      <main className="flex-1 container mx-auto px-4 py-10 md:py-14">
+        {reason === "expired" && (
+          <div className="flex items-start gap-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-400 text-sm rounded-xl p-4 mb-8 max-w-3xl mx-auto">
+            <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+            <p>Your subscription has expired. Please renew to continue managing your policy records.</p>
+          </div>
+        )}
+        {reason === "no-plan" && (
+          <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-amber-700 dark:text-amber-400 text-sm rounded-xl p-4 mb-8 max-w-3xl mx-auto">
+            <Info className="w-5 h-5 shrink-0 mt-0.5" />
+            <p>Please choose a plan to get started with your workspace.</p>
+          </div>
+        )}
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-4">Choose Your Plan</h1>
-          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
-            Choose the plan that fits your needs. Upgrade or downgrade anytime.
+        {/* Hero */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-5">
+            <Sparkles className="w-7 h-7 text-primary" />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-form-header mb-3">Choose Your Plan</h1>
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+            From a free trial to a full 24-month workspace — pick what fits how many client records
+            you manage today. Upgrade or renew any time as your book of business grows.
           </p>
+
+          {/* Trust strip */}
+          <div className="flex flex-wrap justify-center gap-2 mt-6">
+            {[
+              { icon: ShieldCheck, label: "Secure Razorpay checkout" },
+              { icon: WalletIcon, label: "Referral wallet applied automatically" },
+              { icon: RefreshCw, label: "Upgrade or renew any time" },
+            ].map(({ icon: Icon, label }) => (
+              <span
+                key={label}
+                className="inline-flex items-center gap-1.5 text-xs font-medium bg-muted text-muted-foreground px-3 py-1.5 rounded-full"
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {label}
+              </span>
+            ))}
+          </div>
         </div>
 
         {currentUser && walletBalance > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 max-w-md mx-auto">
-            <label className="flex items-center gap-2 text-sm font-medium text-blue-900">
+          <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 rounded-xl p-4 mb-6 max-w-md mx-auto">
+            <label className="flex items-center gap-2 text-sm font-medium text-blue-900 dark:text-blue-300">
               <input
                 type="checkbox"
                 checked={useWallet}
                 onChange={(e) => { setUseWallet(e.target.checked); setWalletAmountInput(String(walletBalance)); }}
+                className="accent-primary"
               />
+              <WalletIcon className="w-4 h-4 shrink-0" />
               Use my referral wallet (₹{walletBalance} available)
             </label>
             {useWallet && (
@@ -256,104 +287,103 @@ const OurPlans = () => {
                 max={walletBalance}
                 value={walletAmountInput}
                 onChange={(e) => setWalletAmountInput(e.target.value)}
-                className="mt-2 w-full border border-blue-200 rounded-lg px-3 py-1.5 text-sm"
+                className="mt-3 w-full border border-blue-200 dark:border-blue-900/50 bg-background rounded-lg px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                 placeholder="Amount to apply"
               />
             )}
           </div>
         )}
 
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center mb-8">
-          <p className="text-md text-green-800 text-center">
-            🎁 Have a referral code?{" "}
+        <div className="flex items-center justify-center gap-2.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 rounded-xl p-4 text-center mb-10 max-w-3xl mx-auto">
+          <Gift className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" />
+          <p className="text-sm text-emerald-800 dark:text-emerald-400">
+            Have a referral code?{" "}
             <strong>Get ₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} off</strong>{" "}
-            any paid plan when you sign up with a valid referral code.{" "}
-            {/* <Link to="/signup" className="underline font-semibold">Sign up now →</Link> */}
+            any paid plan when you sign up with a valid referral code.
           </p>
         </div>
 
-        <div className={`grid md:grid-cols-2 ${hasHadPaidPlan ? 'lg:grid-cols-4' : 'lg:grid-cols-5'} gap-8 max-w-7xl mx-auto`}>
-          {plans.map((plan) => (
-            <Card 
-              key={plan.id} 
-              className={`relative ${plan.popular ? 'border-blue-300 shadow-lg scale-105' : ''} ${selectedPlan === plan.id ? 'ring-2 ring-primary' : ''}`}
-            >
-              {plan.popular && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-primary-foreground">
-                  Most Popular
-                </Badge>
-              )}
-              
-              <CardHeader className="text-center">
-                <CardTitle>
-                  <div className="flex items-center justify-center gap-2 mt-2">
-                    <div className="bg-primary text-primary-foreground px-8 py-2 mb-2 rounded-full">
-                      <span className="text-1xl font-bold">{plan.planType}</span>
-                    </div>
+        <div className={`grid sm:grid-cols-2 ${hasHadPaidPlan ? 'lg:grid-cols-4' : 'lg:grid-cols-5'} gap-6 lg:gap-5 max-w-7xl mx-auto items-start`}>
+          {plans.map((plan) => {
+            const style = planStyle[plan.planType] ?? planStyle.Starter;
+            const Icon = style.icon;
+            return (
+              <Card
+                key={plan.id}
+                className={`relative flex flex-col transition-shadow hover:shadow-md ${plan.popular ? 'border-primary/40 shadow-md md:scale-105' : ''} ${selectedPlan === plan.id ? 'ring-2 ring-primary' : ''}`}
+              >
+                {plan.popular && (
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground shadow-sm">
+                    Most Popular
+                  </Badge>
+                )}
+
+                <CardHeader className="text-center pb-2">
+                  <div className={`w-12 h-12 rounded-xl ${style.iconBg} flex items-center justify-center mx-auto mb-3`}>
+                    <Icon className={`w-6 h-6 ${style.accent}`} />
                   </div>
-                </CardTitle>
-                <CardDescription className="text-2xl">{plan.duration}</CardDescription>
-                <CardDescription>
-                  <div className="flex items-center justify-center gap-2 mt-2">
-                    <span className="text-3xl font-bold text-primary">₹{plan.price}</span>
+                  <CardTitle className="text-lg font-semibold text-form-header">{plan.planType}</CardTitle>
+                  <CardDescription>{plan.duration}</CardDescription>
+                  <div className="flex items-baseline justify-center gap-2 mt-3">
+                    <span className="text-3xl font-bold text-form-header">₹{plan.price}</span>
                     {plan.originalPrice && (
-                      <span className="text-lg text-muted-foreground line-through">₹{plan.originalPrice}</span>
+                      <span className="text-sm text-muted-foreground line-through">₹{plan.originalPrice}</span>
                     )}
                   </div>
                   {plan.originalPrice && (
-                    <div className="text-sm text-green-600 font-medium">
+                    <Badge variant="outline" className="mt-2 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50">
                       Save ₹{plan.originalPrice - plan.price}
-                    </div>
+                    </Badge>
                   )}
-                </CardDescription>
-              </CardHeader>
+                </CardHeader>
 
-              <CardContent>
-                <ul className="space-y-3">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <Check className="h-5 w-5 text-green-500" />
-                      <span className="text-sm">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
+                <CardContent className="flex-1">
+                  <ul className="space-y-2.5">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                        <span className="text-sm text-muted-foreground">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
 
-              <CardFooter>
-                {currentUser?.subscription?.planId === plan.id && currentUser?.subscription?.status === 'active' ? (
-                  <Button
-                    className="w-full"
-                    variant="secondary"
-                    disabled
-                  >
-                    <Check className="h-4 w-4 mr-2" />
-                    Active Plan
-                  </Button>
-                ) : currentUser?.subscription?.planId === plan.id && currentUser?.subscription?.status === 'pending_payment' ? (
-                  <Button
-                    className="w-full"
-                    variant="default"
-                    onClick={() => handleSelectPlan(plan.id)}
-                    disabled={!!processingPlanId}
-                  >
-                    {processingPlanId === plan.id ? "Processing…" : "Complete Payment"}
-                  </Button>
-                ) : (
-                  <Button
-                    className="w-full"
-                    variant={plan.popular ? "default" : "outline"}
-                    onClick={() => handleSelectPlan(plan.id)}
-                    disabled={!!processingPlanId}
-                  >
-                    {processingPlanId === plan.id ? "Processing…" : "Select Plan"}
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-          ))}
+                <CardFooter>
+                  {currentUser?.subscription?.planId === plan.id && currentUser?.subscription?.status === 'active' ? (
+                    <Button
+                      className="w-full"
+                      variant="secondary"
+                      disabled
+                    >
+                      <Check className="h-4 w-4 mr-2" />
+                      Active Plan
+                    </Button>
+                  ) : currentUser?.subscription?.planId === plan.id && currentUser?.subscription?.status === 'pending_payment' ? (
+                    <Button
+                      className="w-full"
+                      variant="default"
+                      onClick={() => handleSelectPlan(plan.id)}
+                      disabled={!!processingPlanId}
+                    >
+                      {processingPlanId === plan.id ? "Processing…" : "Complete Payment"}
+                    </Button>
+                  ) : (
+                    <Button
+                      className="w-full"
+                      variant={plan.popular ? "default" : "outline"}
+                      onClick={() => handleSelectPlan(plan.id)}
+                      disabled={!!processingPlanId}
+                    >
+                      {processingPlanId === plan.id ? "Processing…" : "Select Plan"}
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
 
-        <div className="text-center mt-8">
+        <div className="text-center mt-10">
           <p className="text-sm text-muted-foreground">
             All prices are in Indian Rupees (INR). Plans auto-renew unless cancelled.
           </p>
