@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
   // into /api/api/*. Falls back to the same Railway URL vercel.json's
   // production rewrite points at, so dev works even with no .env set.
   const backendOrigin = (
-    env.VITE_API_URL || "https://lic-agent-dairy-backend-production.up.railway.app/api"
+    env.VITE_API_URL || "https://lic-agent-dairy-backend.onrender.com/api"
   ).replace(/\/api\/?$/, "");
 
   return {
