@@ -27,8 +27,9 @@ import type { CustomFieldValue } from "@/types/config/insuranceTypes.types";
 import { policyRecordSchema } from "@/schemas/policyRecordSchema";
 import type { PolicyRecordFormValues } from "@/types/schemas/policyRecordSchema.types";
 import type { PolicyDetail } from "@/types/pages/AddRecord.types";
-// Small section header used across the form cards — encodes the actual step
-// number from the intake sheet, so it's real sequence info, not decoration.
+// Small section header used across the form cards — a plain sequential
+// step number (Step 1 – Step 8) through the whole form, not tied to any
+// external document.
 const SectionTitle = ({ icon: Icon, step, children }: { icon: LucideIcon; step?: string; children: React.ReactNode }) => (
   <CardTitle className="text-form-header flex items-center gap-2.5">
     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -299,7 +300,7 @@ const AddRecord = () => {
           {/* Basic Information Form */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={IdCard}>Basic Details</SectionTitle>
+              <SectionTitle icon={IdCard} step="Step 3">Basic Details</SectionTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -357,7 +358,7 @@ const AddRecord = () => {
           {/* Personal Information Form */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={User}>Personal Information</SectionTitle>
+              <SectionTitle icon={User} step="Step 4">Personal Information</SectionTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -519,7 +520,7 @@ const AddRecord = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <SectionTitle icon={Users}>9. Family Information</SectionTitle>
+                <SectionTitle icon={Users} step="Step 5">Family Information</SectionTitle>
                 <Button type="button" onClick={addFamilyMember} size="sm" variant="outline">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Member
@@ -617,7 +618,7 @@ const AddRecord = () => {
           {/* Additional Fields */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={HeartPulse}>Physical & Banking Details</SectionTitle>
+              <SectionTitle icon={HeartPulse} step="Step 6">Physical & Banking Details</SectionTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -689,7 +690,7 @@ const AddRecord = () => {
           {/* Current Policy Details */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={ShieldCheck}>11. Current Policy Details</SectionTitle>
+              <SectionTitle icon={ShieldCheck} step="Step 7">Current Policy Details</SectionTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto rounded-lg border border-table-border">
@@ -773,7 +774,7 @@ const AddRecord = () => {
           {/* Previous Policy Details */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={History}>12. Previous Policy Details</SectionTitle>
+              <SectionTitle icon={History} step="Step 8">Previous Policy Details</SectionTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto rounded-lg border border-table-border">
