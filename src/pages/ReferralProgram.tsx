@@ -20,7 +20,7 @@ import {
   Wallet, GitBranch, Receipt, Route, Clock,
   Building2, Smartphone, CheckCircle2, AlertCircle,
   ArrowDownToLine, History, Edit, Save, X,
-  Award, Medal, Star, Sparkles,
+  Award, Medal, Star, Sparkles, Loader2
 } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
 import { getReferralConfig } from "../../services/configService";
@@ -332,7 +332,8 @@ const ReferralProgram = () => {
   if (loading) return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
       <Navigation />
-      <main className="flex-1 flex items-center justify-center">
+      <main className="flex-1 min-h-[60vh] flex flex-col items-center justify-center gap-3 py-16">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
         <p className="text-muted-foreground text-sm">Loading referral dashboard…</p>
       </main>
       <Footer />
