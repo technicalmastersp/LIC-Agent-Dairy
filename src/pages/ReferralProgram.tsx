@@ -19,8 +19,10 @@ import {
   Copy, Share, Users, TrendingUp, Gift, Crown,
   Wallet, GitBranch, Receipt, Route, Clock,
   Building2, Smartphone, CheckCircle2, AlertCircle,
-  ArrowDownToLine, History, Edit, Save, X
+  ArrowDownToLine, History, Edit, Save, X,
+  Award, Medal, Star, Sparkles,
 } from "lucide-react";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
 import { getReferralConfig } from "../../services/configService";
 import type { Dashboard, WithdrawalRowProps, ReferralRowProps } from "@/types/pages/ReferralProgram.types";
 
@@ -31,6 +33,45 @@ const PLANS = [
   { name: "Standard", duration: "12 months", price: 1099 },
   { name: "Premium",  duration: "24 months", price: 2099 },
 ];
+
+// Referrer tiers — a milestone ladder based on direct (L1) referrals, giving
+// active referrers a visible sense of progress and a reason to keep sharing.
+// Purely a client-side presentation layer over totalL1; no backend concept.
+const TIERS = [
+  { name: "Starter",  min: 0,  icon: Sparkles, color: "text-slate-500",   bg: "bg-slate-100 border-slate-200" },
+  { name: "Bronze",   min: 1,  icon: Medal,    color: "text-amber-700",   bg: "bg-amber-100 border-amber-200" },
+  { name: "Silver",   min: 5,  icon: Award,    color: "text-slate-600",   bg: "bg-slate-200 border-slate-300" },
+  { name: "Gold",     min: 10, icon: Award,    color: "text-yellow-600",  bg: "bg-yellow-100 border-yellow-200" },
+  { name: "Platinum", min: 25, icon: Star,     color: "text-purple-600",  bg: "bg-purple-100 border-purple-200" },
+] as const;
+
+const getTier = (totalL1: number) => {
+  const current = [...TIERS].reverse().find(t => totalL1 >= t.min) ?? TIERS[0];
+  const idx = TIERS.indexOf(current);
+  const next = TIERS[idx + 1] ?? null;
+  return { current, next, toNext: next ? next.min - totalL1 : 0 };
+};
+
+// Groups earnings into the last 6 calendar months (oldest first) for the
+// trend chart — only "credited" amounts count as real earned money, same
+// distinction the rest of the page already draws (green = credited).
+const buildMonthlyTrend = (earnings: Dashboard["earningsHistory"]) => {
+  const months: { key: string; label: string; earned: number }[] = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: d.toLocaleDateString("en-IN", { month: "short" }), earned: 0 });
+  }
+  const byKey = new Map(months.map(m => [m.key, m]));
+  for (const e of earnings) {
+    if (e.status !== "credited") continue;
+    const d = new Date(e.date);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    const m = byKey.get(key);
+    if (m) m.earned += e.amount;
+  }
+  return months;
+};
 
 const statusStyle: Record<string, string> = {
   active:  "bg-green-100 text-green-700 border border-green-200",
@@ -139,6 +180,7 @@ const ReferralProgram = () => {
   const [showAllReferrals, setShowAllReferrals] = useState(false);
   const [showAllEarnings, setShowAllEarnings] = useState(false);
   const [showAllWithdrawals, setShowAllWithdrawals] = useState(false);
+  const [referralFilter, setReferralFilter] = useState<"all" | "active" | "pending" | "expired">("all");
 
   const [bankForm, setBankForm] = useState({
     upiId:         "",
@@ -299,20 +341,61 @@ const ReferralProgram = () => {
 
   const d = dashboard!;
 
+  const tier = getTier(d.totalL1);
+  const monthlyTrend = buildMonthlyTrend(d.earningsHistory || []);
+  const hasAnyMonthlyData = monthlyTrend.some(m => m.earned > 0);
+  const l1Earned = (d.earningsHistory || []).filter(e => e.status === "credited" && e.level === 1).reduce((s, e) => s + e.amount, 0);
+  const l2Earned = (d.earningsHistory || []).filter(e => e.status === "credited" && e.level === 2).reduce((s, e) => s + e.amount, 0);
+  const splitTotal = l1Earned + l2Earned;
+  const filteredReferrals = (d.referredUsers || []).filter(u => {
+    if (referralFilter === "all") return true;
+    const effectiveStatus = u.rewardExpired ? "expired" : u.status;
+    return effectiveStatus === referralFilter;
+  });
+
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
       <Navigation />
       <main className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-4xl mx-auto space-y-5">
 
-          {/* Header */}
-          <div>
-            <h1 className="text-2xl font-medium text-form-header flex items-center gap-2">
-              <Crown className="w-6 h-6 text-yellow-500" /> Referral program
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Earn {config.L1_COMMISSION_PCT}% on direct referrals and {config.L2_COMMISSION_PCT}% on their referrals — one-time per user, within {config.REWARD_WINDOW_DAYS} days
-            </p>
+          {/* ── Hero ── */}
+          <div className="relative rounded-2xl overflow-hidden text-primary-foreground shadow-lg"
+            style={{ background: "linear-gradient(135deg, hsl(195,85%,20%) 0%, hsl(195,85%,30%) 55%, hsl(195,80%,40%) 100%)" }}>
+            <div className="absolute -right-10 -top-14 w-56 h-56 rounded-full bg-white/10" />
+            <div className="absolute right-16 bottom-[-3rem] w-32 h-32 rounded-full bg-white/5" />
+            <div className="relative p-5 md:p-7">
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-xl md:text-2xl font-medium">Referral program</h1>
+                    <Badge className={`text-xs border-0 bg-white/15 backdrop-blur-sm text-primary-foreground`}>
+                      <tier.current.icon className="w-3 h-3 mr-1" />
+                      {tier.current.name}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-primary-foreground/80 mt-1 max-w-md">
+                    Earn {config.L1_COMMISSION_PCT}% on direct referrals and {config.L2_COMMISSION_PCT}% on theirs — within {config.REWARD_WINDOW_DAYS} days of signup.
+                  </p>
+                  {tier.next && (
+                    <p className="text-xs text-primary-foreground/70 mt-2">
+                      {tier.toNext} more direct referral{tier.toNext === 1 ? "" : "s"} to reach <span className="font-medium">{tier.next.name}</span>
+                    </p>
+                  )}
+                </div>
+                <div className="text-left sm:text-right w-full sm:w-auto shrink-0">
+                  <p className="text-[11px] uppercase tracking-wide text-primary-foreground/60">Your code</p>
+                  <div className="flex items-center gap-2 mt-1 justify-start sm:justify-end">
+                    <span className="text-2xl font-mono font-medium tracking-widest">{currentUser.referralCode}</span>
+                    <Button size="sm" variant="outline"
+                      className="h-8 border-white/25 bg-white/10 hover:bg-white/20 text-primary-foreground"
+                      onClick={copyCode}>
+                      <Copy className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* ── Stats ── */}
@@ -332,6 +415,70 @@ const ReferralProgram = () => {
               </Card>
             ))}
           </div>
+
+          {/* ── Earnings insight ── */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" /> Earnings trend
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-6">
+                {!hasAnyMonthlyData ? (
+                  <div className="flex flex-col items-center justify-center text-center py-10 px-4">
+                    <TrendingUp className="w-8 h-8 text-muted-foreground/40 mb-3" />
+                    <p className="text-sm text-muted-foreground">
+                      Your monthly earnings will show up here once a referral's plan is credited.
+                    </p>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={monthlyTrend}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                      <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 12 }} allowDecimals={false} width={36} />
+                      <Tooltip formatter={(v: number) => [`₹${v}`, "Earned"]} />
+                      <Bar dataKey="earned" radius={[4, 4, 0, 0]}>
+                        {monthlyTrend.map((m, i) => (
+                          <Cell key={m.key} fill={i === monthlyTrend.length - 1 ? "hsl(195,85%,25%)" : "hsl(195,60%,70%)"} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+
+                {/* L1 vs L2 contribution split */}
+                <div className="flex flex-col justify-center">
+                  <p className="text-xs font-medium text-muted-foreground mb-3">Where it came from</p>
+                  {splitTotal === 0 ? (
+                    <p className="text-xs text-muted-foreground">No credited earnings yet.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="font-medium text-blue-700">Direct (L1)</span>
+                          <span className="text-muted-foreground">₹{l1Earned}</span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                          <div className="h-full bg-blue-600 rounded-full" style={{ width: `${(l1Earned / splitTotal) * 100}%` }} />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="font-medium text-purple-700">Indirect (L2)</span>
+                          <span className="text-muted-foreground">₹{l2Earned}</span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                          <div className="h-full bg-purple-600 rounded-full" style={{ width: `${(l2Earned / splitTotal) * 100}%` }} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* ── Wallet ── */}
           <Card>
@@ -608,13 +755,6 @@ const ReferralProgram = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="bg-muted rounded-lg p-3">
-                <p className="text-xs text-muted-foreground mb-1">Referral code</p>
-                <p className="text-xl font-mono font-medium text-blue-600 tracking-widest flex items-center justify-between gap-2">
-                  {currentUser.referralCode}
-                  <Button size="sm" className="border bottom-1 bg-transparent text-foreground" onClick={copyCode}><Copy className="w-3.5 h-3.5 mr-1.5" />Copy</Button>
-                </p>
-              </div>
-              <div className="bg-muted rounded-lg p-3">
                 <p className="text-xs text-muted-foreground mb-1">Referral URL</p>
                 <p className="text-xs font-mono text-muted-foreground break-all">{referralUrl}</p>
               </div>
@@ -697,24 +837,43 @@ const ReferralProgram = () => {
           {/* ── Referral chain ── */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <GitBranch className="w-4 h-4" /> Referral chain
-              </CardTitle>
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                  <GitBranch className="w-4 h-4" /> Referral chain
+                </CardTitle>
+                {(d.referredUsers?.length ?? 0) > 0 && (
+                  <Select value={referralFilter} onValueChange={(v) => setReferralFilter(v as typeof referralFilter)}>
+                    <SelectTrigger className="h-7 w-[130px] text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="expired">Expired</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               {!d.referredUsers?.length ? (
                 <p className="text-center text-sm text-muted-foreground py-8">
                   No referrals yet. Share your link to get started.
                 </p>
+              ) : !filteredReferrals.length ? (
+                <p className="text-center text-sm text-muted-foreground py-8">
+                  No {referralFilter} referrals.
+                </p>
               ) : (
                 <div>
-                  {d.referredUsers.slice(0, 5).map((u, i) => (
+                  {filteredReferrals.slice(0, 5).map((u, i) => (
                     <ReferralRow key={i} u={u} fmt={fmt} initials={initials} statusStyle={statusStyle} />
                   ))}
-                  {d.referredUsers.length > 5 && (
+                  {filteredReferrals.length > 5 && (
                     <Button variant="outline" size="sm" className="w-full mt-3"
                       onClick={() => setShowAllReferrals(true)}>
-                      See all {d.referredUsers.length} referrals
+                      See all {filteredReferrals.length} referrals
                     </Button>
                   )}
                 </div>
@@ -724,9 +883,9 @@ const ReferralProgram = () => {
 
           <Dialog open={showAllReferrals} onOpenChange={setShowAllReferrals}>
             <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-              <DialogHeader><DialogTitle>All referrals ({d.referredUsers?.length ?? 0})</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>All referrals ({filteredReferrals.length})</DialogTitle></DialogHeader>
               <div>
-                {d.referredUsers?.map((u, i) => (
+                {filteredReferrals.map((u, i) => (
                   <ReferralRow key={i} u={u} fmt={fmt} initials={initials} statusStyle={statusStyle} />
                 ))}
               </div>

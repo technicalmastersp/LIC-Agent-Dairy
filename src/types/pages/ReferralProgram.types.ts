@@ -47,7 +47,7 @@ export interface Dashboard {
   lastWithdrawal:    { amount: number; status: string; requestedAt: string; method: string } | null;
   withdrawalHistory: WithdrawalRecord[];
   referredUsers:     ReferredUser[];
-  earningsHistory:   { date: string; description: string; amount: number; status: string }[];
+  earningsHistory:   { date: string; description: string; amount: number; status: string; level?: 1 | 2 }[];
 }
 export interface WithdrawalRowProps {
   w: WithdrawalRecord;

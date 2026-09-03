@@ -1,4 +1,3 @@
-
 export interface PaymentDetails {
   upiId?: string;
   upiVerified?: boolean;
@@ -36,6 +35,8 @@ export interface User {
     policyDueReminders: boolean;
     subscriptionReminders: boolean;
   };
+  deactivatedAt?: string | null;
+  deactivationNote?: string | null;
 }
 export interface UserSubscription {
   planId: string;
