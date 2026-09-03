@@ -118,8 +118,6 @@ const AdminUsers = () => {
     let result = allUsers;
 
     if (status !== "all") {
-      console.log("status : ", status);
-      
       const wantActive = status === "active";
       if(status === "plan expired") {
         result = result.filter(u => u.subscription.status === "expired");

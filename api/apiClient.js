@@ -3,8 +3,8 @@ import * as Sentry from "@sentry/react";
 import { toastEmitter } from "../utils/toastEmitter";
 
 const apiClient = axios.create({
-  // Same-origin path, not the Railway URL directly. vercel.json rewrites
-  // /api/* to the Railway backend server-side, so from the browser's
+  // Same-origin path, not the Onrender URL directly. vercel.json rewrites
+  // /api/* to the Onrender backend server-side, so from the browser's
   // point of view every request stays on this site's own origin. That
   // matters for the auth cookie: a cookie set via a cross-origin request
   // (even with SameSite=None; Secure) is still a *third-party* cookie,
@@ -17,7 +17,7 @@ const apiClient = axios.create({
   // Still needed even same-origin — withCredentials controls whether the
   // browser attaches/accepts cookies on this axios instance's requests at
   // all. Backend CORS (app.js) also still needs credentials: true, even
-  // though the browser now only ever talks to the proxy, not Railway
+  // though the browser now only ever talks to the proxy, not Onrender
   // directly.
   withCredentials: true,
 });

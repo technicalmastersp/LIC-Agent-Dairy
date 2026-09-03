@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
   // VITE_API_URL historically pointed at the full API base *including* the
   // /api prefix (e.g. https://.../api) — strip that suffix here since the
   // proxy below forwards the /api/* path itself; keeping it would double up
-  // into /api/api/*. Falls back to the same Railway URL vercel.json's
+  // into /api/api/*. Falls back to the same Onrender URL vercel.json's
   // production rewrite points at, so dev works even with no .env set.
   const backendOrigin = (
     env.VITE_API_URL || "https://lic-agent-dairy-backend.onrender.com/api"
@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
     host: "::",
     port: 8080,
     proxy: {
-      // Mirrors vercel.json's "/api/:path* -> Railway" rewrite for local
+      // Mirrors vercel.json's "/api/:path* -> Onrender" rewrite for local
       // dev. Without this, apiClient.js's baseURL: "/api" resolves to
       // localhost:8080/api/*, which nothing is listening on outside of
       // Vercel — this is what broke local API calls after the same-origin
@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
         // The source file api/apiClient.js sits at the project root, so
         // Vite's dev server serves it (unbundled, dev-only) at the exact
         // URL path /api/apiClient.js — colliding with this proxy rule,
-        // which otherwise swallows it and tries forwarding it to Railway
+        // which otherwise swallows it and tries forwarding it to Onrender
         // instead of letting Vite serve your own code. Real backend routes
         // (e.g. /api/auth/login) never end in a file extension, so bypass
         // hands anything that looks like a JS/TS module request back to

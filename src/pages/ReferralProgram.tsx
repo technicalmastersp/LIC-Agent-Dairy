@@ -176,7 +176,7 @@ const ReferralProgram = () => {
     branch?: string;
   }>({ status: "idle" });
 
-  const [config, setConfig] = useState({ SIGNUP_DISCOUNT_AMOUNT: 100, L1_COMMISSION_PCT: 5, L2_COMMISSION_PCT: 2, MIN_WITHDRAWAL: 100, REWARD_WINDOW_DAYS: 15 });
+  const [config, setConfig] = useState({ SIGNUP_DISCOUNT_AMOUNT: 100, L1_COMMISSION_PCT: 5, L2_COMMISSION_PCT: 2, MIN_WITHDRAWAL: 500, REWARD_WINDOW_DAYS: 45 });
   const [showAllReferrals, setShowAllReferrals] = useState(false);
   const [showAllEarnings, setShowAllEarnings] = useState(false);
   const [showAllWithdrawals, setShowAllWithdrawals] = useState(false);
@@ -804,7 +804,7 @@ const ReferralProgram = () => {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
                 Referred users get ₹{config.SIGNUP_DISCOUNT_AMOUNT} off at signup.
                 You earn {config.L1_COMMISSION_PCT}% on their plan (L1) and {config.L2_COMMISSION_PCT}% on their referrals (L2).
-                One-time reward per user within {config.REWARD_WINDOW_DAYS} days. Min withdrawal ₹{config.MIN_WITHDRAWAL || 100}.
+                One-time reward per user within {config.REWARD_WINDOW_DAYS} days. Min withdrawal ₹{config.MIN_WITHDRAWAL || 500}.
               </div>
             </CardContent>
           </Card>
