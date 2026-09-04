@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Mock } from "vitest";
 import type { RazorpayOptions, RazorpayInstance } from "@/types/test/razorpayCheckout.test.types";
 
-vi.mock("./loadRazorpay", () => ({
+vi.mock("../utils/loadRazorpay", () => ({
   loadRazorpayScript: vi.fn().mockResolvedValue(undefined),
 }));
 
