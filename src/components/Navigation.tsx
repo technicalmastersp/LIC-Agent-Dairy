@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import {
   Home, Plus, Table, LogOut, User, Menu, X,
   UserRoundCog, CircleHelp, MapPinnedIcon, Wrench,
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   NavigationMenu, NavigationMenuList, NavigationMenuItem,
-  NavigationMenuTrigger, NavigationMenuContent,
+  NavigationMenuContent,
 } from "@/components/ui/navigation-menu";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage }   from "@/hooks/useLanguage";
@@ -140,28 +141,36 @@ const PublicMobileLink = ({
    TOOLS DROPDOWN (desktop, hover-triggered)
 ───────────────────────────────────────────── */
 
-// NOTE: opening this dropdown logs a harmless React dev-mode warning
-// ("Function components cannot be given refs") originating entirely inside
-// @radix-ui/react-navigation-menu's own Presence/Viewport internals — not
-// from this component. Dev-console-only noise; stripped from production
-// builds. Confirmed via live audit on 2026-08-18, current version
-// @radix-ui/react-navigation-menu@1.2.13. Revisit if a Radix release notes
-// a fix.
+// Trigger is `asChild` wrapping a real react-router <Link>. Radix's own
+// <button> trigger otherwise owns the click event itself — attaching a
+// navigate() handler to that button fires navigation *inside* Radix's
+// synchronous click handling, racing its internal open/collection state,
+// which was making the trigger (and the whole dropdown) vanish right after
+// landing on /tools. With asChild, Radix merges its hover/focus/state
+// props onto the anchor instead of rendering its own button, so the click
+// goes through the normal DOM anchor path and nothing is left half-updated.
 const ToolsDropdown = ({ dark }: { dark?: boolean }) => (
   <NavigationMenu>
     <NavigationMenuList>
       <NavigationMenuItem>
-        <NavigationMenuTrigger
-          className={cn(
-            "!bg-transparent h-auto px-3 py-2 text-sm font-medium",
-            dark
-              ? "text-primary-foreground/80 hover:!bg-primary-light/50 hover:!text-primary-foreground data-[state=open]:!bg-primary-light/50 data-[state=open]:!text-primary-foreground"
-              : "text-muted-foreground hover:!bg-transparent hover:!text-form-header data-[state=open]:!text-form-header"
-          )}
-        >
-          <Wrench className="w-4 h-4 mr-1.5" />
-          Tools
-        </NavigationMenuTrigger>
+        <NavigationMenuPrimitive.Trigger asChild>
+          <Link
+            to="/tools"
+            className={cn(
+              "group inline-flex items-center !bg-transparent h-auto px-3 py-2 rounded-md text-sm font-medium transition-colors",
+              dark
+                ? "text-primary-foreground/80 hover:!bg-primary-light/50 hover:!text-primary-foreground data-[state=open]:!bg-primary-light/50 data-[state=open]:!text-primary-foreground"
+                : "text-muted-foreground hover:!bg-transparent hover:!text-form-header data-[state=open]:!text-form-header"
+            )}
+          >
+            <Wrench className="w-4 h-4 mr-1.5" />
+            Tools
+            <ChevronDown
+              className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180"
+              aria-hidden="true"
+            />
+          </Link>
+        </NavigationMenuPrimitive.Trigger>
         <NavigationMenuContent>
           <div className="w-[280px] p-2">
             {TOOLS.map(({ to, icon: Icon, label }) => (

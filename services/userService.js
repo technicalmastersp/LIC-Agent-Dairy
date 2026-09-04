@@ -18,7 +18,6 @@ export const checkReferralCode = async (code) => {
 
 export const login = async (credentials) => {
   const res = await apiClient.post('/auth/login', credentials);
-  // console.log('login responce : ', res.data);
   
   if(res.data.status !== 'error') {
     // No setToken() anymore — the backend's Set-Cookie header on this same

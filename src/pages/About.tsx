@@ -29,6 +29,11 @@ import {
   Sparkles,
   ArrowRight,
   Quote,
+  CreditCard,
+  Calculator,
+  BookOpenText,
+  Moon,
+  Compass,
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
 
@@ -69,6 +74,12 @@ const About = () => {
         "A built-in referral wallet tracks direct and second-level referrals, with an admin-reviewed withdrawal queue for approving or rejecting payouts.",
     },
     {
+      icon: CreditCard,
+      title: "Flexible plans, secure payments",
+      description:
+        "Start on a free trial, then move up through Starter, Basic, Standard, or Premium plans as your book of business grows. Checkout runs through Razorpay, referral wallet balance is applied automatically where it covers the cost, and UPI payments get an admin-verified manual fallback.",
+    },
+    {
       icon: UserCog,
       title: "Role-based administration",
       description:
@@ -86,6 +97,16 @@ const About = () => {
       description:
         "Full English and Hindi support, Indian date formatting, and terminology that matches how policies are actually discussed in the field.",
     },
+  ];
+
+  const freeTools = [
+    { to: "/tools/age-calculator", icon: Calculator, title: "Age Calculator", accent: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-950/40" },
+    { to: "/tools/sip-calculator", icon: Calculator, title: "SIP Calculator", accent: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-950/40" },
+    { to: "/tools/income-tax-calculator", icon: Calculator, title: "Income Tax Calculator", accent: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/40" },
+    { to: "/tools/home-loan-emi-calculator", icon: Calculator, title: "Home Loan EMI Calculator", accent: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/40" },
+    { to: "/tools/term-insurance-calculator", icon: Calculator, title: "Term Insurance Calculator", accent: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-950/40" },
+    { to: "/tools/inflation-calculator", icon: Calculator, title: "Inflation Calculator", accent: "text-cyan-600 dark:text-cyan-400", bg: "bg-cyan-50 dark:bg-cyan-950/40" },
+    { to: "/lic-info-hub", icon: BookOpenText, title: "LIC Info Hub", accent: "text-primary", bg: "bg-primary/10" },
   ];
 
   return (
@@ -121,6 +142,21 @@ const About = () => {
                   workspace — built for life, health, motor, and general insurance agents who want
                   their entire book of business organized, backed up, and a search away.
                 </p>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {[
+                    { icon: Moon, label: "Dark mode" },
+                    { icon: Compass, label: "Guided onboarding" },
+                    { icon: Languages, label: "English & Hindi" },
+                  ].map(({ icon: Icon, label }) => (
+                    <span
+                      key={label}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium bg-white/10 text-primary-foreground/90 px-3 py-1.5 rounded-full backdrop-blur-sm"
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      {label}
+                    </span>
+                  ))}
+                </div>
                 <div className="flex flex-wrap gap-3 pt-2">
                   <Link to="/view-records">
                     <Button size="lg" className="bg-white text-[hsl(195,90%,15%)] hover:bg-white/90 font-medium">
@@ -242,6 +278,37 @@ const About = () => {
           </div>
         </section>
 
+        {/* ══════════ FREE TOOLS — calculators + LIC Info Hub grid ══════════ */}
+        <section className="bg-background py-16 md:py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center max-w-xl mx-auto mb-12">
+                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Beyond record-keeping</p>
+                <h2 className="text-3xl font-bold text-form-header">Free tools, built right in</h2>
+                <p className="text-muted-foreground mt-3 leading-relaxed">
+                  Six financial calculators agents actually need day to day, plus a searchable glossary
+                  of LIC terms — no separate app, no sign-up wall.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {freeTools.map(({ to, icon: Icon, title, accent, bg }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    className="group flex flex-col items-center text-center gap-3 rounded-2xl border border-border p-5 hover:border-primary/40 hover:shadow-md transition-all"
+                  >
+                    <div className={`w-12 h-12 rounded-xl ${bg} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
+                      <Icon className={`w-5 h-5 ${accent}`} />
+                    </div>
+                    <span className="text-sm font-medium text-form-header leading-snug">{title}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ══════════ DATA PROTECTION — dark panel, icon medallions ══════════ */}
         <section className="bg-form-header text-primary-foreground py-16 md:py-20 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
@@ -269,7 +336,7 @@ const About = () => {
                     icon: Lock,
                     title: "Locked down by default",
                     description:
-                      "Every account is authenticated before it can see a single record. Sensitive fields like Aadhaar, PAN, and bank details are only ever visible to the agent who owns them, or an admin acting within their role.",
+                      "Every account is authenticated before it can see a single record. Sensitive fields like Aadhaar, PAN, and bank details are only ever visible to the agent who owns them, or an admin acting within their role. You can also review your own activity log and sign out any active session yourself, any time.",
                   },
                   {
                     icon: CloudCog,

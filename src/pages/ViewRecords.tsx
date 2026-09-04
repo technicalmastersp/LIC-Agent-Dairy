@@ -349,7 +349,7 @@ const ViewRecords = () => {
           </div>
 
           {/* ── Stat row (Home-style summary cards) ── */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             {[
               {
                 label: "Total records",
@@ -384,12 +384,12 @@ const ViewRecords = () => {
                 color: "text-violet-700",
               },
             ].map(({ label, val, icon, sub, bg, color }) => (
-              <Card key={label} className={`${bg} border-transparent hover:shadow-sm transition-shadow`}>
+              <Card key={label} className={`${bg} border-transparent hover:shadow-sm transition-shadow min-w-0`}>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 text-muted-foreground mb-2 text-xs">
                     {icon} {label}
                   </div>
-                  <p className={`text-2xl font-semibold ${color}`}>{val}</p>
+                  <p className={`text-xl sm:text-2xl font-semibold truncate ${color}`}>{val}</p>
                   <p className="text-xs text-muted-foreground mt-1">{sub}</p>
                 </CardContent>
               </Card>
@@ -399,9 +399,9 @@ const ViewRecords = () => {
           {/* Search bar */}
           <Card>
             <CardContent className="pt-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full sm:max-w-2xl">
-                  <div className="relative flex-1 max-w-md">
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 flex-1 w-full lg:max-w-3xl">
+                  <div className="relative w-full sm:flex-1 sm:min-w-[200px] sm:max-w-md">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
                       placeholder="Search by name, policy number, occupation..."
@@ -411,7 +411,7 @@ const ViewRecords = () => {
                     />
                   </div>
                   <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger className="sm:w-56 shrink-0">
+                    <SelectTrigger className="w-full sm:w-56 shrink-0">
                       <SelectValue placeholder="All insurance types" />
                     </SelectTrigger>
                     <SelectContent>
@@ -426,7 +426,7 @@ const ViewRecords = () => {
                     variant="outline"
                     onClick={handleExportCsv}
                     disabled={filteredAndSortedRecords.length === 0}
-                    className="shrink-0"
+                    className="w-full sm:w-auto shrink-0"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Export CSV
@@ -435,13 +435,13 @@ const ViewRecords = () => {
                     variant="outline"
                     onClick={handleExportPdf}
                     disabled={filteredAndSortedRecords.length === 0}
-                    className="shrink-0"
+                    className="w-full sm:w-auto shrink-0"
                   >
                     <FileDown className="w-4 h-4 mr-2" />
                     Export PDF
                   </Button>
                 </div>
-                <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
                   <span>{t("totalRecords")}: <Badge variant="secondary">{records.length}</Badge></span>
                   <span>{t("filteredRecords")}: <Badge variant="outline">{filteredAndSortedRecords.length}</Badge></span>
                 </div>
@@ -488,7 +488,114 @@ const ViewRecords = () => {
                   )}
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <>
+                  {/* Mobile & tablet: stacked cards (no horizontal scrolling) */}
+                  <div className="lg:hidden p-4 space-y-3 bg-muted/20">
+                    {filteredAndSortedRecords.map((record, idx) => (
+                      <div
+                        key={record.recordId || record._id || record.id}
+                        className="rounded-xl border border-border bg-background p-4 space-y-4 hover:border-primary/30 hover:shadow-sm transition-all"
+                      >
+                        {/* Header: avatar, name, type + policy number */}
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className={`w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ring-2 ring-background shadow-sm ${avatarColor(record.name)}`}>
+                              {initials(record.name)}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-semibold text-form-header truncate leading-tight">{record.name}</p>
+                              <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                                <Badge variant="outline" className="text-[11px] font-normal">
+                                  {recordTypeLabel(record)}
+                                </Badge>
+                                <Badge variant="outline" className="font-mono text-[11px]">
+                                  {record.currentPolicy.policyNumber || "N/A"}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          <span className="font-mono text-[11px] text-muted-foreground/70 shrink-0 pt-0.5">
+                            #{String(idx + 1).padStart(3, "0")}
+                          </span>
+                        </div>
+
+                        {/* Sum assured — the number an agent scans for first */}
+                        <div className="flex items-center justify-between rounded-lg bg-emerald-50 dark:bg-emerald-950/30 px-3 py-2">
+                          <span className="text-xs font-medium text-emerald-800 dark:text-emerald-400/90 flex items-center gap-1.5">
+                            <IndianRupee className="w-3.5 h-3.5" />
+                            Sum Assured
+                          </span>
+                          <span className="text-base font-semibold text-emerald-700 dark:text-emerald-400">
+                            ₹{record.currentPolicy.sumAssured || "0"}
+                          </span>
+                        </div>
+
+                        {/* Details grid */}
+                        <div className="grid grid-cols-2 gap-x-3 gap-y-3 text-sm border-t border-border/60 pt-4">
+                          <div>
+                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Father's Name</p>
+                            <p className="mt-0.5 truncate text-form-header">{record.fatherName || "-"}</p>
+                          </div>
+                          <div>
+                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Age</p>
+                            <p className="mt-0.5 text-form-header">{record.age || "-"}</p>
+                          </div>
+                          <div>
+                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Branch</p>
+                            <p className="mt-0.5 truncate text-form-header">{record.currentPolicy.branch || "-"}</p>
+                          </div>
+                          <div>
+                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Created</p>
+                            <p className="mt-0.5 text-form-header">{convertDateToIndianFormat(record.createdAt)}</p>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center justify-end gap-2 border-t border-border/60 pt-3">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleViewRecord(record)}
+                            className="h-9 w-9 p-0"
+                            title="View Record"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEditRecord(record)}
+                            className={`h-9 w-9 p-0 ${isReadOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                            title={isReadOnly ? "Edit disabled — subscription expired" : "Edit Record"}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleContactRecord(record)}
+                            className="h-9 w-9 p-0"
+                            title="Contact"
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeleteRecord(record.recordId ?? record._id ?? record.id)}
+                            disabled
+                            className="h-9 w-9 p-0 opacity-50 cursor-not-allowed"
+                            title="Delete Record (Disabled)"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop: table */}
+                  <div className="hidden lg:block overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
@@ -592,7 +699,8 @@ const ViewRecords = () => {
                       ))}
                     </TableBody>
                   </Table>
-                </div>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

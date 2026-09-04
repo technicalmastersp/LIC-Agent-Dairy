@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, MapPin, Globe, Compass, Link2, Sparkles, Building2 } from "lucide-react";
+import { Mail, MapPin, Globe, Compass, Link2, Sparkles, Building2, Calculator } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { isAuthenticated } from "@/utils/auth";
 import siteConfig from "@/config/siteConfig";
@@ -63,6 +63,18 @@ const Footer = () => {
     // { label: t("referral"), to: "/referral-program" },
   ];
 
+  // Free financial calculators from ToolsHub.tsx — public, so shown
+  // regardless of auth state, same as the hub page itself.
+  const toolLinks: FooterLink[] = [
+    { label: "All Tools",                    to: "/tools" },
+    { label: "Age Calculator",               to: "/tools/age-calculator" },
+    { label: "SIP Calculator",                to: "/tools/sip-calculator" },
+    { label: "Income Tax Calculator",         to: "/tools/income-tax-calculator" },
+    { label: "Home Loan EMI Calculator",      to: "/tools/home-loan-emi-calculator" },
+    { label: "Term Insurance Calculator",     to: "/tools/term-insurance-calculator" },
+    { label: "Inflation Calculator",          to: "/tools/inflation-calculator" },
+  ];
+
   const features = [
     t("securePolicyManagement"),
     t("multiLanguageSupport"),
@@ -77,8 +89,9 @@ const Footer = () => {
   return (
     <footer className="bg-primary text-primary-foreground mt-auto">
       <div className="container mx-auto px-4 py-10">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-10">
           <FooterSection title={t("quickLinks")} icon={Compass} links={quickLinks} />
+          <FooterSection title="Tools" icon={Calculator} links={toolLinks} />
           <FooterSection title={t("otherLinks")} icon={Link2} links={otherLinks} />
 
           <FooterSection title={t("contactInfo")} icon={MapPin}>
