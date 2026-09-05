@@ -15,7 +15,7 @@ import ContactActionModal from "@/components/ContactActionModal";
 import {
   Search, Eye, Trash2, ArrowUpDown, Plus, Edit,
   FileText, IndianRupee, CalendarPlus, FolderOpen, ShieldCheck, Lock,
-  Download, FileDown, MessageSquare
+  Download, FileDown, MessageSquare, FileUp
 } from "lucide-react";
 import { getCurrentUser } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -422,6 +422,14 @@ const ViewRecords = () => {
                       <SelectItem value="Other">Other (Custom)</SelectItem>
                     </SelectContent>
                   </Select>
+                  <Button
+                    variant="destructive"
+                    onClick={() => navigate("/import-records")}
+                    className="w-full sm:w-auto shrink-0"
+                  >
+                    <FileUp className="w-4 h-4 mr-2" />
+                    Import from Excel
+                  </Button>
                   <Button
                     variant="outline"
                     onClick={handleExportCsv}

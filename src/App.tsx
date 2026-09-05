@@ -24,6 +24,7 @@ import Login from "./pages/Login";
 // now becomes its own chunk, fetched only when its route is visited.
 const Home = lazy(() => import("./pages/Home"));
 const AddRecord = lazy(() => import("./pages/AddRecord"));
+const ImportRecords = lazy(() => import("./pages/ImportRecords"));
 const ViewRecords = lazy(() => import("./pages/ViewRecords"));
 const CurrentMonthDue = lazy(() => import("./pages/CurrentMonthDue"));
 const UpcomingDuePolicies = lazy(() => import("./pages/UpcomingDuePolicies"));
@@ -97,6 +98,7 @@ const App = () => (
                   <Route path="/" element={<Landing />} />
                   <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                   <Route path="/add-record" element={<ProtectedRoute><AddRecord /></ProtectedRoute>} />
+                  <Route path="/import-records" element={<ProtectedRoute><ImportRecords /></ProtectedRoute>} />
                   <Route path="/view-records" element={<ProtectedRoute><ViewRecords /></ProtectedRoute>} />
                   <Route path="/view-due-policies" element={<ProtectedRoute><CurrentMonthDue /></ProtectedRoute>} />
                   <Route path="/view-upcoming-due" element={<ProtectedRoute><UpcomingDuePolicies /></ProtectedRoute>} />
