@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { VitePWA } from "vite-plugin-pwa";
+import siteConfig from "./src/config/siteConfig";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -51,6 +52,29 @@ export default defineConfig(({ mode }) => {
   },
   plugins: [
     react(),
+    {
+      // index.html is static HTML — Vite doesn't run it through React, so
+      // it can't import siteConfig.tsx directly. This keeps its <title>,
+      // meta description/author, and social-card tags in sync with
+      // siteConfig.tsx at build time instead of duplicating those values
+      // by hand in the HTML file (which is exactly how title/description/
+      // author/twitter:site each ended up with their own slightly
+      // different wording before this was added).
+      name: "inject-site-config",
+      transformIndexHtml(html: string) {
+        const socialImage = `${siteConfig.productionUrl}${siteConfig.logo_social}`;
+        return html
+          .replace(/<title>.*?<\/title>/, `<title>${siteConfig.title}</title>`)
+          .replace(/(<meta name="description" content=")[^"]*(")/, `$1${siteConfig.description}$2`)
+          .replace(/(<meta name="author" content=")[^"]*(")/, `$1${siteConfig.companyName}$2`)
+          .replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${siteConfig.title}$2`)
+          .replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${siteConfig.description}$2`)
+          .replace(/(<meta property="og:image" content=")[^"]*(")/, `$1${socialImage}$2`)
+          .replace(/(<meta name="twitter:site" content=")[^"]*(")/, `$1${siteConfig.socialLinks.twitterHandle}$2`)
+          .replace(/(<meta name="twitter:image" content=")[^"]*(")/, `$1${socialImage}$2`)
+          .replace(/(<meta name="apple-mobile-web-app-title" content=")[^"]*(")/, `$1${siteConfig.shortTitle}$2`);
+      },
+    },
     // Emits dist/stats.html (gitignored, build-output only) with a
     // treemap of what's contributing to bundle size. Doesn't run in dev.
     visualizer({
@@ -70,9 +94,9 @@ export default defineConfig(({ mode }) => {
       // call needed anywhere in index.html or main.tsx.
       injectRegister: "auto",
       manifest: {
-        name: "Life Insurance Records",
-        short_name: "LIC Records",
-        description: "Professional life insurance policy record management system for agents and customers",
+        name: siteConfig.title,
+        short_name: siteConfig.shortTitle,
+        description: siteConfig.description,
         start_url: "/",
         scope: "/",
         display: "standalone",
