@@ -14,6 +14,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { createUser, checkReferralCode, getProfile } from "../../services/userService";
 import { getReferralConfig } from "../../services/configService";
@@ -58,6 +59,7 @@ const SignUp = () => {
       confirmPassword: "",
       selectedPlan: "",
       referralCode: "",
+      acceptTerms: false,
     },
   });
 
@@ -128,6 +130,7 @@ const SignUp = () => {
         createdAt: new Date().toISOString(),
         isActive: true,
         referredBy: formData.referralCode || undefined,
+        termsAccepted: formData.acceptTerms,
         subscription: selectedPlanData ? {
           planId: selectedPlanData.id,
           planType: selectedPlanData.planType,
@@ -572,6 +575,35 @@ const SignUp = () => {
                   </p>
                 )}
               </div>
+
+              <Controller
+                name="acceptTerms"
+                control={control}
+                render={({ field }) => (
+                  <div className="flex items-start gap-2.5">
+                    <Checkbox
+                      id="acceptTerms"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="mt-0.5"
+                    />
+                    <Label htmlFor="acceptTerms" className="text-sm font-normal leading-snug cursor-pointer">
+                      I have read and agree to the{" "}
+                      <Link to="/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        Terms & Conditions
+                      </Link>{" "}
+                      and{" "}
+                      <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        Privacy Policy
+                      </Link>
+                      <span className="text-[#ff0000]"> *</span>
+                    </Label>
+                  </div>
+                )}
+              />
+              {errors.acceptTerms && (
+                <p className="text-xs text-destructive">{errors.acceptTerms.message}</p>
+              )}
 
               {error && (
                 <Alert variant="destructive">
