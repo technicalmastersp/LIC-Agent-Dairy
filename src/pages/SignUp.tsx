@@ -205,7 +205,8 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
+    <main className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
+      <h1 className="sr-only">{t('signupTitle')}</h1>
       <div className="w-full max-w-2xl space-y-6">
         <div className="flex w-full items-center justify-between">
           <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate("/")}>
@@ -310,6 +311,7 @@ const SignUp = () => {
                       {...register("password")}
                     />
                     <button type="button" onClick={() => setShowNew(!showNew)}
+                      aria-label={showNew ? "Hide password" : "Show password"}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -350,6 +352,7 @@ const SignUp = () => {
                       {...register("confirmPassword")}
                     />
                     <button type="button" onClick={() => setShowConfirm(!showConfirm)}
+                      aria-label={showConfirm ? "Hide password" : "Show password"}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -571,11 +574,11 @@ const SignUp = () => {
                     />
                     <Label htmlFor="acceptTerms" className="text-sm font-normal leading-snug cursor-pointer">
                       I have read and agree to the{" "}
-                      <Link to="/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      <Link to="/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80">
                         Terms & Conditions
                       </Link>{" "}
                       and{" "}
-                      <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80">
                         Privacy Policy
                       </Link>
                       <span className="text-[#ff0000]"> *</span>
@@ -601,13 +604,13 @@ const SignUp = () => {
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
                 {t('alreadyHaveAccount')}{" "}
-                <Link to="/login" className="text-primary hover:underline">
+                <Link to="/login" className="text-primary underline underline-offset-2 hover:text-primary/80">
                   {t('login')}
                 </Link>
               </p>
               <p className="text-sm text-muted-foreground">
                 Explore &nbsp;  
-                <Link to="/our-plans" className="text-primary hover:underline">
+                <Link to="/our-plans" className="text-primary underline underline-offset-2 hover:text-primary/80">
                   Our Plans
                 </Link>
               </p>
@@ -615,7 +618,7 @@ const SignUp = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </main>
   );
 };
 
