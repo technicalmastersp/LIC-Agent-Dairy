@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { UserPlus, EyeOff, Eye, Check, Home, CheckCircle2, Circle } from "lucide-react";
+import { UserPlus, EyeOff, Eye, Check, Home, CheckCircle2, Circle, ShieldCheck, BellRing, Wallet } from "lucide-react";
 import type { SignUpRequest } from "@/types/pages/SignUp.types";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
@@ -208,42 +208,9 @@ const SignUp = () => {
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl space-y-6">
         <div className="flex w-full items-center justify-between">
-          <div 
-            className="
-              justify-center
-              whitespace-nowrap
-              text-sm
-              font-medium
-              cursor-pointer
-              ring-offset-background
-              transition-colors
-              focus-visible:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-ring
-              focus-visible:ring-offset-2
-              disabled:pointer-events-none
-              disabled:opacity-50
-              [&_svg]:pointer-events-none
-              [&_svg]:size-4
-              [&_svg]:shrink-0
-              border
-              border-input
-              bg-background
-              hover:bg-accent
-              hover:text-accent-foreground
-              h-9
-              rounded-md
-              px-3
-              flex
-              items-center
-              gap-2
-            "
-            onClick={()=>{
-              navigate("/");
-            }}
-          >
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate("/")}>
             <Home className="w-4 h-4" />Back to Home
-          </div>
+          </Button>
           <div className="flex">
             <LanguageSwitcher />
           </div>
@@ -258,6 +225,21 @@ const SignUp = () => {
             <CardDescription>
               {t('welcome')} Sir - {t('createAccount')}
             </CardDescription>
+            <div className="flex flex-wrap justify-center gap-2 pt-1">
+              {[
+                { icon: ShieldCheck, label: "Secure & backed up daily" },
+                { icon: BellRing, label: "Due-date reminders" },
+                { icon: Wallet, label: "Referral rewards" },
+              ].map(({ icon: Icon, label }) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium bg-muted text-muted-foreground px-3 py-1.5 rounded-full"
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {label}
+                </span>
+              ))}
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -458,7 +440,7 @@ const SignUp = () => {
                       disabled={!referralCodeValue || isValidReferralCode}
                       className={`whitespace-nowrap transition-colors ${
                         isValidReferralCode
-                          ? "bg-green-100 text-green-700 border-green-500 hover:bg-green-100"
+                          ? "bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-400 border-green-500 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-950/40"
                           : ""
                       }`}
                     >
@@ -558,8 +540,8 @@ const SignUp = () => {
               <div
                 className={`rounded-lg border p-3 text-sm ${
                   isValidReferralCode
-                    ? "border-green-300 bg-green-50 text-green-700"
-                    : "border-blue-200 bg-blue-50 text-blue-700"
+                    ? "border-green-300 dark:border-green-800 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400"
+                    : "border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400"
                 }`}
               >
                 {isValidReferralCode ? (
