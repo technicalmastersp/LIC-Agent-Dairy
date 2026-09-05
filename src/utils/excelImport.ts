@@ -102,6 +102,24 @@ export function normalizeDateCell(raw: unknown): string {
 const DATE_KEYS = new Set(["dateOfBirth", "lastPaymentDate"]);
 
 /**
+ * True calendar validity, not just "looks like YYYY-MM-DD". JS's Date
+ * constructor silently rolls invalid dates over (e.g. "2023-02-30"
+ * becomes March 2nd) rather than rejecting them — and a spreadsheet cell
+ * can contain literally any text, unlike AddRecord's native
+ * <input type="date">, which can't produce an invalid date in the first
+ * place. Without this check, a row like dateOfBirth "1485-06-83" would
+ * pass client-side validation and only fail server-side when Mongoose
+ * tries to cast it to a real Date.
+ */
+export function isValidCalendarDate(str: string): boolean {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str);
+  if (!match) return false;
+  const [, y, m, d] = match.map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
+}
+
+/**
  * Reads an uploaded workbook and returns sanitized row objects keyed by
  * IMPORT_COLUMNS' internal field names. Only the first worksheet is read.
  * Throws (with a user-facing message) on anything that isn't a readable

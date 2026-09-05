@@ -9,7 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
   FileUp, Download, CheckCircle2, AlertTriangle, ArrowLeft,
@@ -37,6 +40,7 @@ const ImportRecords = () => {
   const [excludedRows, setExcludedRows] = useState<Set<number>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [importedCount, setImportedCount] = useState(0);
+  const [pendingAction, setPendingAction] = useState<"back" | "startOver" | "cancel" | "import" | null>(null);
 
   // Re-validated on every edit — never trust that a row is still valid
   // just because it validated once, since the preview step lets every
@@ -145,13 +149,55 @@ const ImportRecords = () => {
     }
   };
 
+  const CONFIRM_COPY: Record<NonNullable<typeof pendingAction>, { title: string; description: string; confirmLabel: string }> = {
+    back: {
+      title: "Leave this page?",
+      description: "You'll lose the file you've reviewed so far — if it hasn't been saved yet.",
+      confirmLabel: "Leave",
+    },
+    startOver: {
+      title: "Start over?",
+      description: "This discards everything you've reviewed and edited on this file. You'll need to re-upload it.",
+      confirmLabel: "Start over",
+    },
+    cancel: {
+      title: "Cancel this import?",
+      description: "This discards everything you've reviewed and edited on this file. Nothing will be saved.",
+      confirmLabel: "Discard",
+    },
+    import: {
+      title: `Import ${validCount} record${validCount === 1 ? "" : "s"}?`,
+      description: "This adds them to your policy records right away. Excluded and error rows will be skipped.",
+      confirmLabel: "Import",
+    },
+  };
+
+  const runConfirmedAction = () => {
+    const action = pendingAction;
+    setPendingAction(null);
+    if (action === "back") navigate("/view-records");
+    else if (action === "startOver" || action === "cancel") resetToUpload();
+    else if (action === "import") handleImport();
+  };
+
+  // Nothing at stake yet on a fresh visit — skip the confirmation rather
+  // than asking someone to confirm leaving a page they haven't touched.
+  const confirmOrRun = (action: NonNullable<typeof pendingAction>) => {
+    if ((action === "back" || action === "startOver" || action === "cancel") && rows.length === 0) {
+      if (action === "back") navigate("/view-records");
+      else resetToUpload();
+      return;
+    }
+    setPendingAction(action);
+  };
+
   return (
     <main className="min-h-screen bg-background flex flex-col">
       <Navigation />
 
       <div className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex items-center justify-between mb-6">
-          <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate("/view-records")}>
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => confirmOrRun("back")}>
             <ArrowLeft className="w-4 h-4" />
             Back to Records
           </Button>
@@ -236,7 +282,7 @@ const ImportRecords = () => {
                       <Badge variant="outline" className="text-sm">{excludedRows.size} excluded</Badge>
                     )}
                   </div>
-                  <Button variant="ghost" size="sm" onClick={resetToUpload}>
+                  <Button variant="ghost" size="sm" onClick={() => confirmOrRun("startOver")}>
                     Start over
                   </Button>
                 </div>
@@ -274,35 +320,41 @@ const ImportRecords = () => {
                             <TableCell className="border border-table-border">
                               <Checkbox checked={!excluded} onCheckedChange={() => toggleExcluded(row._rowNumber)} />
                             </TableCell>
-                            <TableCell className="border border-table-border">
+                            <TableCell className="border border-table-border align-top">
                               {validation?.valid ? (
                                 <Badge className="bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 text-xs">
                                   Ready
                                 </Badge>
                               ) : (
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <Badge variant="destructive" className="text-xs cursor-pointer">
-                                      {validation?.errors.length} error{validation && validation.errors.length > 1 ? "s" : ""}
-                                    </Badge>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-72 text-sm">
-                                    <ul className="list-disc pl-4 space-y-1">
-                                      {validation?.errors.map((msg, i) => <li key={i}>{msg}</li>)}
-                                    </ul>
-                                  </PopoverContent>
-                                </Popover>
+                                <div className="space-y-1">
+                                  <Badge variant="destructive" className="text-xs">
+                                    {validation?.errors.length} error{validation && validation.errors.length > 1 ? "s" : ""}
+                                  </Badge>
+                                  <ul className="text-xs text-destructive space-y-0.5 max-w-[220px]">
+                                    {validation?.errors.map((msg, i) => (
+                                      <li key={i}>{msg}</li>
+                                    ))}
+                                  </ul>
+                                </div>
                               )}
                             </TableCell>
-                            {IMPORT_COLUMNS.map((col) => (
-                              <TableCell key={col.key} className="border border-table-border p-1">
-                                <Input
-                                  value={row[col.key] ?? ""}
-                                  onChange={(e) => updateCell(row._rowNumber, col.key, e.target.value)}
-                                  className="h-8 min-w-[140px] border-transparent bg-transparent focus-visible:border-input focus-visible:bg-background"
-                                />
-                              </TableCell>
-                            ))}
+                            {IMPORT_COLUMNS.map((col) => {
+                              const fieldError = validation?.fieldErrors[col.key];
+                              return (
+                                <TableCell key={col.key} className="border border-table-border p-1">
+                                  <Input
+                                    value={row[col.key] ?? ""}
+                                    onChange={(e) => updateCell(row._rowNumber, col.key, e.target.value)}
+                                    title={fieldError}
+                                    className={`h-8 min-w-[140px] bg-transparent focus-visible:bg-background ${
+                                      fieldError
+                                        ? "border-destructive focus-visible:border-destructive"
+                                        : "border-transparent focus-visible:border-input"
+                                    }`}
+                                  />
+                                </TableCell>
+                              );
+                            })}
                           </TableRow>
                         );
                       })}
@@ -313,10 +365,10 @@ const ImportRecords = () => {
             </Card>
 
             <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={resetToUpload} disabled={isSubmitting}>
+              <Button variant="outline" onClick={() => confirmOrRun("cancel")} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button onClick={handleImport} disabled={isSubmitting || validCount === 0} className="gap-2">
+              <Button onClick={() => confirmOrRun("import")} disabled={isSubmitting || validCount === 0} className="gap-2">
                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                 {isSubmitting ? "Importing…" : `Import ${validCount} record${validCount === 1 ? "" : "s"}`}
               </Button>
@@ -351,6 +403,25 @@ const ImportRecords = () => {
           </Card>
         )}
       </div>
+
+      <AlertDialog open={!!pendingAction} onOpenChange={(open) => !open && setPendingAction(null)}>
+        <AlertDialogContent>
+          {pendingAction && (
+            <>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{CONFIRM_COPY[pendingAction].title}</AlertDialogTitle>
+                <AlertDialogDescription>{CONFIRM_COPY[pendingAction].description}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Go back</AlertDialogCancel>
+                <AlertDialogAction onClick={runConfirmedAction}>
+                  {CONFIRM_COPY[pendingAction].confirmLabel}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </>
+          )}
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Footer />
     </main>

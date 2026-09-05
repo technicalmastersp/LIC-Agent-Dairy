@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { policyRecordSchema } from "./policyRecordSchema";
-import { VALID_INSURANCE_TYPES, type ImportRow } from "@/utils/excelImport";
+import { VALID_INSURANCE_TYPES, IMPORT_COLUMNS, isValidCalendarDate, type ImportRow } from "@/utils/excelImport";
 
 // Fields policyRecordSchema requires that the Excel import template
 // doesn't collect (family/nominee/bank/employment details — deliberately
@@ -34,13 +34,16 @@ const currentPolicySchema = z.object({
 export interface ImportRowValidation {
   valid: boolean;
   errors: string[];
+  /** field key -> message, so the UI can point at exactly which cell is wrong,
+   * not just say "1 error" somewhere on the row. */
+  fieldErrors: Record<string, string>;
 }
 
 /** Validates one parsed spreadsheet row against the same rules AddRecord
  * uses for personal fields, plus the extra current-policy/insurance-type
  * fields the import template adds on top. */
 export function validateImportRow(row: ImportRow): ImportRowValidation {
-  const errors: string[] = [];
+  const fieldErrors: Record<string, string> = {};
 
   const { _rowNumber, ...rowFields } = row;
   const fullPersonal: Record<string, string> = { ...rowFields, date: new Date().toISOString() };
@@ -48,7 +51,16 @@ export function validateImportRow(row: ImportRow): ImportRowValidation {
 
   const personalResult = policyRecordSchema.safeParse(fullPersonal);
   if (!personalResult.success) {
-    for (const issue of personalResult.error.issues) errors.push(issue.message);
+    for (const issue of personalResult.error.issues) {
+      const field = String(issue.path[0] ?? "name");
+      // Only surface errors for fields the import template actually has a
+      // column for — the ones we defaulted to "" above should never fail
+      // (they're all optional), but if schema rules ever change, don't
+      // point the user at a column that isn't on screen.
+      if (IMPORT_COLUMNS.some((c) => c.key === field) && !fieldErrors[field]) {
+        fieldErrors[field] = issue.message;
+      }
+    }
   }
 
   const policyResult = currentPolicySchema.safeParse({
@@ -60,13 +72,28 @@ export function validateImportRow(row: ImportRow): ImportRowValidation {
     lastPaymentDate: row.lastPaymentDate || "",
   });
   if (!policyResult.success) {
-    for (const issue of policyResult.error.issues) errors.push(issue.message);
+    for (const issue of policyResult.error.issues) {
+      const field = String(issue.path[0] ?? "policyNumber");
+      if (!fieldErrors[field]) fieldErrors[field] = issue.message;
+    }
   }
 
   const insuranceType = (row.insuranceType || "Life Insurance").trim();
   if (!VALID_INSURANCE_TYPES.includes(insuranceType)) {
-    errors.push(`Insurance Type must be one of: ${VALID_INSURANCE_TYPES.join(", ")}`);
+    fieldErrors.insuranceType = `Must be one of: ${VALID_INSURANCE_TYPES.join(", ")}`;
   }
 
-  return { valid: errors.length === 0, errors };
+  // policyRecordSchema/currentPolicySchema only check these are strings —
+  // neither confirms the date actually exists on a calendar. A structurally
+  // fine but nonsensical value like "1485-06-83" would otherwise sail
+  // through here and only fail once it reaches Mongoose server-side.
+  if (row.dateOfBirth && !isValidCalendarDate(row.dateOfBirth) && !fieldErrors.dateOfBirth) {
+    fieldErrors.dateOfBirth = "Not a valid date.";
+  }
+  if (row.lastPaymentDate && !isValidCalendarDate(row.lastPaymentDate) && !fieldErrors.lastPaymentDate) {
+    fieldErrors.lastPaymentDate = "Not a valid date.";
+  }
+
+  const errors = Object.values(fieldErrors);
+  return { valid: errors.length === 0, errors, fieldErrors };
 }
