@@ -428,7 +428,7 @@ const ViewRecords = () => {
                     className="w-full sm:w-auto shrink-0"
                   >
                     <FileUp className="w-4 h-4 mr-2" />
-                    Import from Excel
+                    Import Records
                   </Button>
                   <Button
                     variant="outline"

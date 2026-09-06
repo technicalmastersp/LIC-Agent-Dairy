@@ -1,5 +1,7 @@
 // Client-side Excel import for policy records — ViewRecords.tsx's
-// "Import from Excel" button leads here via ImportRecords.tsx.
+// "Import Records" button leads here via ImportRecords.tsx. Accepts
+// .xlsx, .xls, and .csv — SheetJS's read() auto-detects format from the
+// file content, so CSV needs no separate parsing path.
 //
 // Parsing happens entirely in the browser (SheetJS/`xlsx`), not on the
 // server. An .xlsx file is a zip archive of XML internals, and parsing
@@ -130,10 +132,10 @@ export async function parseExcelFile(file: File): Promise<ImportRow[]> {
     throw new Error(`File is too large. Please keep it under ${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB.`);
   }
 
-  const validExtensions = [".xlsx", ".xls"];
+  const validExtensions = [".xlsx", ".xls", ".csv"];
   const hasValidExtension = validExtensions.some((ext) => file.name.toLowerCase().endsWith(ext));
   if (!hasValidExtension) {
-    throw new Error("Please upload a .xlsx or .xls file.");
+    throw new Error("Please upload a .xlsx, .xls, or .csv file.");
   }
 
   // Dynamically imported so the (fairly large) SheetJS bundle only loads
