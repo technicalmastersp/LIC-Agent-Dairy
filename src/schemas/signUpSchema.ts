@@ -37,6 +37,10 @@ export const signUpSchema = z
     // before. An unvalidated-but-non-empty code is still blocked at
     // submit time in SignUp.tsx, same as the original manual check.
     referralCode: z.string().trim().max(7, "Referral codes are at most 7 characters").optional(),
+
+    acceptTerms: z.boolean().refine((val) => val === true, {
+      message: "You must accept the Terms & Conditions and Privacy Policy to create an account",
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

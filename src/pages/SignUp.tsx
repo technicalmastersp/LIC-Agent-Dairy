@@ -8,12 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { UserPlus, EyeOff, Eye, Check, Home, CheckCircle2, Circle } from "lucide-react";
+import { UserPlus, EyeOff, Eye, Check, Home, CheckCircle2, Circle, ShieldCheck, BellRing, Wallet } from "lucide-react";
 import type { SignUpRequest } from "@/types/pages/SignUp.types";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { createUser, checkReferralCode, getProfile } from "../../services/userService";
 import { getReferralConfig } from "../../services/configService";
@@ -58,6 +59,7 @@ const SignUp = () => {
       confirmPassword: "",
       selectedPlan: "",
       referralCode: "",
+      acceptTerms: false,
     },
   });
 
@@ -128,6 +130,7 @@ const SignUp = () => {
         createdAt: new Date().toISOString(),
         isActive: true,
         referredBy: formData.referralCode || undefined,
+        termsAccepted: formData.acceptTerms,
         subscription: selectedPlanData ? {
           planId: selectedPlanData.id,
           planType: selectedPlanData.planType,
@@ -202,45 +205,13 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
+    <main className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
+      <h1 className="sr-only">{t('signupTitle')}</h1>
       <div className="w-full max-w-2xl space-y-6">
         <div className="flex w-full items-center justify-between">
-          <div 
-            className="
-              justify-center
-              whitespace-nowrap
-              text-sm
-              font-medium
-              cursor-pointer
-              ring-offset-background
-              transition-colors
-              focus-visible:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-ring
-              focus-visible:ring-offset-2
-              disabled:pointer-events-none
-              disabled:opacity-50
-              [&_svg]:pointer-events-none
-              [&_svg]:size-4
-              [&_svg]:shrink-0
-              border
-              border-input
-              bg-background
-              hover:bg-accent
-              hover:text-accent-foreground
-              h-9
-              rounded-md
-              px-3
-              flex
-              items-center
-              gap-2
-            "
-            onClick={()=>{
-              navigate("/");
-            }}
-          >
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate("/")}>
             <Home className="w-4 h-4" />Back to Home
-          </div>
+          </Button>
           <div className="flex">
             <LanguageSwitcher />
           </div>
@@ -255,6 +226,21 @@ const SignUp = () => {
             <CardDescription>
               {t('welcome')} Sir - {t('createAccount')}
             </CardDescription>
+            <div className="flex flex-wrap justify-center gap-2 pt-1">
+              {[
+                { icon: ShieldCheck, label: "Secure & backed up daily" },
+                { icon: BellRing, label: "Due-date reminders" },
+                { icon: Wallet, label: "Referral rewards" },
+              ].map(({ icon: Icon, label }) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium bg-muted text-muted-foreground px-3 py-1.5 rounded-full"
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {label}
+                </span>
+              ))}
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -325,6 +311,7 @@ const SignUp = () => {
                       {...register("password")}
                     />
                     <button type="button" onClick={() => setShowNew(!showNew)}
+                      aria-label={showNew ? "Hide password" : "Show password"}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -365,6 +352,7 @@ const SignUp = () => {
                       {...register("confirmPassword")}
                     />
                     <button type="button" onClick={() => setShowConfirm(!showConfirm)}
+                      aria-label={showConfirm ? "Hide password" : "Show password"}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -455,7 +443,7 @@ const SignUp = () => {
                       disabled={!referralCodeValue || isValidReferralCode}
                       className={`whitespace-nowrap transition-colors ${
                         isValidReferralCode
-                          ? "bg-green-100 text-green-700 border-green-500 hover:bg-green-100"
+                          ? "bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-400 border-green-500 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-950/40"
                           : ""
                       }`}
                     >
@@ -555,8 +543,8 @@ const SignUp = () => {
               <div
                 className={`rounded-lg border p-3 text-sm ${
                   isValidReferralCode
-                    ? "border-green-300 bg-green-50 text-green-700"
-                    : "border-blue-200 bg-blue-50 text-blue-700"
+                    ? "border-green-300 dark:border-green-800 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400"
+                    : "border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400"
                 }`}
               >
                 {isValidReferralCode ? (
@@ -573,6 +561,35 @@ const SignUp = () => {
                 )}
               </div>
 
+              <Controller
+                name="acceptTerms"
+                control={control}
+                render={({ field }) => (
+                  <div className="flex items-start gap-2.5">
+                    <Checkbox
+                      id="acceptTerms"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="mt-0.5"
+                    />
+                    <Label htmlFor="acceptTerms" className="text-sm font-normal leading-snug cursor-pointer">
+                      I have read and agree to the{" "}
+                      <Link to="/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80">
+                        Terms & Conditions
+                      </Link>{" "}
+                      and{" "}
+                      <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80">
+                        Privacy Policy
+                      </Link>
+                      <span className="text-[#ff0000]"> *</span>
+                    </Label>
+                  </div>
+                )}
+              />
+              {errors.acceptTerms && (
+                <p className="text-xs text-destructive">{errors.acceptTerms.message}</p>
+              )}
+
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
@@ -587,13 +604,13 @@ const SignUp = () => {
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
                 {t('alreadyHaveAccount')}{" "}
-                <Link to="/login" className="text-primary hover:underline">
+                <Link to="/login" className="text-primary underline underline-offset-2 hover:text-primary/80">
                   {t('login')}
                 </Link>
               </p>
               <p className="text-sm text-muted-foreground">
                 Explore &nbsp;  
-                <Link to="/our-plans" className="text-primary hover:underline">
+                <Link to="/our-plans" className="text-primary underline underline-offset-2 hover:text-primary/80">
                   Our Plans
                 </Link>
               </p>
@@ -601,7 +618,7 @@ const SignUp = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </main>
   );
 };
 

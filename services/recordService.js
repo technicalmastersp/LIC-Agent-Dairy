@@ -10,6 +10,11 @@ export const createRecord = async (data) => {
   }
 };
 
+export const createRecordsBulk = async (records) => {
+  const res = await apiClient.post('/user/createHugeNewRecord', records);
+  return res.data;
+};
+
 export const getAllRecords = async () => {
   try {
     const res = await apiClient.post('/user/getAllPolicyRecords', {page: "all", limit: "all"});
