@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getActivityLogs } from "../../../services/adminService";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ActivityLog, Pagination } from "@/types/pages/admin/AdminLogs.types";
+import { formatISTDateTime as fmt } from "@/utils/dateFormat";
 
 const ACTION_COLORS: Record<string, string> = {
   WITHDRAWAL_APPROVED: "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
@@ -30,12 +31,7 @@ const ACTION_COLORS: Record<string, string> = {
 
 const ACTIONS = Object.keys(ACTION_COLORS);
 
-const fmt = (d?: string) => d
-  ? new Date(d).toLocaleString("en-IN", {
-      day:"2-digit", month:"short", year:"numeric",
-      hour:"2-digit", minute:"2-digit"
-    })
-  : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 const AdminLogs = () => {
   const [logs,       setLogs]       = useState<ActivityLog[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);

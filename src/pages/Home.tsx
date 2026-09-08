@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { getReferralDashboard } from "../../services/referralService";
 import type { MonthlyTrendPoint, ReferralDashboardData } from "@/types/pages/Home.types";
+import { formatISTDate as fmt, formatISTFullDate } from "@/utils/dateFormat";
 
 const getGreeting = () => {
   const h = new Date().getHours();
@@ -27,8 +28,7 @@ const getGreeting = () => {
   return "Good evening";
 };
 
-const fmt = (d?: string) =>
-  d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 const Home = () => {
   const navigate      = useNavigate();
   const { t }         = useLanguage();
@@ -198,7 +198,7 @@ const Home = () => {
               {getGreeting()}, {currentUser.name}
             </h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              {new Date().toLocaleDateString("en-IN", { weekday:"long", day:"2-digit", month:"long", year:"numeric" })}
+              {formatISTFullDate()}
               {sub && ` · ${sub.planType} plan · ${daysLeft} days left`}
             </p>
           </div>

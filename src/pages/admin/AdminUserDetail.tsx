@@ -16,10 +16,9 @@ import type { Record as PolicyRecord } from "@/types/Record";
 import { ArrowLeft, Trash2, RefreshCw, Eye, LogOut, Building2, Smartphone, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { AdminUserDetailData } from "@/types/pages/admin/AdminUserDetail.types";
+import { formatISTDate as fmt } from "@/utils/dateFormat";
 
-const fmt = (d?: string) => d
-  ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })
-  : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();

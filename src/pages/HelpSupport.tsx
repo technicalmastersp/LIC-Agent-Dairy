@@ -29,6 +29,7 @@ import { createTicket, getMyTickets } from "../../services/supportService";
 import { createSuggestion, getMySuggestions } from "../../services/suggestionService";
 import axios from "axios";
 import type { Ticket, Suggestion, FaqItem } from "@/types/pages/HelpSupport.types";
+import { formatISTDate as fmt } from "@/utils/dateFormat";
 const faqs: FaqItem[] = [
   { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. You can move between the Free trial, Starter, Basic, Standard, and Premium plans — checkout runs through Razorpay, and any referral wallet balance you have is applied automatically where it covers the cost." },
   { category: "Account & Billing", q: "What happens when my plan expires?", a: "Your records stay safe and backed up, but you'll need to renew to add new records or access due/missed payment tracking again." },
@@ -75,9 +76,7 @@ const suggestionStatusStyle: Record<string, string> = {
   declined:     "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border",
 };
 
-const fmt = (d?: string) => d
-  ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-  : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 
 const HelpSupport = () => {
   const { toast } = useToast();

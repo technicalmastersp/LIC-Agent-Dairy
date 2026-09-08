@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValidCalendarDate } from "@/utils/dateFormat";
 
 // Shared by AddRecord.tsx and EditRecordModal.tsx — both create/edit the
 // same policy-record shape. Captures the one hard rule that existed before
@@ -28,7 +29,7 @@ export const policyRecordSchema = z.object({
   motherName: z.string().max(200),
   spouseName: z.string().max(200),
   address: z.string().max(500),
-  dateOfBirth: z.string(),
+  dateOfBirth: z.string().refine((v) => v === "" || isValidCalendarDate(v), "Date of birth is not a valid date"),
   age: z.string().max(10),
   occupation: z.string().max(200),
   educationalQualification: z.string().max(200),
@@ -40,7 +41,7 @@ export const policyRecordSchema = z.object({
   nameOfNominee: z.string().max(200),
   ageOfNominee: z.string().max(10),
   relationName: z.string().max(100),
-  lastChildBirthDate: z.string(),
+  lastChildBirthDate: z.string().refine((v) => v === "" || isValidCalendarDate(v), "Last child's birth date is not a valid date"),
   height: z.string().max(20),
   weight: z.string().max(20),
   bankAccountNumber: z.string().max(30),

@@ -26,6 +26,7 @@ import { policyRecordSchema } from "@/schemas/policyRecordSchema";
 import type { PolicyRecordFormValues } from "@/types/schemas/policyRecordSchema.types";
 import type { Record as RecordData } from "@/types/Record";
 import type { EditRecordModalProps } from "@/types/components/EditRecordModal.types";
+import { isValidCalendarDate } from "@/utils/dateFormat";
 // Small section header used across the form cards — a plain sequential
 // step number (Step 1 – Step 8) through the whole form, matching AddRecord.
 const SectionTitle = ({ icon: Icon, step, children }: { icon: LucideIcon; step?: string; children: React.ReactNode }) => (
@@ -233,6 +234,17 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
         description: "Please enter a name for this custom insurance type",
         variant: "destructive",
       });
+      return;
+    }
+
+    // currentPolicy/previousPolicy are plain state, not part of the zod
+    // schema — validate their date fields the same way.
+    if (currentPolicy.lastPaymentDate && !isValidCalendarDate(currentPolicy.lastPaymentDate)) {
+      toast({ title: "Error", description: "Current policy's last payment date is not a valid date", variant: "destructive" });
+      return;
+    }
+    if (previousPolicy.lastPaymentDate && !isValidCalendarDate(previousPolicy.lastPaymentDate)) {
+      toast({ title: "Error", description: "Previous policy's last payment date is not a valid date", variant: "destructive" });
       return;
     }
 

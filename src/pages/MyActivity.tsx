@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getMyActivity } from "../../services/userService";
 import { ChevronLeft, ChevronRight, History } from "lucide-react";
 import type { ActivityLog, Pagination } from "@/types/pages/MyActivity.types";
+import { formatISTDateTime as fmt } from "@/utils/dateFormat";
 
 // Same palette AdminLogs.tsx uses, plus the self-service actions this
 // page can now show (PASSWORD_CHANGED, PROFILE_UPDATED, RECORD_*) that
@@ -26,12 +27,7 @@ const ACTION_COLORS: Record<string, string> = {
   FORCE_LOGOUT:          "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400",
 };
 
-const fmt = (d?: string) => d
-  ? new Date(d).toLocaleString("en-IN", {
-      day: "2-digit", month: "short", year: "numeric",
-      hour: "2-digit", minute: "2-digit"
-    })
-  : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 
 // Turns e.g. { fields: ["name","email"] } into "name, email" for a short,
 // readable one-liner instead of raw JSON — most entries here are simple

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { ActivityLogItem, RecentUserItem, DashboardStats } from "@/types/pages/admin/AdminDashboard.types";
+import { formatISTDate as fmt, formatISTDateTime as fmtTime } from "@/utils/dateFormat";
 
 const ACTION_COLORS: Record<string, string> = {
   WITHDRAWAL_APPROVED:       "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
@@ -41,16 +42,7 @@ const PLAN_COLOR: Record<string, string> = {
   "24months":    "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
 };
 
-const fmt = (d?: string) => d
-  ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short" })
-  : "—";
-
-const fmtTime = (d?: string) => d
-  ? new Date(d).toLocaleString("en-IN", {
-      day:"2-digit", month:"short",
-      hour:"2-digit", minute:"2-digit"
-    })
-  : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`/`fmtTime`)
 const AdminDashboard = () => {
   const [permissions, setPermissions] = useState<Record<string, boolean> | null>(null);
   const { toast }   = useToast();

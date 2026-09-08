@@ -1,3 +1,5 @@
+import { toDateInputValue } from "./dateFormat";
+
 // Client-side Excel import for policy records — ViewRecords.tsx's
 // "Import Records" button leads here via ImportRecords.tsx. Accepts
 // .xlsx, .xls, and .csv — SheetJS's read() auto-detects format from the
@@ -82,11 +84,14 @@ export function normalizeDateCell(raw: unknown): string {
   if (raw === null || raw === undefined || raw === "") return "";
 
   if (raw instanceof Date && !isNaN(raw.getTime())) {
-    return raw.toISOString().slice(0, 10);
+    return toDateInputValue(raw);
   }
 
   if (typeof raw === "number" && isFinite(raw)) {
-    // Excel serial date: days since 1899-12-30.
+    // Excel serial date: a pure day-count with no inherent timezone of its
+    // own, so constructing and reading it both via UTC (as below) is
+    // self-consistent — unlike the branches above/below, there's no
+    // local-vs-UTC mismatch risk here.
     const epoch = new Date(Date.UTC(1899, 11, 30));
     const ms = raw * 24 * 60 * 60 * 1000;
     const d = new Date(epoch.getTime() + ms);
@@ -96,30 +101,19 @@ export function normalizeDateCell(raw: unknown): string {
   const str = sanitizeCellValue(raw);
   const parsed = new Date(str);
   if (str && !isNaN(parsed.getTime())) {
-    return parsed.toISOString().slice(0, 10);
+    return toDateInputValue(parsed);
   }
   return str; // leave as-is (unparseable) — row-level validation will flag it
 }
 
 const DATE_KEYS = new Set(["dateOfBirth", "lastPaymentDate"]);
 
-/**
- * True calendar validity, not just "looks like YYYY-MM-DD". JS's Date
- * constructor silently rolls invalid dates over (e.g. "2023-02-30"
- * becomes March 2nd) rather than rejecting them — and a spreadsheet cell
- * can contain literally any text, unlike AddRecord's native
- * <input type="date">, which can't produce an invalid date in the first
- * place. Without this check, a row like dateOfBirth "1485-06-83" would
- * pass client-side validation and only fail server-side when Mongoose
- * tries to cast it to a real Date.
- */
-export function isValidCalendarDate(str: string): boolean {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str);
-  if (!match) return false;
-  const [, y, m, d] = match.map(Number);
-  const date = new Date(Date.UTC(y, m - 1, d));
-  return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
-}
+// Re-exported so importRecordSchema.ts's existing `from "@/utils/excelImport"`
+// import keeps working — the real, single definition now lives in
+// dateFormat.ts (it's a general-purpose check, not Excel-import-specific,
+// and is also used directly by AddRecord.tsx/EditRecordModal.tsx/
+// policyRecordSchema.ts for the manual add/edit forms).
+export { isValidCalendarDate } from "./dateFormat";
 
 /**
  * Reads an uploaded workbook and returns sanitized row objects keyed by

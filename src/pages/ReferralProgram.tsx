@@ -25,6 +25,7 @@ import {
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
 import { getReferralConfig } from "../../services/configService";
 import type { Dashboard, WithdrawalRowProps, ReferralRowProps } from "@/types/pages/ReferralProgram.types";
+import { formatISTDate as fmt } from "@/utils/dateFormat";
 
 // ── types ─────────────────────────────────────────────────────────────────────
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -86,10 +87,7 @@ const withdrawStatusStyle: Record<string, string> = {
   failed:    "bg-red-100 text-red-700 border border-red-200",
 };
 
-const fmt = (date?: string) =>
-  date
-    ? new Date(date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-    : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 
 const initials = (name: string) =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();

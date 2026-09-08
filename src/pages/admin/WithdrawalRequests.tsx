@@ -11,6 +11,7 @@ import { getWithdrawals, approveWithdrawal, rejectWithdrawal } from "../../../se
 import { CheckCircle2, XCircle, Eye, Search, ArrowUpDown, X, RefreshCw } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { SortField, SortDir, WithdrawalItem } from "@/types/pages/admin/WithdrawalRequests.types";
+import { formatISTDate as fmt } from "@/utils/dateFormat";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -21,9 +22,7 @@ const statusStyle: Record<string, string> = {
   failed:    "bg-red-100 text-red-700 border border-red-200",
 };
 
-const fmt = (d?: string) => d
-  ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-  : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 const WithdrawalRequests = () => {
   const { toast }   = useToast();
 
