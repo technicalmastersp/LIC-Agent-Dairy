@@ -1,4 +1,4 @@
-# Policy Niketan — Life Insurance Records
+# Policy Niketan — Insurance Records
 
 A web application for LIC agents to manage policyholder records — capture
 applicant details, track policy/premium due dates, monitor missed and

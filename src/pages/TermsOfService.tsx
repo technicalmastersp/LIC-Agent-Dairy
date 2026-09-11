@@ -38,7 +38,7 @@ const TermsOfService = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
         title="Terms of Service"
-        description="The terms that govern use of Life Insurance Records — your account, subscription plans, data responsibilities, and acceptable use."
+        description="The terms that govern use of Policy Niketan — your account, subscription plans, data responsibilities, and acceptable use."
       />
       <Navigation />
 

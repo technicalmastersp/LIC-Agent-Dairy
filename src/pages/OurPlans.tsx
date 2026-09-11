@@ -221,7 +221,7 @@ const OurPlans = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
         title="Subscription Plans & Pricing"
-        description="Compare Life Insurance Records subscription plans — from a free 1-month trial to 24-month options — and pick the right fit for how many client records you manage."
+        description="Compare Policy Niketan subscription plans — from a free 1-month trial to 24-month options — and pick the right fit for how many client records you manage."
       />
       <Navigation />
 

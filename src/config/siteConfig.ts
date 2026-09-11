@@ -12,7 +12,7 @@ const siteConfig = {
   // Legal/brand name — the product is now branded "Policy Niketan".
   companyName: "Policy Niketan",
   // Marketing/SEO name — used for <title>, og:title, twitter:title.
-  title: "Life Insurance Records",
+  title: "Policy Niketan",
   // Shorter variant for space-constrained contexts (PWA home-screen icon
   // label via apple-mobile-web-app-title) where the full title truncates.
   shortTitle: "Policy Niketan",
@@ -27,7 +27,7 @@ const siteConfig = {
   // where crawlers need a real raster image, not a tiny icon.
   logo_social: "/logos/logo_social.png",
 
-  description: "Professional life insurance policy record management system for all types of agents and customers",
+  description: "Professional insurance policy record management system for all types of agents and customers",
   author: "Mr. Shashank S Pandey",
   version: "1.0.0",
   productionUrl: "https://policyniketan.com",

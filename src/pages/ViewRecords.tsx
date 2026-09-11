@@ -325,7 +325,7 @@ const ViewRecords = () => {
               <div>
                 <h1 className="text-2xl font-semibold text-form-header">Policy Records</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">
-                  Manage and view all life insurance policy records
+                  Manage and view all insurance policy records
                 </p>
               </div>
             </div>
