@@ -9,16 +9,15 @@
 // values into it at build time instead. See that file if you need to add
 // another meta tag sourced from here.
 const siteConfig = {
-  // Legal/brand name — as confirmed, "Dairy" is the correct spelling
-  // (not a typo), despite reading like one.
-  companyName: "LIC Agent Dairy",
+  // Legal/brand name — the product is now branded "Policy Niketan".
+  companyName: "Policy Niketan",
   // Marketing/SEO name — used for <title>, og:title, twitter:title.
   title: "Life Insurance Records",
   // Shorter variant for space-constrained contexts (PWA home-screen icon
   // label via apple-mobile-web-app-title) where the full title truncates.
-  shortTitle: "LIC Records",
+  shortTitle: "Policy Niketan",
 
-  buyUrl: "policyegleman.com",
+  buyUrl: "policyniketan.com",
 
   // on root location
   // Small UI icon (128x128 WebP, ~7KB) — used everywhere the logo renders
@@ -31,10 +30,10 @@ const siteConfig = {
   description: "Professional life insurance policy record management system for all types of agents and customers",
   author: "Mr. Shashank S Pandey",
   version: "1.0.0",
-  productionUrl: "https://lic-agent-dairy.vercel.app",
+  productionUrl: "https://policyniketan.com",
   // PLACEHOLDER — update with the real contact address when available.
-  contactEmail: "contact@example.com",
-  supportEmail: "support@lic-agent-dairy.vercel.app",
+  contactEmail: "contact@policyniketan.com",
+  supportEmail: "support@policyniketan.com",
   // PLACEHOLDERS — update with real profile links when available.
   socialLinks: {
     twitter: "https://twitter.com/yourhandle",

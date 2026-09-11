@@ -1,4 +1,5 @@
 import { loadRazorpayScript } from "./loadRazorpay";
+import siteConfig from "@/config/siteConfig";
 import type { RazorpaySuccessResponse, OpenCheckoutOptions } from "@/types/utils/razorpayCheckout.types";
 export const openRazorpayCheckout = async (
   options: OpenCheckoutOptions
@@ -15,7 +16,7 @@ export const openRazorpayCheckout = async (
       amount: options.order.amount * 100, // paise
       currency: options.order.currency,
       order_id: options.order.razorpayOrderId,
-      name: "LIC Agent Dairy",
+      name: siteConfig.companyName,
       description: "Subscription plan payment",
       prefill: {
         name: options.userName,

@@ -1,9 +1,10 @@
 import type { Translations, Language } from "@/types/utils/translations.types";
+import siteConfig from "@/config/siteConfig";
 // Multilingual support for English and Hindi
 export const translations: Record<string, Translations> = {
   en: {
     // Project Lable
-    title: "LIC Agent Dairy",
+    title: siteConfig.companyName,
     // LIC: "Life Insurance Corporation of India",
 
     // Navigation
@@ -123,7 +124,7 @@ export const translations: Record<string, Translations> = {
   hi: {
     // Project Lable
     // title: "एलआईसी एजेंट डायरी",
-    title: "एलआईसी अभिकर्ता डायरी",
+    title: "पॉलिसी निकेतन",
     // LIC: "भारतीय जीवन बीमा निगम",
 
     // Navigation
