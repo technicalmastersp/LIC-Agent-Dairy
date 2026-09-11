@@ -116,9 +116,11 @@ const SessionManagement = () => {
                         </div>
                         <div className="flex items-center gap-3 flex-wrap mt-0.5">
                           <p className="text-xs text-muted-foreground">Signed in {fmt(s.createdAt)}</p>
-                          {s.ip && (
+                          {(s.location || s.ip) && (
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
-                              <MapPin className="w-3 h-3" /> {s.ip}
+                              <MapPin className="w-3 h-3" />
+                              {s.location || "Unknown location"}
+                              {s.ip && <span className="text-muted-foreground/60">· {s.ip}</span>}
                             </p>
                           )}
                         </div>
