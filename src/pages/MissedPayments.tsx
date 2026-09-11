@@ -15,6 +15,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import { getRecordsWithoutLastPayment, deleteRecord } from "../../services/recordService";
 import type { Record } from "@/types/pages/MissedPayments.types";
+import { formatISTMonthYear } from "@/utils/dateFormat";
 const avatarPalette = [
   "bg-blue-100 text-blue-700",
   "bg-violet-100 text-violet-700",
@@ -54,7 +55,7 @@ const MissedPayments = () => {
       setIsLoading(true);
       const recordsWithoutLastPayment = await getRecordsWithoutLastPayment();
       setRecords(recordsWithoutLastPayment.records ?? []);
-      setCurrentMonth("" + new Date().toLocaleString('default', { month: 'long' }) + " " + new Date().getFullYear());
+      setCurrentMonth(formatISTMonthYear());
     } catch (error) {
       console.error(error);
       setRecords([]);

@@ -1,26 +1,18 @@
+import { formatISTDate, toDateInputValue } from "./dateFormat";
+
+// Kept as a thin wrapper (rather than migrating 25+ call sites across 8
+// files) so every existing caller gets the fix for free. This used to:
+//  1. build its own Intl.DateTimeFormat with no explicit timeZone, so the
+//     displayed date silently depended on the viewer's device, not a
+//     guaranteed IST rendering;
+//  2. output dash-separated dates ("05-Sep-2026") while every other date
+//     formatter in the app (13+ separately-duplicated ones) used spaces
+//     ("05 Sep 2026") — two different formats for the same thing, now
+//     unified to the space-separated style everywhere;
+//  3. in its `type` branch, do date.split("T")[0] — which recovers the
+//     *UTC* calendar date, silently off by a day for any stored instant
+//     in the 00:00–05:29 IST window (still "yesterday" in UTC).
 export const convertDateToIndianFormat = (date: string | undefined, type?: string) => {
-    // Record date fields (createdAt, dateOfBirth, lastPaymentDate, etc.)
-    // are optional on the Record type, and several call sites pass them
-    // straight through without a fallback — this already returns '' for
-    // any falsy input at runtime, so widening the param type to match
-    // reality (rather than adding `|| ""` at every call site) is the
-    // correct fix.
     if (!date) return '';
-    
-    if (!type) {
-        const d = typeof date === 'string' ? new Date(date) : date;
-
-        if (!(d instanceof Date) || isNaN(d.getTime())) return '';
-
-        const indiaDate = new Intl.DateTimeFormat('en-IN', {
-            day: '2-digit',
-            // month: '2-digit',
-            month: 'short',
-            year: 'numeric'
-        }).format(d).replace(/ /g, '-');
-
-        return indiaDate;
-    } else {
-        return date.split("T")[0];
-    }
+    return type ? toDateInputValue(date) : formatISTDate(date);
 };

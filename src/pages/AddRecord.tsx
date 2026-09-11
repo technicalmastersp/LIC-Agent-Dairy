@@ -27,6 +27,7 @@ import type { CustomFieldValue } from "@/types/config/insuranceTypes.types";
 import { policyRecordSchema } from "@/schemas/policyRecordSchema";
 import type { PolicyRecordFormValues } from "@/types/schemas/policyRecordSchema.types";
 import type { PolicyDetail } from "@/types/pages/AddRecord.types";
+import { isValidCalendarDate } from "@/utils/dateFormat";
 // Small section header used across the form cards — a plain sequential
 // step number (Step 1 – Step 8) through the whole form, not tied to any
 // external document.
@@ -201,6 +202,17 @@ const AddRecord = () => {
         description: "Please enter a name for this custom insurance type",
         variant: "destructive",
       });
+      return;
+    }
+
+    // currentPolicy/previousPolicy are plain state, not part of the zod
+    // schema above — validate their date fields the same way.
+    if (currentPolicy.lastPaymentDate && !isValidCalendarDate(currentPolicy.lastPaymentDate)) {
+      toast({ title: "Error", description: "Current policy's last payment date is not a valid date", variant: "destructive" });
+      return;
+    }
+    if (previousPolicy.lastPaymentDate && !isValidCalendarDate(previousPolicy.lastPaymentDate)) {
+      toast({ title: "Error", description: "Previous policy's last payment date is not a valid date", variant: "destructive" });
       return;
     }
 

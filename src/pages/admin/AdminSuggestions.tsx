@@ -10,10 +10,9 @@ import { useToast } from "@/hooks/use-toast";
 import { getAllSuggestions, updateSuggestionStatus } from "../../../services/adminService";
 import { RefreshCw, User as UserIcon } from "lucide-react";
 import type { Suggestion } from "@/types/pages/admin/AdminSuggestions.types";
+import { formatISTDate as fmt } from "@/utils/dateFormat";
 
-const fmt = (d?: string) => d
-  ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-  : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 
 const statusStyle: Record<string, string> = {
   new:            "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900",

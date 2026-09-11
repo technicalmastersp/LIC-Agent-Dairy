@@ -13,13 +13,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Eye, UserX, UserCheck, ChevronLeft, ChevronRight, RefreshCw, ArrowUpDown } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { StatusFilter, PlanSort, AdminUserRow, ModalTarget } from "@/types/pages/admin/AdminUsers.types";
+import { formatISTDate as fmt } from "@/utils/dateFormat";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
-const fmt = (d?: string) => d
-  ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })
-  : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 
 const planColor: Record<string, string> = {
   "1month-free": "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground",

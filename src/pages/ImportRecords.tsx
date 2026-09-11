@@ -35,6 +35,7 @@ const ImportRecords = () => {
 
   const [step, setStep] = useState<Step>("upload");
   const [isParsing, setIsParsing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [parseError, setParseError] = useState<string | null>(null);
   const [rows, setRows] = useState<ImportRow[]>([]);
   const [excludedRows, setExcludedRows] = useState<Set<number>>(new Set());
@@ -63,9 +64,7 @@ const ImportRecords = () => {
     setImportedCount(0);
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const processFile = async (file: File) => {
     setIsParsing(true);
     setParseError(null);
     try {
@@ -79,6 +78,31 @@ const ImportRecords = () => {
       setIsParsing(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await processFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault(); // without this, the browser's default is to open/navigate to the dropped file
+    if (!isParsing) setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (isParsing) return;
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    await processFile(file);
   };
 
   const updateCell = (rowNumber: number, key: string, value: string) => {
@@ -209,7 +233,7 @@ const ImportRecords = () => {
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
                 <FileUp className="w-7 h-7 text-primary" />
               </div>
-              <CardTitle className="text-2xl text-form-header">Import from Excel</CardTitle>
+              <CardTitle className="text-2xl text-form-header">Import Records</CardTitle>
               <CardDescription>
                 Upload a spreadsheet of policy records — you'll be able to review and fix any issues
                 before anything is saved. Up to {MAX_IMPORT_ROWS} records per file.
@@ -223,7 +247,12 @@ const ImportRecords = () => {
 
               <label
                 htmlFor="excel-upload"
-                className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border p-8 cursor-pointer hover:border-primary/40 hover:bg-muted/30 transition-colors"
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-8 cursor-pointer transition-colors ${
+                  isDragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/40 hover:bg-muted/30"
+                }`}
               >
                 {isParsing ? (
                   <>
@@ -232,16 +261,18 @@ const ImportRecords = () => {
                   </>
                 ) : (
                   <>
-                    <FileSpreadsheet className="w-8 h-8 text-muted-foreground" />
-                    <p className="text-sm font-medium text-form-header">Click to choose a .xlsx or .xls file</p>
-                    <p className="text-xs text-muted-foreground">Max 5MB, {MAX_IMPORT_ROWS} rows</p>
+                    <FileSpreadsheet className={`w-8 h-8 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
+                    <p className="text-sm font-medium text-form-header">
+                      {isDragging ? "Drop your file here" : "Drag & drop a file here, or click to browse"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">.xlsx, .xls, or .csv — max 5MB, {MAX_IMPORT_ROWS} rows</p>
                   </>
                 )}
                 <input
                   id="excel-upload"
                   ref={fileInputRef}
                   type="file"
-                  accept=".xlsx,.xls"
+                  accept=".xlsx,.xls,.csv"
                   className="hidden"
                   onChange={handleFileChange}
                   disabled={isParsing}

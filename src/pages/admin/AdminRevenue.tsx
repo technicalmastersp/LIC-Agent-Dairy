@@ -29,6 +29,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from "recharts";
 import type { ExpenseBreakdownItem, RevenueSummary, RevenueTrendPoint, RevenueTransaction } from "@/types/pages/admin/AdminRevenue.types";
+import { formatISTDate as fmt } from "@/utils/dateFormat";
 
 const EXPENSE_CATEGORIES = [
   "Hosting & Infrastructure", "Software & Tools", "Marketing & Ads",
@@ -40,9 +41,7 @@ const YEARS = Array.from({ length: 5 }, (_, i) => currentYear - i);
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
 const inr = (n: number | undefined) => `₹${(n ?? 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
-const fmt = (d?: string) => d
-  ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-  : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 const AdminRevenue = () => {
   const navigate      = useNavigate();
   const { toast }     = useToast();

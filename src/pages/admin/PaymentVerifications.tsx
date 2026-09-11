@@ -11,13 +11,12 @@ import { getPendingUpiVerifications, verifyUpiId, rejectUpiId } from "../../../s
 import { CheckCircle2, XCircle, RefreshCw } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { PendingUpiVerification } from "@/types/pages/admin/PaymentVerifications.types";
+import { formatISTDate as fmt } from "@/utils/dateFormat";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
-const fmt = (d?: string) => d
-  ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-  : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 const PaymentVerifications = () => {
   const { toast }      = useToast();
 

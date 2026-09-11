@@ -14,10 +14,9 @@ import { getAdmins, createAdmin, deactivateUser, reactivateUser, updateAdminPerm
 import { Plus, UserX, UserCheck, X, Shield, ToggleLeft, ToggleRight, LogOut, Crown, Clock } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { AdminItem, SuperAdminItem, ModalTarget } from "@/types/pages/admin/AdminAdmins.types";
+import { formatISTDate as fmt } from "@/utils/dateFormat";
 
-const fmt = (d?: string) => d
-  ? new Date(d).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })
-  : "—";
+// (date formatting now imported from dateFormat.ts as `fmt`)
 const AdminAdmins = () => {
   const navigate    = useNavigate();
   const { toast }   = useToast();
