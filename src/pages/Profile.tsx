@@ -343,8 +343,9 @@ const Profile = () => {
                     <button
                       onClick={() => user.easyId && handleCopy(user.easyId, "easyId")}
                       className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 flex items-center gap-1 hover:border-primary/40 transition-colors"
-                      title="Copy Easy ID"
+                      title="Copy User ID"
                     >
+                      User ID: {' '}
                       {user.easyId}
                       {copied === "easyId"
                         ? <Check className="w-2.5 h-2.5 text-green-600" />

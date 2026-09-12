@@ -23,9 +23,9 @@ import { formatISTDate as fmt, formatISTFullDate } from "@/utils/dateFormat";
 
 const getGreeting = () => {
   const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
+  if (h < 12) return "Good Morning";
+  if (h < 17) return "Good Afternoon";
+  return "Good Evening";
 };
 
 // (date formatting now imported from dateFormat.ts as `fmt`)

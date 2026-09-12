@@ -5,9 +5,9 @@ import { z } from "zod";
 // version if you need to compare behavior.
 export const signUpSchema = z
   .object({
-    name: z.string().trim().min(1, "Name is required"),
+    name: z.string().trim().min(2, "Name is required"),
 
-    fullAddress: z.string().trim().min(1, "Full address is required"),
+    fullAddress: z.string().trim().min(5, "Full address is required"),
 
     mobileNumber: z
       .string()
@@ -17,7 +17,7 @@ export const signUpSchema = z
     email: z
       .string()
       .trim()
-      .min(1, "Email is required")
+      .min(3, "Email is required")
       .email("Enter a valid email address"),
 
     // Same standard used on the Change Password page: 6+ chars, one

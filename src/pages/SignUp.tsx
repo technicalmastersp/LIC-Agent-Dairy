@@ -246,7 +246,7 @@ const SignUp = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">{t('name')} <span className="text-[#ff0000]">*</span></Label>
+                  {/* <Label htmlFor="name">{t('name')}</Label> */}
                   <Input
                     id="name"
                     type="text"
@@ -259,7 +259,7 @@ const SignUp = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="mobileNumber">{t('mobileNumber')} <span className="text-[#ff0000]">*</span></Label>
+                  {/* <Label htmlFor="mobileNumber">{t('mobileNumber')}</Label> */}
                   <Input
                     id="mobileNumber"
                     type="tel"
@@ -275,7 +275,7 @@ const SignUp = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="fullAddress">{t('fullAddress')} <span className="text-[#ff0000]">*</span></Label>
+                {/* <Label htmlFor="fullAddress">{t('fullAddress')}</Label> */}
                 <Input
                   id="fullAddress"
                   type="text"
@@ -288,7 +288,7 @@ const SignUp = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">{t('email')} <span className="text-[#ff0000]">*</span></Label>
+                {/* <Label htmlFor="email">{t('email')}</Label> */}
                 <Input
                   id="email"
                   type="email"
@@ -302,7 +302,7 @@ const SignUp = () => {
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="password">{t('password')} <span className="text-[#ff0000]">*</span></Label>
+                  {/* <Label htmlFor="password">{t('password')}</Label> */}
                   <div className="relative">
                     <Input
                       id="password"
@@ -343,7 +343,7 @@ const SignUp = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">{t('confirmPassword')} <span className="text-[#ff0000]">*</span></Label>
+                  {/* <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label> */}
                   <div className="relative">
                     <Input
                       id="confirmPassword"
@@ -365,7 +365,7 @@ const SignUp = () => {
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="selectedPlan">{t('SelectSubscriptionPlan')} <span className="text-[#ff0000]">*</span></Label>
+                  {/* <Label htmlFor="selectedPlan">{t('SelectSubscriptionPlan')}</Label> */}
                   <Controller
                     name="selectedPlan"
                     control={control}
@@ -398,7 +398,7 @@ const SignUp = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="referralCode">{t('ReferralCode')+' ('+t('Optional')+')'}</Label>
+                  {/* <Label htmlFor="referralCode">{t('ReferralCode')+' ('+t('Optional')+')'}</Label> */}
                   <div className="flex gap-2">
                     <Input
                       id="referralCode"
