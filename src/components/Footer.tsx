@@ -126,7 +126,7 @@ const Footer = () => {
               {t("companyDescription")}
             </p>
             <div className="text-xs text-primary-foreground/70">
-              <p>© 2025 - {currentYear} {siteConfig.companyName}</p>
+              <p>© {currentYear} {siteConfig.companyName}</p>
               <p>{t("allRightsReserved")}</p>
             </div>
           </FooterSection>

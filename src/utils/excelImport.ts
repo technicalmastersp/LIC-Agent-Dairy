@@ -25,13 +25,13 @@ export const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 // internal field key. Order here drives both the generated template and
 // the preview table. Keep in sync with policyRecordSchema.ts field names.
 export const IMPORT_COLUMNS: { key: string; header: string; required: boolean; example: string }[] = [
-  { key: "name", header: "Name", required: true, example: "Ramesh Kumar" },
+  { key: "name", header: "Name", required: true, example: "Shashank Shekhar" },
   { key: "insuranceType", header: "Insurance Type", required: false, example: "Life Insurance" },
   { key: "dateOfBirth", header: "Date of Birth", required: false, example: "1985-06-15" },
-  { key: "fatherName", header: "Father's Name", required: false, example: "Suresh Kumar" },
-  { key: "motherName", header: "Mother's Name", required: false, example: "Sunita Kumar" },
+  { key: "fatherName", header: "Father's Name", required: false, example: "Sanjay Kumar" },
+  { key: "motherName", header: "Mother's Name", required: false, example: "Kanti Devi" },
   { key: "spouseName", header: "Spouse's Name", required: false, example: "" },
-  { key: "address", header: "Address", required: false, example: "123 MG Road, Pune" },
+  { key: "address", header: "Address", required: false, example: "123 Main Road, New Delhi" },
   { key: "aadhaarLinkedMobileNumber", header: "Mobile Number", required: false, example: "9876543210" },
   { key: "email", header: "Email", required: false, example: "ramesh@example.com" },
   { key: "aadhaarNumber", header: "Aadhaar Number", required: false, example: "123456789012" },

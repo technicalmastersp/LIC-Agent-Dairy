@@ -115,7 +115,7 @@ const Login = () => {
             </div>
             <CardTitle className="text-2xl text-form-header">{t('loginTitle')}</CardTitle>
             <CardDescription>
-              {t('welcome')} {userNamelocaStorage != 'undefined' ? `${userNamelocaStorage} Ji` : ''}
+              {t('welcome')}{' '} {userNamelocaStorage != null ? `${userNamelocaStorage} Ji` : ''}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
