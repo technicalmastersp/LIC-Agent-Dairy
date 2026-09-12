@@ -1,6 +1,12 @@
 {
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "lic-agent-dairy.vercel.app" }],
+      "destination": "https://policyniketan.com/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "lic-agent-dairy.vercel.app" }],
       "destination": "https://policyniketan.com/:path*",
