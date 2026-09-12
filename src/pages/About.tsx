@@ -113,7 +113,7 @@ const About = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
         title="About Us"
-        description="Learn who builds Life Insurance Records, why we built a dedicated record-keeping tool for LIC and life insurance agents, and how we keep client data secure."
+        description="Learn who builds Policy Niketan, why we built a dedicated record-keeping tool for all types of insurance agents, and how we keep client data secure."
       />
       <Navigation />
 

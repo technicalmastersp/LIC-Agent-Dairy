@@ -164,7 +164,7 @@ const OnboardingTour = () => {
             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mb-2">
               <Sparkles className="w-5 h-5 text-blue-600" />
             </div>
-            <DialogTitle>Welcome to LIC Agent Diary</DialogTitle>
+            <DialogTitle>Welcome to Policy Niketan</DialogTitle>
             <DialogDescription>
               Want a 60-second tour of where everything lives on your dashboard? You can skip any time.
             </DialogDescription>

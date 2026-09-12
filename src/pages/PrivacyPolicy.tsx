@@ -38,7 +38,7 @@ const PrivacyPolicy = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
         title="Privacy Policy"
-        description="How Life Insurance Records collects, stores, and protects the personal and policy data you enter, including Aadhaar, PAN, and bank details."
+        description="How Policy Niketan collects, stores, and protects the personal and policy data you enter, including Aadhaar, PAN, and bank details."
       />
       <Navigation />
 

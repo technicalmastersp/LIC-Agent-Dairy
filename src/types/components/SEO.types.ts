@@ -1,6 +1,6 @@
 
 export interface SEOProps {
-  /** Page-specific title. " | Life Insurance Records" is appended automatically. */
+  /** Page-specific title. " | Policy Niketan" is appended automatically. */
   title: string;
   /** Page-specific meta description (also used for og:description). */
   description: string;

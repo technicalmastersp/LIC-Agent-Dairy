@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://lic-agent-dairy.vercel.app/sitemap.xml
+Sitemap: https://policyniketan.com/sitemap.xml

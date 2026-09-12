@@ -238,13 +238,13 @@ const ReferralProgram = () => {
 
   const shareLink = async () => {
     if (navigator.share) {
-      try { await navigator.share({ title: "Join LIC Agent Diary", url: referralUrl }); }
+      try { await navigator.share({ title: "Join Policy Niketan", url: referralUrl }); }
       catch { copyLink(); }
     } else { copyLink(); }
   };
 
   const shareWhatsApp = () => {
-    const msg = encodeURIComponent(`Join LIC Agent Diary!\n${referralUrl}`);
+    const msg = encodeURIComponent(`Join Policy Niketan!\n${referralUrl}`);
     window.open(`https://wa.me/?text=${msg}`, "_blank");
   };
 

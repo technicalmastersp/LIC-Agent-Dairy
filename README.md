@@ -1,4 +1,4 @@
-# LIC Agent Diary — Life Insurance Records
+# Policy Niketan — Insurance Records
 
 A web application for LIC agents to manage policyholder records — capture
 applicant details, track policy/premium due dates, monitor missed and
@@ -10,7 +10,7 @@ tickets, and subscriptions.
      remote or `repository` field in package.json is available here. -->
 [![CI](https://github.com/<owner>/<repo>/actions/workflows/ci.yml/badge.svg)](https://github.com/<owner>/<repo>/actions/workflows/ci.yml)
 
-[Live Demo ›](https://lic-agent-dairy.vercel.app/)
+[Live Demo ›](https://policyniketan.com/)
 
 ---
 

@@ -35,8 +35,8 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
-        title="Life Insurance Policy Record Management for Agents"
-        description="Track every client's policy, due date, and payment status in one place. Add records in seconds, search instantly, and never miss a renewal — built for LIC and life insurance agents."
+        title="Insurance Policy Record Management for Agents"
+        description="Track every client's policy, due date, and payment status in one place. Add records in seconds, search instantly, and never miss a renewal — built for all type of insurance agents."
       />
 
       <Navigation />
