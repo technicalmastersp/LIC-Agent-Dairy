@@ -310,7 +310,7 @@ const OurPlans = () => {
             return (
               <Card
                 key={plan.id}
-                className={`relative flex flex-col transition-shadow hover:shadow-md ${plan.popular ? 'border-primary/40 shadow-md md:scale-105' : ''} ${selectedPlan === plan.id ? 'ring-2 ring-primary' : ''}`}
+                className={`relative h-full flex flex-col transition-shadow hover:shadow-md ${plan.popular ? 'border-primary/40 shadow-md md:scale-105' : ''} ${selectedPlan === plan.id ? 'ring-2 ring-primary' : ''}`}
               >
                 {plan.popular && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground shadow-sm">
