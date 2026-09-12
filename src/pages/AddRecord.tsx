@@ -685,6 +685,7 @@ const AddRecord = () => {
                     id="bankName" 
                     {...register("bankName")}
                     className="mt-1"
+                    disabled
                   />
                 </div>
                 <div>
@@ -693,6 +694,7 @@ const AddRecord = () => {
                     id="branchName" 
                     {...register("branchName")}
                     className="mt-1"
+                    disabled
                   />
                 </div>
               </div>
