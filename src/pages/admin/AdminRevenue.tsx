@@ -1,7 +1,7 @@
 import AdminLayout from "./AdminLayout";
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -48,7 +48,13 @@ const AdminRevenue = () => {
   const currentUser   = getCurrentUser();
   const canManageExpenses = currentUser?.role === "superadmin" || currentUser?.permissions?.can_manage_expenses;
 
-  const [scope, setScope]   = useState<"all" | "year" | "month">("all");
+  // Dashboard's "This month's income" card links here as
+  // /admin/revenue?filters=currentMonth — land straight on the current
+  // month's data when that's present, otherwise default to all-time.
+  const [searchParams] = useSearchParams();
+  const wantsCurrentMonth = searchParams.get("filters") === "currentMonth";
+
+  const [scope, setScope]   = useState<"all" | "year" | "month">(wantsCurrentMonth ? "month" : "all");
   const [year, setYear]     = useState(currentYear);
   const [month, setMonth]   = useState(new Date().getMonth() + 1);
 
@@ -73,6 +79,18 @@ const AdminRevenue = () => {
 
   const [expenseToDelete, setExpenseToDelete] = useState<RevenueTransaction | null>(null);
   const [deletingExpense, setDeletingExpense] = useState(false);
+
+  // Clicking a scope button should always reset year/month back to the
+  // actual current year/month — otherwise re-clicking "This month" after
+  // having browsed a different month/year (via the dropdowns, or having
+  // landed here from the dashboard link earlier) keeps showing whatever
+  // year/month was last selected instead of resetting the filter.
+  const selectScope = (s: "all" | "year" | "month") => {
+    setScope(s);
+    if (s === "year" || s === "month") setYear(currentYear);
+    if (s === "month") setMonth(new Date().getMonth() + 1);
+    setTxPage(1);
+  };
 
   const fetchAll = useCallback(async (isRefresh = false) => {
     try {
@@ -184,7 +202,7 @@ const AdminRevenue = () => {
             <div className="flex items-center gap-2 flex-wrap">
               {(["all", "year", "month"] as const).map(s => (
                 <Button key={s} size="sm" variant={scope === s ? "default" : "outline"} className="capitalize"
-                  onClick={() => setScope(s)}>
+                  onClick={() => selectScope(s)}>
                   {s === "all" ? "All time" : s === "year" ? "This year" : "This month"}
                 </Button>
               ))}
