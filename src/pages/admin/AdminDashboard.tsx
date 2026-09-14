@@ -165,14 +165,23 @@ const AdminDashboard = () => {
               sub:     `${subscriptions.paid} paid · ${subscriptions.freeTrial} trial`,
               link:    "/admin/users?status=active",
             },
-            {
+            ...(currentUser?.role === "superadmin" || permissions?.can_view_revenue ? [{
               label:   "Total revenue",
               val:     `₹${(revenue.total ?? 0).toLocaleString("en-IN")}`,
               icon:    <TrendingUp className="w-5 h-5 text-purple-600" />,
               bg:      "bg-purple-50 border-purple-200 dark:bg-purple-950/40 dark:border-purple-900",
               sub:     `${subscriptions.paid} paid users`,
               link:    "/admin/revenue",
-            },
+            }] : []),
+            ...(currentUser?.role === "superadmin" || permissions?.can_view_revenue ? [{
+              label:   "This month's income",
+              val:     `₹${(stats.revenue?.thisMonthIncome ?? 0).toLocaleString("en-IN")}`,
+              icon:    <IndianRupee className="w-5 h-5 text-green-600" />,
+              bg:      "border bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-900",
+              sub:     "View full revenue report",
+              link:    "/admin/revenue?filters=currentMonth",
+              urgent:  false,
+            }] : []),
             {
               label:   "Pending withdrawals",
               val:     withdrawals.pending,
@@ -210,16 +219,7 @@ const AdminDashboard = () => {
                 link:    "/admin/suggestions",
                 urgent:  false,
               },
-            ] : []),
-            ...(currentUser?.role === "superadmin" || permissions?.can_view_revenue ? [{
-              label:   "This month's income",
-              val:     `₹${(stats.revenue?.thisMonthIncome ?? 0).toLocaleString("en-IN")}`,
-              icon:    <IndianRupee className="w-5 h-5 text-green-600" />,
-              bg:      "border bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-900",
-              sub:     "View full revenue report",
-              link:    "/admin/revenue?filters=currentMonth",
-              urgent:  false,
-            }] : []),
+            ] : [])
           ].map(({ label, val, icon, bg, sub, trend, link, urgent }) => (
             <Card key={label}
               className={`border ${bg} ${link ? "cursor-pointer hover:shadow-md transition-shadow" : ""} ${urgent ? "ring-2 ring-amber-400" : ""}`}
