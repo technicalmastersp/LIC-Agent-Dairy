@@ -171,7 +171,7 @@ const AdminDashboard = () => {
               icon:    <TrendingUp className="w-5 h-5 text-purple-600" />,
               bg:      "bg-purple-50 border-purple-200 dark:bg-purple-950/40 dark:border-purple-900",
               sub:     `${subscriptions.paid} paid users`,
-              link:    null,
+              link:    "/admin/revenue",
             },
             {
               label:   "Pending withdrawals",
@@ -217,7 +217,7 @@ const AdminDashboard = () => {
               icon:    <IndianRupee className="w-5 h-5 text-green-600" />,
               bg:      "border bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-900",
               sub:     "View full revenue report",
-              link:    "/admin/revenue",
+              link:    "/admin/revenue?filters=currentMonth",
               urgent:  false,
             }] : []),
           ].map(({ label, val, icon, bg, sub, trend, link, urgent }) => (

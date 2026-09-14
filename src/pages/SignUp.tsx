@@ -280,6 +280,7 @@ const SignUp = () => {
                   id="fullAddress"
                   type="text"
                   placeholder={t('fullAddress')}
+                  maxLength={100}
                   {...register("fullAddress")}
                 />
                 {errors.fullAddress && (
@@ -580,8 +581,8 @@ const SignUp = () => {
                       and{" "}
                       <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80">
                         Privacy Policy
-                      </Link>
-                      <span className="text-[#ff0000]"> *</span>
+                      </Link>.
+                      {/* <span className="text-[#ff0000]"> *</span> */}
                     </Label>
                   </div>
                 )}
