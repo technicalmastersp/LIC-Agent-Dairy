@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
 import { convertDateToIndianFormat } from "@/utils/tools";
+import { formatAadhaar, formatIndianNumber, formatMobileNumber } from "@/utils/inputValueFormats";
 import { getInsuranceTypeDef, isOtherInsuranceType } from "@/config/insuranceTypes";
 import type { FamilyMember, CustomFieldValue, RecordDetailsModalProps, IconType } from "@/types/components/RecordDetailsModal.types";
 const SectionTitle = ({ icon: Icon, children }: { icon: IconType; children: React.ReactNode }) => (
@@ -85,7 +86,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <InfoItem icon={User} label="Date" value={convertDateToIndianFormat(record.date)} />
-                <InfoItem icon={Calendar} label="Aadhaar Number" value={record.aadhaarNumber} />
+                <InfoItem icon={Calendar} label="Aadhaar Number" value={formatAadhaar(record.aadhaarNumber)} />
                 <InfoItem icon={MapPin} label="Pan Number" value={record.panNumber} />
                 <InfoItem icon={User} label="E Mail" value={record.email} />
               </div>
@@ -149,7 +150,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 <InfoItem icon={MapPin} label="Address" value={record.address || ""} />
                 <InfoItem icon={Calendar} label="Date of Birth" value={convertDateToIndianFormat(record.dateOfBirth) || ""} />
                 <InfoItem icon={User} label="Age" value={record.age || ""} />
-                <InfoItem icon={Phone} label="Aadhaar Linked Mobile Number" value={record.aadhaarLinkedMobileNumber || ""} />
+                <InfoItem icon={Phone} label="Aadhaar Linked Mobile Number" value={formatMobileNumber(record.aadhaarLinkedMobileNumber) || ""} />
                 <InfoItem icon={User} label="Name of Nominee" value={record.nameOfNominee || ""} />
                 <InfoItem icon={User} label="Age of Nominee" value={record.ageOfNominee || ""} />
                 <InfoItem icon={User} label="Relation Name" value={record.relationName || ""} />
@@ -167,7 +168,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 <InfoItem icon={Briefcase} label="Educational Qualification" value={record.educationalQualification || ""} />
                 <InfoItem icon={Briefcase} label="Occupation" value={record.occupation || ""} />
                 <InfoItem icon={Briefcase} label="Designation" value={record.designationOfPolicyHolder || ""} />
-                <InfoItem icon={Briefcase} label="Annual Income" value={record.annualIncome || ""} />
+                <InfoItem icon={Briefcase} label="Annual Income" value={formatIndianNumber(record.annualIncome) || ""} />
                 <InfoItem icon={Briefcase} label="Period of Service" value={record.periodOfService || ""} />
                 <InfoItem icon={Briefcase} label="Employer Name" value={record.employerName || ""} />
               </div>
@@ -297,7 +298,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                       {record.currentPolicy.policyNumber || "N/A"}
                     </Badge>
                     <span className="text-sm font-medium text-emerald-700">
-                      ₹{record.currentPolicy.sumAssured || "0"}
+                      ₹{formatIndianNumber(record.currentPolicy.sumAssured) || "0"}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
@@ -344,7 +345,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                           {record.currentPolicy.planAndTerm || "-"}
                         </TableCell>
                         <TableCell className="border border-table-border font-medium text-emerald-700">
-                          ₹{record.currentPolicy.sumAssured || "0"}
+                          ₹{formatIndianNumber(record.currentPolicy.sumAssured) || "0"}
                         </TableCell>
                         <TableCell className="border border-table-border">
                           {record.currentPolicy.modeOfPayment || "-"}
@@ -376,8 +377,8 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                     <Badge variant="outline" className="font-mono">
                       {record.previousPolicy.policyNumber || "N/A"}
                     </Badge>
-                    <span className="text-sm font-medium">
-                      ₹{record.previousPolicy.sumAssured || "0"}
+                    <span className="text-sm font-medium text-emerald-700">
+                      ₹{formatIndianNumber(record.previousPolicy.sumAssured) || "0"}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
@@ -423,8 +424,8 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                         <TableCell className="border border-table-border">
                           {record.previousPolicy.planAndTerm || "-"}
                         </TableCell>
-                        <TableCell className="border border-table-border">
-                          ₹{record.previousPolicy.sumAssured || "0"}
+                        <TableCell className="border border-table-border font-medium text-emerald-700">
+                          ₹{formatIndianNumber(record.previousPolicy.sumAssured) || "0"}
                         </TableCell>
                         <TableCell className="border border-table-border">
                           {record.previousPolicy.modeOfPayment || "-"}

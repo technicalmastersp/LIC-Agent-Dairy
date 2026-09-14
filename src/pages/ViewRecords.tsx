@@ -24,6 +24,7 @@ import { getAllRecords, deleteRecord } from "../../services/recordService";
 import { dedupeRecords } from "@/utils/recordDedupe";
 import { convertDateToIndianFormat } from "@/utils/tools";
 import { INSURANCE_TYPES, getInsuranceTypeDef } from "@/config/insuranceTypes";
+import { formatIndianNumber } from "@/utils/inputValueFormats";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Record } from "@/types/Record";
 import jsPDF from "jspdf";
@@ -534,7 +535,7 @@ const ViewRecords = () => {
                             Sum Assured
                           </span>
                           <span className="text-base font-semibold text-emerald-700 dark:text-emerald-400">
-                            ₹{record.currentPolicy.sumAssured || "0"}
+                            ₹{formatIndianNumber(record.currentPolicy.sumAssured) || "0"}
                           </span>
                         </div>
 
@@ -654,7 +655,7 @@ const ViewRecords = () => {
                             </Badge>
                           </TableCell>
                           <TableCell className="border border-table-border font-medium text-emerald-700">
-                            ₹{record.currentPolicy.sumAssured || "0"}
+                            ₹{formatIndianNumber(record.currentPolicy.sumAssured) || "0"}
                           </TableCell>
                           <TableCell className="border border-table-border text-muted-foreground">
                             {record.currentPolicy.branch || "-"}

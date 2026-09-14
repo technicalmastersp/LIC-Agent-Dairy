@@ -17,6 +17,7 @@ import { ArrowLeft, Trash2, RefreshCw, Eye, LogOut, Building2, Smartphone, Check
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { AdminUserDetailData } from "@/types/pages/admin/AdminUserDetail.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
+import { formatIndianNumber } from "@/utils/inputValueFormats";
 
 // (date formatting now imported from dateFormat.ts as `fmt`)
 
@@ -351,7 +352,7 @@ const AdminUserDetail = () => {
                             {r.currentPolicy?.policyNumber || "—"}
                           </span>
                         </td>
-                        <td className="p-2.5 text-xs">₹{r.currentPolicy?.sumAssured || "0"}</td>
+                        <td className="p-2.5 text-xs">₹{formatIndianNumber(r.currentPolicy?.sumAssured) || "0"}</td>
                         <td className="p-2.5 text-xs">{r.currentPolicy?.branch || "—"}</td>
                         <td className="p-2.5">
                           <Button size="sm" variant="outline" className="h-7 w-7 p-0"

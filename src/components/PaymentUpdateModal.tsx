@@ -13,6 +13,7 @@ import { ShieldCheck, CalendarCheck2, Save, Loader2 } from "lucide-react";
 import { updateRecord } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
 import type { PaymentUpdateModalProps } from "@/types/components/PaymentUpdateModal.types";
+import { formatIndianNumber } from "@/utils/inputValueFormats";
 
 // Loosely-typed on purpose: CurrentMonthDue.tsx, MissedPayments.tsx, and
 // UpcomingDuePolicies.tsx each keep their own local `Record` interface
@@ -116,7 +117,7 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate }: PaymentUpdate
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="border border-table-border">Sum Assured</TableHead>
                     <TableCell className="border border-table-border font-medium text-emerald-700">
-                      ₹{policy?.sumAssured || "0"}
+                      ₹{formatIndianNumber(policy?.sumAssured) || "0"}
                     </TableCell>
                   </TableRow>
                   <TableRow className="hover:bg-transparent">

@@ -12,13 +12,15 @@ import Navigation from "@/components/Navigation";
 import {
   Save, Plus, Trash2, User, Users, 
   HeartPulse, ShieldCheck, History, IdCard, ListChecks,
-  LucideIcon,
+  LucideIcon, Loader2, CheckCircle2, AlertCircle,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import Footer from "@/components/Footer";
 import siteConfig from "@/config/siteConfig";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createRecord } from "../../services/recordService.js";
+import { validateIfsc } from "../../utils/bankValidators";
+import { lookupIfsc } from "../../services/referralService";
 import InsuranceTypeSelector from "@/components/InsuranceTypeSelector";
 import TypeSpecificFieldsForm from "@/components/TypeSpecificFieldsForm";
 import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
@@ -28,6 +30,7 @@ import { policyRecordSchema } from "@/schemas/policyRecordSchema";
 import type { PolicyRecordFormValues } from "@/types/schemas/policyRecordSchema.types";
 import type { PolicyDetail } from "@/types/pages/AddRecord.types";
 import { isValidCalendarDate } from "@/utils/dateFormat";
+import { formatAadhaar, unformatAadhaar, formatIndianNumber, unformatIndianNumber, formatMobileNumber, unformatMobileNumber, digitsOnly } from "@/utils/inputValueFormats";
 // Small section header used across the form cards — a plain sequential
 // step number (Step 1 – Step 8) through the whole form, not tied to any
 // external document.
@@ -78,6 +81,9 @@ const AddRecord = () => {
   const {
     register,
     handleSubmit: rhfHandleSubmit,
+    getValues,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<PolicyRecordFormValues>({
     resolver: zodResolver(policyRecordSchema),
@@ -150,6 +156,37 @@ const AddRecord = () => {
       setCurrentPolicy(prev => ({ ...prev, [field]: value }));
     } else {
       setPreviousPolicy(prev => ({ ...prev, [field]: value }));
+    }
+  };
+
+  // IFSC -> bank name / branch name auto-fill, same lookup + status pattern
+  // used on the Referral Program's bank-details form. bankName/branchName
+  // stay disabled inputs — they're always derived from the IFSC code, never
+  // typed directly.
+  const [ifscLookupState, setIfscLookupState] = useState<{
+    status: "idle" | "loading" | "found" | "not_found";
+    bank?: string;
+    branch?: string;
+  }>({ status: "idle" });
+
+  const handleIfscBlur = async () => {
+    const code = (getValues("ifscCode") || "").trim().toUpperCase();
+    if (!validateIfsc(code)) {
+      setIfscLookupState({ status: "idle" });
+      setValue("bankName", "");
+      setValue("branchName", "");
+      return;
+    }
+    setIfscLookupState({ status: "loading" });
+    try {
+      const details = await lookupIfsc(code);
+      setIfscLookupState({ status: "found", bank: details.bank, branch: details.branch });
+      setValue("bankName", details.bank || "");
+      setValue("branchName", details.branch || "");
+    } catch {
+      setIfscLookupState({ status: "not_found" });
+      setValue("bankName", "");
+      setValue("branchName", "");
     }
   };
 
@@ -330,9 +367,12 @@ const AddRecord = () => {
                   <Input 
                     id="aadhaarNumber" 
                     placeholder="12-digit Aadhaar number"
-                    {...register("aadhaarNumber")}
+                    value={formatAadhaar(watch("aadhaarNumber"))}
+                    onChange={(e) => setValue("aadhaarNumber", unformatAadhaar(e.target.value), { shouldValidate: true })}
+                    onBlur={register("aadhaarNumber").onBlur}
                     className="mt-1"
-                    maxLength={12}
+                    maxLength={14}
+                    inputMode="numeric"
                   />
                   {errors.aadhaarNumber && (
                     <p className="text-xs text-destructive mt-1">{errors.aadhaarNumber.message}</p>
@@ -358,6 +398,7 @@ const AddRecord = () => {
                     type="email" 
                     {...register("email")}
                     className="mt-1"
+                    maxLength={100}
                   />
                   {errors.email && (
                     <p className="text-xs text-destructive mt-1">{errors.email.message}</p>
@@ -382,6 +423,7 @@ const AddRecord = () => {
                     {...nameField}
                     ref={(el) => { nameFieldRef(el); nameInputRef.current = el; }}
                     className={`mt-1 ${errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    maxLength={100}
                   />
                   {errors.name && (
                     <p className="text-xs text-destructive mt-1">{errors.name.message}</p>
@@ -393,6 +435,7 @@ const AddRecord = () => {
                     id="birthPlace" 
                     {...register("birthPlace")}
                     className="mt-1"
+                    maxLength={100}
                   />
                 </div>
                 <div>
@@ -401,6 +444,7 @@ const AddRecord = () => {
                     id="fatherName" 
                     {...register("fatherName")}
                     className="mt-1"
+                    maxLength={100}
                   />
                 </div>
                 <div>
@@ -409,6 +453,7 @@ const AddRecord = () => {
                     id="motherName" 
                     {...register("motherName")}
                     className="mt-1"
+                    maxLength={100}
                   />
                 </div>
                 <div>
@@ -417,6 +462,7 @@ const AddRecord = () => {
                     id="spouseName" 
                     {...register("spouseName")}
                     className="mt-1"
+                    maxLength={100}
                   />
                 </div>
                 <div>
@@ -425,6 +471,7 @@ const AddRecord = () => {
                     id="address" 
                     {...register("address")}
                     className="mt-1"
+                    maxLength={200}
                   />
                 </div>
                 <div>
@@ -440,8 +487,12 @@ const AddRecord = () => {
                   <Label htmlFor="age">8. Age</Label>
                   <Input 
                     id="age" 
-                    {...register("age")}
+                    value={digitsOnly(watch("age"))}
+                    onChange={(e) => setValue("age", digitsOnly(e.target.value), { shouldValidate: true })}
+                    onBlur={register("age").onBlur}
+                    // {...register("age")}
                     className="mt-1"
+                    maxLength={3}
                   />
                 </div>
                 <div>
@@ -450,6 +501,7 @@ const AddRecord = () => {
                     id="education" 
                     {...register("educationalQualification")}
                     className="mt-1"
+                    maxLength={100}
                   />
                 </div>
                 <div>
@@ -458,6 +510,7 @@ const AddRecord = () => {
                     id="occupation" 
                     {...register("occupation")}
                     className="mt-1"
+                    maxLength={100}
                   />
                 </div>
                 <div>
@@ -466,6 +519,7 @@ const AddRecord = () => {
                     id="DesignationName" 
                     {...register("designationOfPolicyHolder")}
                     className="mt-1"
+                    maxLength={100}
                   />
                 </div>
                 <div>
@@ -474,14 +528,19 @@ const AddRecord = () => {
                     id="income" 
                     {...register("annualIncome")}
                     className="mt-1"
+                    maxLength={50}
                   />
                 </div>
                 <div>
                   <Label htmlFor="servicePeriod">13. Period Of Service</Label>
                   <Input 
                     id="servicePeriod" 
-                    {...register("periodOfService")}
+                    value={digitsOnly(watch("periodOfService"))}
+                    onChange={(e) => setValue("periodOfService", digitsOnly(e.target.value), { shouldValidate: true })}
+                    onBlur={register("periodOfService").onBlur}
+                    // {...register("periodOfService")}
                     className="mt-1"
+                    maxLength={3}
                   />
                 </div>
                 <div>
@@ -490,13 +549,17 @@ const AddRecord = () => {
                     id="employer" 
                     {...register("employerName")}
                     className="mt-1"
+                    maxLength={100}
                   />
                 </div>
                 <div>
                   <Label htmlFor="mobileNumberLinkedAadhaar">15. Aadhaar Linked Mobile Number </Label>
                   <Input 
                     id="mobileNumberLinkedAadhaar" 
-                    {...register("aadhaarLinkedMobileNumber")}
+                    value={formatMobileNumber(watch("aadhaarLinkedMobileNumber"))}
+                    onChange={(e) => setValue("aadhaarLinkedMobileNumber", unformatMobileNumber(e.target.value), { shouldValidate: true })}
+                    onBlur={register("aadhaarLinkedMobileNumber").onBlur}
+                    // {...register("aadhaarLinkedMobileNumber")}
                     className="mt-1"
                   />
                 </div>
@@ -506,14 +569,19 @@ const AddRecord = () => {
                     id="nominee" 
                     {...register("nameOfNominee")}
                     className="mt-1"
+                    maxLength={100}
                   />
                 </div>
                 <div>
                   <Label htmlFor="nomineeAge">17. Age of Nominee</Label>
                   <Input 
                     id="nomineeAge" 
-                    {...register("ageOfNominee")}
+                    value={digitsOnly(watch("ageOfNominee"))}
+                    onChange={(e) => setValue("ageOfNominee", digitsOnly(e.target.value), { shouldValidate: true })}
+                    onBlur={register("ageOfNominee").onBlur}
+                    // {...register("ageOfNominee")}
                     className="mt-1"
+                    maxLength={3}
                   />
                 </div>
                 <div>
@@ -522,6 +590,7 @@ const AddRecord = () => {
                     id="relation" 
                     {...register("relationName")}
                     className="mt-1"
+                    maxLength={100}
                   />
                 </div>
               </div>
@@ -571,10 +640,11 @@ const AddRecord = () => {
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Input 
-                            value={member.currentAge}
+                            value={digitsOnly(member.currentAge)}
                             onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
                             aria-label={`Current age for family member ${index + 1}`}
                             className="w-full border border-input bg-background focus-visible:border-primary"
+                            maxLength={3}
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -590,10 +660,11 @@ const AddRecord = () => {
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Input 
-                            value={member.deathAge}
+                            value={digitsOnly(member.deathAge)}
                             onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
                             aria-label={`Age at death or year for family member ${index + 1}`}
                             className="w-full border border-input bg-background focus-visible:border-primary"
+                            maxLength={4}
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -602,6 +673,7 @@ const AddRecord = () => {
                             onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
                             aria-label={`Reason for family member ${index + 1}`}
                             className="w-full border border-input bg-background focus-visible:border-primary"
+                            maxLength={100}
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -635,21 +707,29 @@ const AddRecord = () => {
             <CardContent className="pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <Label htmlFor="height">1. Height</Label>
+                  <Label htmlFor="height">1. Height : cm</Label>
                   <Input 
                     id="height" 
                     placeholder="Height in cm"
-                    {...register("height")}
+                    value={digitsOnly(watch("height"))}
+                    onChange={(e) => setValue("height", digitsOnly(e.target.value), { shouldValidate: true })}
+                    onBlur={register("height").onBlur}
+                    // {...register("height")}
                     className="mt-1"
+                    maxLength={3}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="weight">2. Weight</Label>
+                  <Label htmlFor="weight">2. Weight : kg</Label>
                   <Input 
                     id="weight" 
                     placeholder="Weight in kg"
-                    {...register("weight")}
+                    value={digitsOnly(watch("weight"))}
+                    onChange={(e) => setValue("weight", digitsOnly(e.target.value), { shouldValidate: true })}
+                    onBlur={register("weight").onBlur}
+                    // {...register("weight")}
                     className="mt-1"
+                    maxLength={3}
                   />
                 </div>
                 <div>
@@ -668,6 +748,7 @@ const AddRecord = () => {
                     placeholder="Enter bank account number"
                     {...register("bankAccountNumber")}
                     className="mt-1"
+                    maxLength={30}
                   />
                 </div>
                 <div>
@@ -675,8 +756,12 @@ const AddRecord = () => {
                   <Input 
                     id="ifsc" 
                     placeholder="e.g. SBIN0001234"
-                    {...register("ifscCode")}
-                    className="mt-1"
+                    {...register("ifscCode", {
+                      onChange: () => setIfscLookupState({ status: "idle" }),
+                    })}
+                    onBlur={(e) => { register("ifscCode").onBlur(e); handleIfscBlur(); }}
+                    className="mt-1 uppercase"
+                    maxLength={11}
                   />
                 </div>
                 <div>
@@ -685,8 +770,25 @@ const AddRecord = () => {
                     id="bankName" 
                     {...register("bankName")}
                     className="mt-1"
+                    maxLength={100}
                     disabled
+                    placeholder="Auto-filled from IFSC"
                   />
+                  {ifscLookupState.status === "loading" && (
+                    <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                      <Loader2 className="w-3 h-3 animate-spin" /> Looking up bank…
+                    </p>
+                  )}
+                  {ifscLookupState.status === "not_found" && (
+                    <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" /> IFSC not found — check the code
+                    </p>
+                  )}
+                  {ifscLookupState.status === "found" && (
+                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" /> Verified
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="branchName">7. Branch Name</Label>
@@ -694,7 +796,9 @@ const AddRecord = () => {
                     id="branchName" 
                     {...register("branchName")}
                     className="mt-1"
+                    maxLength={100}
                     disabled
+                    placeholder="Auto-filled from IFSC"
                   />
                 </div>
               </div>
@@ -727,6 +831,7 @@ const AddRecord = () => {
                           onChange={(e) => handlePolicyChange("current", "policyNumber", e.target.value)}
                           aria-label="Policy Number"
                           className="border border-input bg-background focus-visible:border-primary"
+                          maxLength={30}
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -735,14 +840,16 @@ const AddRecord = () => {
                           onChange={(e) => handlePolicyChange("current", "planAndTerm", e.target.value)}
                           aria-label="Plan and Term"
                           className="border border-input bg-background focus-visible:border-primary"
+                          maxLength={100}
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
                         <Input 
-                          value={currentPolicy.sumAssured}
-                          onChange={(e) => handlePolicyChange("current", "sumAssured", e.target.value)}
+                          value={formatIndianNumber(currentPolicy.sumAssured)}
+                          onChange={(e) => handlePolicyChange("current", "sumAssured", unformatIndianNumber(e.target.value))}
                           aria-label="Sum Assured"
                           className="border border-input bg-background focus-visible:border-primary"
+                          inputMode="numeric"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -767,6 +874,7 @@ const AddRecord = () => {
                           onChange={(e) => handlePolicyChange("current", "branch", e.target.value)}
                           aria-label="Branch"
                           className="border border-input bg-background focus-visible:border-primary"
+                          maxLength={100}
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -811,6 +919,7 @@ const AddRecord = () => {
                           onChange={(e) => handlePolicyChange("previous", "policyNumber", e.target.value)}
                           aria-label="Previous Policy Number"
                           className="border border-input bg-background focus-visible:border-primary"
+                          maxLength={30}
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -819,14 +928,16 @@ const AddRecord = () => {
                           onChange={(e) => handlePolicyChange("previous", "planAndTerm", e.target.value)}
                           aria-label="Previous Plan and Term"
                           className="border border-input bg-background focus-visible:border-primary"
+                          maxLength={100}
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
                         <Input 
-                          value={previousPolicy.sumAssured}
-                          onChange={(e) => handlePolicyChange("previous", "sumAssured", e.target.value)}
+                          value={formatIndianNumber(previousPolicy.sumAssured)}
+                          onChange={(e) => handlePolicyChange("previous", "sumAssured", unformatIndianNumber(e.target.value))}
                           aria-label="Previous Sum Assured"
                           className="border border-input bg-background focus-visible:border-primary"
+                          inputMode="numeric"
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
@@ -851,6 +962,7 @@ const AddRecord = () => {
                           onChange={(e) => handlePolicyChange("previous", "branch", e.target.value)}
                           aria-label="Previous Branch"
                           className="border border-input bg-background focus-visible:border-primary"
+                          maxLength={100}
                         />
                       </TableCell>
                       <TableCell className="border border-table-border">
