@@ -7,6 +7,7 @@ import { CheckCircle2, XCircle, Loader2, MailCheck } from "lucide-react";
 import { verifyEmail, resendVerification, logoutCurrentUser } from "../../services/userService";
 import { getCurrentUser } from "@/utils/auth";
 import type { VerifyStatus } from "@/types/pages/VerifyEmail.types";
+import SEO from "@/components/SEO";
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const navigate       = useNavigate();
@@ -104,6 +105,7 @@ const VerifyEmail = () => {
 
   return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
+      <SEO title="Verify Email" description="Verify your Policy Niketan account email address." path="/verify-email" noindex />
       <div className="w-full max-w-md">
         <Card>
           <CardHeader className="text-center">

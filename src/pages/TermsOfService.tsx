@@ -60,6 +60,7 @@ const TermsOfService = () => {
       <SEO
         title="Terms of Service"
         description={`The terms and conditions governing use of ${siteConfig.title} — account eligibility, subscription plans, data responsibilities, intellectual property, liability, and dispute resolution.`}
+        path="/terms-of-service"
       />
       <Navigation />
 

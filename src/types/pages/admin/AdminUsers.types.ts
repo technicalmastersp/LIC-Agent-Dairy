@@ -6,6 +6,7 @@ export interface UserSubscriptionInfo {
   planId?: string;
   planType?: string;
   status?: string;
+  endDate?: string;
 }
 export interface AdminUserRow {
   userId: string;

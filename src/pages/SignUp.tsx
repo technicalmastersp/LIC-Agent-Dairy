@@ -13,6 +13,7 @@ import type { SignUpRequest } from "@/types/pages/SignUp.types";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import SEO from "@/components/SEO";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -206,6 +207,11 @@ const SignUp = () => {
 
   return (
     <main className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
+      <SEO
+        title="Sign Up"
+        description="Create your free Policy Niketan account and start tracking client policy records, premium due dates, and payments today."
+        path="/signup"
+      />
       <h1 className="sr-only">{t('signupTitle')}</h1>
       <div className="w-full max-w-2xl space-y-6">
         <div className="flex w-full items-center justify-between">

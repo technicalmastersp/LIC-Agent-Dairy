@@ -55,6 +55,7 @@ const PrivacyPolicy = () => {
       <SEO
         title="Privacy Policy"
         description={`How ${siteConfig.companyName} collects, processes, stores, and protects personal, financial, and policy data, in accordance with the Digital Personal Data Protection Act, 2023.`}
+        path="/privacy-policy"
       />
       <Navigation />
 

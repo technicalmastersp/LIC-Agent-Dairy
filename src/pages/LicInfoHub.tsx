@@ -180,6 +180,7 @@ const LicInfoHub: React.FC = () => {
         title="LIC Info Hub — Insurance Abbreviations & Terms Explained"
         description="Look up LIC abbreviations, internal codes, private insurer names, and common policy terms — a searchable glossary built for life insurance agents."
         jsonLd={jsonLd}
+        path="/lic-info-hub"
       />
       <Navigation />
 

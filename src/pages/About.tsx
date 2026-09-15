@@ -114,6 +114,7 @@ const About = () => {
       <SEO
         title="About Us"
         description="Learn who builds Policy Niketan, why we built a dedicated record-keeping tool for all types of insurance agents, and how we keep client data secure."
+        path="/about"
       />
       <Navigation />
 

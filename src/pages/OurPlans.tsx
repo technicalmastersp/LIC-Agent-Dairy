@@ -222,6 +222,7 @@ const OurPlans = () => {
       <SEO
         title="Subscription Plans & Pricing"
         description="Compare Policy Niketan subscription plans — from a free 1-month trial to 24-month options — and pick the right fit for how many client records you manage."
+        path="/our-plans"
       />
       <Navigation />
 

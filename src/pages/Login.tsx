@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import SEO from "@/components/SEO";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LogIn, EyeOff, Eye, User, Home } from "lucide-react";
 import { setCurrentUser } from "@/utils/auth";
@@ -65,6 +66,11 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
+      <SEO
+        title="Log In"
+        description="Log in to your Policy Niketan account to manage client policy records, track due dates, and monitor payments."
+        path="/login"
+      />
       <div className="w-full max-w-md space-y-6">
         <div className="flex w-full items-center justify-between">
           <div 
