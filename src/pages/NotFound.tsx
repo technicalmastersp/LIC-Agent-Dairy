@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Compass, ArrowLeft, Home } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
+import SEO from "@/components/SEO";
 
 const REDIRECT_SECONDS = 5;
 
@@ -35,6 +36,7 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4 py-12">
+      <SEO title="Page Not Found" description="The page you're looking for doesn't exist or may have been moved." path={location.pathname} noindex />
       <div className="w-full max-w-md text-center">
 
         {/* Icon badge */}

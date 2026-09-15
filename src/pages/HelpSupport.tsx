@@ -189,6 +189,7 @@ const HelpSupport = () => {
       <SEO
         title="Help & Support"
         description="Find answers to common questions, browse help topics, or contact our support team directly. Track your open tickets and suggestions in one place."
+        path="/help-support"
       />
       <Navigation />
 

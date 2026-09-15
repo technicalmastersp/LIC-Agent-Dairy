@@ -41,6 +41,7 @@ const Footer = () => {
         { label: t("missedPayments"), to: "/view-missed-payments" }
       ]
     : [
+        { label: t("home"), to: "/" },
         { label: t("login"), to: "/login" },
         { label: t("signupFree"), to: "/signup" },
         { label: ("Help & Support"), to: "/help-support" }
@@ -98,7 +99,7 @@ const Footer = () => {
             <div className="flex flex-col space-y-2.5">
               <div className="flex items-start gap-2">
                 <Mail className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                <span className="break-words">{siteConfig.supportEmail}</span>
+                <span className="break-all">{siteConfig.supportEmail}</span>
               </div>
               <div className="flex items-start gap-2">
                 <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0" />
@@ -106,7 +107,7 @@ const Footer = () => {
               </div>
               <div className="flex items-start gap-2">
                 <Globe className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                <span className="break-words">{siteConfig.productionUrl}</span>
+                <span className="break-all">{siteConfig.productionUrl}</span>
               </div>
             </div>
           </FooterSection>

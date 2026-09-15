@@ -234,6 +234,28 @@ const Home = () => {
             </div>
           )}
 
+          {/* ── Subscription expiry warning ── */}
+          {sub?.status === "active" && daysLeft <= 15 && (() => {
+            const tier = daysLeft <= 1
+              ? { box: "bg-red-50 border-red-300",    icon: "text-red-600",    text: "text-red-800",    link: "text-red-700",    pulse: true  }
+              : daysLeft <= 3
+              ? { box: "bg-red-50 border-red-200",    icon: "text-red-600",    text: "text-red-800",    link: "text-red-700",    pulse: false }
+              : daysLeft <= 7
+              ? { box: "bg-orange-50 border-orange-200", icon: "text-orange-600", text: "text-orange-800", link: "text-orange-700", pulse: false }
+              : { box: "bg-yellow-50 border-yellow-200", icon: "text-yellow-600", text: "text-yellow-800", link: "text-yellow-700", pulse: false };
+            const whenText = daysLeft === 0 ? "today" : daysLeft === 1 ? "tomorrow" : `in ${daysLeft} days`;
+            return (
+              <div className={`flex items-start gap-3 border rounded-lg px-4 py-3 ${tier.box}`}>
+                <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${tier.icon} ${tier.pulse ? "animate-pulse" : ""}`} />
+                <p className={`text-sm ${tier.text}`}>
+                  <strong>Your {sub.planType} plan expires {whenText}</strong> ({fmt(sub.endDate)}).
+                  Renew now to avoid losing access to your records and adding new ones.{" "}
+                  <Link to="/our-plans" className={`underline font-medium ${tier.link}`}>Renew now →</Link>
+                </p>
+              </div>
+            );
+          })()}
+
           {/* ── Stat cards ── */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {stats.map(({ label, val, icon, color, sub, link, bg, tourId }) => (

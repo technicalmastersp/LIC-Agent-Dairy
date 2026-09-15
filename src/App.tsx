@@ -56,6 +56,7 @@ const NotificationPreferences = lazy(() => import("./pages/NotificationPreferenc
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminUserDetail = lazy(() => import("./pages/admin/AdminUserDetail"));
 const AdminAdmins = lazy(() => import("./pages/admin/AdminAdmins"));
+const AdminAdminDetail = lazy(() => import("./pages/admin/AdminAdminDetail"));
 const WithdrawalRequests = lazy(() => import("./pages/admin/WithdrawalRequests"));
 const PaymentVerifications = lazy(() => import("./pages/admin/PaymentVerifications"));
 const AdminLogs = lazy(() => import("./pages/admin/AdminLogs"));
@@ -132,6 +133,7 @@ const App = () => (
                       Gated the same as its parent /admin/users list. */}
                   <Route path="/admin/users/:userId" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminUserDetail /></ProtectedRoute>} />
                   <Route path="/admin/admins" element={<ProtectedRoute roles={["superadmin"]}><AdminAdmins /></ProtectedRoute>} />
+                  <Route path="/admin/admins/:userId" element={<ProtectedRoute roles={["superadmin"]}><AdminAdminDetail /></ProtectedRoute>} />
                   <Route path="/admin/withdrawals" element={<ProtectedRoute roles={["admin", "superadmin"]}><WithdrawalRequests /></ProtectedRoute>} />
                   <Route path="/admin/payment-verifications" element={<ProtectedRoute roles={["admin", "superadmin"]}><PaymentVerifications /></ProtectedRoute>} />
                   <Route path="/admin/logs" element={<ProtectedRoute roles={["superadmin"]}><AdminLogs /></ProtectedRoute>} />

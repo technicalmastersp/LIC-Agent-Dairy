@@ -21,6 +21,7 @@ const ToolsHub = () => {
       <SEO
         title="Free Financial Calculators"
         description="Free calculators for age, SIP returns, income tax, home loan EMI, term insurance cover, and inflation — quick tools for agents and clients alike."
+        path="/tools"
       />
       <Navigation />
       <main className="flex-1">

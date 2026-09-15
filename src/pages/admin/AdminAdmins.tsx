@@ -11,10 +11,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast }     from "@/hooks/use-toast";
 import { getCurrentUser } from "@/utils/auth";
 import { getAdmins, createAdmin, deactivateUser, reactivateUser, updateAdminPermissions, forceLogoutUser, getSuperAdmins, promoteAdmin, demoteAdmin } from "../../../services/adminService";
-import { Plus, UserX, UserCheck, X, Shield, ToggleLeft, ToggleRight, LogOut, Crown, Clock } from "lucide-react";
+import { Plus, UserX, UserCheck, X, Shield, ToggleLeft, ToggleRight, LogOut, Crown, Clock, Eye } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { AdminItem, SuperAdminItem, ModalTarget } from "@/types/pages/admin/AdminAdmins.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
+import { PERMISSION_DEFS, PERMISSION_RISK_COLOR } from "@/config/adminPermissions";
 
 // (date formatting now imported from dateFormat.ts as `fmt`)
 const AdminAdmins = () => {
@@ -48,28 +49,6 @@ const AdminAdmins = () => {
   const [deactivateModal, setDeactivateModal] = useState<ModalTarget | null>(null);
   const [deactivateNote,  setDeactivateNote]  = useState("");
   const [reactivateModal, setReactivateModal] = useState<ModalTarget | null>(null);
-
-  const PERMISSION_DEFS = [
-    { key: "can_view_users",          label: "View users",              desc: "See user list and details",                  risk: "low"    },
-    { key: "can_deactivate_users",    label: "Deactivate users",        desc: "Activate or deactivate user accounts",       risk: "medium" },
-    { key: "can_view_withdrawals",    label: "View withdrawals",        desc: "See all withdrawal requests",                risk: "low"    },
-    { key: "can_approve_withdrawals", label: "Approve withdrawals",     desc: "Approve pending withdrawal requests",        risk: "high"   },
-    { key: "can_reject_withdrawals",  label: "Reject withdrawals",      desc: "Reject and refund withdrawal requests",      risk: "high"   },
-    { key: "can_view_logs",           label: "View activity logs",      desc: "See admin action logs",                      risk: "medium" },
-    { key: "can_change_subscription", label: "Change subscriptions",    desc: "Modify any user's subscription plan",        risk: "high"   },
-    { key: "can_delete_users",        label: "Delete users",            desc: "Permanently delete user accounts and data",  risk: "critical"},
-    { key: "can_verify_payment_details", label: "Verify payment details", desc: "Approve or reject users' UPI IDs for withdrawal payouts", risk: "high" },
-    { key: "can_manage_support", label: "Manage support & suggestions", desc: "View and reply to support tickets, review user suggestions", risk: "medium" },
-    { key: "can_view_revenue", label: "View revenue", desc: "See financial reports — income, expenses, profit/loss", risk: "high" },
-    { key: "can_manage_expenses", label: "Manage expenses & refunds", desc: "Log expenses, edit/delete entries, process payment refunds", risk: "critical" },
-  ];
-
-  const riskColor: Record<string, string> = {
-    low:      "text-green-600",
-    medium:   "text-yellow-600",
-    high:     "text-orange-600",
-    critical: "text-red-600",
-  };
 
   const handleForceLogout = async () => {
     if (!logoutModal) return;
@@ -199,7 +178,7 @@ const AdminAdmins = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-5 max-w-4xl">
+      <div className="space-y-5 max-w-6xl">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-medium">Admins</h1>
@@ -303,6 +282,10 @@ const AdminAdmins = () => {
                           {demoting === s.userId ? "Demoting…" : "Demote"}
                         </Button>
                       )}
+                      <Button size="sm" variant="outline" className="h-7 text-xs shrink-0"
+                        onClick={() => navigate(`/admin/admins/${s.userId}`)}>
+                        <Eye className="w-3.5 h-3.5 mr-1" /> View details
+                      </Button>
                     </div>
                   );
                 })}
@@ -370,6 +353,10 @@ const AdminAdmins = () => {
                         onClick={() => setPromoteModal({ userId: a.userId, name: a.name })}>
                         <Crown className="w-3.5 h-3.5 mr-1" /> Promote
                       </Button>
+                      <Button size="sm" variant="outline" className="h-7 text-xs"
+                        onClick={() => navigate(`/admin/admins/${a.userId}`)}>
+                        <Eye className="w-3.5 h-3.5 mr-1" /> View details
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -406,7 +393,7 @@ const AdminAdmins = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium">{label}</p>
-                          <span className={`text-xs font-medium capitalize ${riskColor[risk]}`}>
+                          <span className={`text-xs font-medium capitalize ${PERMISSION_RISK_COLOR[risk]}`}>
                             {risk}
                           </span>
                         </div>

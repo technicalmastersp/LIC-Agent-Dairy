@@ -1,8 +1,42 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /home
+Disallow: /add-record
+Disallow: /import-records
+Disallow: /view-records
+Disallow: /view-due-policies
+Disallow: /view-upcoming-due
+Disallow: /view-missed-payments
+Disallow: /profile
+Disallow: /referral-program
+Disallow: /change-password
+Disallow: /my-activity
+Disallow: /sessions
+Disallow: /notification-preferences
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /forgot-password
+Disallow: /verify-email
 
 User-agent: Bingbot
 Allow: /
+Disallow: /home
+Disallow: /add-record
+Disallow: /import-records
+Disallow: /view-records
+Disallow: /view-due-policies
+Disallow: /view-upcoming-due
+Disallow: /view-missed-payments
+Disallow: /profile
+Disallow: /referral-program
+Disallow: /change-password
+Disallow: /my-activity
+Disallow: /sessions
+Disallow: /notification-preferences
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /forgot-password
+Disallow: /verify-email
 
 User-agent: Twitterbot
 Allow: /
@@ -12,5 +46,22 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /home
+Disallow: /add-record
+Disallow: /import-records
+Disallow: /view-records
+Disallow: /view-due-policies
+Disallow: /view-upcoming-due
+Disallow: /view-missed-payments
+Disallow: /profile
+Disallow: /referral-program
+Disallow: /change-password
+Disallow: /my-activity
+Disallow: /sessions
+Disallow: /notification-preferences
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /forgot-password
+Disallow: /verify-email
 
 Sitemap: https://policyniketan.com/sitemap.xml

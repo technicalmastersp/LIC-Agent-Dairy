@@ -255,6 +255,7 @@ const AdminUsers = () => {
                       <TableHead className="text-xs">Records</TableHead>
                       <TableHead className="text-xs">Status</TableHead>
                       <TableHead className="text-xs">Joined</TableHead>
+                      <TableHead className="text-xs">Expiry</TableHead>
                       <TableHead className="text-xs">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -293,6 +294,8 @@ const AdminUsers = () => {
                             : <Badge className="text-xs bg-red-100 text-red-700 border border-red-200">Deactivated</Badge>}
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground">{fmt(u.createdAt)}</TableCell>
+                        {/* <TableCell className="text-xs text-muted-foreground">{fmt(u.subscription.endDate != null ? u.subscription.endDate : u.subscription.status)}</TableCell> */}
+                        <TableCell className="text-xs text-muted-foreground">{u.subscription.endDate != null ? fmt(u.subscription.endDate) : u.subscription.status}</TableCell>
                         <TableCell>
                           <div className="flex gap-1.5">
                             <Button size="sm" variant="outline" className="h-7 w-7 p-0"

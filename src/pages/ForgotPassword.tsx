@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { forgotPassword, verifyOTP, resetPassword } from "../../services/userService";
 import { forgotPasswordEmailSchema, resetPasswordSchema } from "@/schemas/forgotPasswordSchema";
 import type { ForgotPasswordEmailValues, ResetPasswordValues } from "@/types/schemas/forgotPasswordSchema.types";
+import SEO from "@/components/SEO";
 import type { Step } from "@/types/pages/ForgotPassword.types";
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -150,6 +151,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
+      <SEO title="Forgot Password" description="Reset your Policy Niketan account password." path="/forgot-password" noindex />
       <div className="w-full max-w-md">
         <Card>
 

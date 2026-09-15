@@ -165,14 +165,23 @@ const AdminDashboard = () => {
               sub:     `${subscriptions.paid} paid · ${subscriptions.freeTrial} trial`,
               link:    "/admin/users?status=active",
             },
-            {
+            ...(currentUser?.role === "superadmin" || permissions?.can_view_revenue ? [{
               label:   "Total revenue",
               val:     `₹${(revenue.total ?? 0).toLocaleString("en-IN")}`,
               icon:    <TrendingUp className="w-5 h-5 text-purple-600" />,
               bg:      "bg-purple-50 border-purple-200 dark:bg-purple-950/40 dark:border-purple-900",
               sub:     `${subscriptions.paid} paid users`,
-              link:    null,
-            },
+              link:    "/admin/revenue",
+            }] : []),
+            ...(currentUser?.role === "superadmin" || permissions?.can_view_revenue ? [{
+              label:   "This month's income",
+              val:     `₹${(stats.revenue?.thisMonthIncome ?? 0).toLocaleString("en-IN")}`,
+              icon:    <IndianRupee className="w-5 h-5 text-green-600" />,
+              bg:      "border bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-900",
+              sub:     "View full revenue report",
+              link:    "/admin/revenue?filters=currentMonth",
+              urgent:  false,
+            }] : []),
             {
               label:   "Pending withdrawals",
               val:     withdrawals.pending,
@@ -181,6 +190,7 @@ const AdminDashboard = () => {
               sub:     `₹${withdrawals.pendingAmount.toLocaleString("en-IN")} pending`,
               link:    "/admin/withdrawals",
               urgent:  withdrawals.pending > 0,
+              dot:     withdrawals.pending > 0,
             },
             ...(currentUser?.role === "superadmin" || permissions?.can_verify_payment_details ? [{
               label:   "Pending UPI verifications",
@@ -190,6 +200,7 @@ const AdminDashboard = () => {
               sub:     "Awaiting manual review",
               link:    "/admin/payment-verifications",
               urgent:  (stats.paymentVerifications?.pendingUpi ?? 0) > 0,
+              dot:     (stats.paymentVerifications?.pendingUpi ?? 0) > 0,
             }] : []),
             ...(currentUser?.role === "superadmin" || permissions?.can_manage_support ? [
               {
@@ -200,6 +211,7 @@ const AdminDashboard = () => {
                 sub:     `${stats.support?.openHighPriority ?? 0} high · ${stats.support?.openGuest ?? 0} guest`,
                 link:    "/admin/support",
                 urgent:  (stats.support?.openHighPriority ?? 0) > 0,
+                dot:     ((stats.support?.openHighPriority ?? 0) + (stats.support?.openGuest ?? 0)) > 0,
               },
               {
                 label:   "New suggestions",
@@ -209,25 +221,23 @@ const AdminDashboard = () => {
                 sub:     "Awaiting review",
                 link:    "/admin/suggestions",
                 urgent:  false,
+                dot:     (stats.support?.newSuggestions ?? 0) > 0,
               },
-            ] : []),
-            ...(currentUser?.role === "superadmin" || permissions?.can_view_revenue ? [{
-              label:   "This month's income",
-              val:     `₹${(stats.revenue?.thisMonthIncome ?? 0).toLocaleString("en-IN")}`,
-              icon:    <IndianRupee className="w-5 h-5 text-green-600" />,
-              bg:      "border bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-900",
-              sub:     "View full revenue report",
-              link:    "/admin/revenue",
-              urgent:  false,
-            }] : []),
-          ].map(({ label, val, icon, bg, sub, trend, link, urgent }) => (
+            ] : [])
+          ].map(({ label, val, icon, bg, sub, trend, link, urgent, dot }) => (
             <Card key={label}
               className={`border ${bg} ${link ? "cursor-pointer hover:shadow-md transition-shadow" : ""} ${urgent ? "ring-2 ring-amber-400" : ""}`}
               onClick={() => link && navigate(link)}>
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-2">
-                  <div className="w-9 h-9 rounded-lg bg-white dark:bg-background border border-border flex items-center justify-center">
+                  <div className="relative w-9 h-9 rounded-lg bg-white dark:bg-background border border-border flex items-center justify-center">
                     {icon}
+                    {dot && (
+                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white dark:border-background"></span>
+                      </span>
+                    )}
                   </div>
                   {trend !== undefined && (
                     <span className={`text-xs font-medium flex items-center gap-0.5 ${trend >= 0 ? "text-green-600" : "text-red-500"}`}>

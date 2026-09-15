@@ -32,7 +32,7 @@ const ToolPageLayout = ({ icon: Icon, title, description, children, accent }: To
           on-page heading — reused here as the SEO title/meta description too,
           so each calculator gets genuinely different search/social copy
           without duplicating it in every individual page file. */}
-      <SEO title={title} description={description} jsonLd={jsonLd} />
+      <SEO title={title} description={description} jsonLd={jsonLd} path={pathname} />
       <Navigation />
       <main className="flex-1">
         <section className="relative bg-gradient-to-b from-primary/5 via-background to-background overflow-hidden">
