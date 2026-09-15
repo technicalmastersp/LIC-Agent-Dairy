@@ -30,9 +30,10 @@ import { formatISTDate as fmt } from "@/utils/dateFormat";
 // ── types ─────────────────────────────────────────────────────────────────────
 // ── helpers ───────────────────────────────────────────────────────────────────
 const PLANS = [
-  { name: "Basic",    duration: "6 months",  price: 599  },
-  { name: "Standard", duration: "12 months", price: 1099 },
-  { name: "Premium",  duration: "24 months", price: 2099 },
+  { name: "Starter",  duration: "1 month",  price: 249  },
+  { name: "Basic",    duration: "3 months",  price: 599  },
+  { name: "Standard", duration: "6 months", price: 1099 },
+  { name: "Premium",  duration: "12 months", price: 2099 },
 ];
 
 // Referrer tiers — a milestone ladder based on direct (L1) referrals, giving

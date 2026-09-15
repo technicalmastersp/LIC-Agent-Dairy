@@ -21,20 +21,21 @@ const initials = (name = "") =>
 // (date formatting now imported from dateFormat.ts as `fmt`)
 
 const planColor: Record<string, string> = {
-  "1month-free": "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground",
-  "6months":     "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400",
-  "12months":    "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
-  "24months":    "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
+  "1month-free": "bg-indigo-100 text-gray-600 dark:bg-muted dark:text-muted-foreground",
+  "3months":     "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400",
+  "6months":    "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  "12months":    "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
 };
 
 const PAGE_SIZE = 20;
 export const STATUS_OPTIONS = ["all", "active", "deactivated", "plan expired"] as const;
 export const PLAN_SORT_OPTIONS = {
   default: { label: "Latest first", order: null },
-  "0st":   { label: "Free Trial → Basic → Standard → Premium", order: ["1month-free", "6months", "12months", "24months"] },
-  "1st":   { label: "Basic → Standard → Premium",  order: ["6months", "12months", "24months"] },
-  "2nd":   { label: "Standard → Premium → Basic",  order: ["12months", "24months", "6months"] },
-  "3rd":   { label: "Premium → Basic → Standard",  order: ["24months", "6months", "12months"] },
+  "0st":   { label: "Free Trial First", order: ["1month-free", "1month", "3months", "6months", "12months"] },
+  "1st":   { label: "Starter First", order: ["1month", "3months", "6months", "12months", "1month-free"] },
+  "2st":   { label: "Basic First",  order: ["3months", "6months", "12months", "1month-free", "1month"] },
+  "3nd":   { label: "Standard First",  order: ["6months", "12months", "1month-free", "1month", "3months"] },
+  "4rd":   { label: "Premium First",  order: ["12months", "1month-free", "1month", "3months", "6months"] },
 } as const;
 const AdminUsers = () => {
   const navigate    = useNavigate();

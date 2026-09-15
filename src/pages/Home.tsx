@@ -77,9 +77,9 @@ const Home = () => {
   const daysLeft   = sub?.endDate
     ? Math.max(0, Math.ceil((new Date(sub.endDate).getTime() - Date.now()) / 86400000))
     : 0;
-  const totalDays  = sub?.planId === "6months"  ? 180
+  const totalDays  = sub?.planId === "3months"  ? 90
+                   : sub?.planId === "6months" ? 180
                    : sub?.planId === "12months" ? 365
-                   : sub?.planId === "24months" ? 730
                    : 30;
   const progressPct = Math.round((daysLeft / totalDays) * 100);
   const progressColor = progressPct > 50 ? "bg-blue-500"

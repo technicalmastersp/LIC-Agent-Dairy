@@ -25,11 +25,11 @@ const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
 const PLANS = [
-  { id: "1month-free", label: "Free — 1 Month"    },
-  { id: "1month", label: "Starter — 1 Month"    },
-  { id: "6months",     label: "Basic — 6 Months"  },
-  { id: "12months",    label: "Standard — 12 Months" },
-  { id: "24months",    label: "Premium — 24 Months"  },
+  { id: "1month-free",  label: "Free — 1 Month" },
+  { id: "1month",       label: "Starter — 1 Month" },
+  { id: "3months",      label: "Basic — 3 Months" },
+  { id: "6months",      label: "Standard — 6 Months" },
+  { id: "12months",     label: "Premium — 12 Months" },
 ];
 const AdminUserDetail = () => {
   const { userId }  = useParams();

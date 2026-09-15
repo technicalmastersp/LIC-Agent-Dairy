@@ -36,10 +36,10 @@ const ACTION_COLORS: Record<string, string> = {
 };
 
 const PLAN_COLOR: Record<string, string> = {
-  "1month-free": "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground",
-  "6months":     "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400",
-  "12months":    "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
-  "24months":    "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
+  "1month-free": "bg-indigo-100 text-gray-600 dark:bg-muted dark:text-muted-foreground",
+  "3months":     "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400",
+  "6months":     "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  "12months":    "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
 };
 
 // (date formatting now imported from dateFormat.ts as `fmt`/`fmtTime`)
