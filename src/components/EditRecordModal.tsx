@@ -12,10 +12,12 @@ import { getCurrentUser } from "@/utils/auth";
 import {
   Save, Plus, Trash2, User, X,
   IdCard, Users, HeartPulse, ShieldCheck, History,
-  LucideIcon
+  LucideIcon, Loader2, CheckCircle2, AlertCircle,
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { updateRecord } from "../../services/recordService";
+import { validateIfsc } from "../../utils/bankValidators";
+import { lookupIfsc } from "../../services/referralService";
 import { convertDateToIndianFormat } from "@/utils/tools";
 import InsuranceTypeSelector from "@/components/InsuranceTypeSelector";
 import TypeSpecificFieldsForm from "@/components/TypeSpecificFieldsForm";
@@ -27,6 +29,7 @@ import type { PolicyRecordFormValues } from "@/types/schemas/policyRecordSchema.
 import type { Record as RecordData } from "@/types/Record";
 import type { EditRecordModalProps } from "@/types/components/EditRecordModal.types";
 import { isValidCalendarDate } from "@/utils/dateFormat";
+import { formatAadhaar, unformatAadhaar, formatIndianNumber, unformatIndianNumber, formatMobileNumber, unformatMobileNumber, digitsOnly } from "@/utils/inputValueFormats";
 // Small section header used across the form cards — a plain sequential
 // step number (Step 1 – Step 8) through the whole form, matching AddRecord.
 const SectionTitle = ({ icon: Icon, step, children }: { icon: LucideIcon; step?: string; children: React.ReactNode }) => (
@@ -72,6 +75,9 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
     register,
     handleSubmit: rhfHandleSubmit,
     reset,
+    getValues,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<PolicyRecordFormValues>({
     resolver: zodResolver(policyRecordSchema),
@@ -132,6 +138,16 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
         bankName: record.bankName,
         branchName: record.branchName,
       });
+
+      // If this record already has a resolved bank name (saved previously,
+      // whether via lookup or the older free-text field), show it as
+      // "found" immediately instead of demanding a redundant IFSC re-lookup
+      // before the agent can save again.
+      if (record.ifscCode && record.bankName) {
+        setIfscLookupState({ status: "found", bank: record.bankName, branch: record.branchName });
+      } else {
+        setIfscLookupState({ status: "idle" });
+      }
 
       setPreviousPolicy({
         policyNumber: record.previousPolicy.policyNumber,
@@ -200,6 +216,37 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
       setCurrentPolicy(prev => ({ ...prev, [field]: value }));
     } else {
       setPreviousPolicy(prev => ({ ...prev, [field]: value }));
+    }
+  };
+
+  // IFSC -> bank name / branch name auto-fill, same lookup + status pattern
+  // used on AddRecord and the Referral Program's bank-details form.
+  // bankName/branchName stay disabled inputs — always derived from the
+  // IFSC code, never typed directly.
+  const [ifscLookupState, setIfscLookupState] = useState<{
+    status: "idle" | "loading" | "found" | "not_found";
+    bank?: string;
+    branch?: string;
+  }>({ status: "idle" });
+
+  const handleIfscBlur = async () => {
+    const code = (getValues("ifscCode") || "").trim().toUpperCase();
+    if (!validateIfsc(code)) {
+      setIfscLookupState({ status: "idle" });
+      setValue("bankName", "");
+      setValue("branchName", "");
+      return;
+    }
+    setIfscLookupState({ status: "loading" });
+    try {
+      const details = await lookupIfsc(code);
+      setIfscLookupState({ status: "found", bank: details.bank, branch: details.branch });
+      setValue("bankName", details.bank || "");
+      setValue("branchName", details.branch || "");
+    } catch {
+      setIfscLookupState({ status: "not_found" });
+      setValue("bankName", "");
+      setValue("branchName", "");
     }
   };
 
@@ -294,7 +341,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
               <p>Update invoice details and save changes.</p>
               <p>* Please ensure all required fields are filled out correctly before saving.</p>
               <p>* Changes will be reflected immediately in the record list after saving.</p>
-              <p>* Date fields should be in the format MM/DD/YYYY. For example, 03/26/2001.</p>
+              <p>* Date fields should be in the format DD/MM/YYYY. For example, 26/03/2001.</p>
+              <p>* All type of Age fields should be in year. For example, '15' it mean '15 years'.</p>
             </div>
           </DialogDescription>
         </DialogHeader>
@@ -358,7 +406,11 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="aadhaarNumber">2. Aadhaar Number</Label>
                   <Input 
                     id="aadhaarNumber" 
-                    {...register("aadhaarNumber")}
+                    value={formatAadhaar(watch("aadhaarNumber"))}
+                    onChange={(e) => setValue("aadhaarNumber", unformatAadhaar(e.target.value), { shouldValidate: true })}
+                    onBlur={register("aadhaarNumber").onBlur}
+                    maxLength={14}
+                    inputMode="numeric"
                   />
                 </div>
                 <div className="space-y-2">
@@ -366,6 +418,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="panNumber" 
                     {...register("panNumber")}
+                    className="uppercase"
+                    maxLength={10}
                   />
                 </div>
                 <div className="space-y-2">
@@ -374,6 +428,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="email" 
                     type="email" 
                     {...register("email")}
+                    maxLength={100}
                   />
                 </div>
               </div>
@@ -395,6 +450,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     {...nameField}
                     ref={(el) => { nameFieldRef(el); nameInputRef.current = el; }}
                     className={errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
+                    maxLength={100}
                   />
                   {errors.name && (
                     <p className="text-xs text-destructive mt-1">{errors.name.message}</p>
@@ -405,6 +461,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="birthPlace" 
                     {...register("birthPlace")}
+                    maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
@@ -412,6 +469,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="fatherName" 
                     {...register("fatherName")}
+                    maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
@@ -419,6 +477,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="motherName" 
                     {...register("motherName")}
+                    maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
@@ -426,6 +485,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="spouseName" 
                     {...register("spouseName")}
+                    maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
@@ -433,6 +493,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="address" 
                     {...register("address")}
+                    maxLength={200}
                   />
                 </div>
                 <div className="space-y-2">
@@ -447,7 +508,11 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Label htmlFor="age">8. Age</Label>
                   <Input 
                     id="age" 
-                    {...register("age")}
+                    value={digitsOnly(watch("age"))}
+                    onChange={(e) => setValue("age", digitsOnly(e.target.value), { shouldValidate: true })}
+                    onBlur={register("age").onBlur}
+                    // {...register("age")}
+                    maxLength={3}
                   />
                 </div>
                 <div className="space-y-2">
@@ -455,6 +520,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="educationalQualification" 
                     {...register("educationalQualification")}
+                    maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
@@ -462,6 +528,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="occupation" 
                     {...register("occupation")}
+                    maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
@@ -469,6 +536,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="designationOfPolicyHolder" 
                     {...register("designationOfPolicyHolder")}
+                    maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
@@ -476,13 +544,18 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="annualIncome" 
                     {...register("annualIncome")}
+                    maxLength={50}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="periodOfService">13. Period Of Service</Label>
                   <Input 
                     id="periodOfService" 
-                    {...register("periodOfService")}
+                    value={digitsOnly(watch("periodOfService"))}
+                    onChange={(e) => setValue("periodOfService", digitsOnly(e.target.value), { shouldValidate: true })}
+                    onBlur={register("periodOfService").onBlur}
+                    // {...register("periodOfService")}
+                    maxLength={3}
                   />
                 </div>
                 <div className="space-y-2">
@@ -490,13 +563,18 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="employerName" 
                     {...register("employerName")}
+                    maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="aadhaarLinkedMobileNumber">15. Aadhaar Linked Mobile Number </Label>
                   <Input 
                     id="aadhaarLinkedMobileNumber" 
-                    {...register("aadhaarLinkedMobileNumber")}
+                    value={formatMobileNumber(watch("aadhaarLinkedMobileNumber"))}
+                    onChange={(e) => setValue("aadhaarLinkedMobileNumber", unformatMobileNumber(e.target.value), { shouldValidate: true })}
+                    onBlur={register("aadhaarLinkedMobileNumber").onBlur}
+                    // {...register("aadhaarLinkedMobileNumber")}
+                    // maxLength={10}
                   />
                 </div>
                 <div className="space-y-2">
@@ -504,13 +582,18 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="nameOfNominee" 
                     {...register("nameOfNominee")}
+                    maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="ageOfNominee">17. Age of Nominee</Label>
                   <Input 
                     id="ageOfNominee" 
-                    {...register("ageOfNominee")}
+                    value={digitsOnly(watch("ageOfNominee"))}
+                    onChange={(e) => setValue("ageOfNominee", digitsOnly(e.target.value), { shouldValidate: true })}
+                    onBlur={register("ageOfNominee").onBlur}
+                    // {...register("ageOfNominee")}
+                    maxLength={3}
                   />
                 </div>
                 <div className="space-y-2">
@@ -518,6 +601,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="relationName" 
                     {...register("relationName")}
+                    maxLength={100}
                   />
                 </div>
               </div>
@@ -573,8 +657,9 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                       <div className="space-y-2">
                         <Label className="text-xs">2. Current Age</Label>
                         <Input
-                          value={member.currentAge}
+                          value={digitsOnly(member.currentAge)}
                           onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
+                          maxLength={3}
                         />
                       </div>
                       <div className="space-y-2">
@@ -594,8 +679,9 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                       <div className="space-y-2">
                         <Label className="text-xs">4. Age at Death/Year</Label>
                         <Input
-                          value={member.deathAge}
+                          value={digitsOnly(member.deathAge)}
                           onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
+                          maxLength={4}
                         />
                       </div>
                       <div className="space-y-2">
@@ -603,6 +689,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                         <Input
                           value={member.reason}
                           onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
+                          maxLength={100}
                         />
                       </div>
                     </div>
@@ -642,9 +729,10 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Input 
-                            value={member.currentAge}
+                            value={digitsOnly(member.currentAge)}
                             onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
                             className="w-full border border-input bg-background focus-visible:border-primary"
+                            maxLength={3}
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -660,9 +748,10 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Input 
-                            value={member.deathAge}
+                            value={digitsOnly(member.deathAge)}
                             onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
                             className="w-full border border-input bg-background focus-visible:border-primary"
+                            maxLength={4}
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -670,6 +759,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                             value={member.reason}
                             onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
                             className="w-full border border-input bg-background focus-visible:border-primary"
+                            maxLength={100}
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
@@ -702,19 +792,27 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
             <CardContent className="pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="height">1. Height</Label>
+                  <Label htmlFor="height">1. Height : cm</Label>
                   <Input 
                     id="height" 
                     placeholder="Height in cm"
-                    {...register("height")}
+                    value={digitsOnly(watch("height"))}
+                    onChange={(e) => setValue("height", digitsOnly(e.target.value), { shouldValidate: true })}
+                    onBlur={register("height").onBlur}
+                    // {...register("height")}
+                    maxLength={3}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="weight">2. Weight</Label>
+                  <Label htmlFor="weight">2. Weight : kg</Label>
                   <Input 
                     id="weight" 
                     placeholder="Weight in kg"
-                    {...register("weight")}
+                    value={digitsOnly(watch("weight"))}
+                    onChange={(e) => setValue("weight", digitsOnly(e.target.value), { shouldValidate: true })}
+                    onBlur={register("weight").onBlur}
+                    // {...register("weight")}
+                    maxLength={3}
                   />
                 </div>
                 <div className="space-y-2">
@@ -731,6 +829,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="bankAccountNumber" 
                     placeholder="Enter bank account number"
                     {...register("bankAccountNumber")}
+                    maxLength={30}
                   />
                 </div>
                 <div className="space-y-2">
@@ -738,7 +837,12 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="ifscCode" 
                     placeholder="e.g. SBIN0001234"
-                    {...register("ifscCode")}
+                    {...register("ifscCode", {
+                      onChange: () => setIfscLookupState({ status: "idle" }),
+                    })}
+                    onBlur={(e) => { register("ifscCode").onBlur(e); handleIfscBlur(); }}
+                    className="uppercase"
+                    maxLength={11}
                   />
                 </div>
                 <div className="space-y-2">
@@ -746,13 +850,34 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="bankName" 
                     {...register("bankName")}
+                    maxLength={100}
+                    disabled
+                    placeholder="Auto-filled from IFSC"
                   />
+                  {ifscLookupState.status === "loading" && (
+                    <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                      <Loader2 className="w-3 h-3 animate-spin" /> Looking up bank…
+                    </p>
+                  )}
+                  {ifscLookupState.status === "not_found" && (
+                    <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" /> IFSC not found — check the code
+                    </p>
+                  )}
+                  {ifscLookupState.status === "found" && (
+                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" /> Verified
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="branchName">7. Branch Name</Label>
                   <Input 
                     id="branchName" 
                     {...register("branchName")}
+                    maxLength={100}
+                    disabled
+                    placeholder="Auto-filled from IFSC"
                   />
                 </div>
               </div>
@@ -771,6 +896,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input
                     value={currentPolicy.policyNumber}
                     onChange={(e) => handlePolicyChange("currentPolicy", "policyNumber", e.target.value)}
+                    maxLength={30}
                   />
                 </div>
 
@@ -779,6 +905,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input
                     value={currentPolicy.planAndTerm}
                     onChange={(e) => handlePolicyChange("currentPolicy", "planAndTerm", e.target.value)}
+                    maxLength={100}
                   />
                 </div>
                 
@@ -813,6 +940,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input
                     value={currentPolicy.branch}
                     onChange={(e) => handlePolicyChange("currentPolicy", "branch", e.target.value)}
+                    maxLength={100}
                   />
                 </div>
                 
@@ -840,6 +968,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input
                     value={previousPolicy.policyNumber}
                     onChange={(e) => handlePolicyChange("previousPolicy", "policyNumber", e.target.value)}
+                    maxLength={30}
                   />
                 </div>
 
@@ -848,6 +977,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input
                     value={previousPolicy.planAndTerm}
                     onChange={(e) => handlePolicyChange("previousPolicy", "planAndTerm", e.target.value)}
+                    maxLength={100}
                   />
                 </div>
                 
@@ -882,6 +1012,7 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input
                     value={previousPolicy.branch}
                     onChange={(e) => handlePolicyChange("previousPolicy", "branch", e.target.value)}
+                    maxLength={100}
                   />
                 </div>
                 

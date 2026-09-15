@@ -141,6 +141,7 @@ const CustomFieldsBuilder = ({ customTypeName, onCustomTypeNameChange, fields, o
                         onChange={(e) => updateOption(index, optIndex, e.target.value)}
                         placeholder={`Option ${optIndex + 1}`}
                         className="h-8 text-sm"
+                        maxLength={100}
                       />
                       {(field.options || []).length > 1 && (
                         <Button type="button" size="sm" variant="ghost" onClick={() => removeOption(index, optIndex)} className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0">
@@ -158,7 +159,7 @@ const CustomFieldsBuilder = ({ customTypeName, onCustomTypeNameChange, fields, o
               <div className="pl-6">
                 <Label className="text-xs text-muted-foreground">Value</Label>
                 {field.fieldType === "textarea" ? (
-                  <Textarea value={field.value} onChange={(e) => updateField(index, { value: e.target.value })} rows={2} className="mt-1 resize-none text-sm" />
+                  <Textarea value={field.value} onChange={(e) => updateField(index, { value: e.target.value })} rows={2} maxLength={200} className="mt-1 resize-none text-sm" />
                 ) : field.fieldType === "select" ? (
                   <Select value={field.value} onValueChange={(v) => updateField(index, { value: v })}>
                     <SelectTrigger className="mt-1">
@@ -176,6 +177,7 @@ const CustomFieldsBuilder = ({ customTypeName, onCustomTypeNameChange, fields, o
                     value={field.value}
                     onChange={(e) => updateField(index, { value: e.target.value })}
                     className="mt-1 text-sm"
+                    maxLength={100}
                   />
                 )}
               </div>
