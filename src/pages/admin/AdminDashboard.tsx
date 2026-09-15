@@ -228,16 +228,16 @@ const AdminDashboard = () => {
             <Card key={label}
               className={`border ${bg} ${link ? "cursor-pointer hover:shadow-md transition-shadow" : ""} ${urgent ? "ring-2 ring-amber-400" : ""}`}
               onClick={() => link && navigate(link)}>
-              <CardContent className="p-4">
+              <CardContent className="p-4 relative">
+                {dot && (
+                  <span className="absolute top-3 right-3 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-600 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white dark:border-background"></span>
+                  </span>
+                )}
                 <div className="flex items-start justify-between mb-2">
                   <div className="relative w-9 h-9 rounded-lg bg-white dark:bg-background border border-border flex items-center justify-center">
                     {icon}
-                    {dot && (
-                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white dark:border-background"></span>
-                      </span>
-                    )}
                   </div>
                   {trend !== undefined && (
                     <span className={`text-xs font-medium flex items-center gap-0.5 ${trend >= 0 ? "text-green-600" : "text-red-500"}`}>
