@@ -19,8 +19,10 @@ import {
   RefreshCw, ChevronRight, UserCircle2, Wallet2, Gauge,
   FileText, PlusCircle, BellRing, Bell, ShieldCheck, ShieldAlert, History, Monitor,
   Landmark, Copy, Check, CalendarClock, CreditCard, LogOut, Lock, AlertTriangle,
-  Fingerprint,
+  Fingerprint, Download, IdCard,
 } from "lucide-react";
+import BusinessCard, { BUSINESS_CARD_TEMPLATES } from "@/components/BusinessCard";
+import type { BusinessCardHandle, BusinessCardTheme } from "@/types/components/BusinessCard.types";
 import {
   getProfile, updateProfile, updateProfileImage,
   getMySessions, revokeOtherSessions,
@@ -104,6 +106,8 @@ const Profile = () => {
   const [activityTotal,    setActivityTotal]    = useState<Pagination | null>(null);
   const [signingOutOthers, setSigningOutOthers] = useState(false);
   const [copied,           setCopied]           = useState<"easyId" | "referral" | null>(null);
+  const [cardTheme,        setCardTheme]        = useState<BusinessCardTheme>("classic");
+  const cardRef = useRef<BusinessCardHandle>(null);
 
   const [form, setForm] = useState({
     name: "", fullAddress: "", mobileNumber: "", email: ""
@@ -241,6 +245,15 @@ const Profile = () => {
     } finally {
       setSigningOutOthers(false);
     }
+  };
+
+  const handleDownloadCard = () => {
+    const dataUrl = cardRef.current?.toDataURL();
+    if (!dataUrl) return;
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `${(user.name || "business-card").trim().toLowerCase().replace(/\s+/g, "-")}-business-card.png`;
+    a.click();
   };
 
   const sub        = user.subscription;
@@ -447,6 +460,61 @@ const Profile = () => {
                 </span>
               ))}
             </div>
+          </div>
+
+          {/* ── Digital business card ── */}
+          <div className="bg-card border border-border rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+              <p className="text-sm font-medium flex items-center gap-1.5">
+                <IdCard className="w-4 h-4 text-primary" /> Your digital business card
+              </p>
+              {completionPct === 100 ? (
+                <Button size="sm" onClick={handleDownloadCard}>
+                  <Download className="w-3.5 h-3.5 mr-1.5" /> Download Your Card
+                </Button>
+              ) : (
+                <Badge variant="secondary" className="text-xs">
+                  {completionPct}% complete — unlocks at 100%
+                </Badge>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-start">
+              <BusinessCard
+                ref={cardRef}
+                name={form.name}
+                roleLabel={roleLabel[user.role?.toLocaleUpperCase() ?? "user"] ?? "Policy Agent"}
+                mobileNumber={form.mobileNumber}
+                email={form.email}
+                easyId={user.easyId}
+                profileImage={avatar}
+                theme={cardTheme}
+                locked={completionPct < 100}
+                className="max-w-xl"
+              />
+              <div className="flex md:flex-col gap-2 flex-wrap md:w-40">
+                {BUSINESS_CARD_TEMPLATES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setCardTheme(t.id)}
+                    className={`flex items-center gap-2 rounded-lg border px-2.5 py-2 text-xs font-medium transition-colors ${
+                      cardTheme === t.id
+                        ? "border-primary ring-1 ring-primary"
+                        : "border-border hover:border-primary/40"
+                    }`}
+                  >
+                    <span className="w-6 h-6 rounded-full border border-border shrink-0" style={{ background: t.swatch }} />
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {completionPct < 100 && (
+              <p className="text-xs text-muted-foreground mt-3">
+                Finish your profile — {completionItems.filter(i => !i.done).map(i => i.label).join(", ")} — to unlock downloading your card.
+              </p>
+            )}
           </div>
 
           {/* ── Main layout: sidebar + content ── */}

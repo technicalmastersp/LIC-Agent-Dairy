@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,10 +10,12 @@ import {
   ShieldCheck, FileText, Search, Wallet, BellRing, Smartphone,
   DatabaseBackup, Lock, Timer, CheckCircle2, LifeBuoy,
   Sparkles, ArrowRight, UserPlus, LogIn, ClipboardList, ListChecks,
-  TrendingUp, CircleDot, Bell, Languages,
+  TrendingUp, CircleDot, Bell, Languages, IdCard,
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
 import SEO from "@/components/SEO";
+import BusinessCard, { BUSINESS_CARD_TEMPLATES } from "@/components/BusinessCard";
+import type { BusinessCardTheme } from "@/types/components/BusinessCard.types";
 
 const plans = [
   { id: "1month-free", name: "1 Month", price: "Free", tag: "Try it out", color: "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border", accent: "text-gray-600 dark:text-muted-foreground" },
@@ -25,6 +27,7 @@ const plans = [
 const Landing = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [demoTheme, setDemoTheme] = useState<BusinessCardTheme>("classic");
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -295,6 +298,77 @@ const Landing = () => {
                 </div>
 
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════ BUSINESS CARD — interactive prototype for visitors ══════════ */}
+        <section className="bg-background py-16 md:py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+              <div className="space-y-5 order-2 lg:order-1">
+                <Badge className="bg-primary/10 text-primary border border-primary/20 w-fit">
+                  <Sparkles className="w-3 h-3 mr-1" /> New
+                </Badge>
+                <h2 className="text-3xl font-bold text-form-header leading-tight">
+                  Your own digital business card, generated for free
+                </h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  Once your profile is 100% complete, {siteConfig.companyName} turns your name,
+                  role, and contact details into a shareable business card — pick from 4 designs,
+                  then download it as a PNG to share on WhatsApp, print, or add to your email
+                  signature.
+                </p>
+                <div className="space-y-3">
+                  {[
+                    "4 professionally designed themes to choose from",
+                    "Your name, mobile number, email, and Agent ID laid out automatically",
+                    "Unlocks the moment your profile hits 100% completion",
+                    "Download as a high-resolution PNG, ready to share or print",
+                  ].map((point) => (
+                    <div key={point} className="flex items-start gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                      <span className="text-sm text-form-header">{point}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {BUSINESS_CARD_TEMPLATES.map((tpl) => (
+                    <button
+                      key={tpl.id}
+                      onClick={() => setDemoTheme(tpl.id)}
+                      className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        demoTheme === tpl.id
+                          ? "border-primary ring-1 ring-primary bg-primary/5"
+                          : "border-border hover:border-primary/40"
+                      }`}
+                    >
+                      <span className="w-4 h-4 rounded-full border border-border shrink-0" style={{ background: tpl.swatch }} />
+                      {tpl.label}
+                    </button>
+                  ))}
+                </div>
+                <Button size="lg" className="mt-2" onClick={() => navigate("/signup")}>
+                  <UserPlus className="w-4 h-4 mr-2" /> Get started free
+                </Button>
+              </div>
+
+              <div className="order-1 lg:order-2">
+                <BusinessCard
+                  name="Rahul Sharma"
+                  roleLabel="Policy Agent"
+                  mobileNumber="+91 98765 43210"
+                  email="rahul.sharma@example.com"
+                  easyId="PN-10482"
+                  theme={demoTheme}
+                  className="w-full max-w-lg mx-auto"
+                />
+                <p className="text-xs text-muted-foreground text-center mt-3 flex items-center justify-center gap-1">
+                  <IdCard className="w-3.5 h-3.5" /> Live prototype — sample data shown, sign up to make your own
+                </p>
+              </div>
+
             </div>
           </div>
         </section>
