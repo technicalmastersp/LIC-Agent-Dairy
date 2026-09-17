@@ -183,8 +183,9 @@ const Profile = () => {
       setUser(updated);
       setIsEditing(false);
       toast({ title: "Profile updated", description: "Your changes have been saved." });
-    } catch {
-      toast({ title: "Error", description: "Failed to update profile.", variant: "destructive" });
+    } catch (error: unknown) {
+      const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
+      toast({ title: "Error", description: message || "Failed to update profile.", variant: "destructive" });
     } finally { setSaving(false); }
   };
 

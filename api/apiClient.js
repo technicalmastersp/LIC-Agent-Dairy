@@ -88,12 +88,18 @@ apiClient.interceptors.response.use(
 
     // 403 — forbidden (subscription expired, downgrade blocked, etc.)
     if (status === 403) {
-      // Subscription-specific codes — redirect, don't just toast
-      if (code === "SUBSCRIPTION_EXPIRED" || code === "SUBSCRIPTION_INACTIVE") {
+      // Subscription-specific codes — redirect, don't just toast. Guarded
+      // against already being on /our-plans: without this, any gated
+      // request that page itself fires (or ever fires in the future) would
+      // re-trigger this same redirect on arrival, reloading the page, which
+      // fires the same request again — an infinite reload loop instead of
+      // the single, expected "go renew your plan" redirect.
+      const onOurPlans = window.location.pathname.startsWith("/our-plans");
+      if (!onOurPlans && (code === "SUBSCRIPTION_EXPIRED" || code === "SUBSCRIPTION_INACTIVE")) {
         window.location.href = "/our-plans?reason=expired";
         return Promise.reject(error);
       }
-      if (code === "NO_SUBSCRIPTION") {
+      if (!onOurPlans && code === "NO_SUBSCRIPTION") {
         window.location.href = "/our-plans?reason=no-plan";
         return Promise.reject(error);
       }

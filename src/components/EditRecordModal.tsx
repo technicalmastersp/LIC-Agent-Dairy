@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -316,9 +317,10 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
       onUpdate();
       onClose();
     } catch (error) {
+      const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
       toast({
         title: "Error",
-        description: "Failed to update record. Please try again.",
+        description: message || "Failed to update record. Please try again.",
         variant: "destructive",
       });
     } finally {

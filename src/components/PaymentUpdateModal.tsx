@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
@@ -66,9 +67,10 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate }: PaymentUpdate
       onClose();
     } catch (error) {
       console.error(error);
+      const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
       toast({
         title: "Error",
-        description: "Failed to update the payment date. Please try again.",
+        description: message || "Failed to update the payment date. Please try again.",
         variant: "destructive",
       });
     } finally {
