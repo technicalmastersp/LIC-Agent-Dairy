@@ -19,13 +19,14 @@
       "permanent": true
     },
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.policyniketan.com" }],
+      "destination": "https://policyniketan.com/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.policyniketan.com"
-        }
-      ],
+      "has": [{ "type": "host", "value": "www.policyniketan.com" }],
       "destination": "https://policyniketan.com/:path*",
       "permanent": true
     }
