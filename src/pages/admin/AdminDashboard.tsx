@@ -36,10 +36,10 @@ const ACTION_COLORS: Record<string, string> = {
 };
 
 const PLAN_COLOR: Record<string, string> = {
-  "1month-free": "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground",
-  "6months":     "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400",
-  "12months":    "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
-  "24months":    "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
+  "1month-free": "bg-indigo-100 text-gray-600 dark:bg-muted dark:text-muted-foreground",
+  "3months":     "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400",
+  "6months":     "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  "12months":    "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
 };
 
 // (date formatting now imported from dateFormat.ts as `fmt`/`fmtTime`)
@@ -228,16 +228,16 @@ const AdminDashboard = () => {
             <Card key={label}
               className={`border ${bg} ${link ? "cursor-pointer hover:shadow-md transition-shadow" : ""} ${urgent ? "ring-2 ring-amber-400" : ""}`}
               onClick={() => link && navigate(link)}>
-              <CardContent className="p-4">
+              <CardContent className="p-4 relative">
+                {dot && (
+                  <span className="absolute top-3 right-3 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-600 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white dark:border-background"></span>
+                  </span>
+                )}
                 <div className="flex items-start justify-between mb-2">
                   <div className="relative w-9 h-9 rounded-lg bg-white dark:bg-background border border-border flex items-center justify-center">
                     {icon}
-                    {dot && (
-                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white dark:border-background"></span>
-                      </span>
-                    )}
                   </div>
                   {trend !== undefined && (
                     <span className={`text-xs font-medium flex items-center gap-0.5 ${trend >= 0 ? "text-green-600" : "text-red-500"}`}>

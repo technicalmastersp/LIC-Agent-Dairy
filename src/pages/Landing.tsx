@@ -17,9 +17,9 @@ import SEO from "@/components/SEO";
 
 const plans = [
   { id: "1month-free", name: "1 Month", price: "Free", tag: "Try it out", color: "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border", accent: "text-gray-600 dark:text-muted-foreground" },
-  { id: "6months", name: "6 Months", price: "For starting agents", tag: "", color: "bg-violet-50 border-violet-200 dark:bg-violet-950/40 dark:border-violet-900", accent: "text-violet-700 dark:text-violet-400" },
-  { id: "12months", name: "12 Months", price: "Most popular", tag: "Recommended", color: "bg-blue-50 border-blue-300 ring-2 ring-blue-200 dark:bg-blue-950/40 dark:border-blue-800 dark:ring-blue-900", accent: "text-blue-700 dark:text-blue-400" },
-  { id: "24months", name: "24 Months", price: "Best value", tag: "", color: "bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900", accent: "text-amber-700 dark:text-amber-400" },
+  { id: "3months", name: "3 Months", price: "For starting agents", tag: "", color: "bg-violet-50 border-violet-200 dark:bg-violet-950/40 dark:border-violet-900", accent: "text-violet-700 dark:text-violet-400" },
+  { id: "6months", name: "6 Months", price: "Most popular", tag: "Recommended", color: "bg-blue-50 border-blue-300 ring-2 ring-blue-200 dark:bg-blue-950/40 dark:border-blue-800 dark:ring-blue-900", accent: "text-blue-700 dark:text-blue-400" },
+  { id: "12months", name: "12 Months", price: "Best value", tag: "", color: "bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900", accent: "text-amber-700 dark:text-amber-400" },
 ];
 
 const Landing = () => {

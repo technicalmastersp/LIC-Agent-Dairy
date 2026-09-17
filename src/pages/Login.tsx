@@ -132,12 +132,11 @@ const Login = () => {
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="userId">{t('userId')}</Label>
+                <Label htmlFor="userId">{t('userIdOrEmailId')}</Label>
                 <Input
                   id="userId"
                   type="text"
-                  // placeholder={t('userId')}
-                  placeholder='Enter User ID or Email ID'
+                  placeholder={t('enterUserIdOrEmailId')}
                   value={userId}
                   onChange={(e) => setUserId(e.target.value.trim())}
                   required

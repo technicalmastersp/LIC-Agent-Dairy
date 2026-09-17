@@ -66,42 +66,42 @@ const OurPlans = () => {
       ]
     },
     {
-      id: "6months",
+      id: "3months",
       planType: "Basic",
-      duration: "6 Months",
+      duration: "3 Months",
       price: 599,
       originalPrice: 899,
       features: [
         "Access to all features",
-        "6 months validity",
+        "3 months validity",
         "Email support",
         "Regular updates"
       ]
     },
     {
-      id: "12months",
+      id: "6months",
       planType: "Standard",
-      duration: "12 Months",
+      duration: "6 Months",
       price: 1099,
       originalPrice: 1599,
       popular: true,
       features: [
         "Access to all features",
-        "12 months validity",
+        "6 months validity",
         "Priority email support",
         "Regular updates",
         "Extended storage"
       ]
     },
     {
-      id: "24months",
+      id: "12months",
       planType: "Premium",
-      duration: "24 Months",
+      duration: "12 Months",
       price: 2099,
       originalPrice: 2999,
       features: [
         "Access to all features",
-        "24 months validity",
+        "12 months validity",
         "24/7 priority support",
         "Regular updates",
         "Unlimited storage",

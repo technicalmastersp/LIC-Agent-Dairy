@@ -247,9 +247,9 @@ const Profile = () => {
   const daysLeft   = sub?.endDate
     ? Math.max(0, Math.ceil((new Date(sub.endDate).getTime() - Date.now()) / 86400000))
     : 0;
-  const totalDays  = sub?.planId === "6months" ? 180
-                   : sub?.planId === "12months" ? 365
-                   : sub?.planId === "24months" ? 730 : 30;
+  const totalDays  = sub?.planId === "3months" ? 90
+                   : sub?.planId === "6months" ? 180
+                   : sub?.planId === "12months" ? 365 : 30;
   const planPct    = Math.min(100, Math.round((daysLeft / totalDays) * 100));
   const planColor  = planPct > 50 ? "bg-blue-500" : planPct > 20 ? "bg-yellow-500" : "bg-red-500";
 

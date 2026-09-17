@@ -69,6 +69,8 @@ export interface Translations {
   loginTitle: string;
   signupTitle: string;
   userId: string;
+  userIdOrEmailId: string;
+  enterUserIdOrEmailId: string;
   fullAddress: string;
   mobileNumber: string;
   designation: string;
