@@ -110,7 +110,7 @@ const Profile = () => {
   const cardRef = useRef<BusinessCardHandle>(null);
 
   const [form, setForm] = useState({
-    name: "", fullAddress: "", mobileNumber: "", email: ""
+    name: "", fullAddress: "", mobileNumber: "", email: "", businessCardNote: ""
   });
 
   const load = useCallback(async (isRefresh = false) => {
@@ -133,10 +133,11 @@ const Profile = () => {
         setActivityTotal(act.pagination ?? null);
       }
       setForm({
-        name:         u.name         ?? "",
-        fullAddress:  u.fullAddress  ?? "",
-        mobileNumber: u.mobileNumber ?? "",
-        email:        u.email        ?? "",
+        name:             u.name             ?? "",
+        fullAddress:      u.fullAddress      ?? "",
+        mobileNumber:     u.mobileNumber     ?? "",
+        email:            u.email            ?? "",
+        businessCardNote: u.businessCardNote ?? "",
       });
       if (u.profileImage) setAvatar(u.profileImage);
     } catch (err) {
@@ -155,6 +156,14 @@ const Profile = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm(p => ({ ...p, [name]: value }));
+  };
+
+  const MAX_NOTE_CHARS = 150;
+  const noteCharCount = form.businessCardNote.length;
+
+  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const raw = e.target.value.slice(0, MAX_NOTE_CHARS);
+    setForm(p => ({ ...p, businessCardNote: raw }));
   };
 
   const handleSave = async () => {
@@ -181,10 +190,11 @@ const Profile = () => {
 
   const handleCancel = () => {
     setForm({
-      name:         user.name         ?? "",
-      fullAddress:  user.fullAddress  ?? "",
-      mobileNumber: user.mobileNumber ?? "",
-      email:        user.email        ?? "",
+      name:             user.name             ?? "",
+      fullAddress:      user.fullAddress      ?? "",
+      mobileNumber:     user.mobileNumber     ?? "",
+      email:            user.email            ?? "",
+      businessCardNote: user.businessCardNote ?? "",
     });
     setIsEditing(false);
   };
@@ -488,6 +498,7 @@ const Profile = () => {
                 email={form.email}
                 easyId={user.easyId}
                 profileImage={avatar}
+                note={form.businessCardNote}
                 theme={cardTheme}
                 locked={completionPct < 100}
                 className="max-w-xl"
@@ -727,7 +738,24 @@ const Profile = () => {
             {/* ══ Main content ══ */}
             <div className="space-y-4">
 
-              <div className="bg-card border border-border rounded-xl p-4">
+              <div className="bg-card border border-border rounded-xl p-4 relative">
+                <div className="absolute top-1 right-1">
+                  {!isEditing ? (
+                    <Button size="icon" variant={"ghost"} onClick={() => setIsEditing(true)}>
+                      <Edit className="w-3.5 h-3.5 mr-1.5" />
+                    </Button>
+                  ) : (
+                    <>
+                      <Button size="sm" onClick={handleSave} disabled={saving} className="mr-2">
+                        <Save className="w-3.5 h-3.5 mr-1.5" />
+                        {saving ? "…" : ""}
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={handleCancel}>
+                        <X className="w-3.5 h-3.5 mr-1.5" />
+                      </Button>
+                    </>
+                  )}
+                </div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
                   <UserCircle2 className="w-3.5 h-3.5 text-primary" /> Profile information
                 </p>
@@ -778,6 +806,22 @@ const Profile = () => {
                   <Label className="text-xs text-muted-foreground">Full address</Label>
                   <Textarea name="fullAddress" value={form.fullAddress}
                     onChange={handleChange} disabled={!isEditing} rows={3}
+                    className={`text-sm resize-none ${!isEditing ? "bg-muted text-muted-foreground" : ""}`} />
+                </div>
+
+                <div className="space-y-1.5 mt-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-muted-foreground">
+                      Business card note <span className="text-muted-foreground/60">(optional)</span>
+                    </Label>
+                    <span hidden={!isEditing} className={`text-[11px] ${noteCharCount >= MAX_NOTE_CHARS ? "text-red-600 font-medium" : "text-muted-foreground"}`}>
+                      {noteCharCount}/{MAX_NOTE_CHARS} characters
+                    </span>
+                  </div>
+                  <Textarea name="businessCardNote" value={form.businessCardNote}
+                    onChange={handleNoteChange} disabled={!isEditing} rows={4}
+                    maxLength={MAX_NOTE_CHARS}
+                    placeholder="A short line about yourself, your specialty, or your motto — shown on your downloadable business card."
                     className={`text-sm resize-none ${!isEditing ? "bg-muted text-muted-foreground" : ""}`} />
                 </div>
 

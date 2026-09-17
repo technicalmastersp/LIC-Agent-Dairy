@@ -4,8 +4,16 @@ import type { BusinessCardHandle, BusinessCardProps, BusinessCardTemplate } from
 
 // Real-world business-card ratio (3.5in x 2in) rendered at high enough
 // resolution that the downloaded PNG still looks crisp when printed.
+// Fixed size — the note (150 chars max) is laid out to always fit inside
+// this, rather than growing the card.
 const CARD_W = 1050;
 const CARD_H = 600;
+const NOTE_TEXT_X = 340;
+const NOTE_MAX_WIDTH = CARD_W - NOTE_TEXT_X - 40;
+// const NOTE_FONT = "italic 400 20px 'Segoe UI', Arial, sans-serif";
+const NOTE_FONT = "400 20px 'Segoe UI', Arial, sans-serif";
+const NOTE_LINE_HEIGHT = 27;
+const NOTE_MAX_LINES = 3;
 
 export const BUSINESS_CARD_TEMPLATES: BusinessCardTemplate[] = [
   { id: "classic",  label: "Classic Navy",  swatch: "linear-gradient(135deg, #0A2A43, #0A5B76)" },
@@ -27,6 +35,36 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.arcTo(x, y + h, x, y, r);
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
+}
+
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, font: string, maxLines?: number): string[] {
+  ctx.font = font;
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const test = current ? `${current} ${word}` : word;
+    if (current && ctx.measureText(test).width > maxWidth) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+
+  // Safety net only — at 150 characters this basically never triggers, but
+  // guarantees the note can never push into or past the footer watermark.
+  if (maxLines && lines.length > maxLines) {
+    const truncated = lines.slice(0, maxLines);
+    let last = truncated[maxLines - 1];
+    while (ctx.measureText(`${last}…`).width > maxWidth && last.length > 1) {
+      last = last.slice(0, -1);
+    }
+    truncated[maxLines - 1] = `${last}…`;
+    return truncated;
+  }
+  return lines;
 }
 
 function drawWatermark(ctx: CanvasRenderingContext2D, lightText: boolean) {
@@ -86,7 +124,8 @@ function drawAvatar(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: nu
 function draw(
   ctx: CanvasRenderingContext2D,
   { name, roleLabel, mobileNumber, email, easyId, theme }: BusinessCardProps,
-  avatarImg: HTMLImageElement | null
+  avatarImg: HTMLImageElement | null,
+  noteLines: string[]
 ) {
   ctx.clearRect(0, 0, CARD_W, CARD_H);
 
@@ -141,34 +180,34 @@ function draw(
   drawAvatar(ctx, cx, cy, r, avatarImg, name, accent);
 
   // Text block
-  const textX = 340;
+  const textX = NOTE_TEXT_X;
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
 
   ctx.fillStyle = textColor;
   ctx.font = "700 46px 'Segoe UI', Arial, sans-serif";
-  ctx.fillText(name || "Your Name", textX, theme === "teal" ? 250 : 210);
+  ctx.fillText(name || "Your Name", textX, theme === "teal" ? 230 : 210);
 
   ctx.fillStyle = accent;
   ctx.font = "600 24px 'Segoe UI', Arial, sans-serif";
-  ctx.fillText(roleLabel, textX, theme === "teal" ? 288 : 248);
+  ctx.fillText(roleLabel, textX, theme === "teal" ? 268 : 248);
 
   ctx.strokeStyle = accent;
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(textX, (theme === "teal" ? 288 : 248) + 18);
-  ctx.lineTo(textX + 70, (theme === "teal" ? 288 : 248) + 18);
+  ctx.moveTo(textX, (theme === "teal" ? 268 : 248) + 18);
+  ctx.lineTo(textX + 70, (theme === "teal" ? 268 : 248) + 18);
   ctx.stroke();
 
   const lines = [
     mobileNumber ? `Mobile :   ${mobileNumber}` : null,
-    email        ? `Email :    ${email}`        : null,
+    email        ? `Email    :   ${email}`        : null,
     easyId       ? `Agent ID : ${easyId}`       : null,
   ].filter(Boolean) as string[];
 
   ctx.fillStyle = subColor;
   ctx.font = "500 22px 'Segoe UI', Arial, sans-serif";
-  const startY = (theme === "teal" ? 288 : 248) + 55;
+  const startY = (theme === "teal" ? 268 : 248) + 55;
   lines.forEach((line, i) => ctx.fillText(line, textX, startY + i * 34));
 
   // Company wordmark, top-right
@@ -176,11 +215,38 @@ function draw(
   ctx.fillStyle = textColor;
   ctx.font = "700 26px 'Segoe UI', Arial, sans-serif";
   ctx.fillText(siteConfig.companyName, CARD_W - 40, 60);
+
+  // Personal note — own section below the Agent ID, only when present.
+  // Fixed position sized to always clear the watermark footer: contact
+  // lines end by ~411 at the latest (teal theme, all 3 lines shown), and
+  // at NOTE_MAX_LINES=3 the note's last line lands at ~527 — comfortably
+  // above the footer at CARD_H-24=576.
+  if (noteLines.length) {
+    const dividerY = 400;
+    ctx.save();
+    ctx.strokeStyle = accent;
+    ctx.globalAlpha = 0.5;
+    ctx.lineWidth = 0.01;
+    ctx.beginPath();
+    ctx.moveTo(textX, dividerY);
+    ctx.lineTo(CARD_W - 40, dividerY);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.textAlign = "left";
+    ctx.fillStyle = accent;
+    // ctx.font = "600 15px 'Segoe UI', Arial, sans-serif";
+    // ctx.fillText("IN THEIR OWN WORDS", textX, dividerY + 24);
+
+    ctx.fillStyle = subColor;
+    ctx.font = NOTE_FONT;
+    const noteStartY = dividerY + 48;
+    noteLines.forEach((line, i) => ctx.fillText(line, textX, noteStartY + i * NOTE_LINE_HEIGHT));
+  }
 }
 
 const BusinessCard = forwardRef<BusinessCardHandle, BusinessCardProps>((props, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const avatarImgRef = useRef<HTMLImageElement | null>(null);
 
   useImperativeHandle(ref, () => ({
     toDataURL: () => canvasRef.current?.toDataURL("image/png") ?? null,
@@ -192,22 +258,20 @@ const BusinessCard = forwardRef<BusinessCardHandle, BusinessCardProps>((props, r
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const noteLines = props.note ? wrapText(ctx, props.note, NOTE_MAX_WIDTH, NOTE_FONT, NOTE_MAX_LINES) : [];
+
     // profileImage is always a client-compressed base64 data URI (never a
     // remote URL — see models/User.js), so this never taints the canvas
-    // and toDataURL() below stays usable without any CORS handling.
+    // and toDataURL() above stays usable without any CORS handling.
     if (props.profileImage) {
       const img = new Image();
-      img.onload = () => {
-        avatarImgRef.current = img;
-        draw(ctx, props, img);
-      };
+      img.onload = () => draw(ctx, props, img, noteLines);
       img.src = props.profileImage;
     } else {
-      avatarImgRef.current = null;
-      draw(ctx, props, null);
+      draw(ctx, props, null, noteLines);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.name, props.roleLabel, props.mobileNumber, props.email, props.easyId, props.profileImage, props.theme]);
+  }, [props.name, props.roleLabel, props.mobileNumber, props.email, props.easyId, props.profileImage, props.note, props.theme]);
 
   return (
     <div className={`relative rounded-xl overflow-hidden shadow-md ${props.className ?? ""}`}>

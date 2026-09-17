@@ -13,6 +13,8 @@ export interface BusinessCardProps {
   email?: string;
   easyId?: string;
   profileImage?: string | null;
+  /** Free-text note shown below the Agent ID. Capped at 150 characters — see Profile.tsx. */
+  note?: string;
   theme: BusinessCardTheme;
   /** Visually locked/blurred preview state — used pre-100% completion and on the public demo. */
   locked?: boolean;
