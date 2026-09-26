@@ -19,8 +19,10 @@ import {
   RefreshCw, ChevronRight, UserCircle2, Wallet2, Gauge,
   FileText, PlusCircle, BellRing, Bell, ShieldCheck, ShieldAlert, History, Monitor,
   Landmark, Copy, Check, CalendarClock, CreditCard, LogOut, Lock, AlertTriangle,
-  Fingerprint,
+  Fingerprint, Download, IdCard,
 } from "lucide-react";
+import BusinessCard, { BUSINESS_CARD_TEMPLATES } from "@/components/BusinessCard";
+import type { BusinessCardHandle, BusinessCardTheme } from "@/types/components/BusinessCard.types";
 import {
   getProfile, updateProfile, updateProfileImage,
   getMySessions, revokeOtherSessions,
@@ -104,9 +106,11 @@ const Profile = () => {
   const [activityTotal,    setActivityTotal]    = useState<Pagination | null>(null);
   const [signingOutOthers, setSigningOutOthers] = useState(false);
   const [copied,           setCopied]           = useState<"easyId" | "referral" | null>(null);
+  const [cardTheme,        setCardTheme]        = useState<BusinessCardTheme>("classic");
+  const cardRef = useRef<BusinessCardHandle>(null);
 
   const [form, setForm] = useState({
-    name: "", fullAddress: "", mobileNumber: "", email: ""
+    name: "", fullAddress: "", mobileNumber: "", email: "", businessCardNote: ""
   });
 
   const load = useCallback(async (isRefresh = false) => {
@@ -129,10 +133,11 @@ const Profile = () => {
         setActivityTotal(act.pagination ?? null);
       }
       setForm({
-        name:         u.name         ?? "",
-        fullAddress:  u.fullAddress  ?? "",
-        mobileNumber: u.mobileNumber ?? "",
-        email:        u.email        ?? "",
+        name:             u.name             ?? "",
+        fullAddress:      u.fullAddress      ?? "",
+        mobileNumber:     u.mobileNumber     ?? "",
+        email:            u.email            ?? "",
+        businessCardNote: u.businessCardNote ?? "",
       });
       if (u.profileImage) setAvatar(u.profileImage);
     } catch (err) {
@@ -153,6 +158,14 @@ const Profile = () => {
     setForm(p => ({ ...p, [name]: value }));
   };
 
+  const MAX_NOTE_CHARS = 150;
+  const noteCharCount = form.businessCardNote.length;
+
+  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const raw = e.target.value.slice(0, MAX_NOTE_CHARS);
+    setForm(p => ({ ...p, businessCardNote: raw }));
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -170,17 +183,19 @@ const Profile = () => {
       setUser(updated);
       setIsEditing(false);
       toast({ title: "Profile updated", description: "Your changes have been saved." });
-    } catch {
-      toast({ title: "Error", description: "Failed to update profile.", variant: "destructive" });
+    } catch (error: unknown) {
+      const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
+      toast({ title: "Error", description: message || "Failed to update profile.", variant: "destructive" });
     } finally { setSaving(false); }
   };
 
   const handleCancel = () => {
     setForm({
-      name:         user.name         ?? "",
-      fullAddress:  user.fullAddress  ?? "",
-      mobileNumber: user.mobileNumber ?? "",
-      email:        user.email        ?? "",
+      name:             user.name             ?? "",
+      fullAddress:      user.fullAddress      ?? "",
+      mobileNumber:     user.mobileNumber     ?? "",
+      email:            user.email            ?? "",
+      businessCardNote: user.businessCardNote ?? "",
     });
     setIsEditing(false);
   };
@@ -241,6 +256,15 @@ const Profile = () => {
     } finally {
       setSigningOutOthers(false);
     }
+  };
+
+  const handleDownloadCard = () => {
+    const dataUrl = cardRef.current?.toDataURL();
+    if (!dataUrl) return;
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `${(user.name || "business-card").trim().toLowerCase().replace(/\s+/g, "-")}-business-card.png`;
+    a.click();
   };
 
   const sub        = user.subscription;
@@ -447,6 +471,62 @@ const Profile = () => {
                 </span>
               ))}
             </div>
+          </div>
+
+          {/* ── Digital business card ── */}
+          <div className="bg-card border border-border rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+              <p className="text-sm font-medium flex items-center gap-1.5">
+                <IdCard className="w-4 h-4 text-primary" /> Your digital business card
+              </p>
+              {completionPct === 100 ? (
+                <Button size="sm" onClick={handleDownloadCard}>
+                  <Download className="w-3.5 h-3.5 mr-1.5" /> Download Your Card
+                </Button>
+              ) : (
+                <Badge variant="secondary" className="text-xs">
+                  {completionPct}% complete — unlocks at 100%
+                </Badge>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-start">
+              <BusinessCard
+                ref={cardRef}
+                name={form.name}
+                roleLabel={roleLabel[user.role?.toLocaleUpperCase() ?? "user"] ?? "Policy Agent"}
+                mobileNumber={form.mobileNumber}
+                email={form.email}
+                easyId={user.easyId}
+                profileImage={avatar}
+                note={form.businessCardNote}
+                theme={cardTheme}
+                locked={completionPct < 100}
+                className="max-w-xl"
+              />
+              <div className="flex md:flex-col gap-2 flex-wrap md:w-40">
+                {BUSINESS_CARD_TEMPLATES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setCardTheme(t.id)}
+                    className={`flex items-center gap-2 rounded-lg border px-2.5 py-2 text-xs font-medium transition-colors ${
+                      cardTheme === t.id
+                        ? "border-primary ring-1 ring-primary"
+                        : "border-border hover:border-primary/40"
+                    }`}
+                  >
+                    <span className="w-6 h-6 rounded-full border border-border shrink-0" style={{ background: t.swatch }} />
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {completionPct < 100 && (
+              <p className="text-xs text-muted-foreground mt-3">
+                Finish your profile — {completionItems.filter(i => !i.done).map(i => i.label).join(", ")} — to unlock downloading your card.
+              </p>
+            )}
           </div>
 
           {/* ── Main layout: sidebar + content ── */}
@@ -659,7 +739,24 @@ const Profile = () => {
             {/* ══ Main content ══ */}
             <div className="space-y-4">
 
-              <div className="bg-card border border-border rounded-xl p-4">
+              <div className="bg-card border border-border rounded-xl p-4 relative">
+                <div className="absolute top-1 right-1">
+                  {!isEditing ? (
+                    <Button size="icon" variant={"ghost"} onClick={() => setIsEditing(true)}>
+                      <Edit className="w-3.5 h-3.5 mr-1.5" />
+                    </Button>
+                  ) : (
+                    <>
+                      <Button size="sm" onClick={handleSave} disabled={saving} className="mr-2">
+                        <Save className="w-3.5 h-3.5 mr-1.5" />
+                        {saving ? "…" : ""}
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={handleCancel}>
+                        <X className="w-3.5 h-3.5 mr-1.5" />
+                      </Button>
+                    </>
+                  )}
+                </div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
                   <UserCircle2 className="w-3.5 h-3.5 text-primary" /> Profile information
                 </p>
@@ -710,6 +807,22 @@ const Profile = () => {
                   <Label className="text-xs text-muted-foreground">Full address</Label>
                   <Textarea name="fullAddress" value={form.fullAddress}
                     onChange={handleChange} disabled={!isEditing} rows={3}
+                    className={`text-sm resize-none ${!isEditing ? "bg-muted text-muted-foreground" : ""}`} />
+                </div>
+
+                <div className="space-y-1.5 mt-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-muted-foreground">
+                      Business card note <span className="text-muted-foreground/60">(optional)</span>
+                    </Label>
+                    <span hidden={!isEditing} className={`text-[11px] ${noteCharCount >= MAX_NOTE_CHARS ? "text-red-600 font-medium" : "text-muted-foreground"}`}>
+                      {noteCharCount}/{MAX_NOTE_CHARS} characters
+                    </span>
+                  </div>
+                  <Textarea name="businessCardNote" value={form.businessCardNote}
+                    onChange={handleNoteChange} disabled={!isEditing} rows={4}
+                    maxLength={MAX_NOTE_CHARS}
+                    placeholder="A short line about yourself, your specialty, or your motto — shown on your downloadable business card."
                     className={`text-sm resize-none ${!isEditing ? "bg-muted text-muted-foreground" : ""}`} />
                 </div>
 

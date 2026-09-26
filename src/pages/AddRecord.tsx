@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
@@ -273,9 +274,10 @@ const AddRecord = () => {
       });
       navigate("/view-records");
     } catch (error) {
+      const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
       toast({
         title: "Error",
-        description: "Failed to save record",
+        description: message || "Failed to save record",
         variant: "destructive",
       });
     } finally {

@@ -16,6 +16,7 @@ export interface User {
   easyId?: string;
   name: string;
   fullAddress: string;
+  businessCardNote?: string;
   mobileNumber: string;
   // designation: string;
   email: string;
