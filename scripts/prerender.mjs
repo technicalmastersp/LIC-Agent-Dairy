@@ -1,13 +1,3 @@
-// Root cause this fixes: this app is a pure client-side-rendered SPA — the
-// raw HTML Vite builds (dist/index.html) is the same near-empty shell for
-// every single route ("<div id="root">" + a visually-hidden <h1>), and
-// react-helmet-async only injects the real per-page <title>/description/
-// canonical/content AFTER React mounts and runs client-side. Googlebot's
-// first crawl pass fetches that raw HTML — every public page on the site
-// looks byte-for-byte identical to it at that point, which is exactly the
-// kind of signal that leaves pages sitting in "Discovered - currently not
-// indexed" instead of progressing to a render/index pass.
-//
 // LOCAL-ONLY SCRIPT — run this yourself (`npm run prerender:generate`) on
 // your own machine, NOT as part of the Vercel build. Vercel's build
 // container generally can't launch a real Chromium (missing system
@@ -15,24 +5,31 @@
 // Actions runner has but a serverless build sandbox doesn't), so this must
 // never run there. Instead this writes its output into prerendered/, a
 // folder you commit to git; the separate, browser-free
-// scripts/copy-prerendered.mjs runs during the actual Vercel build and just
-// copies those already-generated files into dist/ — pure filesystem I/O,
-// safe anywhere.
+// scripts/copy-prerendered.mjs runs during the actual Vercel build and
+// merges those already-generated snapshots into THAT build's own fresh
+// dist/index.html — pure filesystem/string work, safe anywhere.
+//
+// IMPORTANT: this deliberately saves only *data* (title, meta tags,
+// canonical, JSON-LD, and the rendered #root markup) as JSON — never a
+// full HTML document. An earlier version of this script saved the whole
+// page, including Vite's own hashed <script src="/assets/index-XXXX.js">
+// tag from whatever build happened to be running locally at generation
+// time. That filename changes on every build (Vite content-hashes it), so
+// a snapshot with a baked-in script tag goes stale the instant you rebuild
+// — Vercel's own build produces a *different* hash, the old one 404s, no
+// JS ever runs, and the whole site freezes (this is exactly what broke
+// production: check git history for the incident if you're reading this
+// after that). Keeping snapshots as pure content data and merging them
+// into whichever build's index.html is actually running (see
+// copy-prerendered.mjs) makes that entire bug class impossible.
 //
 // Re-run this locally and commit the result whenever a public page's
 // content changes; it isn't regenerated automatically on every deploy.
 //
-// This spins up a throwaway static server for a fresh `vite build` output,
-// visits each public route with Playwright's bundled Chromium (already a
-// devDependency here for e2e tests — reused rather than pulling in a second
-// full headless-browser toolchain), waits for React + Helmet + any data
-// fetch to fully settle, and writes the resulting *fully rendered* HTML to
-// prerendered/<route>/index.html.
-//
 // Only ever add PUBLIC, non-authenticated routes below. Prerendering bakes
-// in whatever HTML renders without a login session — adding an
-// authenticated route here would bake in its logged-out empty/redirect
-// state as if that were the real page.
+// in whatever renders without a login session — adding an authenticated
+// route here would bake in its logged-out empty/redirect state as if that
+// were the real page.
 import { chromium } from "@playwright/test";
 import http from "node:http";
 import fs from "node:fs/promises";
@@ -112,15 +109,43 @@ async function prerenderRoute(browser, route) {
     ).catch(() => {}); // best-effort; never fail the whole build over a slow title update
     await new Promise((r) => setTimeout(r, 300));
 
-    const html = await page.content();
+    // Pull out only the pieces we actually want to merge into a fresh
+    // build's index.html — never the raw page HTML, which would include
+    // this build's own hashed <script>/<link> asset tags (see the header
+    // comment for why that's the bug that broke production).
+    const snapshot = await page.evaluate(() => {
+      const meta = (selector, attr = "content") =>
+        document.querySelector(selector)?.getAttribute(attr) ?? null;
 
-    const outDir = route === "/" ? OUT_DIR : path.join(OUT_DIR, route);
-    await fs.mkdir(outDir, { recursive: true });
-    await fs.writeFile(path.join(outDir, "index.html"), html, "utf-8");
+      const ogAndTwitterMeta = Array.from(
+        document.querySelectorAll('meta[property^="og:"], meta[name^="twitter:"]')
+      ).map(el => ({
+        attr:  el.hasAttribute("property") ? "property" : "name",
+        key:   el.getAttribute("property") || el.getAttribute("name"),
+        value: el.getAttribute("content") || "",
+      }));
+
+      const jsonLd = Array.from(
+        document.querySelectorAll('script[type="application/ld+json"]')
+      ).map(el => el.textContent || "");
+
+      return {
+        title:       document.title,
+        description: meta('meta[name="description"]'),
+        canonical:   meta('link[rel="canonical"]', "href"),
+        ogAndTwitterMeta,
+        jsonLd,
+        rootHtml:    document.getElementById("root")?.innerHTML ?? "",
+      };
+    });
+
+    const outPath = route === "/" ? "home" : route.replace(/^\//, "").replace(/\//g, "__");
+    await fs.mkdir(OUT_DIR, { recursive: true });
+    await fs.writeFile(path.join(OUT_DIR, `${outPath}.json`), JSON.stringify({ route, ...snapshot }, null, 2), "utf-8");
     console.log(`  ✓ ${route}`);
   } catch (err) {
     console.error(`  ✗ ${route} — ${err.message}`);
-    process.exitCode = 1; // fail CI loudly rather than silently shipping a stale/empty page
+    process.exitCode = 1; // fail loudly rather than silently shipping a stale/empty page
   } finally {
     await page.close();
   }

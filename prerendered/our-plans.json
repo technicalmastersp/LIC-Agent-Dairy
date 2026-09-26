@@ -1,0 +1,45 @@
+{
+  "route": "/our-plans",
+  "title": "Subscription Plans & Pricing | Policy Niketan",
+  "description": "Professional insurance policy record management system for all types of agents and customers",
+  "canonical": null,
+  "ogAndTwitterMeta": [
+    {
+      "attr": "property",
+      "key": "og:title",
+      "value": "Policy Niketan"
+    },
+    {
+      "attr": "property",
+      "key": "og:description",
+      "value": "Professional insurance policy record management system for all types of agents and customers"
+    },
+    {
+      "attr": "property",
+      "key": "og:type",
+      "value": "website"
+    },
+    {
+      "attr": "property",
+      "key": "og:image",
+      "value": "https://policyniketan.com/logos/logo_social.png"
+    },
+    {
+      "attr": "name",
+      "key": "twitter:card",
+      "value": "summary_large_image"
+    },
+    {
+      "attr": "name",
+      "key": "twitter:site",
+      "value": "@yourhandle"
+    },
+    {
+      "attr": "name",
+      "key": "twitter:image",
+      "value": "https://policyniketan.com/logos/logo_social.png"
+    }
+  ],
+  "jsonLd": [],
+  "rootHtml": "<script>!function(){try{var d=document.documentElement,c=d.classList;c.remove('light','dark');var e=localStorage.getItem('theme');if('system'===e||(!e&&true)){var t='(prefers-color-scheme: dark)',m=window.matchMedia(t);if(m.media!==t||m.matches){d.style.colorScheme = 'dark';c.add('dark')}else{d.style.colorScheme = 'light';c.add('light')}}else if(e){c.add(e|| '')}if(e==='light'||e==='dark')d.style.colorScheme=e}catch(e){}}()</script><div role=\"region\" aria-label=\"Notifications (F8)\" tabindex=\"-1\" style=\"pointer-events: none;\"><ol tabindex=\"-1\" class=\"fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]\"></ol></div><section aria-label=\"Notifications alt+T\" tabindex=\"-1\" aria-live=\"polite\" aria-relevant=\"additions text\" aria-atomic=\"false\"></section><nav aria-label=\"Quick help\"><a title=\"Help &amp; Support\" class=\"fixed bottom-5 right-5 z-50 flex items-center gap-2 bg-primary hover:bg-primary-light text-primary-foreground rounded-full shadow-lg hover:shadow-xl transition-all px-4 py-3 group\" href=\"/help-support\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-life-buoy w-5 h-5\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"m4.93 4.93 4.24 4.24\"></path><path d=\"m14.83 9.17 4.24-4.24\"></path><path d=\"m14.83 14.83 4.24 4.24\"></path><path d=\"m9.17 14.83-4.24 4.24\"></path><circle cx=\"12\" cy=\"12\" r=\"4\"></circle></svg><span class=\"max-w-0 overflow-hidden group-hover:max-w-[100px] transition-all duration-300 whitespace-nowrap text-sm font-medium\">Need help?</span></a></nav><div class=\"min-h-screen flex items-center justify-center bg-muted/30 px-4 py-12\"><div class=\"w-full max-w-md text-center\"><div class=\"w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto mb-6\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-triangle-alert w-8 h-8 sm:w-10 sm:h-10 text-destructive\"><path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"></path><path d=\"M12 9v4\"></path><path d=\"M12 17h.01\"></path></svg></div><h1 class=\"text-2xl sm:text-3xl font-bold text-form-header leading-tight tracking-tight\">Something went wrong</h1><p class=\"mt-2 text-sm sm:text-base text-muted-foreground\">An unexpected error occurred on Policy Niketan. Reloading the page usually fixes it.</p><div class=\"mt-8\"><button class=\"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 text-primary-foreground h-10 px-4 py-2 bg-primary hover:bg-primary-light w-full sm:w-auto\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-rotate-cw w-4 h-4 mr-2\"><path d=\"M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8\"></path><path d=\"M21 3v5h-5\"></path></svg>Reload page</button></div></div></div>"
+}
