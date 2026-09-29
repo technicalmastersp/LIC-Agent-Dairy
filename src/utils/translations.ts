@@ -28,7 +28,7 @@ export const translations: Record<string, Translations> = {
     quickLinks: "Quick Links",
 
     contactInfo: "Contact Info",
-    officeAddress: "No. 170, Sector 39, Gurugram Haryana, Bharat - 122022",
+    officeAddress: "No. 170, Sector 39, Gurugram Haryana - 122022",
     
     features: "Features",
     securePolicyManagement: "Secure Policy Management",

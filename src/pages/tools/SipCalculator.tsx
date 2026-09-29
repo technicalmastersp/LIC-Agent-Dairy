@@ -65,11 +65,11 @@ const SipCalculator = () => {
               <p className="text-lg font-semibold text-form-header">{inr(invested)}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-muted-foreground mb-1">Est. returns</p>
+              <p className="text-xs text-muted-foreground mb-1">Total interest</p>
               <p className="text-lg font-semibold text-green-600">{inr(gains)}</p>
             </div>
             <div className="text-center bg-violet-50 rounded-xl py-2">
-              <p className="text-xs text-violet-600 mb-1">Future value</p>
+              <p className="text-xs text-violet-600 mb-1">Est. total returns</p>
               <p className="text-xl font-bold text-violet-700">{inr(futureValue)}</p>
             </div>
           </div>

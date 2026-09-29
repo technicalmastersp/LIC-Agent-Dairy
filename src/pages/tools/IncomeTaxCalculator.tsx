@@ -122,7 +122,7 @@ const IncomeTaxCalculator = () => {
               <p className="text-2xl font-bold text-amber-800">{inr(result.totalTax)}</p>
             </div>
             <div className="bg-green-50 rounded-xl p-4 text-center">
-              <p className="text-xs text-green-700 mb-1">Estimated take-home</p>
+              <p className="text-xs text-green-700 mb-1">Estimated get in hand</p>
               <p className="text-2xl font-bold text-green-800">{inr(result.takeHome)}</p>
             </div>
           </div>
