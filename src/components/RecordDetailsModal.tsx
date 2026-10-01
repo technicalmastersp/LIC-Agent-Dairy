@@ -15,6 +15,7 @@ import {
 import siteConfig from "@/config/siteConfig";
 import { convertDateToIndianFormat } from "@/utils/tools";
 import { formatAadhaar, formatIndianNumber, formatMobileNumber } from "@/utils/inputValueFormats";
+import { SensitiveValue } from "@/components/SensitiveValue";
 import { getInsuranceTypeDef, isOtherInsuranceType } from "@/config/insuranceTypes";
 import type { FamilyMember, CustomFieldValue, RecordDetailsModalProps, IconType } from "@/types/components/RecordDetailsModal.types";
 const SectionTitle = ({ icon: Icon, children }: { icon: IconType; children: React.ReactNode }) => (
@@ -29,7 +30,7 @@ const SectionTitle = ({ icon: Icon, children }: { icon: IconType; children: Reac
 const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps) => {
   if (!record) return null;
 
-  const InfoItem = ({ icon: Icon, label, value }: { icon: IconType; label: string; value?: string }) => (
+  const InfoItem = ({ icon: Icon, label, value }: { icon: IconType; label: string; value?: React.ReactNode }) => (
     <div className="flex items-start space-x-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
       <Icon className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
       <div className="min-w-0 flex-1">
@@ -86,8 +87,8 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <InfoItem icon={User} label="Date" value={convertDateToIndianFormat(record.date)} />
-                <InfoItem icon={Calendar} label="Aadhaar Number" value={formatAadhaar(record.aadhaarNumber)} />
-                <InfoItem icon={MapPin} label="Pan Number" value={record.panNumber} />
+                <InfoItem icon={Calendar} label="Aadhaar Number" value={<SensitiveValue value={record.aadhaarNumber} render={formatAadhaar} />} />
+                <InfoItem icon={MapPin} label="Pan Number" value={<SensitiveValue value={record.panNumber} />} />
                 <InfoItem icon={User} label="E Mail" value={record.email} />
               </div>
             </CardContent>
@@ -150,7 +151,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 <InfoItem icon={MapPin} label="Address" value={record.address || ""} />
                 <InfoItem icon={Calendar} label="Date of Birth" value={convertDateToIndianFormat(record.dateOfBirth) || ""} />
                 <InfoItem icon={User} label="Age" value={record.age || ""} />
-                <InfoItem icon={Phone} label="Aadhaar Linked Mobile Number" value={formatMobileNumber(record.aadhaarLinkedMobileNumber) || ""} />
+                <InfoItem icon={Phone} label="Aadhaar Linked Mobile Number" value={<SensitiveValue value={record.aadhaarLinkedMobileNumber} render={formatMobileNumber} />} />
                 <InfoItem icon={User} label="Name of Nominee" value={record.nameOfNominee || ""} />
                 <InfoItem icon={User} label="Age of Nominee" value={record.ageOfNominee || ""} />
                 <InfoItem icon={User} label="Relation Name" value={record.relationName || ""} />
@@ -196,8 +197,8 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <InfoItem icon={CreditCard} label="Bank Account Number" value={record.bankAccountNumber} />
-                <InfoItem icon={CreditCard} label="IFSC Code" value={record.ifscCode} />
+                <InfoItem icon={CreditCard} label="Bank Account Number" value={<SensitiveValue value={record.bankAccountNumber} />} />
+                <InfoItem icon={CreditCard} label="IFSC Code" value={<SensitiveValue value={record.ifscCode} />} />
                 <InfoItem icon={HomeIcon} label="Bank Name" value={record.bankName} />
                 <InfoItem icon={MapPin} label="Branch Name" value={record.branchName} />
               </div>

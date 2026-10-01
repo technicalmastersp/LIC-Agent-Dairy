@@ -26,6 +26,8 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { getReferralConfig } from "../../services/configService";
 import type { Dashboard, WithdrawalRowProps, ReferralRowProps } from "@/types/pages/ReferralProgram.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
+import { isEncryptedValue } from "@/utils/inputValueFormats";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 // ── types ─────────────────────────────────────────────────────────────────────
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -106,10 +108,13 @@ const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: WithdrawalRowProps) => (
         Requested: {fmt(w.requestedAt)}
         {w.processedAt && ` · Processed: ${fmt(w.processedAt)}`}
       </p>
-      {w.upiId && <p className="text-xs text-muted-foreground">{w.upiId}</p>}
+      {w.upiId && <p className="text-xs text-muted-foreground"><SensitiveValue value={w.upiId} /></p>}
       {w.accountNumber && (
         <p className="text-xs text-muted-foreground">
-          {w.bankName} ••••{w.accountNumber.slice(-4)}
+          {w.bankName}{" "}
+          {isEncryptedValue(w.accountNumber)
+            ? <SensitiveValue value={w.accountNumber} />
+            : <>••••{w.accountNumber.slice(-4)}</>}
         </p>
       )}
       {(w.status === "failed") && (
@@ -579,7 +584,9 @@ const ReferralProgram = () => {
                         )}
                       </div>
                       <p className="font-mono text-lg tracking-[0.2em] mb-4">
-                        •••• •••• •••• {d.paymentDetails.accountNumber.slice(-4)}
+                        {isEncryptedValue(d.paymentDetails.accountNumber)
+                          ? <SensitiveValue value={d.paymentDetails.accountNumber} />
+                          : <>•••• •••• •••• {d.paymentDetails.accountNumber.slice(-4)}</>}
                       </p>
                       <div className="flex items-end justify-between">
                         <div>
@@ -588,7 +595,7 @@ const ReferralProgram = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60 mb-0.5">{d.paymentDetails.bankName || "Bank"}</p>
-                          <p className="text-xs text-primary-foreground/80">{d.paymentDetails.ifscCode}</p>
+                          <p className="text-xs text-primary-foreground/80"><SensitiveValue value={d.paymentDetails.ifscCode} /></p>
                         </div>
                       </div>
                       {d.paymentDetails.branchName && (
@@ -617,7 +624,11 @@ const ReferralProgram = () => {
                           </Badge>
                         )}
                       </div>
-                      <p className="font-mono text-lg mb-1">••••••{d.paymentDetails.upiId.slice(6)}</p>
+                      <p className="font-mono text-lg mb-1">
+                        {isEncryptedValue(d.paymentDetails.upiId)
+                          ? <SensitiveValue value={d.paymentDetails.upiId} />
+                          : <>••••••{d.paymentDetails.upiId.slice(6)}</>}
+                      </p>
                       <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60">UPI ID</p>
                       {d.paymentDetails.upiRejectionReason && (
                         <p className="text-xs text-red-100 mt-2 bg-red-950/30 rounded px-2 py-1">
