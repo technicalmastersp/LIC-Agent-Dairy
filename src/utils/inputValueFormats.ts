@@ -19,10 +19,24 @@
 export const digitsOnly = (value: string) => (value || "").replace(/\D/g, "");
 
 /**
+ * True if `value` is the backend's encrypted-field format ("v1:iv:authTag:
+ * ciphertext" — see backend/utils/encryption.js's isEncrypted()). This is
+ * exactly what an admin without the "view sensitive data" permission gets
+ * back for Aadhaar/PAN/bank/UPI fields: the real ciphertext, by design.
+ * Formatters below must skip it — running digit-grouping on a base64
+ * ciphertext would extract whatever digits happen to appear in it and
+ * display a garbled string that *looks* like a plausible real number.
+ */
+export const isEncryptedValue = (value: string) =>
+  typeof value === "string" && /^v1:[^:]+:[^:]+:[^:]+$/.test(value);
+
+/**
  * Aadhaar number, grouped in 4s for readability: "123456789012" -> "1234 5678 9012".
  * Display only — always feed the unformatted value to unformatAadhaar before storing it.
+ * Passes an encrypted value through unchanged (see isEncryptedValue above).
  */
 export const formatAadhaar = (value: string) => {
+  if (isEncryptedValue(value)) return value;
   const digits = digitsOnly(value).slice(0, 12);
   return digits.replace(/(\d{4})(?=\d)/g, "$1 ");
 };
@@ -35,6 +49,7 @@ export const unformatAadhaar = (value: string) => digitsOnly(value).slice(0, 12)
  * Display only — always feed the unformatted value to unformatMobileNumber before storing it.
  */
 export const formatMobileNumber = (value: string) => {
+  if (isEncryptedValue(value)) return value;
   const digits = digitsOnly(value).slice(0, 10);
   return digits.length > 5 ? `${digits.slice(0, 5)} ${digits.slice(5)}` : digits;
 };

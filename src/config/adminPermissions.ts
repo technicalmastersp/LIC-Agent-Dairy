@@ -18,6 +18,7 @@ export const PERMISSION_DEFS: PermissionDef[] = [
   { key: "can_manage_support", label: "Manage support & suggestions", desc: "View and reply to support tickets, review user suggestions", risk: "medium" },
   { key: "can_view_revenue", label: "View revenue", desc: "See financial reports — income, expenses, profit/loss", risk: "high" },
   { key: "can_manage_expenses", label: "Manage expenses & refunds", desc: "Log expenses, edit/delete entries, process payment refunds", risk: "critical" },
+  { key: "can_view_sensitive_data", label: "View sensitive data", desc: "Decrypt Aadhaar, PAN, and bank/UPI details when viewing a user — without it, these show as encrypted", risk: "critical" },
 ];
 
 export const PERMISSION_RISK_COLOR: Record<string, string> = {
