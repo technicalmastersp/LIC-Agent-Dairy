@@ -126,15 +126,14 @@ const Footer = () => {
             <p className="mb-4 leading-relaxed">
               {t("companyDescription")}
             </p>
-            <div className="text-xs text-primary-foreground/70">
-              <p>© {currentYear} {siteConfig.companyName}</p>
-              <p>{t("allRightsReserved")}</p>
-            </div>
+            <p>{t("footerTagline")}</p>
           </FooterSection>
         </div>
 
         <div className="border-t border-primary-foreground/15 mt-8 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-primary-foreground/70">
-          <p>{t("footerTagline")}</p>
+          <div className="text-xs text-primary-foreground/70">
+            <p>© {currentYear} {siteConfig.companyName} - {t("allRightsReserved")}</p>
+          </div>
           <div className="flex items-center gap-4">
             <Link to="/privacy-policy" className="hover:text-primary-foreground transition-colors">
               Privacy Policy

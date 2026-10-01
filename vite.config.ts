@@ -141,6 +141,18 @@ export default defineConfig(({ mode }) => {
         // SPA fallback so deep links (e.g. /view-records opened directly
         // while offline after the first visit) still serve index.html
         // instead of a browser network-error page.
+        //
+        // KNOWN LIMITATION as of the prerendering change (scripts/
+        // copy-prerendered.mjs): index.html now carries the Landing page's
+        // specific prerendered content instead of being a neutral empty
+        // shell, so an offline/uncached navigation to some other route
+        // (e.g. /home) could briefly flash Landing's content/navbar before
+        // client-side routing corrects it. A proper fix needs the SW's
+        // precache manifest generated AFTER copy-prerendered.mjs runs
+        // (currently vite-plugin-pwa generates it as part of `vite build`,
+        // which finishes before that script even starts) — not done here
+        // to avoid shipping an untested build-pipeline reorder alongside
+        // an unrelated, already-confirmed bug fix.
         navigateFallback: "/index.html",
         // Never let the SW intercept API calls or the SPA fallback would
         // incorrectly serve index.html for a failed /api/* request instead

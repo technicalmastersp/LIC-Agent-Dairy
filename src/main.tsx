@@ -29,7 +29,23 @@ if (import.meta.env.DEV) {
   );
 }
 
-createRoot(document.getElementById("root")!).render(
+const container = document.getElementById("root")!;
+
+// Prerendered public pages (see scripts/prerender.mjs) bake real, visible
+// markup into #root so crawlers see actual content on the first HTML
+// fetch. But createRoot() — unlike React 17's ReactDOM.render(), and
+// unlike hydrateRoot() — does NOT clear a container's existing children
+// before rendering; it only manages nodes it creates itself. Left as-is,
+// that prerendered markup would stay in the DOM forever, with React's own
+// tree rendered *alongside* it rather than replacing it — exactly the
+// "stacked" duplicate content (leftover public navbar, an auth-redirect
+// that looks like it never fired) seen after login. Clearing the
+// container first restores plain client-side rendering for real visitors,
+// while crawlers — which never run this JS — still see the prerendered
+// content in the raw HTML.
+container.innerHTML = "";
+
+createRoot(container).render(
   <HelmetProvider>
     <App />
   </HelmetProvider>
