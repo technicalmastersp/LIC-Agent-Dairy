@@ -36,6 +36,7 @@ import fs from "node:fs/promises";
 import fsSync from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { PUBLIC_ROUTES } from "./publicRoutes.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = path.resolve(__dirname, "../dist");
@@ -44,24 +45,9 @@ const PORT = 5099;
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 
 // Mirrors public/sitemap.xml and robots.txt's Allow list exactly.
-const ROUTES = [
-  "/",
-  "/about",
-  "/our-plans",
-  "/lic-info-hub",
-  "/help-support",
-  "/tools",
-  "/tools/age-calculator",
-  "/tools/sip-calculator",
-  "/tools/income-tax-calculator",
-  "/tools/home-loan-emi-calculator",
-  "/tools/term-insurance-calculator",
-  "/tools/inflation-calculator",
-  "/privacy-policy",
-  "/terms-of-service",
-  "/login",
-  "/signup",
-];
+// Sourced from scripts/publicRoutes.mjs — the same list generate-sitemap.mjs
+// writes into public/sitemap.xml.
+const ROUTES = PUBLIC_ROUTES.map((r) => r.path);
 
 const MIME_TYPES = {
   ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript",
