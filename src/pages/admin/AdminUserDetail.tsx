@@ -17,7 +17,8 @@ import { ArrowLeft, Trash2, RefreshCw, Eye, LogOut, Building2, Smartphone, Check
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { AdminUserDetailData } from "@/types/pages/admin/AdminUserDetail.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
-import { formatIndianNumber } from "@/utils/inputValueFormats";
+import { formatIndianNumber, isEncryptedValue } from "@/utils/inputValueFormats";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 // (date formatting now imported from dateFormat.ts as `fmt`)
 
@@ -253,7 +254,11 @@ const AdminUserDetail = () => {
                           <Badge className="bg-amber-400/90 text-amber-950 border-0 text-[10px]"><Clock className="w-3 h-3 mr-1" />Pending</Badge>
                         )}
                       </div>
-                      <p className="font-mono text-base tracking-[0.15em] mb-3">•••• •••• •••• {user.paymentDetails.accountNumber.slice(-4)}</p>
+                      <p className="font-mono text-base tracking-[0.15em] mb-3">
+                        {isEncryptedValue(user.paymentDetails.accountNumber)
+                          ? <SensitiveValue value={user.paymentDetails.accountNumber} />
+                          : <>•••• •••• •••• {user.paymentDetails.accountNumber.slice(-4)}</>}
+                      </p>
                       <div className="flex items-end justify-between text-xs">
                         <div>
                           <p className="text-[9px] uppercase text-primary-foreground/60">Holder</p>
@@ -261,7 +266,10 @@ const AdminUserDetail = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-[9px] uppercase text-primary-foreground/60">{user.paymentDetails.bankName || "Bank"}</p>
-                          <p className="text-primary-foreground/80">{user.paymentDetails.ifscCode}{user.paymentDetails.branchName ? ` · ${user.paymentDetails.branchName}` : ""}</p>
+                          <p className="text-primary-foreground/80">
+                            <SensitiveValue value={user.paymentDetails.ifscCode} />
+                            {!isEncryptedValue(user.paymentDetails.ifscCode) && user.paymentDetails.branchName ? ` · ${user.paymentDetails.branchName}` : ""}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -280,7 +288,7 @@ const AdminUserDetail = () => {
                           <Badge className="bg-amber-400/90 text-amber-950 border-0 text-[10px]"><Clock className="w-3 h-3 mr-1" />Pending review</Badge>
                         )}
                       </div>
-                      <p className="font-mono text-base">{user.paymentDetails.upiId}</p>
+                      <p className="font-mono text-base"><SensitiveValue value={user.paymentDetails.upiId} /></p>
                       {user.paymentDetails.upiRejectionReason && (
                         <p className="text-xs text-red-100 mt-2 bg-red-950/30 rounded px-2 py-1">{user.paymentDetails.upiRejectionReason}</p>
                       )}

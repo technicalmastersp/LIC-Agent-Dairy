@@ -48,7 +48,7 @@ const Section = ({
 );
 
 const PrivacyPolicy = () => {
-  const lastUpdated = "September 2026";
+  const lastUpdated = "October 2026";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -191,19 +191,21 @@ const PrivacyPolicy = () => {
                   <li>One-way password hashing using bcrypt; passwords are never stored or logged in plain text</li>
                   <li>HTTP security headers, including a Content Security Policy, and cross-origin resource sharing (CORS) restrictions limiting which origins may interact with the API</li>
                   <li>Request rate-limiting to mitigate brute-force and denial-of-service attempts</li>
-                  <li>Role-based access control distinguishing Agent, Admin, and Super-Admin privileges</li>
+                  <li>Role-based access control distinguishing Agent, Admin, and Super-Admin privileges, with a further permission-based gate (below) restricting which Admin accounts may view decrypted Sensitive Personal Data</li>
+                  <li>Field-level encryption at rest (AES-256-GCM) for Aadhaar number, PAN, bank account number, IFSC code, and UPI ID — these fields are never stored as plain text in the database</li>
                   <li>Automated application error monitoring (Sentry) to detect and remediate faults, configured to avoid intentional capture of Sensitive Personal Data in error payloads</li>
                 </ul>
                 <p>
-                  <strong>Disclosed limitation:</strong> Aadhaar, PAN, and bank account
-                  fields are currently stored as plain, unencrypted text within the
-                  database record, alongside other policy fields, rather than being
-                  subject to separate field-level encryption at rest. Access to this data
-                  is restricted to your authenticated session and, where applicable,
-                  Admin/Super-Admin accounts performing platform administration. If
-                  field-level encryption of Sensitive Personal Data is a requirement for
-                  your use case or regulatory environment, this should be treated as an
-                  open item for further engineering and legal review.
+                  <strong>Permission-gated access to Sensitive Personal Data:</strong> your
+                  own Aadhaar, PAN, bank, and UPI details are decrypted for you whenever you
+                  view your own records. For platform administration, decryption of these
+                  fields is restricted to Super-Admin accounts and to Admin accounts
+                  individually granted a specific "view sensitive data" permission; an Admin
+                  without that permission sees these fields in their encrypted form and
+                  cannot read their contents. A narrow exception applies to the specific
+                  permission that lets an Admin manually verify a UPI ID for payout
+                  processing, which necessarily requires seeing that one field in order to
+                  perform the verification.
                 </p>
                 <p>
                   No method of electronic transmission or storage is completely secure. While

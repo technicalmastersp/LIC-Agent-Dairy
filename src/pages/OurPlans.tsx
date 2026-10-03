@@ -221,7 +221,7 @@ const OurPlans = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
         title="Subscription Plans & Pricing"
-        description="Compare Policy Niketan subscription plans — from a free 1-month trial to 24-month options — and pick the right fit for how many client records you manage."
+        description="Compare Policy Niketan subscription plans — from a free 1-month trial to 12-month options — and pick the right fit for how many client records you manage."
         path="/our-plans"
       />
       <Navigation />
@@ -247,7 +247,7 @@ const OurPlans = () => {
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-form-header mb-3">Choose Your Plan</h1>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            From a free trial to a full 24-month workspace — pick what fits how many client records
+            From a free trial to a full 12-month workspace — pick what fits how many client records
             you manage today. Upgrade or renew any time as your book of business grows.
           </p>
 

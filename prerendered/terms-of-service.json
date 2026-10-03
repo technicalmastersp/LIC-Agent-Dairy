@@ -7,12 +7,12 @@
     {
       "attr": "property",
       "key": "og:title",
-      "value": "Policy Niketan"
+      "value": "Terms of Service | Policy Niketan"
     },
     {
       "attr": "property",
       "key": "og:description",
-      "value": "Professional insurance policy record management system for all types of agents and customers"
+      "value": "The terms and conditions governing use of Policy Niketan — account eligibility, subscription plans, data responsibilities, intellectual property, liability, and dispute resolution."
     },
     {
       "attr": "property",
@@ -38,6 +38,26 @@
       "attr": "name",
       "key": "twitter:image",
       "value": "https://policyniketan.com/logos/logo_social.png"
+    },
+    {
+      "attr": "property",
+      "key": "og:site_name",
+      "value": "Policy Niketan"
+    },
+    {
+      "attr": "property",
+      "key": "og:url",
+      "value": "https://policyniketan.com/terms-of-service"
+    },
+    {
+      "attr": "name",
+      "key": "twitter:title",
+      "value": "Terms of Service | Policy Niketan"
+    },
+    {
+      "attr": "name",
+      "key": "twitter:description",
+      "value": "The terms and conditions governing use of Policy Niketan — account eligibility, subscription plans, data responsibilities, intellectual property, liability, and dispute resolution."
     },
     {
       "attr": "property",

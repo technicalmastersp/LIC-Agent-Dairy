@@ -7,12 +7,12 @@
     {
       "attr": "property",
       "key": "og:title",
-      "value": "Policy Niketan"
+      "value": "Help & Support | Policy Niketan"
     },
     {
       "attr": "property",
       "key": "og:description",
-      "value": "Professional insurance policy record management system for all types of agents and customers"
+      "value": "Find answers to common questions, browse help topics, or contact our support team directly. Track your open tickets and suggestions in one place."
     },
     {
       "attr": "property",
@@ -38,6 +38,26 @@
       "attr": "name",
       "key": "twitter:image",
       "value": "https://policyniketan.com/logos/logo_social.png"
+    },
+    {
+      "attr": "property",
+      "key": "og:site_name",
+      "value": "Policy Niketan"
+    },
+    {
+      "attr": "property",
+      "key": "og:url",
+      "value": "https://policyniketan.com/help-support"
+    },
+    {
+      "attr": "name",
+      "key": "twitter:title",
+      "value": "Help & Support | Policy Niketan"
+    },
+    {
+      "attr": "name",
+      "key": "twitter:description",
+      "value": "Find answers to common questions, browse help topics, or contact our support team directly. Track your open tickets and suggestions in one place."
     },
     {
       "attr": "property",

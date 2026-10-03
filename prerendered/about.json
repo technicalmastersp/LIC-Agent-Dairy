@@ -7,12 +7,12 @@
     {
       "attr": "property",
       "key": "og:title",
-      "value": "Policy Niketan"
+      "value": "About Us | Policy Niketan"
     },
     {
       "attr": "property",
       "key": "og:description",
-      "value": "Professional insurance policy record management system for all types of agents and customers"
+      "value": "Learn who builds Policy Niketan, why we built a dedicated record-keeping tool for all types of insurance agents, and how we keep client data secure."
     },
     {
       "attr": "property",
@@ -38,6 +38,26 @@
       "attr": "name",
       "key": "twitter:image",
       "value": "https://policyniketan.com/logos/logo_social.png"
+    },
+    {
+      "attr": "property",
+      "key": "og:site_name",
+      "value": "Policy Niketan"
+    },
+    {
+      "attr": "property",
+      "key": "og:url",
+      "value": "https://policyniketan.com/about"
+    },
+    {
+      "attr": "name",
+      "key": "twitter:title",
+      "value": "About Us | Policy Niketan"
+    },
+    {
+      "attr": "name",
+      "key": "twitter:description",
+      "value": "Learn who builds Policy Niketan, why we built a dedicated record-keeping tool for all types of insurance agents, and how we keep client data secure."
     },
     {
       "attr": "property",

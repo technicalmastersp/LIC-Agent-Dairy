@@ -12,6 +12,8 @@ import { CheckCircle2, XCircle, Eye, Search, ArrowUpDown, X, RefreshCw } from "l
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { SortField, SortDir, WithdrawalItem } from "@/types/pages/admin/WithdrawalRequests.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
+import { isEncryptedValue } from "@/utils/inputValueFormats";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -364,14 +366,17 @@ const WithdrawalRequests = () => {
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              {w.upiId && <p className="text-xs">{w.upiId}</p>}
+                              {w.upiId && <p className="text-xs"><SensitiveValue value={w.upiId} /></p>}
                               {w.accountNumber && (
                                 <>
                                   <p className="text-xs font-medium">{w.accountHolder}</p>
                                   <p className="text-xs text-muted-foreground">
-                                    {w.bankName} · ••••{w.accountNumber.slice(-4)}
+                                    {w.bankName} ·{" "}
+                                    {isEncryptedValue(w.accountNumber)
+                                      ? <SensitiveValue value={w.accountNumber} />
+                                      : <>••••{w.accountNumber.slice(-4)}</>}
                                   </p>
-                                  <p className="text-xs text-muted-foreground">{w.ifscCode}</p>
+                                  <p className="text-xs text-muted-foreground"><SensitiveValue value={w.ifscCode} /></p>
                                 </>
                               )}
                             </TableCell>
