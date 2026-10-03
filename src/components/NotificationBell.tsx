@@ -145,6 +145,16 @@ const NotificationBell = ({ variant = "default", align = "end" }: NotificationBe
             </ul>
           )}
         </div>
+
+        <div className="border-t border-border px-3 py-2">
+          <button
+            type="button"
+            onClick={() => { setOpen(false); navigate("/notification-preferences"); }}
+            className="text-xs text-primary hover:underline"
+          >
+            Notification settings
+          </button>
+        </div>
       </PopoverContent>
     </Popover>
   );

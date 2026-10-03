@@ -134,6 +134,11 @@ export default defineConfig(({ mode }) => {
         // should be compressed anyway (see the separate image-optimization
         // pass for public/logos).
         globIgnores: ["logos/logo_medium_size.png"],
+        // Adds Web Push handling (show a notification when the server pushes
+        // one; open the right page when it's tapped) to the generated service
+        // worker WITHOUT switching to injectManifest — the caching setup above
+        // is unchanged. File lives in public/push-sw.js.
+        importScripts: ["/push-sw.js"],
         // Vite emits hashed filenames per build, so a fresh deploy always
         // gets a new precache manifest — cleanupOutdatedCaches prevents
         // stale precached assets from a previous deploy lingering forever.

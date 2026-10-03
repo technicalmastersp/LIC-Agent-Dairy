@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/utils/auth";
 import ThemeToggle from "@/components/ThemeToggle";
 import NotificationBell from "@/components/NotificationBell";
 import { getMyPermissions, getPendingCounts } from "../../../services/adminService";
+import { logoutCurrentUser } from "../../../services/userService";
 import {
   Users,
   ShieldCheck,
@@ -161,7 +162,11 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Logout
-  const handleLogout = () => {
+  // Goes through logoutCurrentUser so the server clears the auth cookie and
+  // this device stops receiving the admin's push notifications. (This used to
+  // only clear localStorage, leaving the httpOnly cookie in place.)
+  const handleLogout = async () => {
+    await logoutCurrentUser();
     localStorage.clear();
     setSidebarOpen(false);
     navigate("/login");
