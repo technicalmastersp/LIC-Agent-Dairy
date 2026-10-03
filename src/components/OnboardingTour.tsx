@@ -59,7 +59,7 @@ const STEPS: TourStep[] = [
   {
     target: "tour-referral-wallet",
     title: "Referral wallet",
-    body: "Refer other agents and earn commission here. Track your balance and withdraw once you cross the minimum.",
+    body: "Refer other agents and earn commission here. Track your balance and use it to renew or upgrade your plan.",
   },
 ];
 

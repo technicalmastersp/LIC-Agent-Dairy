@@ -20,7 +20,7 @@ import {
   Wallet, GitBranch, Receipt, Route, Clock,
   Building2, Smartphone, CheckCircle2, AlertCircle,
   ArrowDownToLine, History, Edit, Save, X,
-  Award, Medal, Star, Sparkles, Loader2
+  Award, Medal, Star, Sparkles, Loader2, Info, RefreshCw
 } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
 import { getReferralConfig } from "../../services/configService";
@@ -307,6 +307,16 @@ const ReferralProgram = () => {
   };
 
   const handleWithdraw = async () => {
+    // WALLET-TRANSFER-PAUSED — the server also rejects this (403
+    // WITHDRAWALS_DISABLED); this is just a friendlier early exit.
+    if (dashboard?.withdrawalsEnabled !== true) {
+      toast({
+        title:       "Withdrawals unavailable",
+        description: "Your wallet balance can be used to renew or upgrade your plan.",
+        variant:     "destructive",
+      });
+      return;
+    }
     if (!dashboard?.hasPaymentDetails) {
       toast({
         title:       "Bank details required",
@@ -345,6 +355,12 @@ const ReferralProgram = () => {
   );
 
   const d = dashboard!;
+
+  // WALLET-TRANSFER-PAUSED — referral wallet money can currently only be used
+  // for plan renewals/upgrades. Driven by the server flag, so bringing
+  // withdrawals back is a backend env change (REFERRAL_WITHDRAWALS_ENABLED),
+  // not a UI rewrite.
+  const withdrawalsEnabled = d.withdrawalsEnabled === true;
 
   const tier = getTier(d.totalL1);
   const monthlyTrend = buildMonthlyTrend(d.earningsHistory || []);
@@ -497,25 +513,52 @@ const ReferralProgram = () => {
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                   <p className="text-xs font-medium text-green-700 mb-1">Available balance</p>
                   <p className="text-3xl font-medium text-green-700">₹{d.availableBalance}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Withdrawn: ₹{d.totalWithdrawn} · Min: ₹{config.MIN_WITHDRAWAL}
-                  </p>
-                  {/* Bank details warning */}
-                  {!d.hasPaymentDetails && (
-                    <div className="flex items-center gap-1.5 mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                      Add bank details to withdraw
-                    </div>
+                  {withdrawalsEnabled ? (
+                    <>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Withdrawn: ₹{d.totalWithdrawn} · Min: ₹{config.MIN_WITHDRAWAL}
+                      </p>
+                      {/* Bank details warning */}
+                      {!d.hasPaymentDetails && (
+                        <div className="flex items-center gap-1.5 mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
+                          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                          Add bank details to withdraw
+                        </div>
+                      )}
+                      <Button
+                        size="sm"
+                        className="mt-3 bg-green-600 hover:bg-green-700 text-primary-foreground text-xs w-full"
+                        onClick={handleWithdraw}
+                        disabled={withdrawing || d.availableBalance < config.MIN_WITHDRAWAL}
+                      >
+                        <ArrowDownToLine className="w-3.5 h-3.5 mr-1.5" />
+                        {withdrawing ? "Processing…" : "Withdraw earnings"}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      {/* WALLET-TRANSFER-PAUSED */}
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Use it to renew or upgrade your plan
+                        {d.totalWithdrawn > 0 && ` · Previously withdrawn: ₹${d.totalWithdrawn}`}
+                      </p>
+                      <div className="flex items-start gap-1.5 mt-2 text-xs text-blue-800 bg-blue-50 border border-blue-200 rounded px-2 py-1.5">
+                        <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                        <span>
+                          Transfers to your bank account or UPI aren't available right now. Wallet balance can only be used for plan renewals and upgrades.
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="mt-3 bg-green-600 hover:bg-green-700 text-primary-foreground text-xs w-full"
+                        onClick={() => navigate("/our-plans")}
+                        disabled={d.availableBalance <= 0}
+                      >
+                        <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                        Use wallet on renewal or upgrade
+                      </Button>
+                    </>
                   )}
-                  <Button
-                    size="sm"
-                    className="mt-3 bg-green-600 hover:bg-green-700 text-primary-foreground text-xs w-full"
-                    onClick={handleWithdraw}
-                    disabled={withdrawing || d.availableBalance < config.MIN_WITHDRAWAL}
-                  >
-                    <ArrowDownToLine className="w-3.5 h-3.5 mr-1.5" />
-                    {withdrawing ? "Processing…" : "Withdraw earnings"}
-                  </Button>
                 </div>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <p className="text-xs font-medium text-yellow-700 mb-1">Pending rewards</p>
@@ -539,6 +582,8 @@ const ReferralProgram = () => {
           </Card>
 
           {/* ── Bank / Payment Details ── */}
+          {/* WALLET-TRANSFER-PAUSED — payout details are only needed for withdrawals */}
+          {withdrawalsEnabled && (
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center justify-between">
@@ -756,6 +801,7 @@ const ReferralProgram = () => {
               )}
             </CardContent>
           </Card>
+          )}
 
           {/* ── Share link ── */}
           <Card>
@@ -814,7 +860,10 @@ const ReferralProgram = () => {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
                 Referred users get ₹{config.SIGNUP_DISCOUNT_AMOUNT} off at signup.
                 You earn {config.L1_COMMISSION_PCT}% on their plan (L1) and {config.L2_COMMISSION_PCT}% on their referrals (L2).
-                One-time reward per user within {config.REWARD_WINDOW_DAYS} days. Min withdrawal ₹{config.MIN_WITHDRAWAL || 500}.
+                One-time reward per user within {config.REWARD_WINDOW_DAYS} days.{" "}
+                {withdrawalsEnabled
+                  ? `Min withdrawal ₹${config.MIN_WITHDRAWAL || 500}.`
+                  : "Rewards go to your wallet and can be used to renew or upgrade your plan."}
               </div>
             </CardContent>
           </Card>
@@ -831,7 +880,7 @@ const ReferralProgram = () => {
                 {[
                   { step: "1", title: "Share your link",  desc: "Send your referral URL to agents or friends" },
                   { step: "2", title: "They sign up",     desc: `They register with your link and get ₹${config.SIGNUP_DISCOUNT_AMOUNT} off any paid plan` },
-                  { step: "3", title: "Earn commission",  desc: `Get ${config.L1_COMMISSION_PCT}% on their plan once, ${config.L2_COMMISSION_PCT}% on their referrals once` },
+                  { step: "3", title: "Earn commission",  desc: `Get ${config.L1_COMMISSION_PCT}% on their plan once, ${config.L2_COMMISSION_PCT}% on their referrals once — added to your wallet for renewals & upgrades` },
                 ].map(({ step, title, desc }) => (
                   <div key={step} className="text-center p-4 bg-muted rounded-lg">
                     <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-medium text-sm mx-auto mb-3">
@@ -953,6 +1002,8 @@ const ReferralProgram = () => {
           </Dialog>
 
           {/* ── Withdrawal history ── */}
+          {/* WALLET-TRANSFER-PAUSED — keep history visible for anyone who has past requests */}
+          {(withdrawalsEnabled || (d.withdrawalHistory?.length ?? 0) > 0) && (
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
@@ -977,6 +1028,7 @@ const ReferralProgram = () => {
               )}
             </CardContent>
           </Card>
+          )}
 
           <Dialog open={showAllWithdrawals} onOpenChange={setShowAllWithdrawals}>
             <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">

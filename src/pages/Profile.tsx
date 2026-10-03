@@ -284,13 +284,17 @@ const Profile = () => {
     (payment?.accountNumber && payment?.bankVerified)
   );
 
+  // WALLET-TRANSFER-PAUSED — payout details only matter when wallet→bank/UPI
+  // transfers are on, so they don't count toward profile completion otherwise.
+  const withdrawalsEnabled = referral?.withdrawalsEnabled === true;
+
   const completionItems = [
     { label: "Name",            done: !!user.name           },
     { label: "Email verified",  done: !!user.isEmailVerified },
     { label: "Mobile number",   done: !!user.mobileNumber   },
     { label: "Full address",    done: !!user.fullAddress     },
     { label: "Profile photo",   done: !!avatar              },
-    { label: "Payout details",  done: hasPayout              },
+    ...(withdrawalsEnabled ? [{ label: "Payout details", done: hasPayout }] : []),
   ];
   const completionPct  = Math.round((completionItems.filter(i => i.done).length / completionItems.length) * 100);
   const completionColor = completionPct === 100 ? "bg-green-500"
@@ -593,7 +597,8 @@ const Profile = () => {
                 </button>
               </div>
 
-              {/* Payment & payout details */}
+              {/* Payment & payout details — WALLET-TRANSFER-PAUSED: hidden while withdrawals are off */}
+              {withdrawalsEnabled && (
               <div className="bg-card border border-border rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
@@ -647,6 +652,7 @@ const Profile = () => {
                   </div>
                 )}
               </div>
+              )}
 
               {/* Security & sessions */}
               <div className="bg-card border border-border rounded-xl p-4">

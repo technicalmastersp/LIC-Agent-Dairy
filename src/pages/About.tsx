@@ -69,27 +69,27 @@ const About = () => {
     },
     {
       icon: Wallet,
-      title: "Referrals and withdrawals",
+      title: "Referrals and wallet",
       description:
-        "A built-in referral wallet tracks direct and second-level referrals, with an admin-reviewed withdrawal queue for approving or rejecting payouts.",
+        "A built-in referral wallet tracks direct and second-level referrals, and your wallet balance can be used toward plan renewals and upgrades.",
     },
     {
       icon: CreditCard,
       title: "Flexible plans, secure payments",
       description:
-        "Start on a free trial, then move up through Starter, Basic, Standard, or Premium plans as your book of business grows. Checkout runs through Razorpay, referral wallet balance is applied automatically where it covers the cost, and UPI payments get an admin-verified manual fallback.",
+        "Start on a free trial, then move up through Starter, Basic, Standard, or Premium plans as your book of business grows. Checkout runs through Razorpay, referral wallet balance can be applied toward renewals and upgrades, and UPI payments get an admin-verified manual fallback.",
     },
     {
       icon: UserCog,
       title: "Role-based administration",
       description:
-        "Admins get dedicated tools to manage user accounts, review withdrawal requests, and keep the platform running smoothly — without touching agents' day-to-day workspace.",
+        "Admins get dedicated tools to manage user accounts, handle support requests, and keep the platform running smoothly — without touching agents' day-to-day workspace.",
     },
     {
       icon: Search,
       title: "Fast, precise search",
       description:
-        "Every record list — policies, due payments, users, withdrawals — supports instant search and column sorting, so finding one record among thousands takes seconds.",
+        "Every record list — policies, due payments, and users — supports instant search and column sorting, so finding one record among thousands takes seconds.",
     },
     {
       icon: Languages,

@@ -1,5 +1,6 @@
 
 export interface ReferralDashboardData {
+  withdrawalsEnabled?: boolean;
   totalL1?: number;
   totalL2?: number;
   availableBalance?: number;

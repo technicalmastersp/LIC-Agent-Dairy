@@ -31,7 +31,7 @@ import axios from "axios";
 import type { Ticket, Suggestion, FaqItem } from "@/types/pages/HelpSupport.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
 const faqs: FaqItem[] = [
-  { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. You can move between the Free trial, Starter, Basic, Standard, and Premium plans — checkout runs through Razorpay, and any referral wallet balance you have is applied automatically where it covers the cost." },
+  { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. You can move between the Free trial, Starter, Basic, Standard, and Premium plans — checkout runs through Razorpay, and you can apply your referral wallet balance toward the cost at checkout." },
   { category: "Account & Billing", q: "What happens when my plan expires?", a: "Your records stay safe and backed up, but you'll need to renew to add new records or access due/missed payment tracking again." },
   { category: "Account & Billing", q: "Can I change my registered name or Easy ID?", a: "No — your name and Easy ID are permanently assigned at signup for record integrity. Everything else on your profile (mobile number, address, email) can be updated any time." },
   { category: "Account & Billing", q: "Can I switch between light and dark mode?", a: "Yes — use the theme toggle in the navigation bar to switch between light and dark mode. Your choice is remembered the next time you log in." },
@@ -41,9 +41,9 @@ const faqs: FaqItem[] = [
   { category: "Policies & Records", q: "Can I delete a policy record?", a: "Record deletion is currently disabled from the interface to prevent accidental data loss. Contact support if a record genuinely needs to be removed." },
   { category: "Policies & Records", q: "Can I call or WhatsApp a policyholder directly from a record?", a: "Yes — open a record from the Missed, Due, or Upcoming payment pages and use the contact action to call or message the policyholder on WhatsApp without leaving the page." },
   { category: "Policies & Records", q: "Can I update a payment date without opening the full edit form?", a: "Yes — from the Missed, Due, or Upcoming payment pages, use the update-payment action on a record to change the last payment date directly, without going through the full edit form." },
-  { category: "Payments & Referrals", q: "How does the referral wallet work?", a: "You earn rewards for direct (L1) and second-level (L2) referrals. Balances show as available or pending, and can be withdrawn once payment details are added to your profile." },
-  { category: "Payments & Referrals", q: "How long does a withdrawal take to process?", a: "Withdrawal requests go into an admin-reviewed queue and are typically approved or rejected within a few business days. You'll see the status update on the Referral Program page." },
-  { category: "Payments & Referrals", q: "My withdrawal was rejected — what now?", a: "A rejection always comes with a reason and refunds the amount to your wallet automatically, so you can correct the issue (e.g. bank details) and request again." },
+  { category: "Payments & Referrals", q: "How does the referral wallet work?", a: "You earn rewards for direct (L1) and second-level (L2) referrals, and they're added to your referral wallet. Balances show as available or pending. For now, wallet balance can only be used toward renewing or upgrading your plan — tick \"Use my referral wallet\" on the Plans page at checkout." },
+  { category: "Payments & Referrals", q: "Can I withdraw my referral wallet balance to my bank account or UPI?", a: "Not at the moment. Withdrawals to a bank account or UPI ID are paused, and wallet balance can only be used for plan renewals and upgrades. We plan to offer transfers to your own account in the future — we'll let you know in the app and update this page when it's available." },
+  { category: "Payments & Referrals", q: "I requested a withdrawal before this change — what happens to it?", a: "Requests made before withdrawals were paused are still reviewed by our team, and you can follow the status on the Referral Program page. If one is declined, it always comes with a reason and the amount is returned to your wallet automatically." },
   { category: "Tools & Calculators", q: "What free calculators are available?", a: "Age, SIP, Income Tax, Home Loan EMI, Term Insurance, and Inflation calculators are all available from the Tools menu — free to use, and no login required." },
   { category: "Tools & Calculators", q: "What's the LIC Info Hub?", a: "It's a searchable reference of LIC and insurance terms and abbreviations — DOC, SA, KYC, ULIP, and more — with a plain-language explanation for each one. Also free to use without logging in." },
   { category: "Security & Data", q: "Is my policyholder data backed up?", a: "Yes — records are backed up daily without exception, so a single failure never means lost work." },
@@ -55,7 +55,7 @@ const faqs: FaqItem[] = [
 const categories = [
   { icon: UserCog, title: "Account & Billing", description: "Plans, upgrades, profile details, and login issues." },
   { icon: FileText, title: "Policies & Records", description: "Adding, editing, and tracking policy records of any type." },
-  { icon: Wallet, title: "Payments & Referrals", description: "Referral wallet, withdrawals, and payment details." },
+  { icon: Wallet, title: "Payments & Referrals", description: "Referral wallet, rewards, and plan renewals." },
   { icon: Calculator, title: "Tools & Calculators", description: "Free calculators and the LIC terms reference." },
   { icon: Lock, title: "Security & Data", description: "How your data is protected, backed up, and accessed." },
   { icon: ShieldCheck, title: "Technical", description: "Bugs, loading issues, or anything not working as expected." },

@@ -255,7 +255,7 @@ const OurPlans = () => {
           <div className="flex flex-wrap justify-center gap-2 mt-6">
             {[
               { icon: ShieldCheck, label: "Secure Razorpay checkout" },
-              { icon: WalletIcon, label: "Referral wallet applied automatically" },
+              { icon: WalletIcon, label: "Use your referral wallet at checkout" },
               { icon: RefreshCw, label: "Upgrade or renew any time" },
             ].map(({ icon: Icon, label }) => (
               <span
@@ -292,6 +292,10 @@ const OurPlans = () => {
                 placeholder="Amount to apply"
               />
             )}
+            {/* WALLET-TRANSFER-PAUSED */}
+            <p className="mt-2 text-xs text-blue-800/80 dark:text-blue-300/80">
+              Wallet balance can only be used for plan renewals and upgrades.
+            </p>
           </div>
         )}
 

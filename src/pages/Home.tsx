@@ -390,13 +390,25 @@ const Home = () => {
                   <Link to="/referral-program" className="text-xs font-medium text-blue-600 hover:underline">
                     View referrals →
                   </Link>
-                  {(referralData?.availableBalance ?? 0) >= 100 && (
-                    <>
-                      <span className="text-muted-foreground text-xs">·</span>
-                      <Link to="/referral-program" className="text-xs font-medium text-green-600 hover:underline">
-                        Withdraw →
-                      </Link>
-                    </>
+                  {referralData?.withdrawalsEnabled === true ? (
+                    (referralData?.availableBalance ?? 0) >= 100 && (
+                      <>
+                        <span className="text-muted-foreground text-xs">·</span>
+                        <Link to="/referral-program" className="text-xs font-medium text-green-600 hover:underline">
+                          Withdraw →
+                        </Link>
+                      </>
+                    )
+                  ) : (
+                    /* WALLET-TRANSFER-PAUSED — wallet can only be used on renewals/upgrades */
+                    (referralData?.availableBalance ?? 0) > 0 && (
+                      <>
+                        <span className="text-muted-foreground text-xs">·</span>
+                        <Link to="/our-plans" className="text-xs font-medium text-green-600 hover:underline">
+                          Use on renewal →
+                        </Link>
+                      </>
+                    )
                   )}
                 </div>
               </CardContent>

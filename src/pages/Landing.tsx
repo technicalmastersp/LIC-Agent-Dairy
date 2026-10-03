@@ -255,7 +255,7 @@ const Landing = () => {
                   </div>
                   <Wallet className="w-5 h-5 text-primary mb-2" />
                   <h3 className="font-semibold text-form-header mb-1.5">Referral wallet</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Earn and track referral rewards, with a simple, admin-reviewed withdrawal process.</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">Earn and track referral rewards, and use your wallet balance toward plan renewals and upgrades.</p>
                 </div>
 
                 {/* Search */}
