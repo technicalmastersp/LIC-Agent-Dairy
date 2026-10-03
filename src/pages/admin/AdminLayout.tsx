@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "@/utils/auth";
 import ThemeToggle from "@/components/ThemeToggle";
+import NotificationBell from "@/components/NotificationBell";
 import { getMyPermissions, getPendingCounts } from "../../../services/adminService";
 import {
   Users,
@@ -186,15 +187,18 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         {/* Mobile title */}
         <div className="text-sm font-semibold">Admin Panel</div>
 
-        {/* Root/Home */}
-        <button
-          type="button"
-          onClick={goToHome}
-          aria-label="Go to website"
-          className="inline-flex items-center justify-center w-9 h-9 rounded-md hover:bg-muted transition-colors"
-        >
-          <Home className="w-5 h-5" />
-        </button>
+        {/* Notifications + Root/Home */}
+        <div className="flex items-center">
+          <NotificationBell align="end" />
+          <button
+            type="button"
+            onClick={goToHome}
+            aria-label="Go to website"
+            className="inline-flex items-center justify-center w-9 h-9 rounded-md hover:bg-muted transition-colors"
+          >
+            <Home className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
       {/* ====================== MOBILE BACKDROP ====================== */}
@@ -246,7 +250,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               {role}
             </p>
           </div>
-          <ThemeToggle type="icon" />
+          <div className="flex items-center gap-1">
+            <NotificationBell align="start" />
+            <ThemeToggle type="icon" />
+          </div>
         </div>
 
         {/* ====================== NAVIGATION ====================== */}

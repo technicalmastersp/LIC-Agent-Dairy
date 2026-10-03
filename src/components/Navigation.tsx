@@ -22,6 +22,7 @@ import { useLanguage }   from "@/hooks/useLanguage";
 import type { Translations } from "@/types/utils/translations.types";
 import LanguageSwitcher  from "./LanguageSwitcher";
 import ThemeToggle        from "./ThemeToggle";
+import NotificationBell   from "./NotificationBell";
 import { cn }            from "@/lib/utils";
 import siteConfig        from "@/config/siteConfig";
 import { logoutCurrentUser } from "../../services/userService";
@@ -369,6 +370,11 @@ const Navigation = () => {
             </span>
           </Link>
 
+          {/* Mobile notification bell — ml-auto pushes bell + hamburger to the right edge */}
+          <div className="lg:hidden ml-auto shrink-0">
+            <NotificationBell variant="onPrimary" />
+          </div>
+
           {/* Mobile hamburger */}
           <button
             type="button"
@@ -392,6 +398,8 @@ const Navigation = () => {
               [...navItems, ...adminNavItems].map((item) => <NavItem key={item.to} {...item} />)}
 
             <ToolsDropdown dark />
+
+            <NotificationBell variant="onPrimary" />
 
             {/* Language switcher + theme toggle */}
             <div data-tour="tour-language-switcher" className="pl-1.5 ml-1 border-l border-primary-foreground/15 shrink-0 flex items-center gap-2">
