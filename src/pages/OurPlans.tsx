@@ -184,7 +184,9 @@ const OurPlans = () => {
   };
 
   useEffect(() => {
-    getReferralConfig().then(setReferralConfig).catch(() => {});
+    getReferralConfig()
+      .then((c) => { if (c && typeof c === "object") setReferralConfig(c); })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -303,7 +305,7 @@ const OurPlans = () => {
           <Gift className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" />
           <p className="text-sm text-emerald-800 dark:text-emerald-400">
             Have a referral code?{" "}
-            <strong>Get ₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} off</strong>{" "}
+            <strong>Get ₹{referralConfig?.SIGNUP_DISCOUNT_AMOUNT ?? 100} off</strong>{" "}
             any paid plan when you sign up with a valid referral code.
           </p>
         </div>

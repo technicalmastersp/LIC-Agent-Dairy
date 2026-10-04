@@ -37,6 +37,9 @@ import fsSync from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PUBLIC_ROUTES } from "./publicRoutes.mjs";
+import { extractSnapshot, validateSnapshot } from "./snapshotExtract.mjs";
+
+const PRODUCTION_URL = "https://policyniketan.com"; // must equal siteConfig.productionUrl
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = path.resolve(__dirname, "../dist");
@@ -61,6 +64,17 @@ const MIME_TYPES = {
 // just enough to let Playwright load each route the same way Vercel will.
 function startStaticServer() {
   const server = http.createServer(async (req, res) => {
+    // The app calls its API same-origin at /api/*. This tiny server has no
+    // backend, and the SPA fallback below would answer those calls with
+    // index.html + HTTP 200 — axios then "succeeds" with an HTML string as
+    // data, config values come back undefined, and pages crash and get
+    // snapshotted as the error screen. A real 404 makes the call fail
+    // cleanly, so every page just renders with its built-in defaults.
+    if (req.url.startsWith("/api/")) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end('{"success":false,"message":"no backend during prerender"}');
+      return;
+    }
     let filePath = path.join(DIST_DIR, decodeURIComponent(req.url.split("?")[0]));
     try {
       const stat = await fs.stat(filePath);
@@ -85,45 +99,36 @@ async function prerenderRoute(browser, route) {
   const page = await browser.newPage();
   try {
     await page.goto(`${ORIGIN}${route}`, { waitUntil: "networkidle", timeout: 30000 });
-    // Helmet updates document.title asynchronously on mount — wait until it
-    // differs from index.html's bare placeholder ("Policy Niketan"), which
-    // means the real per-page <SEO> title has taken effect, then give any
-    // last data-driven re-render a brief moment past that to settle.
+    // Helmet applies <SEO> tags asynchronously on mount, so wait for them,
+    // then give any last data-driven re-render a brief moment to settle.
+    // Wait until react-helmet-async has applied THIS route's canonical
+    // (its tags carry data-rh). Waiting only for "title changed" could pass
+    // on the shell's pre-baked home title before Helmet ran for this page.
     await page.waitForFunction(
-      () => document.title && document.title !== "Policy Niketan",
-      { timeout: 5000 }
-    ).catch(() => {}); // best-effort; never fail the whole build over a slow title update
+      (r) => {
+        const el = document.querySelector('link[rel="canonical"][data-rh]');
+        return !!el && new URL(el.href).pathname.replace(/\/$/, "") === r.replace(/\/$/, "");
+      },
+      route,
+      { timeout: 8000 }
+    ).catch(() => {}); // best-effort here; validateSnapshot() below is the hard gate
     await new Promise((r) => setTimeout(r, 300));
 
     // Pull out only the pieces we actually want to merge into a fresh
     // build's index.html — never the raw page HTML, which would include
     // this build's own hashed <script>/<link> asset tags (see the header
     // comment for why that's the bug that broke production).
-    const snapshot = await page.evaluate(() => {
-      const meta = (selector, attr = "content") =>
-        document.querySelector(selector)?.getAttribute(attr) ?? null;
+    const snapshot = await page.evaluate(extractSnapshot);
 
-      const ogAndTwitterMeta = Array.from(
-        document.querySelectorAll('meta[property^="og:"], meta[name^="twitter:"]')
-      ).map(el => ({
-        attr:  el.hasAttribute("property") ? "property" : "name",
-        key:   el.getAttribute("property") || el.getAttribute("name"),
-        value: el.getAttribute("content") || "",
-      }));
-
-      const jsonLd = Array.from(
-        document.querySelectorAll('script[type="application/ld+json"]')
-      ).map(el => el.textContent || "");
-
-      return {
-        title:       document.title,
-        description: meta('meta[name="description"]'),
-        canonical:   meta('link[rel="canonical"]', "href"),
-        ogAndTwitterMeta,
-        jsonLd,
-        rootHtml:    document.getElementById("root")?.innerHTML ?? "",
-      };
-    });
+    // Hard gate: never write a snapshot that would ship the error screen, an
+    // empty page, or another page's canonical. The route simply keeps the
+    // plain client-rendered shell until the cause is fixed.
+    const problems = validateSnapshot(route, snapshot, PRODUCTION_URL);
+    if (problems.length) {
+      console.error(`  ✗ ${route} — NOT written:\n      - ${problems.join("\n      - ")}`);
+      process.exitCode = 1;
+      return;
+    }
 
     const outPath = route === "/" ? "home" : route.replace(/^\//, "").replace(/\//g, "__");
     await fs.mkdir(OUT_DIR, { recursive: true });
