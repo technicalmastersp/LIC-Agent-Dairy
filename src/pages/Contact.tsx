@@ -4,9 +4,11 @@ import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, LifeBuoy, Clock, Phone, MapPin, Building2, ArrowRight } from "lucide-react";
+import { BUSINESS_HOURS_LABELS } from "@/config/businessHours";
 import siteConfig from "@/config/siteConfig";
 
-// Phone, address and legal entity name are OPTIONAL in siteConfig — each card
+// Callers use the "Request a call" flow (Help & Support) instead of a public
+// number. Phone, address and legal entity name are OPTIONAL in siteConfig — each card
 // below only renders when its value has been filled in, so the page never
 // shows a placeholder or an empty row.
 const Contact = () => {
@@ -16,7 +18,7 @@ const Contact = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
         title="Contact Us"
-        description={`Contact ${siteConfig.companyName}: email our support team, raise a support ticket, or find our business details.`}
+        description={`Contact ${siteConfig.companyName}: email our support team, raise a support ticket, request a call back, or find our business details.`}
         path="/contact"
       />
       <Navigation />
@@ -81,17 +83,40 @@ const Contact = () => {
                   </CardContent>
                 </Card>
 
+                <Card id="request-call">
+                  <CardContent className="pt-6 space-y-2">
+                    <div className="flex items-center gap-2.5 text-form-header font-semibold">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <Phone className="w-4 h-4 text-primary" />
+                      </div>
+                      Request a call
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Share your mobile number and a short reason — our team calls you back. We call only during business hours.
+                    </p>
+                    <Link
+                      to="/help-support#request-call"
+                      className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                    >
+                      Request a call <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </CardContent>
+                </Card>
+
                 <Card>
                   <CardContent className="pt-6 space-y-2">
                     <div className="flex items-center gap-2.5 text-form-header font-semibold">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                         <Clock className="w-4 h-4 text-primary" />
                       </div>
-                      Response time
+                      Business hours &amp; response time
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      Most queries are answered within a few hours.
-                    </p>
+                    <div className="text-sm text-muted-foreground space-y-0.5">
+                      {BUSINESS_HOURS_LABELS.map((l) => (
+                        <p key={l.days}>{l.days}: {l.hours} <span className="text-xs">(IST)</span></p>
+                      ))}
+                      <p className="pt-1">Most email queries are answered within a few hours.</p>
+                    </div>
                   </CardContent>
                 </Card>
 

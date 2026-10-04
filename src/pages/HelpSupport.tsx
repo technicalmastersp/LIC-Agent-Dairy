@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -24,12 +24,16 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import SEO from "@/components/SEO";
+import RequestCallDialog from "@/components/RequestCallDialog";
+import { BUSINESS_HOURS_LABELS } from "@/config/businessHours";
 import siteConfig from "@/config/siteConfig";
 import { createTicket, getMyTickets } from "../../services/supportService";
 import { createSuggestion, getMySuggestions } from "../../services/suggestionService";
+import { getMyCallRequests } from "../../services/callRequestService";
 import axios from "axios";
 import type { Ticket, Suggestion, FaqItem } from "@/types/pages/HelpSupport.types";
-import { formatISTDate as fmt } from "@/utils/dateFormat";
+import type { CallRequestSummary } from "@/types/components/RequestCallDialog.types";
+import { formatISTDate as fmt, formatISTDateTime } from "@/utils/dateFormat";
 const faqs: FaqItem[] = [
   { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. You can move between the Free trial, Starter, Basic, Standard, and Premium plans — checkout runs through Razorpay, and you can apply your referral wallet balance toward the cost at checkout." },
   { category: "Account & Billing", q: "What happens when my plan expires?", a: "Your records stay safe and backed up, but you'll need to renew to add new records or access due/missed payment tracking again." },
@@ -49,6 +53,8 @@ const faqs: FaqItem[] = [
   { category: "Tools & Calculators", q: "What's the LIC Info Hub?", a: "It's a searchable reference of LIC and insurance terms and abbreviations — DOC, SA, KYC, ULIP, and more — with a plain-language explanation for each one. Also free to use without logging in." },
   { category: "Security & Data", q: "Is my policyholder data backed up?", a: "Yes — records are backed up daily without exception, so a single failure never means lost work." },
   { category: "Security & Data", q: "Who can see sensitive fields like Aadhaar or PAN?", a: "Only you and admins acting within their role can view sensitive fields. Access is authenticated and scoped by design, not open by default." },
+  { category: "Account & Billing", q: "Can I talk to someone on the phone?", a: "Yes — use \"Request a call\" on this page. Enter your mobile number and a short reason, and our team will call you back. We don't publish a direct number, and calls are placed only during business hours (Mon–Fri 9 AM – 9 PM, Sat–Sun 10 AM – 8 PM IST). Requests made outside those hours are queued and called at the next opening." },
+  { category: "Account & Billing", q: "When will I get the call after requesting one?", a: "If you request during business hours, expect a call shortly. Otherwise your request is queued and you'll be called when we next open — the confirmation shows the exact time. You can only have one open call request per number; logged-in users can track theirs under \"My requests\"." },
   { category: "Technical", q: "The site isn't loading properly on my phone — what should I do?", a: "Try refreshing or clearing your browser cache first. If the issue continues, reach out via the contact form below with your device and browser details so we can investigate." },
   { category: "Technical", q: "I saw a short walkthrough when I logged in — can I see it again?", a: "A short guided tour appears automatically the first time you log in, highlighting the main parts of the workspace. It won't reappear on its own after that — let us know via the contact form if you'd like it shown again." },
 ];
@@ -75,6 +81,13 @@ const suggestionStatusStyle: Record<string, string> = {
   planned:      "bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-900",
   implemented:  "bg-green-100 text-green-700 border border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900",
   declined:     "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border",
+};
+
+const callStatusStyle: Record<CallRequestSummary["status"], { label: string; cls: string }> = {
+  pending:   { label: "Queued",             cls: "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900" },
+  no_answer: { label: "Tried — no answer",  cls: "bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900" },
+  completed: { label: "Called",             cls: "bg-green-100 text-green-700 border border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900" },
+  cancelled: { label: "Closed",             cls: "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border" },
 };
 
 // (date formatting now imported from dateFormat.ts as `fmt`)
@@ -105,10 +118,26 @@ const HelpSupport = () => {
   const [mySuggestions, setMySuggestions] = useState<Suggestion[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(true);
 
+  // "Request a call" dialog. Opening /help-support#request-call (linked from the
+  // footer, Contact, About and the legal pages) opens it straight away.
+  const location = useLocation();
+  const [callOpen, setCallOpen] = useState(false);
+  const [myCalls, setMyCalls] = useState<CallRequestSummary[]>([]);
+  const refreshMyCalls = () => { if (authenticated) getMyCallRequests().then(setMyCalls).catch(() => {}); };
+
+  useEffect(() => {
+    if (location.hash === "#request-call") {
+      document.getElementById("request-call")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setCallOpen(true);
+    }
+  }, [location.hash]);
+
   useEffect(() => {
     if (!authenticated) { setLoadingTickets(false); setLoadingSuggestions(false); return; }
     getMyTickets().then(setMyTickets).catch(() => {}).finally(() => setLoadingTickets(false));
     getMySuggestions().then(setMySuggestions).catch(() => {}).finally(() => setLoadingSuggestions(false));
+    refreshMyCalls();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authenticated]);
 
   const filteredFaqs = useMemo(() => {
@@ -257,7 +286,7 @@ const HelpSupport = () => {
                 <h2 className="text-3xl font-bold text-form-header">Talk to a real person</h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              <div className={`grid grid-cols-1 gap-5 ${siteConfig.features.liveChat ? "sm:grid-cols-3" : "sm:grid-cols-2 max-w-3xl mx-auto"}`}>
                 <a href={`mailto:${siteConfig.supportEmail}`} className="bg-muted/40 hover:bg-muted/70 rounded-2xl p-6 text-center transition-colors">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                     <Mail className="w-5 h-5 text-primary" />
@@ -266,23 +295,37 @@ const HelpSupport = () => {
                   <p className="text-sm text-muted-foreground break-words">{siteConfig.supportEmail}</p>
                 </a>
 
-                {/* NOTE: no live chat tool is wired up yet — update the href/onClick once one exists, or remove this card */}
-                <div className="bg-muted/40 rounded-2xl p-6 text-center opacity-70">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <MessageCircle className="w-5 h-5 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-form-header mb-1">Live chat</h3>
-                  <p className="text-sm text-muted-foreground">Coming soon</p>
-                </div>
+                {/* Request a call — no public number; the team calls back in business hours */}
+                <RequestCallDialog
+                  open={callOpen}
+                  onOpenChange={setCallOpen}
+                  onSubmitted={refreshMyCalls}
+                  trigger={
+                    <button
+                      id="request-call"
+                      type="button"
+                      className="bg-muted/40 hover:bg-muted/70 rounded-2xl p-6 text-center transition-colors w-full"
+                    >
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                        <Phone className="w-5 h-5 text-primary" />
+                      </div>
+                      <h3 className="font-semibold text-form-header mb-1">Request a call</h3>
+                      <p className="text-sm text-muted-foreground">We'll call you back in business hours</p>
+                    </button>
+                  }
+                />
 
-                {/* NOTE: placeholder — add a real support phone number, or remove this card */}
-                <div className="bg-muted/40 rounded-2xl p-6 text-center opacity-70">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <Phone className="w-5 h-5 text-primary" />
+                {/* Live chat is hidden for now — set siteConfig.features.liveChat = true
+                    (and wire a real chat tool into this card) to bring it back. */}
+                {siteConfig.features.liveChat && (
+                  <div className="bg-muted/40 rounded-2xl p-6 text-center opacity-70">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                      <MessageCircle className="w-5 h-5 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-form-header mb-1">Live chat</h3>
+                    <p className="text-sm text-muted-foreground">Coming soon</p>
                   </div>
-                  <h3 className="font-semibold text-form-header mb-1">Call us</h3>
-                  <p className="text-sm text-muted-foreground">Number not yet published</p>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -389,12 +432,21 @@ const HelpSupport = () => {
                   <Clock className="w-4.5 h-4.5 text-primary mt-0.5 shrink-0" />
                   <div className="text-sm">
                     <p className="text-form-header font-medium mb-2">Support hours</p>
-                    <p className="text-muted-foreground mb-1">Mon–Fri 9:00 AM – 9:00 PM</p>
-                    <p className="text-muted-foreground">Sat-Sun 10:00 AM – 8:00 PM</p>
+                    {BUSINESS_HOURS_LABELS.map((l) => (
+                      <p key={l.days} className="text-muted-foreground mb-1 last:mb-0">{l.days} {l.hours}</p>
+                    ))}
+                    <p className="text-xs text-muted-foreground mt-2">All times IST. Callbacks are placed only within these hours.</p>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Prefer email? Write to <a href={`mailto:${siteConfig.supportEmail}`} className="text-primary hover:underline">{siteConfig.supportEmail}</a> directly.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Rather talk it through?{" "}
+                  <button type="button" onClick={() => setCallOpen(true)} className="text-primary hover:underline">
+                    Request a call back
+                  </button>{" "}
+                  — we call only during business hours.
                 </p>
               </div>
 
@@ -526,6 +578,45 @@ const HelpSupport = () => {
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ══════════ MY CALL REQUESTS (logged-in only, when any exist) ══════════ */}
+        {authenticated && myCalls.length > 0 && (
+          <section className="bg-background py-12 border-t border-border">
+            <div className="container mx-auto px-4">
+              <div className="max-w-3xl mx-auto">
+                <div className="text-center max-w-xl mx-auto mb-8">
+                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Callbacks</p>
+                  <h2 className="text-2xl font-bold text-form-header">My call requests</h2>
+                </div>
+                <div className="space-y-3">
+                  {myCalls.map((c) => (
+                    <Card key={c.requestId}>
+                      <CardHeader className="pb-2">
+                        <div className="flex items-start justify-between flex-wrap gap-2">
+                          <div>
+                            <CardTitle className="text-sm font-mono">{c.requestId}</CardTitle>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {c.category} · {fmt(c.createdAt)} · +91 {c.phone}
+                            </p>
+                          </div>
+                          <Badge className={`text-xs ${callStatusStyle[c.status].cls}`}>{callStatusStyle[c.status].label}</Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-1">
+                        <p className="text-sm text-foreground">{c.reason}</p>
+                        {(c.status === "pending" || c.status === "no_answer") && c.expectedCallFrom && (
+                          <p className="text-xs text-muted-foreground">
+                            Expected call from {formatISTDateTime(c.expectedCallFrom)} (during business hours)
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
             </div>
           </section>

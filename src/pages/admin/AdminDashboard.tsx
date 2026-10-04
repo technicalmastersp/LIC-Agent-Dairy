@@ -15,7 +15,7 @@ import {
   Users, TrendingUp, Wallet, ArrowDownToLine,
   Clock, CheckCircle2, UserX, Gift,
   ArrowUpRight, ArrowDownRight, RefreshCw, LogOut, AlertTriangle,
-  BadgeCheck, LifeBuoy, Lightbulb, IndianRupee, CalendarClock, Mail,
+  BadgeCheck, LifeBuoy, Lightbulb, IndianRupee, CalendarClock, Mail, PhoneCall,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { ActivityLogItem, RecentUserItem, DashboardStats } from "@/types/pages/admin/AdminDashboard.types";
@@ -201,6 +201,16 @@ const AdminDashboard = () => {
               link:    "/admin/payment-verifications",
               urgent:  (stats.paymentVerifications?.pendingUpi ?? 0) > 0,
               dot:     (stats.paymentVerifications?.pendingUpi ?? 0) > 0,
+            }] : []),
+            ...(currentUser?.role === "superadmin" || permissions?.can_manage_call_requests ? [{
+              label:   "Open call requests",
+              val:     stats.support?.openCallRequests ?? 0,
+              icon:    <PhoneCall className="w-5 h-5 text-teal-600" />,
+              bg:      `border ${(stats.support?.openCallRequests ?? 0) > 0 ? "bg-teal-50 border-teal-300 dark:bg-teal-950/40 dark:border-teal-800" : "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border"}`,
+              sub:     "Callers waiting for a call back",
+              link:    "/admin/call-requests",
+              urgent:  false,
+              dot:     (stats.support?.openCallRequests ?? 0) > 0,
             }] : []),
             ...(currentUser?.role === "superadmin" || permissions?.can_manage_support ? [
               {

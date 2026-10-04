@@ -151,7 +151,11 @@ const RefundPolicy = () => {
                   <Link to="/help-support" className="text-primary hover:underline">
                     Help &amp; Support
                   </Link>{" "}
-                  page, and include:
+                  page (you can also{" "}
+                  <Link to="/help-support#request-call" className="text-primary hover:underline">
+                    request a call back
+                  </Link>
+                  , but please send the details below in writing so we have a record), and include:
                 </p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>the email address registered on your account;</li>
@@ -179,7 +183,11 @@ const RefundPolicy = () => {
                   <Link to="/contact" className="text-primary hover:underline">
                     Contact page
                   </Link>
-                  .
+                  , or{" "}
+                  <Link to="/help-support#request-call" className="text-primary hover:underline">
+                    request a call back
+                  </Link>{" "}
+                  (placed during business hours only).
                 </p>
               </Section>
 

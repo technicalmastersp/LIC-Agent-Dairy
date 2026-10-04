@@ -21,6 +21,7 @@ import {
   BadgeCheck,
   LifeBuoy,
   IndianRupee,
+  PhoneCall,
 } from "lucide-react";
 
 // Nav items with required permission
@@ -78,6 +79,14 @@ const NAV = [
     countKey: "supportTickets",
   },
   {
+    path: "/admin/call-requests",
+    label: "Call requests",
+    icon: PhoneCall,
+    roles: ["admin", "superadmin"],
+    permission: "can_manage_call_requests",
+    countKey: "callRequests",
+  },
+  {
     path: "/admin/revenue",
     label: "Revenue",
     icon: IndianRupee,
@@ -94,7 +103,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   const [permissions, setPermissions] = useState<Record<string, boolean> | null>(null);
   const [loadingPerms, setLoadingPerms] = useState(true);
-  const [counts, setCounts] = useState<{ withdrawals: number; upiVerifications: number }>({ withdrawals: 0, upiVerifications: 0 });
+  const [counts, setCounts] = useState<{ withdrawals: number; upiVerifications: number; supportTickets: number; callRequests: number }>({ withdrawals: 0, upiVerifications: 0, supportTickets: 0, callRequests: 0 });
 
   // Mobile sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -102,7 +111,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const fetchCounts = useCallback(async () => {
     try {
       const data = await getPendingCounts();
-      setCounts(data);
+      setCounts((prev) => ({ ...prev, ...data }));
     } catch {
       // non-fatal — sidebar just shows no badge
     }

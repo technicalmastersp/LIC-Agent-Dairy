@@ -438,7 +438,11 @@ const TermsOfService = () => {
                   <a href="/help-support" className="text-primary hover:underline">
                     Help &amp; Support
                   </a>{" "}
-                  page.
+                  page. If you would rather speak to us, you can{" "}
+                  <a href="/help-support#request-call" className="text-primary hover:underline">
+                    request a call back
+                  </a>
+                  ; we do not publish a direct phone number and place calls only during business hours.
                 </p>
               </Section>
 

@@ -38,8 +38,16 @@ const siteConfig = {
   // (payment gateways compare the website against the KYC entity, so filling
   // these in helps). Leave "" to hide a row — nothing placeholder is rendered.
   legalEntityName: "Shashank Shekhar Pandey",   // e.g. "Shashank Shekhar Pandey (Proprietor)" or your registered name
+  // Intentionally blank: callers use the "Request a call" form instead of a public
+  // number. If filled, /contact will ALSO show it as a direct-dial card.
   phone: "",             // e.g. "+91 98765 43210"
   address: "",           // full postal address, if you want it public
+  // Feature switches for public-facing contact channels.
+  // liveChat: no live-chat tool is wired up. Keep false to hide every live-chat
+  // card/button; flip to true (and wire a real tool) when it's ready.
+  features: {
+    liveChat: false,
+  },
   // PLACEHOLDERS — update with real profile links when available.
   socialLinks: {
     twitter: "https://twitter.com/yourhandle",

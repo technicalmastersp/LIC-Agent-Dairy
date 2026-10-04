@@ -166,3 +166,14 @@ export const rejectUpiId = async (userId, reason) => {
   const res = await apiClient.patch(`/admin/payment-verifications/upi/${userId}/reject`, { reason });
   return res.data;
 };
+
+// Call requests (callback queue) — needs can_manage_call_requests
+export const getCallRequests = async (status = "open") => {
+  const res = await apiClient.get(`/admin/call-requests?status=${encodeURIComponent(status)}`);
+  return res.data.data;
+};
+
+export const updateCallRequest = async (requestId, payload) => {
+  const res = await apiClient.patch(`/admin/call-requests/${requestId}`, payload);
+  return res.data;
+};

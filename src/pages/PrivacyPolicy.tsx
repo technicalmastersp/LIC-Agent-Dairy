@@ -368,7 +368,11 @@ const PrivacyPolicy = () => {
                   <a href="/help-support" className="text-primary hover:underline">
                     Help &amp; Support
                   </a>{" "}
-                  page.
+                  page. You can also{" "}
+                  <a href="/help-support#request-call" className="text-primary hover:underline">
+                    request a call back
+                  </a>
+                  ; the name, mobile number, topic and reason you enter are used only to return your call and handle your request, and are visible only to authorised members of our support team.
                 </p>
               </Section>
 

@@ -64,6 +64,7 @@ const PaymentVerifications = lazy(() => import("./pages/admin/PaymentVerificatio
 const AdminLogs = lazy(() => import("./pages/admin/AdminLogs"));
 const AdminSupportTickets = lazy(() => import("./pages/admin/AdminSupportTickets"));
 const AdminSuggestions = lazy(() => import("./pages/admin/AdminSuggestions"));
+const AdminCallRequests = lazy(() => import("./pages/admin/AdminCallRequests"));
 const AdminRevenue = lazy(() => import("./pages/admin/AdminRevenue"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 
@@ -142,6 +143,7 @@ const App = () => (
                   <Route path="/admin/payment-verifications" element={<ProtectedRoute roles={["admin", "superadmin"]}><PaymentVerifications /></ProtectedRoute>} />
                   <Route path="/admin/logs" element={<ProtectedRoute roles={["superadmin"]}><AdminLogs /></ProtectedRoute>} />
                   <Route path="/admin/support" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminSupportTickets /></ProtectedRoute>} />
+                  <Route path="/admin/call-requests" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminCallRequests /></ProtectedRoute>} />
                   <Route path="/admin/suggestions" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminSuggestions /></ProtectedRoute>} />
                   <Route path="/admin/revenue" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminRevenue /></ProtectedRoute>} />
 
