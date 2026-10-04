@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast }      from "@/hooks/use-toast";
 import { getWithdrawals, approveWithdrawal, rejectWithdrawal } from "../../../services/adminService";
-import { CheckCircle2, XCircle, Eye, Search, ArrowUpDown, X, RefreshCw } from "lucide-react";
+import { getReferralConfig } from "../../../services/configService";
+import { CheckCircle2, XCircle, Eye, Search, ArrowUpDown, X, RefreshCw, Info } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { SortField, SortDir, WithdrawalItem } from "@/types/pages/admin/WithdrawalRequests.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
@@ -32,6 +33,8 @@ const WithdrawalRequests = () => {
   const [allWithdrawals, setAllWithdrawals] = useState<WithdrawalItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  // Fail-closed: banner shows until the server confirms withdrawals are ON.
+  const [withdrawalsEnabled, setWithdrawalsEnabled] = useState(false);
 
   // ---- client-side filter / search / sort state ----
   const [statusFilter, setStatusFilter] = useState("requested");
@@ -49,6 +52,9 @@ const WithdrawalRequests = () => {
 
   useEffect(() => {
     fetchWithdrawals();
+    getReferralConfig()
+      .then((c: { WITHDRAWALS_ENABLED?: boolean }) => setWithdrawalsEnabled(c?.WITHDRAWALS_ENABLED === true))
+      .catch(() => {});
   }, []);
 
   const fetchWithdrawals = async (isRefresh = false) => {
@@ -219,6 +225,18 @@ const WithdrawalRequests = () => {
                 {refreshing ? "Refreshing…" : "Refresh"}
               </Button>
             </div>
+
+            {/* WALLET-TRANSFER-PAUSED — new requests are blocked server-side; this queue only holds older ones */}
+            {!withdrawalsEnabled && (
+              <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 text-xs text-blue-800">
+                <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                <p>
+                  Wallet withdrawals are currently paused — users can only spend referral wallet balance on plan renewals and upgrades,
+                  and no new requests can be created. Requests listed here were made <strong>before</strong> the pause.
+                  Approving pays the user out; rejecting returns the amount to their wallet.
+                </p>
+              </div>
+            )}
 
             {/* Summary cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

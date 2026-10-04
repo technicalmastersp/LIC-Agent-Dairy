@@ -1,4 +1,5 @@
 import apiClient from '../api/apiClient';
+import { disablePushQuietly } from '../src/utils/pushNotifications';
 
 export const createUser = async (userData) => {
   const res = await apiClient.post('/auth/register', userData);
@@ -60,6 +61,9 @@ export const logoutCurrentUser = async () => {
   const user = JSON.parse(localStorage.getItem('currentUser'))
   if (user?.name) localStorage.setItem('userName', user.name)
   localStorage.removeItem('currentUser');
+  // Stop THIS device receiving the signed-out user's push notifications.
+  // Must run before the logout call below, while the session is still valid.
+  await disablePushQuietly();
   // No clearToken() anymore — there's no client-readable token to clear.
   // The httpOnly cookie can only be removed by the server, hence this call.
   try {

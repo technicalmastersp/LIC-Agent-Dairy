@@ -3,6 +3,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import PushNotificationToggle from "@/components/PushNotificationToggle";
 import { useToast } from "@/hooks/use-toast";
 import { getNotificationPreferences, updateNotificationPreferences } from "../../services/userService";
 import { Bell, CalendarClock, CreditCard } from "lucide-react";
@@ -88,6 +89,9 @@ const NotificationPreferences = () => {
               </p>
             </div>
           </div>
+
+          {/* OS-level notifications (Windows / phone notification panel) — per device */}
+          <PushNotificationToggle />
 
           <Card>
             <CardContent className="p-0">

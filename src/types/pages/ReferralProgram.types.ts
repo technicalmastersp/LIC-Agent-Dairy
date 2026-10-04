@@ -35,6 +35,9 @@ export interface ReferredUser {
   daysLeft?:     number | null;
 }
 export interface Dashboard {
+  // Server-controlled switch for wallet→bank/UPI transfers. Anything other
+  // than `true` (including missing) is treated as OFF — fail-closed.
+  withdrawalsEnabled?: boolean;
   referralCode:      string;
   totalL1:           number;
   totalL2:           number;
