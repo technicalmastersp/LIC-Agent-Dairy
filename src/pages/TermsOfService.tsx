@@ -83,7 +83,7 @@ const TermsOfService = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto space-y-6">
 
-              <Card className="border-amber-200 bg-amber-50">
+              <Card hidden className="border-amber-200 bg-amber-50">
                 <CardContent className="pt-6 flex gap-3 text-sm text-amber-900">
                   <Info className="w-5 h-5 shrink-0 text-amber-600" />
                   <p>

@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import {
   Home, Plus, Table, LogOut, User, Menu, X,
-  UserRoundCog, CircleHelp, MapPinnedIcon, Wrench,
+  UserRoundCog, CircleHelp, Phone, MapPinnedIcon, Wrench,
   Cake, TrendingUp, Receipt, ShieldCheck, LineChart, ChevronDown,
   LucideIcon
 } from "lucide-react";
@@ -446,6 +446,9 @@ const Navigation = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/help-support")}>
                     <CircleHelp className="w-4 h-4 mr-2" /> Help & Support
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/contact")}>
+                    <Phone className="w-4 h-4 mr-2" /> Contact Us
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem

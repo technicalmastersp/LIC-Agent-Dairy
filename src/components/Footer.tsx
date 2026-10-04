@@ -44,7 +44,8 @@ const Footer = () => {
         { label: t("home"), to: "/" },
         { label: t("login"), to: "/login" },
         { label: t("signupFree"), to: "/signup" },
-        { label: ("Help & Support"), to: "/help-support" }
+        { label: ("Help & Support"), to: "/help-support" },
+        { label: ("Contact Us"), to: "/contact" }
       ];
 
   const otherLinks: FooterLink[] = [
@@ -55,6 +56,7 @@ const Footer = () => {
           { label: t("bestInfoHub"), to: "/lic-info-hub" },
           { label: t("aboutUs"), to: "/about" },
           { label: ("Help & Support"), to: "/help-support" },
+          { label: ("Contact Us"), to: "/contact" },
         ]
       : [
           { label: t("ourPlans"), to: "/our-plans" },
@@ -152,9 +154,6 @@ const Footer = () => {
             </Link>
             <Link to="/refund-policy" className="hover:text-primary-foreground transition-colors">
               Cancellation &amp; Refunds
-            </Link>
-            <Link to="/contact" className="hover:text-primary-foreground transition-colors">
-              Contact Us
             </Link>
           </div>
         </div>
