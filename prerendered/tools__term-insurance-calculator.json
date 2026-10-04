@@ -1,7 +1,7 @@
 {
   "route": "/tools/term-insurance-calculator",
   "title": "Term Insurance Calculator | Policy Niketan",
-  "description": "Professional insurance policy record management system for all types of agents and customers",
+  "description": "Estimate how much life cover you need to protect your family's future — based on income, liabilities, and savings.",
   "canonical": "https://policyniketan.com/tools/term-insurance-calculator",
   "ogAndTwitterMeta": [
     {
@@ -58,56 +58,6 @@
       "attr": "name",
       "key": "twitter:description",
       "value": "Estimate how much life cover you need to protect your family's future — based on income, liabilities, and savings."
-    },
-    {
-      "attr": "property",
-      "key": "og:type",
-      "value": "website"
-    },
-    {
-      "attr": "property",
-      "key": "og:site_name",
-      "value": "Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:url",
-      "value": "https://policyniketan.com/tools/term-insurance-calculator"
-    },
-    {
-      "attr": "property",
-      "key": "og:title",
-      "value": "Term Insurance Calculator | Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:description",
-      "value": "Estimate how much life cover you need to protect your family's future — based on income, liabilities, and savings."
-    },
-    {
-      "attr": "property",
-      "key": "og:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:card",
-      "value": "summary_large_image"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:title",
-      "value": "Term Insurance Calculator | Policy Niketan"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:description",
-      "value": "Estimate how much life cover you need to protect your family's future — based on income, liabilities, and savings."
-    },
-    {
-      "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
     }
   ],
   "jsonLd": [

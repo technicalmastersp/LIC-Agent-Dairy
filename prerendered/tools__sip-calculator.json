@@ -1,7 +1,7 @@
 {
   "route": "/tools/sip-calculator",
   "title": "SIP Calculator | Policy Niketan",
-  "description": "Professional insurance policy record management system for all types of agents and customers",
+  "description": "Estimate the future value of a Systematic Investment Plan (SIP) based on your monthly contribution, expected return, and tenure.",
   "canonical": "https://policyniketan.com/tools/sip-calculator",
   "ogAndTwitterMeta": [
     {
@@ -58,56 +58,6 @@
       "attr": "name",
       "key": "twitter:description",
       "value": "Estimate the future value of a Systematic Investment Plan (SIP) based on your monthly contribution, expected return, and tenure."
-    },
-    {
-      "attr": "property",
-      "key": "og:type",
-      "value": "website"
-    },
-    {
-      "attr": "property",
-      "key": "og:site_name",
-      "value": "Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:url",
-      "value": "https://policyniketan.com/tools/sip-calculator"
-    },
-    {
-      "attr": "property",
-      "key": "og:title",
-      "value": "SIP Calculator | Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:description",
-      "value": "Estimate the future value of a Systematic Investment Plan (SIP) based on your monthly contribution, expected return, and tenure."
-    },
-    {
-      "attr": "property",
-      "key": "og:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:card",
-      "value": "summary_large_image"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:title",
-      "value": "SIP Calculator | Policy Niketan"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:description",
-      "value": "Estimate the future value of a Systematic Investment Plan (SIP) based on your monthly contribution, expected return, and tenure."
-    },
-    {
-      "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
     }
   ],
   "jsonLd": [

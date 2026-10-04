@@ -1,7 +1,7 @@
 {
   "route": "/privacy-policy",
   "title": "Privacy Policy | Policy Niketan",
-  "description": "Professional insurance policy record management system for all types of agents and customers",
+  "description": "How Policy Niketan collects, processes, stores, and protects personal, financial, and policy data, in accordance with the Digital Personal Data Protection Act, 2023.",
   "canonical": "https://policyniketan.com/privacy-policy",
   "ogAndTwitterMeta": [
     {
@@ -58,56 +58,6 @@
       "attr": "name",
       "key": "twitter:description",
       "value": "How Policy Niketan collects, processes, stores, and protects personal, financial, and policy data, in accordance with the Digital Personal Data Protection Act, 2023."
-    },
-    {
-      "attr": "property",
-      "key": "og:type",
-      "value": "website"
-    },
-    {
-      "attr": "property",
-      "key": "og:site_name",
-      "value": "Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:url",
-      "value": "https://policyniketan.com/privacy-policy"
-    },
-    {
-      "attr": "property",
-      "key": "og:title",
-      "value": "Privacy Policy | Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:description",
-      "value": "How Policy Niketan collects, processes, stores, and protects personal, financial, and policy data, in accordance with the Digital Personal Data Protection Act, 2023."
-    },
-    {
-      "attr": "property",
-      "key": "og:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:card",
-      "value": "summary_large_image"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:title",
-      "value": "Privacy Policy | Policy Niketan"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:description",
-      "value": "How Policy Niketan collects, processes, stores, and protects personal, financial, and policy data, in accordance with the Digital Personal Data Protection Act, 2023."
-    },
-    {
-      "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
     }
   ],
   "jsonLd": [],

@@ -1,7 +1,7 @@
 {
   "route": "/tools/income-tax-calculator",
   "title": "Income Tax Calculator | Policy Niketan",
-  "description": "Professional insurance policy record management system for all types of agents and customers",
+  "description": "Estimate your income tax liability under India's old and new tax regimes.",
   "canonical": "https://policyniketan.com/tools/income-tax-calculator",
   "ogAndTwitterMeta": [
     {
@@ -58,56 +58,6 @@
       "attr": "name",
       "key": "twitter:description",
       "value": "Estimate your income tax liability under India's old and new tax regimes."
-    },
-    {
-      "attr": "property",
-      "key": "og:type",
-      "value": "website"
-    },
-    {
-      "attr": "property",
-      "key": "og:site_name",
-      "value": "Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:url",
-      "value": "https://policyniketan.com/tools/income-tax-calculator"
-    },
-    {
-      "attr": "property",
-      "key": "og:title",
-      "value": "Income Tax Calculator | Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:description",
-      "value": "Estimate your income tax liability under India's old and new tax regimes."
-    },
-    {
-      "attr": "property",
-      "key": "og:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:card",
-      "value": "summary_large_image"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:title",
-      "value": "Income Tax Calculator | Policy Niketan"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:description",
-      "value": "Estimate your income tax liability under India's old and new tax regimes."
-    },
-    {
-      "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
     }
   ],
   "jsonLd": [

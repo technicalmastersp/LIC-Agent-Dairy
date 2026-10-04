@@ -1,7 +1,7 @@
 {
   "route": "/tools/inflation-calculator",
   "title": "Inflation Calculator | Policy Niketan",
-  "description": "Professional insurance policy record management system for all types of agents and customers",
+  "description": "See how inflation changes what money is worth — either what something will cost in the future, or what a future amount is worth today.",
   "canonical": "https://policyniketan.com/tools/inflation-calculator",
   "ogAndTwitterMeta": [
     {
@@ -58,56 +58,6 @@
       "attr": "name",
       "key": "twitter:description",
       "value": "See how inflation changes what money is worth — either what something will cost in the future, or what a future amount is worth today."
-    },
-    {
-      "attr": "property",
-      "key": "og:type",
-      "value": "website"
-    },
-    {
-      "attr": "property",
-      "key": "og:site_name",
-      "value": "Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:url",
-      "value": "https://policyniketan.com/tools/inflation-calculator"
-    },
-    {
-      "attr": "property",
-      "key": "og:title",
-      "value": "Inflation Calculator | Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:description",
-      "value": "See how inflation changes what money is worth — either what something will cost in the future, or what a future amount is worth today."
-    },
-    {
-      "attr": "property",
-      "key": "og:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:card",
-      "value": "summary_large_image"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:title",
-      "value": "Inflation Calculator | Policy Niketan"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:description",
-      "value": "See how inflation changes what money is worth — either what something will cost in the future, or what a future amount is worth today."
-    },
-    {
-      "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
     }
   ],
   "jsonLd": [

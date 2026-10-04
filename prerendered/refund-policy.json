@@ -1,18 +1,18 @@
 {
   "route": "/refund-policy",
   "title": "Cancellation & Refund Policy | Policy Niketan",
-  "description": "Professional insurance policy record management system for all types of agents and customers",
-  "canonical": "https://policyniketan.com/",
+  "description": "How cancellations, refunds, and failed or duplicate payments are handled for Policy Niketan subscription plans.",
+  "canonical": "https://policyniketan.com/refund-policy",
   "ogAndTwitterMeta": [
     {
       "attr": "property",
       "key": "og:title",
-      "value": "Insurance Policy Record Management for Agents | Policy Niketan"
+      "value": "Cancellation & Refund Policy | Policy Niketan"
     },
     {
       "attr": "property",
       "key": "og:description",
-      "value": "Track every client's policy, due date, and payment status in one place. Add records in seconds, search instantly, and never miss a renewal — built for all type of insurance agents."
+      "value": "How cancellations, refunds, and failed or duplicate payments are handled for Policy Niketan subscription plans."
     },
     {
       "attr": "property",
@@ -47,54 +47,9 @@
     {
       "attr": "property",
       "key": "og:url",
-      "value": "https://policyniketan.com/"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:title",
-      "value": "Insurance Policy Record Management for Agents | Policy Niketan"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:description",
-      "value": "Track every client's policy, due date, and payment status in one place. Add records in seconds, search instantly, and never miss a renewal — built for all type of insurance agents."
-    },
-    {
-      "attr": "property",
-      "key": "og:type",
-      "value": "website"
-    },
-    {
-      "attr": "property",
-      "key": "og:site_name",
-      "value": "Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:url",
       "value": "https://policyniketan.com/refund-policy"
     },
     {
-      "attr": "property",
-      "key": "og:title",
-      "value": "Cancellation & Refund Policy | Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:description",
-      "value": "How cancellations, refunds, and failed or duplicate payments are handled for Policy Niketan subscription plans."
-    },
-    {
-      "attr": "property",
-      "key": "og:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:card",
-      "value": "summary_large_image"
-    },
-    {
       "attr": "name",
       "key": "twitter:title",
       "value": "Cancellation & Refund Policy | Policy Niketan"
@@ -103,11 +58,6 @@
       "attr": "name",
       "key": "twitter:description",
       "value": "How cancellations, refunds, and failed or duplicate payments are handled for Policy Niketan subscription plans."
-    },
-    {
-      "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
     }
   ],
   "jsonLd": [],

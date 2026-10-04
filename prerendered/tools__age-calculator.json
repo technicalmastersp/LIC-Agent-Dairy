@@ -1,7 +1,7 @@
 {
   "route": "/tools/age-calculator",
   "title": "Age Calculator | Policy Niketan",
-  "description": "Professional insurance policy record management system for all types of agents and customers",
+  "description": "Enter a date of birth to find the exact age in years, months, and days.",
   "canonical": "https://policyniketan.com/tools/age-calculator",
   "ogAndTwitterMeta": [
     {
@@ -58,56 +58,6 @@
       "attr": "name",
       "key": "twitter:description",
       "value": "Enter a date of birth to find the exact age in years, months, and days."
-    },
-    {
-      "attr": "property",
-      "key": "og:type",
-      "value": "website"
-    },
-    {
-      "attr": "property",
-      "key": "og:site_name",
-      "value": "Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:url",
-      "value": "https://policyniketan.com/tools/age-calculator"
-    },
-    {
-      "attr": "property",
-      "key": "og:title",
-      "value": "Age Calculator | Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:description",
-      "value": "Enter a date of birth to find the exact age in years, months, and days."
-    },
-    {
-      "attr": "property",
-      "key": "og:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:card",
-      "value": "summary_large_image"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:title",
-      "value": "Age Calculator | Policy Niketan"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:description",
-      "value": "Enter a date of birth to find the exact age in years, months, and days."
-    },
-    {
-      "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
     }
   ],
   "jsonLd": [

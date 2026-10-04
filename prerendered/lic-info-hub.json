@@ -1,7 +1,7 @@
 {
   "route": "/lic-info-hub",
   "title": "LIC Info Hub — Insurance Abbreviations & Terms Explained | Policy Niketan",
-  "description": "Professional insurance policy record management system for all types of agents and customers",
+  "description": "Look up LIC abbreviations, internal codes, private insurer names, and common policy terms — a searchable glossary built for life insurance agents.",
   "canonical": "https://policyniketan.com/lic-info-hub",
   "ogAndTwitterMeta": [
     {
@@ -58,56 +58,6 @@
       "attr": "name",
       "key": "twitter:description",
       "value": "Look up LIC abbreviations, internal codes, private insurer names, and common policy terms — a searchable glossary built for life insurance agents."
-    },
-    {
-      "attr": "property",
-      "key": "og:type",
-      "value": "website"
-    },
-    {
-      "attr": "property",
-      "key": "og:site_name",
-      "value": "Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:url",
-      "value": "https://policyniketan.com/lic-info-hub"
-    },
-    {
-      "attr": "property",
-      "key": "og:title",
-      "value": "LIC Info Hub — Insurance Abbreviations & Terms Explained | Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:description",
-      "value": "Look up LIC abbreviations, internal codes, private insurer names, and common policy terms — a searchable glossary built for life insurance agents."
-    },
-    {
-      "attr": "property",
-      "key": "og:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:card",
-      "value": "summary_large_image"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:title",
-      "value": "LIC Info Hub — Insurance Abbreviations & Terms Explained | Policy Niketan"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:description",
-      "value": "Look up LIC abbreviations, internal codes, private insurer names, and common policy terms — a searchable glossary built for life insurance agents."
-    },
-    {
-      "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
     }
   ],
   "jsonLd": [

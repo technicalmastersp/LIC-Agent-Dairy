@@ -1,7 +1,7 @@
 {
   "route": "/about",
   "title": "About Us | Policy Niketan",
-  "description": "Professional insurance policy record management system for all types of agents and customers",
+  "description": "Learn who builds Policy Niketan, why we built a dedicated record-keeping tool for all types of insurance agents, and how we keep client data secure.",
   "canonical": "https://policyniketan.com/about",
   "ogAndTwitterMeta": [
     {
@@ -58,56 +58,6 @@
       "attr": "name",
       "key": "twitter:description",
       "value": "Learn who builds Policy Niketan, why we built a dedicated record-keeping tool for all types of insurance agents, and how we keep client data secure."
-    },
-    {
-      "attr": "property",
-      "key": "og:type",
-      "value": "website"
-    },
-    {
-      "attr": "property",
-      "key": "og:site_name",
-      "value": "Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:url",
-      "value": "https://policyniketan.com/about"
-    },
-    {
-      "attr": "property",
-      "key": "og:title",
-      "value": "About Us | Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:description",
-      "value": "Learn who builds Policy Niketan, why we built a dedicated record-keeping tool for all types of insurance agents, and how we keep client data secure."
-    },
-    {
-      "attr": "property",
-      "key": "og:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:card",
-      "value": "summary_large_image"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:title",
-      "value": "About Us | Policy Niketan"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:description",
-      "value": "Learn who builds Policy Niketan, why we built a dedicated record-keeping tool for all types of insurance agents, and how we keep client data secure."
-    },
-    {
-      "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
     }
   ],
   "jsonLd": [],

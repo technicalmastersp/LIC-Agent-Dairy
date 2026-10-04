@@ -1,7 +1,7 @@
 {
   "route": "/tools",
   "title": "Free Financial Calculators | Policy Niketan",
-  "description": "Professional insurance policy record management system for all types of agents and customers",
+  "description": "Free calculators for age, SIP returns, income tax, home loan EMI, term insurance cover, and inflation — quick tools for agents and clients alike.",
   "canonical": "https://policyniketan.com/tools",
   "ogAndTwitterMeta": [
     {
@@ -58,56 +58,6 @@
       "attr": "name",
       "key": "twitter:description",
       "value": "Free calculators for age, SIP returns, income tax, home loan EMI, term insurance cover, and inflation — quick tools for agents and clients alike."
-    },
-    {
-      "attr": "property",
-      "key": "og:type",
-      "value": "website"
-    },
-    {
-      "attr": "property",
-      "key": "og:site_name",
-      "value": "Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:url",
-      "value": "https://policyniketan.com/tools"
-    },
-    {
-      "attr": "property",
-      "key": "og:title",
-      "value": "Free Financial Calculators | Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:description",
-      "value": "Free calculators for age, SIP returns, income tax, home loan EMI, term insurance cover, and inflation — quick tools for agents and clients alike."
-    },
-    {
-      "attr": "property",
-      "key": "og:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:card",
-      "value": "summary_large_image"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:title",
-      "value": "Free Financial Calculators | Policy Niketan"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:description",
-      "value": "Free calculators for age, SIP returns, income tax, home loan EMI, term insurance cover, and inflation — quick tools for agents and clients alike."
-    },
-    {
-      "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
     }
   ],
   "jsonLd": [],
