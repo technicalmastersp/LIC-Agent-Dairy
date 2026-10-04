@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -390,7 +390,10 @@ const OurPlans = () => {
 
         <div className="text-center mt-10">
           <p className="text-sm text-muted-foreground">
-            All prices are in Indian Rupees (INR). Plans auto-renew unless cancelled.
+            All prices are in Indian Rupees (INR). Each plan is a one-time payment and does not renew automatically.{" "}
+            <Link to="/refund-policy" className="text-primary hover:underline">
+              Cancellation &amp; Refund Policy
+            </Link>
           </p>
         </div>
       </main>

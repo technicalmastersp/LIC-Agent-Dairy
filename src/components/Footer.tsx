@@ -134,12 +134,18 @@ const Footer = () => {
           <div className="text-xs text-primary-foreground/70">
             <p>© {currentYear} {siteConfig.companyName} - {t("allRightsReserved")}</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             <Link to="/privacy-policy" className="hover:text-primary-foreground transition-colors">
               Privacy Policy
             </Link>
             <Link to="/terms-of-service" className="hover:text-primary-foreground transition-colors">
               Terms of Service
+            </Link>
+            <Link to="/refund-policy" className="hover:text-primary-foreground transition-colors">
+              Cancellation &amp; Refunds
+            </Link>
+            <Link to="/contact" className="hover:text-primary-foreground transition-colors">
+              Contact Us
             </Link>
           </div>
         </div>

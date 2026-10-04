@@ -208,7 +208,9 @@ const TermsOfService = () => {
                 </p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>All payments are processed through Razorpay, a third-party payment gateway; we do not receive or store your full payment card, UPI, or net-banking credentials.</li>
-                  <li>Fees are billed in advance for the applicable Subscription period and, except where required by law or expressly stated otherwise, are non-refundable.</li>
+                  <li>Fees are billed in advance for the applicable Subscription period. Each Subscription is a one-time payment and does not renew automatically. Fees are non-refundable except as set out in our{" "}
+                    <a href="/refund-policy" className="text-primary hover:underline">Cancellation &amp; Refund Policy</a>{" "}
+                    or where required by law.</li>
                   <li>If your Subscription expires or is cancelled, your Account is downgraded to read-only access to existing records; creating, editing, or deleting records requires an active Subscription.</li>
                   <li>Wallet Balance may be applied toward the price of a Subscription renewal or upgrade, as described in Section 7.</li>
                   <li>You are responsible for any taxes, duties, or governmental charges applicable to your purchase, other than taxes on our net income.</li>

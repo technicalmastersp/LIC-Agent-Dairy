@@ -49,6 +49,8 @@ const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const HelpSupport = lazy(() => import("./pages/HelpSupport"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const Contact = lazy(() => import("./pages/Contact"));
 const MyActivity = lazy(() => import("./pages/MyActivity"));
 const SessionManagement = lazy(() => import("./pages/SessionManagement"));
 const NotificationPreferences = lazy(() => import("./pages/NotificationPreferences"));
@@ -125,6 +127,8 @@ const App = () => (
                   <Route path="/verify-email" element={<VerifyEmail />} />
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/refund-policy" element={<RefundPolicy />} />
+                  <Route path="/contact" element={<Contact />} />
 
                   <Route path="/admin" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminDashboard /></ProtectedRoute>} />
                   <Route path="/admin/users" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminUsers /></ProtectedRoute>} />

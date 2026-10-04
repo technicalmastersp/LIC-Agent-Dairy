@@ -23,6 +23,8 @@ export const PUBLIC_ROUTES = [
   { path: "/tools/inflation-calculator",          changefreq: "monthly", priority: 0.6 },
   { path: "/privacy-policy",                      changefreq: "yearly",  priority: 0.3 },
   { path: "/terms-of-service",                    changefreq: "yearly",  priority: 0.3 },
+  { path: "/refund-policy",                       changefreq: "yearly",  priority: 0.3 },
+  { path: "/contact",                             changefreq: "yearly",  priority: 0.5 },
   { path: "/login",                               changefreq: "yearly",  priority: 0.4 },
   { path: "/signup",                              changefreq: "yearly",  priority: 0.5 },
 ];
