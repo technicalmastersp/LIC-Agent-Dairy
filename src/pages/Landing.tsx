@@ -64,7 +64,7 @@ const Landing = () => {
                   Stop Chasing Policies Across Spreadsheets.
                 </h1>
                 <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
-                  {siteConfig.title} is where policy agents — life, health, motor, or general
+                  {siteConfig.title} is where policy agents — life, health, motor, or all
                   insurance — keep every record, every due date, and every client organized,
                   backed up daily, and a search away.
                 </p>

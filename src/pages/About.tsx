@@ -46,7 +46,7 @@ const About = () => {
     { label: "Life", icon: ShieldCheck, rotate: "-rotate-6", offset: "translate-y-2", bg: "bg-blue-50 dark:bg-blue-950/40", accent: "text-blue-600 dark:text-blue-400", chip: "Active" },
     { label: "Health", icon: HeartPulse, rotate: "rotate-3", offset: "-translate-y-3", bg: "bg-emerald-50 dark:bg-emerald-950/40", accent: "text-emerald-600 dark:text-emerald-400", chip: "Due soon" },
     { label: "Motor", icon: Car, rotate: "-rotate-2", offset: "translate-y-4", bg: "bg-amber-50 dark:bg-amber-950/40", accent: "text-amber-600 dark:text-amber-400", chip: "Active" },
-    { label: "General", icon: HomeIcon, rotate: "rotate-6", offset: "-translate-y-1", bg: "bg-violet-50 dark:bg-violet-950/40", accent: "text-violet-600 dark:text-violet-400", chip: "Renewed" },
+    { label: "All", icon: HomeIcon, rotate: "rotate-6", offset: "-translate-y-1", bg: "bg-violet-50 dark:bg-violet-950/40", accent: "text-violet-600 dark:text-violet-400", chip: "Renewed" },
   ];
 
   const trustStats = [
@@ -61,7 +61,7 @@ const About = () => {
       icon: FileText,
       title: "End-to-end policy records",
       description:
-        "Capture full policyholder details, nominee information, and both current and previous policy terms in one place — then search, sort, and update them as circumstances change. Works for life, health, motor, and general insurance policies alike.",
+        "Capture full policyholder details, nominee information, and both current and previous policy terms in one place — then search, sort, and update them as circumstances change. Works for life, health, motor, and all insurance policies alike.",
     },
     {
       icon: BellRing,
@@ -142,7 +142,7 @@ const About = () => {
                 </h1>
                 <p className="text-lg text-primary-foreground/80 leading-relaxed max-w-lg">
                   {siteConfig.title} replaces spreadsheets and paper registers with a single, secure
-                  workspace — built for life, health, motor, and general insurance agents who want
+                  workspace — built for life, health, motor, and all insurance agents who want
                   their entire book of business organized, backed up, and a search away.
                 </p>
                 <div className="flex flex-wrap gap-2 pt-1">
@@ -240,7 +240,7 @@ const About = () => {
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
                   This platform was never designed around a single insurance category. Whether you
-                  sell life, health, motor, home, or general insurance, you manage every policy,
+                  sell life, health, motor, home, or all insurance, you manage every policy,
                   every policyholder, and every due payment the same organized, dependable way.
                   If your work is tracking policies and staying on top of renewals, this is the
                   best tool to run that work from — no matter what you sell.
