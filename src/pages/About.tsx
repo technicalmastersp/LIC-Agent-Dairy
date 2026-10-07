@@ -14,6 +14,7 @@ import {
   BellRing,
   Smartphone,
   Mail,
+  Phone,
   MapPin,
   Globe,
   Clock,
@@ -36,6 +37,7 @@ import {
   Compass,
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
+import { BUSINESS_HOURS_LABELS } from "@/config/businessHours";
 
 const About = () => {
   const { t } = useLanguage();
@@ -449,6 +451,18 @@ const About = () => {
                   </div>
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      <Phone className="w-4.5 h-4.5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-form-header">Call back</p>
+                      <p className="text-sm text-muted-foreground">
+                        Prefer to talk? <Link to="/help-support#request-call" className="text-primary hover:underline">Request a call</Link> and
+                        our team will phone you during business hours.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                       <MapPin className="w-4.5 h-4.5 text-primary" />
                     </div>
                     <div>
@@ -471,11 +485,7 @@ const About = () => {
               <div className="bg-background rounded-2xl p-8 shadow-sm">
                 <h2 className="text-xl font-semibold text-form-header mb-6">Support hours</h2>
                 <div className="space-y-3 mb-6">
-                  {[
-                    { day: "Monday – Friday", hours: "9:00 AM – 6:00 PM" },
-                    { day: "Saturday", hours: "10:00 AM – 4:00 PM" },
-                    { day: "Sunday", hours: "Closed" },
-                  ].map(({ day, hours }) => (
+                  {BUSINESS_HOURS_LABELS.map(({ days: day, hours }) => (
                     <div key={day} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                       <span className="text-sm text-muted-foreground flex items-center gap-2">
                         <Clock className="w-4 h-4 text-primary" /> {day}

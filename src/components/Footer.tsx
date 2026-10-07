@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, MapPin, Globe, Compass, Link2, Sparkles, Building2, Calculator } from "lucide-react";
+import { Mail, MapPin, Globe, Compass, Link2, Sparkles, Building2, Calculator, Phone } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { isAuthenticated } from "@/utils/auth";
 import siteConfig from "@/config/siteConfig";
@@ -44,7 +44,8 @@ const Footer = () => {
         { label: t("home"), to: "/" },
         { label: t("login"), to: "/login" },
         { label: t("signupFree"), to: "/signup" },
-        { label: ("Help & Support"), to: "/help-support" }
+        { label: ("Help & Support"), to: "/help-support" },
+        { label: ("Contact Us"), to: "/contact" }
       ];
 
   const otherLinks: FooterLink[] = [
@@ -55,6 +56,7 @@ const Footer = () => {
           { label: t("bestInfoHub"), to: "/lic-info-hub" },
           { label: t("aboutUs"), to: "/about" },
           { label: ("Help & Support"), to: "/help-support" },
+          { label: ("Contact Us"), to: "/contact" },
         ]
       : [
           { label: t("ourPlans"), to: "/our-plans" },
@@ -102,6 +104,15 @@ const Footer = () => {
                 <span className="break-all">{siteConfig.supportEmail}</span>
               </div>
               <div className="flex items-start gap-2">
+                <Phone className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                <span>
+                  <Link to="/help-support#request-call" className="hover:text-accent transition-colors underline-offset-2 hover:underline">
+                    Request a call back
+                  </Link>
+                  <span className="block text-xs text-primary-foreground/60">Business hours only</span>
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
                 <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0" />
                 <span>{t("officeAddress")}</span>
               </div>
@@ -134,12 +145,15 @@ const Footer = () => {
           <div className="text-xs text-primary-foreground/70">
             <p>© {currentYear} {siteConfig.companyName} - {t("allRightsReserved")}</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             <Link to="/privacy-policy" className="hover:text-primary-foreground transition-colors">
               Privacy Policy
             </Link>
             <Link to="/terms-of-service" className="hover:text-primary-foreground transition-colors">
               Terms of Service
+            </Link>
+            <Link to="/refund-policy" className="hover:text-primary-foreground transition-colors">
+              Cancellation &amp; Refunds
             </Link>
           </div>
         </div>

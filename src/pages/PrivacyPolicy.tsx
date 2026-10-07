@@ -78,7 +78,7 @@ const PrivacyPolicy = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto space-y-6">
 
-              <Card className="border-amber-200 bg-amber-50">
+              <Card hidden className="border-amber-200 bg-amber-50">
                 <CardContent className="pt-6 flex gap-3 text-sm text-amber-900">
                   <Info className="w-5 h-5 shrink-0 text-amber-600" />
                   <p>
@@ -368,7 +368,11 @@ const PrivacyPolicy = () => {
                   <a href="/help-support" className="text-primary hover:underline">
                     Help &amp; Support
                   </a>{" "}
-                  page.
+                  page. You can also{" "}
+                  <a href="/help-support#request-call" className="text-primary hover:underline">
+                    request a call back
+                  </a>
+                  ; the name, mobile number, topic and reason you enter are used only to return your call and handle your request, and are visible only to authorised members of our support team.
                 </p>
               </Section>
 

@@ -1,7 +1,7 @@
 {
   "route": "/login",
   "title": "Log In | Policy Niketan",
-  "description": "Professional insurance policy record management system for all types of agents and customers",
+  "description": "Log in to your Policy Niketan account to manage client policy records, track due dates, and monitor payments.",
   "canonical": "https://policyniketan.com/login",
   "ogAndTwitterMeta": [
     {
@@ -58,56 +58,6 @@
       "attr": "name",
       "key": "twitter:description",
       "value": "Log in to your Policy Niketan account to manage client policy records, track due dates, and monitor payments."
-    },
-    {
-      "attr": "property",
-      "key": "og:type",
-      "value": "website"
-    },
-    {
-      "attr": "property",
-      "key": "og:site_name",
-      "value": "Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:url",
-      "value": "https://policyniketan.com/login"
-    },
-    {
-      "attr": "property",
-      "key": "og:title",
-      "value": "Log In | Policy Niketan"
-    },
-    {
-      "attr": "property",
-      "key": "og:description",
-      "value": "Log in to your Policy Niketan account to manage client policy records, track due dates, and monitor payments."
-    },
-    {
-      "attr": "property",
-      "key": "og:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:card",
-      "value": "summary_large_image"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:title",
-      "value": "Log In | Policy Niketan"
-    },
-    {
-      "attr": "name",
-      "key": "twitter:description",
-      "value": "Log in to your Policy Niketan account to manage client policy records, track due dates, and monitor payments."
-    },
-    {
-      "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
     }
   ],
   "jsonLd": [],

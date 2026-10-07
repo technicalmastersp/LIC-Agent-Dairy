@@ -21,5 +21,5 @@ export interface DashboardStats {
   recentActivity: ActivityLogItem[];
   recentUsers: RecentUserItem[];
   paymentVerifications?: { pendingUpi?: number };
-  support?: { openHighPriority?: number; openGuest?: number; newSuggestions?: number };
+  support?: { openHighPriority?: number; openGuest?: number; newSuggestions?: number; openCallRequests?: number };
 }

@@ -1,4 +1,4 @@
-import type { ToastPayload, ToastListener } from "@/types/_root/utils/toastEmitter.types";
+import type { ToastPayload, ToastListener } from "../src/types/_root/utils/toastEmitter.types";
 // A simple event emitter so non-React files can trigger toasts
 let listener: ToastListener | null = null;
 

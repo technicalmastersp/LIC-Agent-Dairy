@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -184,7 +184,9 @@ const OurPlans = () => {
   };
 
   useEffect(() => {
-    getReferralConfig().then(setReferralConfig).catch(() => {});
+    getReferralConfig()
+      .then((c) => { if (c && typeof c === "object") setReferralConfig(c); })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -303,7 +305,7 @@ const OurPlans = () => {
           <Gift className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" />
           <p className="text-sm text-emerald-800 dark:text-emerald-400">
             Have a referral code?{" "}
-            <strong>Get ₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} off</strong>{" "}
+            <strong>Get ₹{referralConfig?.SIGNUP_DISCOUNT_AMOUNT ?? 100} off</strong>{" "}
             any paid plan when you sign up with a valid referral code.
           </p>
         </div>
@@ -390,7 +392,10 @@ const OurPlans = () => {
 
         <div className="text-center mt-10">
           <p className="text-sm text-muted-foreground">
-            All prices are in Indian Rupees (INR). Plans auto-renew unless cancelled.
+            All prices are in Indian Rupees (INR). Each plan is a one-time payment and does not renew automatically.{" "}
+            <Link to="/refund-policy" className="text-primary hover:underline">
+              Cancellation &amp; Refund Policy
+            </Link>
           </p>
         </div>
       </main>
