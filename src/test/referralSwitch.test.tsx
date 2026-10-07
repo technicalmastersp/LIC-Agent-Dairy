@@ -8,8 +8,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
+// Each case re-imports the whole page graph (that is how the build-time flag is
+// re-evaluated), and the first one — Landing — pays the cold-start cost of
+// loading every dependency. That can exceed vitest's default 5 s on a slower
+// machine, so give these tests room.
+vi.setConfig({ testTimeout: 30_000 });
+
 // jsdom has no ResizeObserver; Radix UI (the signup checkbox) needs one.
 (globalThis as unknown as { ResizeObserver?: unknown }).ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} };
+
+// jsdom doesn't implement <canvas>. BusinessCard (rendered on Landing and
+// Profile) calls getContext("2d") and simply returns when it gets null, so
+// returning null keeps it quiet instead of logging "Not implemented" errors.
+vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
 
 const h = vi.hoisted(() => ({ user: null as Record<string, unknown> | null }));
 
