@@ -13,6 +13,7 @@ import {
   TrendingUp, CircleDot, Bell, Languages, IdCard,
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
+import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import SEO from "@/components/SEO";
 import BusinessCard, { BUSINESS_CARD_TEMPLATES } from "@/components/BusinessCard";
 import type { BusinessCardTheme } from "@/types/components/BusinessCard.types";
@@ -247,7 +248,8 @@ const Landing = () => {
                   <p className="text-sm text-muted-foreground leading-relaxed">See what's due this month and who missed a payment — before it lapses.</p>
                 </div>
 
-                {/* Referral wallet */}
+                {/* REFERRAL-PROGRAM — only while the program is enabled */}
+                {REFERRAL_PROGRAM_ENABLED && (
                 <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
                   <div className="mb-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl p-4">
                     <p className="text-[10px] text-emerald-700 dark:text-emerald-400 mb-1">Available balance</p>
@@ -257,6 +259,7 @@ const Landing = () => {
                   <h3 className="font-semibold text-form-header mb-1.5">Referral wallet</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">Earn and track referral rewards, and use your wallet balance toward plan renewals and upgrades.</p>
                 </div>
+                )}
 
                 {/* Search */}
                 <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">

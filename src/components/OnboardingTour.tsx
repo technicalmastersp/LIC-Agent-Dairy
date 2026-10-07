@@ -13,6 +13,7 @@ import { ArrowLeft, ArrowRight, Sparkles, X } from "lucide-react";
 import { getCurrentUser, setCurrentUser } from "@/utils/auth";
 import { completeOnboarding } from "../../services/userService";
 import type { TourStep, Rect } from "@/types/components/OnboardingTour.types";
+import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 
 // ── Step config ──────────────────────────────────────────────────────────
 // `target` matches a `data-tour="..."` attribute already placed on the real
@@ -20,7 +21,7 @@ import type { TourStep, Rect } from "@/types/components/OnboardingTour.types";
 // found in the DOM (e.g. the language switcher is hidden on a narrow mobile
 // viewport), the step still shows as a centered card with no spotlight
 // rather than breaking the tour.
-const STEPS: TourStep[] = [
+const ALL_STEPS: TourStep[] = [
   {
     target: "tour-add-record",
     title: "Add a policy record",
@@ -62,6 +63,12 @@ const STEPS: TourStep[] = [
     body: "Refer other agents and earn commission here. Track your balance and use it to renew or upgrade your plan.",
   },
 ];
+
+// The referral step points at a card that only exists while the referral
+// program is enabled.
+const STEPS: TourStep[] = ALL_STEPS.filter(
+  (s) => REFERRAL_PROGRAM_ENABLED || s.target !== "tour-referral-wallet"
+);
 
 const CARD_WIDTH = 320;
 const CARD_GAP = 12;

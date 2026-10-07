@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
 import { BUSINESS_HOURS_LABELS } from "@/config/businessHours";
+import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 
 const About = () => {
   const { t } = useLanguage();
@@ -69,17 +70,24 @@ const About = () => {
       description:
         "Automatically surfaces policies with payments due this month and flags anyone who missed their last payment, so follow-ups happen before a policy lapses — whatever kind of policy it is.",
     },
-    {
-      icon: Wallet,
-      title: "Referrals and wallet",
-      description:
-        "A built-in referral wallet tracks direct and second-level referrals, and your wallet balance can be used toward plan renewals and upgrades.",
-    },
+    ...(REFERRAL_PROGRAM_ENABLED
+      ? [
+          {
+            icon: Wallet,
+            title: "Referrals and wallet",
+            description:
+              "A built-in referral wallet tracks direct and second-level referrals, and your wallet balance can be used toward plan renewals and upgrades.",
+          },
+        ]
+      : []),
     {
       icon: CreditCard,
       title: "Flexible plans, secure payments",
       description:
-        "Start on a free trial, then move up through Starter, Basic, Standard, or Premium plans as your book of business grows. Checkout runs through Razorpay, referral wallet balance can be applied toward renewals and upgrades, and UPI payments get an admin-verified manual fallback.",
+        "Start on a free trial, then move up through Starter, Basic, Standard, or Premium plans as your book of business grows. " +
+        (REFERRAL_PROGRAM_ENABLED
+          ? "Checkout runs through Razorpay, referral wallet balance can be applied toward renewals and upgrades, and UPI payments get an admin-verified manual fallback."
+          : "Checkout runs through Razorpay, and UPI payments get an admin-verified manual fallback."),
     },
     {
       icon: UserCog,
@@ -345,7 +353,7 @@ const About = () => {
                     icon: CloudCog,
                     title: "Built for reliability",
                     description:
-                      "Records, policies, and wallet balances are written and backed up in a way designed to survive the unexpected — a single failure was never meant to mean lost work.",
+                      (REFERRAL_PROGRAM_ENABLED ? "Records, policies, and wallet balances" : "Records and policies") + " are written and backed up in a way designed to survive the unexpected — a single failure was never meant to mean lost work.",
                   },
                 ].map(({ icon: Icon, title, description }) => (
                   <div key={title} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/[0.08] transition-colors">

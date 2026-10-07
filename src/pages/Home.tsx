@@ -18,6 +18,7 @@ import {
   FileText, Users,
 } from "lucide-react";
 import { getReferralDashboard } from "../../services/referralService";
+import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import type { MonthlyTrendPoint, ReferralDashboardData } from "@/types/pages/Home.types";
 import { formatISTDate as fmt, formatISTFullDate } from "@/utils/dateFormat";
 
@@ -50,7 +51,7 @@ const Home = () => {
           dueThisMonth(),
           dueNextMonth(),
           getRecordsWithoutLastPayment(),
-          getReferralDashboard().catch(() => null),
+          REFERRAL_PROGRAM_ENABLED ? getReferralDashboard().catch(() => null) : Promise.resolve(null),
           getMonthlyTrend(),
         ]);
         setTrendData(trend);
@@ -124,6 +125,7 @@ const Home = () => {
       bg: "bg-emerald-50",
       tourId: "tour-upcoming-due",
     },
+    ...(REFERRAL_PROGRAM_ENABLED ? [
     {
       label: "Referrals",
       val:   (referralData?.totalL1 ?? 0) + (referralData?.totalL2 ?? 0),
@@ -133,6 +135,7 @@ const Home = () => {
       link:  "/referral-program",
       bg: "bg-amber-50"
     },
+    ] : []),
   ];
 
   const actions = [
@@ -257,7 +260,7 @@ const Home = () => {
           })()}
 
           {/* ── Stat cards ── */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className={`grid grid-cols-2 ${REFERRAL_PROGRAM_ENABLED ? "md:grid-cols-5" : "md:grid-cols-4"} gap-3`}>
             {stats.map(({ label, val, icon, color, sub, link, bg, tourId }) => (
               <Card key={label}
                 data-tour={tourId}
@@ -325,7 +328,7 @@ const Home = () => {
           </div>
 
           {/* ── Subscription + Referral ── */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className={`grid grid-cols-1 ${REFERRAL_PROGRAM_ENABLED ? "md:grid-cols-2" : ""} gap-3`}>
 
             {/* Subscription */}
             <Card data-tour="tour-your-plan">
@@ -366,7 +369,8 @@ const Home = () => {
               </CardContent>
             </Card>
 
-            {/* Referral wallet */}
+            {/* REFERRAL-PROGRAM — only while the program is enabled */}
+            {REFERRAL_PROGRAM_ENABLED && (
             <Card data-tour="tour-referral-wallet">
               <CardHeader className="pb-3">
                 <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2">
@@ -413,6 +417,7 @@ const Home = () => {
                 </div>
               </CardContent>
             </Card>
+            )}
           </div>
 
           {/* ── Quick links ── */}

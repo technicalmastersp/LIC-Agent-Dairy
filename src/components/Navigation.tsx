@@ -25,6 +25,7 @@ import ThemeToggle        from "./ThemeToggle";
 import NotificationBell   from "./NotificationBell";
 import { cn }            from "@/lib/utils";
 import siteConfig        from "@/config/siteConfig";
+import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import { logoutCurrentUser } from "../../services/userService";
 
 /* ─────────────────────────────────────────────
@@ -438,9 +439,11 @@ const Navigation = () => {
                   <DropdownMenuItem onClick={() => navigate("/profile")}>
                     <User className="w-4 h-4 mr-2" /> Profile
                   </DropdownMenuItem>
+                  {REFERRAL_PROGRAM_ENABLED && (
                   <DropdownMenuItem onClick={() => navigate("/referral-program")}>
                     <User className="w-4 h-4 mr-2" /> Referral Program
                   </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={() => navigate("/about")}>
                     <MapPinnedIcon className="w-4 h-4 mr-2" /> About
                   </DropdownMenuItem>
