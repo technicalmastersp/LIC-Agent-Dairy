@@ -31,13 +31,13 @@
     },
     {
       "attr": "name",
-      "key": "twitter:site",
-      "value": "@yourhandle"
+      "key": "twitter:image",
+      "value": "https://policyniketan.com/logos/logo_social.png"
     },
     {
       "attr": "name",
-      "key": "twitter:image",
-      "value": "https://policyniketan.com/logos/logo_social.png"
+      "key": "twitter:site",
+      "value": "@yourhandle"
     },
     {
       "attr": "property",
