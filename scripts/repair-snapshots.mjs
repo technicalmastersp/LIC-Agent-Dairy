@@ -5,6 +5,7 @@
 // Fixes two kinds of damage caused by the old extraction logic:
 //  1. canonical pointing at another page (usually the home page) or missing
 //     -> rewritten to PRODUCTION_URL + route
+//  3. a placeholder twitter:site tag (e.g. "@yourhandle" or "@dev") -> removed
 //  2. meta description = the generic site-wide text -> replaced by the page's
 //     own description, which is always present as og:description (SEO.tsx
 //     writes the same string to both)
@@ -46,6 +47,13 @@ for (const file of fs.readdirSync(DIR).filter((f) => f.endsWith(".json")).sort()
     notes.push("description -> page's own (from og:description)");
     snap.description = og["og:description"];
   }
+
+  // Placeholder social handle baked in from siteConfig — drop the tag.
+  const before = (snap.ogAndTwitterMeta || []).length;
+  snap.ogAndTwitterMeta = (snap.ogAndTwitterMeta || []).filter(
+    (m) => !(m.key === "twitter:site" && /yourhandle|^@dev$/i.test(m.value || ""))
+  );
+  if (snap.ogAndTwitterMeta.length !== before) notes.push("removed placeholder twitter:site tag");
 
   if (notes.length) {
     console.log(`✓ ${snap.route}: ${notes.join("; ")}`);

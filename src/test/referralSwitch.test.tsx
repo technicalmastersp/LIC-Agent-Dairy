@@ -141,6 +141,7 @@ describe("switch OFF — help and legal pages tell the truth without advertising
     expect(text).toMatch(/Earlier referral records/);
     expect(text).toMatch(/no longer collect new referral data/);
     expect(text).not.toMatch(/RazorpayX/);
+    expect(text).not.toMatch(/wallet payouts/i);   // §5 admin-permission sentence
   });
 });
 

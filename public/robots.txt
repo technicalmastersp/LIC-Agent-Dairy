@@ -8,7 +8,6 @@ Disallow: /view-due-policies
 Disallow: /view-upcoming-due
 Disallow: /view-missed-payments
 Disallow: /profile
-Disallow: /referral-program
 Disallow: /change-password
 Disallow: /my-activity
 Disallow: /sessions
@@ -28,7 +27,6 @@ Disallow: /view-due-policies
 Disallow: /view-upcoming-due
 Disallow: /view-missed-payments
 Disallow: /profile
-Disallow: /referral-program
 Disallow: /change-password
 Disallow: /my-activity
 Disallow: /sessions
@@ -54,7 +52,6 @@ Disallow: /view-due-policies
 Disallow: /view-upcoming-due
 Disallow: /view-missed-payments
 Disallow: /profile
-Disallow: /referral-program
 Disallow: /change-password
 Disallow: /my-activity
 Disallow: /sessions

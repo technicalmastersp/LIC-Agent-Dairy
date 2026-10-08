@@ -210,7 +210,7 @@ const PrivacyPolicy = () => {
                   without that permission sees these fields in their encrypted form and
                   cannot read their contents. A narrow exception applies to the specific
                   permission that lets an Admin manually verify a UPI ID for payout
-                  processing (a function that is dormant while wallet payouts are paused),
+                  processing {REFERRAL_PROGRAM_ENABLED ? "(a function that is dormant while wallet payouts are paused)" : "(a function that is not currently in use)"},
                   which necessarily requires seeing that one field in order to
                   perform the verification.
                 </p>

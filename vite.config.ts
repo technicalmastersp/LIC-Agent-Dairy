@@ -63,6 +63,11 @@ export default defineConfig(({ mode }) => {
       name: "inject-site-config",
       transformIndexHtml(html: string) {
         const socialImage = `${siteConfig.productionUrl}${siteConfig.logo_social}`;
+        // siteConfig still holds a placeholder handle ("@yourhandle"). Publishing
+        // a fake handle in every page's <head> looks careless (and a payment
+        // reviewer can see it), so the tag is dropped until a real one is set.
+        const handle = siteConfig.socialLinks.twitterHandle;
+        const hasRealHandle = !!handle && !/yourhandle/i.test(handle);
         return html
           .replace(/<title>.*?<\/title>/, `<title>${siteConfig.title}</title>`)
           .replace(/(<meta name="description" content=")[^"]*(")/, `$1${siteConfig.description}$2`)
@@ -70,19 +75,29 @@ export default defineConfig(({ mode }) => {
           .replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${siteConfig.title}$2`)
           .replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${siteConfig.description}$2`)
           .replace(/(<meta property="og:image" content=")[^"]*(")/, `$1${socialImage}$2`)
-          .replace(/(<meta name="twitter:site" content=")[^"]*(")/, `$1${siteConfig.socialLinks.twitterHandle}$2`)
+          .replace(
+            /([ \t]*)<meta name="twitter:site" content="[^"]*"\s*\/?>\r?\n?/,
+            hasRealHandle ? `$1<meta name="twitter:site" content="${handle}" />\n` : ""
+          )
           .replace(/(<meta name="twitter:image" content=")[^"]*(")/, `$1${socialImage}$2`)
           .replace(/(<meta name="apple-mobile-web-app-title" content=")[^"]*(")/, `$1${siteConfig.shortTitle}$2`);
       },
     },
-    // Emits dist/stats.html (gitignored, build-output only) with a
-    // treemap of what's contributing to bundle size. Doesn't run in dev.
-    visualizer({
-      filename: "dist/stats.html",
-      gzipSize: true,
-      brotliSize: true,
-      template: "treemap",
-    }),
+    // Bundle-size treemap — OPT-IN only. It used to be written to
+    // dist/stats.html on every build, and everything in dist/ is deployed, so
+    // it was publicly downloadable at /stats.html (listing source file names
+    // and absolute build paths). Now it only runs when you ask for it and it
+    // is written OUTSIDE dist/, to stats/ (gitignored).
+    //   bash:        ANALYZE=true npx vite build
+    //   PowerShell:  $env:ANALYZE="true"; npx vite build
+    ...(process.env.ANALYZE === "true"
+      ? [visualizer({
+          filename: "stats/bundle-stats.html",
+          gzipSize: true,
+          brotliSize: true,
+          template: "treemap",
+        })]
+      : []),
     VitePWA({
       // "generateSW" (not injectManifest) is the right strategy here — we're
       // not writing custom service-worker logic, just precaching the static
