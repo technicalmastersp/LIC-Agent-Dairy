@@ -35,11 +35,6 @@
       "value": "630"
     },
     {
-      "attr": "property",
-      "key": "og:image:alt",
-      "value": "Policy Niketan — Professional insurance policy record management system for all types of agents and customers"
-    },
-    {
       "attr": "name",
       "key": "twitter:card",
       "value": "summary_large_image"
@@ -53,6 +48,11 @@
       "attr": "name",
       "key": "twitter:image",
       "value": "https://policyniketan.com/logos/og_image.png"
+    },
+    {
+      "attr": "property",
+      "key": "og:image:alt",
+      "value": "Policy Niketan — Professional insurance policy record management system for all types of agents and customers"
     },
     {
       "attr": "property",
