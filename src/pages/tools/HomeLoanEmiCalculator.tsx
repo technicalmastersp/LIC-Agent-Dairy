@@ -29,7 +29,7 @@ const HomeLoanEmiCalculator = () => {
     <ToolPageLayout
       icon={Home}
       title="Home Loan EMI Calculator"
-      description="Calculate your monthly EMI, total interest, and total repayment amount on a home loan."
+      description="Free home loan EMI calculator: enter the loan amount, interest rate and tenure to see your monthly EMI, total interest and total payment."
       accent="emerald"
     >
       <Card className="rounded-2xl mt-3">

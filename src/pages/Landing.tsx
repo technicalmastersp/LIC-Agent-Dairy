@@ -40,8 +40,30 @@ const Landing = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
         title="Insurance Policy Record Management for Agents"
-        description="Track every client's policy, due date, and payment status in one place. Add records in seconds, search instantly, and never miss a renewal — built for all type of insurance agents."
+        description="Track every client's policy, due date, and payment status in one place. Add records in seconds, search instantly, and never miss a renewal — built for all types of insurance agents."
         path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": `${siteConfig.productionUrl}/#organization`,
+              name: siteConfig.companyName,
+              url: siteConfig.productionUrl,
+              logo: `${siteConfig.productionUrl}${siteConfig.logo_social}`,
+              email: siteConfig.supportEmail,
+              contactPoint: [{ "@type": "ContactPoint", contactType: "customer support", email: siteConfig.supportEmail }],
+            },
+            {
+              "@type": "WebSite",
+              "@id": `${siteConfig.productionUrl}/#website`,
+              name: siteConfig.companyName,
+              url: siteConfig.productionUrl,
+              inLanguage: ["en", "hi"],
+              publisher: { "@id": `${siteConfig.productionUrl}/#organization` },
+            },
+          ],
+        }}
       />
 
       <Navigation />

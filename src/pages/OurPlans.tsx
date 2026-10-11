@@ -157,6 +157,12 @@ const OurPlans = () => {
         userName: currentUser?.name,
         userEmail: currentUser?.email,
         userContact: currentUser?.mobileNumber,
+        onFailure: () =>
+          toast({
+            title: "Payment attempt failed",
+            description: "You can retry in the payment window, or close it and try again later.",
+            variant: "destructive",
+          }),
       });
 
       await verifyPayment(paymentResponse);
@@ -177,8 +183,10 @@ const OurPlans = () => {
         toast({ title: "Payment Failed", description: "Your payment could not be completed. Please try again.", variant: "destructive" });
         return;
       }
-      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
-      toast({ title: "Error", description: message || "Something went wrong.", variant: "destructive" });
+      // Every axios error has already been toasted (or redirected) by apiClient's global
+      // interceptor — toasting again here showed users the same message twice.
+      if (axios.isAxiosError(err)) return;
+      toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
     } finally {
       setProcessingPlanId(null);
     }
@@ -317,7 +325,7 @@ const OurPlans = () => {
 
         <div className={`grid sm:grid-cols-2 ${hasHadPaidPlan ? 'lg:grid-cols-4' : 'lg:grid-cols-5'} gap-6 lg:gap-5 max-w-7xl mx-auto items-start`}>
           {plans.map((plan) => {
-            const style = planStyle[plan.planType] ?? planStyle.Starter;
+            const style = planStyle[plan.planType ?? "Starter"] ?? planStyle.Starter;
             const Icon = style.icon;
             return (
               <Card

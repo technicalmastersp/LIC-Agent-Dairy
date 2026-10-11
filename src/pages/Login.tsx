@@ -1,9 +1,10 @@
+import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import SEO from "@/components/SEO";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LogIn, EyeOff, Eye, User, Home } from "lucide-react";
@@ -51,7 +52,14 @@ const Login = () => {
         setError(t('invalidCredentials'));
       }
     } catch (err) {
-      setError(t('invalidCredentials'));
+      // Don't blame the password for an outage or a timeout.
+      if (axios.isAxiosError(err) && (!err.response || err.response.status >= 500)) {
+        setError(t('loginServerError'));
+      } else if (axios.isAxiosError(err) && err.response?.status === 403 && err.response.data?.message) {
+        setError(err.response.data.message); // e.g. email not verified / account disabled
+      } else {
+        setError(t('invalidCredentials'));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -119,7 +127,7 @@ const Login = () => {
             <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
               <LogIn className="w-8 h-8 text-primary-foreground" />
             </div>
-            <CardTitle className="text-2xl text-form-header">{t('loginTitle')}</CardTitle>
+            <h1 className="text-2xl font-semibold leading-none tracking-tight text-form-header">{t('loginTitle')}</h1>
             <CardDescription>
               {t('welcome')}{' '} {userNamelocaStorage != null ? `${userNamelocaStorage} Ji` : ''}
             </CardDescription>
@@ -188,17 +196,6 @@ const Login = () => {
                 </Link>
               </p>
             </div>
-
-            {/* Test Credentials */}
-            {/* <Card className="bg-accent/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-form-subheader">{t('testCredentials')}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-xs space-y-1">
-                <p>{t('testUserId')}</p>
-                <p>{t('testPassword')}</p>
-              </CardContent>
-            </Card> */}
           </CardContent>
         </Card>
       </div>

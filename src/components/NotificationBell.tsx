@@ -35,7 +35,7 @@ const NotificationBell = ({ variant = "default", align = "end" }: NotificationBe
   // window focus, react-query's default). Polling stops after an error so an
   // outage or offline phone doesn't toast "Network Error" every minute via
   // apiClient's global handler; it resumes on the next focus/reload.
-  const { data: unread = 0 } = useQuery({
+  const { data: unread = 0 } = useQuery<number>({
     queryKey: COUNT_KEY,
     queryFn: getUnreadCount,
     refetchInterval: (q) => (q.state.status === "error" ? false : POLL_MS),
@@ -55,7 +55,7 @@ const NotificationBell = ({ variant = "default", align = "end" }: NotificationBe
     queryClient.invalidateQueries({ queryKey: LIST_KEY });
   };
 
-  const readOne = useMutation({ mutationFn: markNotificationRead, onSettled: refresh });
+  const readOne = useMutation<unknown, Error, string>({ mutationFn: markNotificationRead, onSettled: refresh });
   const readAll = useMutation({ mutationFn: markAllNotificationsRead, onSettled: refresh });
 
   const handleClick = (n: AppNotification) => {

@@ -48,16 +48,36 @@ describe("openRazorpayCheckout", () => {
     await expect(openRazorpayCheckout({ order })).rejects.toThrow("PAYMENT_CANCELLED");
   });
 
-  it("rejects with PAYMENT_FAILED when Razorpay emits a payment.failed event", async () => {
-    RazorpayMock.mockImplementation(() => ({
-      open: vi.fn(),
-      on: (event: string, cb: () => void) => {
-        if (event === "payment.failed") cb();
-      },
-    }));
+  it("a failed attempt does NOT settle the promise — a later successful retry still resolves", async () => {
+    const successResponse = {
+      razorpay_order_id: "order_1", razorpay_payment_id: "pay_2", razorpay_signature: "sig_2",
+    };
+    const onFailure = vi.fn();
+    RazorpayMock.mockImplementation((opts) => {
+      const listeners: Record<string, (r: unknown) => void> = {};
+      return {
+        on: (event: string, cb: (r: unknown) => void) => { listeners[event] = cb; },
+        open: () => {
+          listeners["payment.failed"]?.({ error: { code: "BAD_REQUEST_ERROR" } }); // attempt 1 fails
+          opts.handler(successResponse);                                           // attempt 2 succeeds
+        },
+      };
+    });
 
     const { openRazorpayCheckout } = await import("../utils/razorpayCheckout");
-    await expect(openRazorpayCheckout({ order })).rejects.toThrow("PAYMENT_FAILED");
+    await expect(openRazorpayCheckout({ order, onFailure })).resolves.toEqual(successResponse);
+    expect(onFailure).toHaveBeenCalledTimes(1);
+  });
+
+  it("sends an integer paise amount (no float drift)", async () => {
+    let captured: RazorpayOptions | undefined;
+    RazorpayMock.mockImplementation((opts) => {
+      captured = opts;
+      return { open: () => opts.modal.ondismiss(), on: vi.fn() };
+    });
+    const { openRazorpayCheckout } = await import("../utils/razorpayCheckout");
+    await expect(openRazorpayCheckout({ order: { ...order, amount: 0.29 } })).rejects.toThrow();
+    expect(captured?.amount).toBe(29); // 0.29 * 100 === 28.999999999999996 without Math.round
   });
 
   it("rejects if window.Razorpay never loaded", async () => {

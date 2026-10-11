@@ -62,7 +62,7 @@ export default defineConfig(({ mode }) => {
       // different wording before this was added).
       name: "inject-site-config",
       transformIndexHtml(html: string) {
-        const socialImage = `${siteConfig.productionUrl}${siteConfig.logo_social}`;
+        const socialImage = `${siteConfig.productionUrl}${siteConfig.og_image}`;
         // siteConfig still holds a placeholder handle ("@yourhandle"). Publishing
         // a fake handle in every page's <head> looks careless (and a payment
         // reviewer can see it), so the tag is dropped until a real one is set.
@@ -177,7 +177,15 @@ export default defineConfig(({ mode }) => {
         // Never let the SW intercept API calls or the SPA fallback would
         // incorrectly serve index.html for a failed /api/* request instead
         // of letting axios's real error handling run.
-        navigateFallbackDenylist: [/^\/api\//],
+        navigateFallbackDenylist: [
+          /^\/api\//,
+          // Static files that must never be answered with the app shell by a
+          // returning visitor's service worker.
+          /^\/sitemap\.xml$/,
+          /^\/robots\.txt$/,
+          /^\/google[0-9a-z]+\.html$/,
+          /^\/BingSiteAuth\.xml$/,
+        ],
       },
       devOptions: {
         // Off in dev by default — a service worker intercepting requests
