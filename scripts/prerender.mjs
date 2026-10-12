@@ -68,11 +68,15 @@ function startStaticServer() {
     // backend, and the SPA fallback below would answer those calls with
     // index.html + HTTP 200 — axios then "succeeds" with an HTML string as
     // data, config values come back undefined, and pages crash and get
-    // snapshotted as the error screen. A real 404 makes the call fail
-    // cleanly, so every page just renders with its built-in defaults.
+    // snapshotted as the error screen.
+    // Answer with an EMPTY 204 instead. NOT a 404/5xx: api/apiClient.js shows a
+    // destructive toast for those (e.g. "Not Found: <message>"), and a toast on
+    // screen at capture time gets baked into the snapshot. A 2xx never toasts,
+    // and callers already treat an empty body as "no data" (configService
+    // rejects anything that isn't an object), so pages render their defaults.
     if (req.url.startsWith("/api/")) {
-      res.writeHead(404, { "Content-Type": "application/json" });
-      res.end('{"success":false,"message":"no backend during prerender"}');
+      res.writeHead(204);
+      res.end();
       return;
     }
     let filePath = path.join(DIST_DIR, decodeURIComponent(req.url.split("?")[0]));
@@ -132,6 +136,7 @@ async function prerenderRoute(browser, route) {
 
     const outPath = route === "/" ? "home" : route.replace(/^\//, "").replace(/\//g, "__");
     await fs.mkdir(OUT_DIR, { recursive: true });
+    delete snapshot.toastCount; // diagnostic only — not part of the stored snapshot
     await fs.writeFile(path.join(OUT_DIR, `${outPath}.json`), JSON.stringify({ route, ...snapshot }, null, 2), "utf-8");
     console.log(`  ✓ ${route}`);
   } catch (err) {

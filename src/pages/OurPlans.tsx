@@ -13,6 +13,7 @@ import { changePlan, createCheckoutOrder, verifyPayment, getSubscription } from 
 import { getReferralConfig } from "../../services/configService";
 import { getProfile } from "../../services/userService";
 import { getReferralDashboard } from "../../services/referralService";
+import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
 import SEO from "@/components/SEO";
 import type { Plan } from "@/types/pages/OurPlans.types";
@@ -138,7 +139,7 @@ const OurPlans = () => {
 
       // Paid plan — apply wallet balance first (server clamps to real
       // balance + plan price regardless of what's requested here)
-      const walletToApply = useWallet ? Number(walletAmountInput) || 0 : 0;
+      const walletToApply = REFERRAL_PROGRAM_ENABLED && useWallet ? Number(walletAmountInput) || 0 : 0;
       const order = await createCheckoutOrder(planId, walletToApply);
 
       if (order.walletCovered) {
@@ -184,13 +185,14 @@ const OurPlans = () => {
   };
 
   useEffect(() => {
+    if (!REFERRAL_PROGRAM_ENABLED) return;
     getReferralConfig()
       .then((c) => { if (c && typeof c === "object") setReferralConfig(c); })
       .catch(() => {});
   }, []);
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!REFERRAL_PROGRAM_ENABLED || !currentUser) return;
     getReferralDashboard().then(d => setWalletBalance(d.availableBalance ?? 0)).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -257,7 +259,7 @@ const OurPlans = () => {
           <div className="flex flex-wrap justify-center gap-2 mt-6">
             {[
               { icon: ShieldCheck, label: "Secure Razorpay checkout" },
-              { icon: WalletIcon, label: "Use your referral wallet at checkout" },
+              ...(REFERRAL_PROGRAM_ENABLED ? [{ icon: WalletIcon, label: "Use your referral wallet at checkout" }] : []),
               { icon: RefreshCw, label: "Upgrade or renew any time" },
             ].map(({ icon: Icon, label }) => (
               <span
@@ -271,7 +273,7 @@ const OurPlans = () => {
           </div>
         </div>
 
-        {currentUser && walletBalance > 0 && (
+        {REFERRAL_PROGRAM_ENABLED && currentUser && walletBalance > 0 && (
           <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 rounded-xl p-4 mb-6 max-w-md mx-auto">
             <label className="flex items-center gap-2 text-sm font-medium text-blue-900 dark:text-blue-300">
               <input
@@ -301,6 +303,8 @@ const OurPlans = () => {
           </div>
         )}
 
+        {/* REFERRAL-PROGRAM — only while the program is enabled */}
+        {REFERRAL_PROGRAM_ENABLED && (
         <div className="flex items-center justify-center gap-2.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 rounded-xl p-4 text-center mb-10 max-w-3xl mx-auto">
           <Gift className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" />
           <p className="text-sm text-emerald-800 dark:text-emerald-400">
@@ -309,6 +313,7 @@ const OurPlans = () => {
             any paid plan when you sign up with a valid referral code.
           </p>
         </div>
+        )}
 
         <div className={`grid sm:grid-cols-2 ${hasHadPaidPlan ? 'lg:grid-cols-4' : 'lg:grid-cols-5'} gap-6 lg:gap-5 max-w-7xl mx-auto items-start`}>
           {plans.map((plan) => {

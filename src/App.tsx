@@ -4,7 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -119,7 +120,10 @@ const App = () => (
                   <Route path="/tools/home-loan-emi-calculator" element={<HomeLoanEmiCalculator />} />
                   <Route path="/tools/term-insurance-calculator" element={<TermInsuranceCalculator />} />
                   <Route path="/tools/inflation-calculator" element={<InflationCalculator />} />
-                  <Route path="/referral-program" element={<ProtectedRoute><ReferralProgram /></ProtectedRoute>} />
+                  <Route
+                    path="/referral-program"
+                    element={REFERRAL_PROGRAM_ENABLED ? <ProtectedRoute><ReferralProgram /></ProtectedRoute> : <Navigate to="/home" replace />}
+                  />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
                   <Route path="/my-activity" element={<ProtectedRoute><MyActivity /></ProtectedRoute>} />

@@ -32,3 +32,6 @@ dist-ssr
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# bundle analysis output (see vite.config.ts, ANALYZE=true)
+stats

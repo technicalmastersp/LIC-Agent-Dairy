@@ -19,6 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { createUser, checkReferralCode, getProfile } from "../../services/userService";
 import { getReferralConfig } from "../../services/configService";
+import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import { createCheckoutOrder, verifyPayment } from "../../services/subscriptionService";
 import { setCurrentUser } from "@/utils/auth";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
@@ -87,7 +88,10 @@ const SignUp = () => {
   ];
 
   useEffect(() => {
-    getReferralConfig().then(setReferralConfig).catch(() => {});
+    if (!REFERRAL_PROGRAM_ENABLED) return;
+    getReferralConfig()
+      .then((c) => { if (c && typeof c === "object") setReferralConfig(c); })
+      .catch(() => {});
   }, []);
 
   const getSelectedPlan = () => {
@@ -112,7 +116,7 @@ const SignUp = () => {
     // manual guard is referral-code *validity*, since that's an async
     // backend check tied to the separate "Validate" button, not
     // something a sync schema can express.
-    if (formData.referralCode && !isValidReferralCode) {
+    if (REFERRAL_PROGRAM_ENABLED && formData.referralCode && !isValidReferralCode) {
       setError("Invalid Referral Code, Please Re-Validate and Try Again");
       setIsLoading(false);
       return;
@@ -130,7 +134,7 @@ const SignUp = () => {
         password: formData.password,
         createdAt: new Date().toISOString(),
         isActive: true,
-        referredBy: formData.referralCode || undefined,
+        referredBy: REFERRAL_PROGRAM_ENABLED ? (formData.referralCode || undefined) : undefined,
         termsAccepted: formData.acceptTerms,
         subscription: selectedPlanData ? {
           planId: selectedPlanData.id,
@@ -236,7 +240,7 @@ const SignUp = () => {
               {[
                 { icon: ShieldCheck, label: "Secure & backed up daily" },
                 { icon: BellRing, label: "Due-date reminders" },
-                { icon: Wallet, label: "Referral rewards" },
+                ...(REFERRAL_PROGRAM_ENABLED ? [{ icon: Wallet, label: "Referral rewards" }] : []),
               ].map(({ icon: Icon, label }) => (
                 <span
                   key={label}
@@ -370,7 +374,7 @@ const SignUp = () => {
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid gap-4">
                 <div className="space-y-2">
                   {/* <Label htmlFor="selectedPlan">{t('SelectSubscriptionPlan')}</Label> */}
                   <Controller
@@ -404,6 +408,8 @@ const SignUp = () => {
                   )}
                 </div>
 
+                {/* REFERRAL-PROGRAM — hidden unless the program is enabled */}
+                {REFERRAL_PROGRAM_ENABLED && (
                 <div className="space-y-2">
                   {/* <Label htmlFor="referralCode">{t('ReferralCode')+' ('+t('Optional')+')'}</Label> */}
                   <div className="flex gap-2">
@@ -473,6 +479,7 @@ const SignUp = () => {
                     </p>
                   )}
                 </div>
+                )}
               </div>
 
               <div className="grid lg:grid-cols-2 gap-4">
@@ -502,7 +509,7 @@ const SignUp = () => {
                           </div>
                         </div>
 
-                        {!isValidReferralCode && !referralCodeValue && (
+                        {REFERRAL_PROGRAM_ENABLED && !isValidReferralCode && !referralCodeValue && (
                           <div className="bg-accent/90 border border-accent/60 rounded-lg p-3">
                             <p className="text-sm text-foreground/80 flex items-center gap-2">
                               💡 <span><strong>Pro Tip:</strong> Enter a valid referral code to get an instant ₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} discount!</span>
@@ -547,6 +554,7 @@ const SignUp = () => {
                 )}
               </div>
 
+              {REFERRAL_PROGRAM_ENABLED && (
               <div
                 className={`rounded-lg border p-3 text-sm ${
                   isValidReferralCode
@@ -567,6 +575,7 @@ const SignUp = () => {
                   </p>
                 )}
               </div>
+              )}
 
               <Controller
                 name="acceptTerms"

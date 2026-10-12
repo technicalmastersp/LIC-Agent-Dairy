@@ -41,7 +41,21 @@ export function extractSnapshot() {
     jsonLd: Array.from(
       document.querySelectorAll('script[type="application/ld+json"][data-rh]')
     ).map((el) => el.textContent || ""),
-    rootHtml: document.getElementById("root")?.innerHTML ?? "",
+    // Work on a COPY of #root with any toast notifications removed, so a
+    // transient message ("Not Found", "Network error"...) can never be baked
+    // into a snapshot. toastCount lets validateSnapshot() fail loudly: a toast
+    // during capture means something errored and the page may not be in its
+    // normal state. (Sonner renders li[data-sonner-toast]; Radix toasts render
+    // li[role="status"].)
+    ...(() => {
+      const root = document.getElementById("root");
+      if (!root) return { rootHtml: "", toastCount: 0 };
+      const clone = root.cloneNode(true);
+      const toasts = clone.querySelectorAll('[data-sonner-toast], li[role="status"]');
+      const toastCount = toasts.length;
+      toasts.forEach((el) => el.remove());
+      return { rootHtml: clone.innerHTML, toastCount };
+    })(),
   };
 }
 
@@ -59,6 +73,9 @@ export function validateSnapshot(route, snap, productionUrl) {
     if (snap.canonical !== expected) {
       problems.push(`canonical is ${snap.canonical}, expected ${expected}`);
     }
+  }
+  if (snap.toastCount > 0) {
+    problems.push(`${snap.toastCount} error/notification toast(s) were on screen during capture (a failed API call?)`);
   }
   if (!snap.rootHtml || snap.rootHtml.length < 500) {
     problems.push("page body is empty or suspiciously small");

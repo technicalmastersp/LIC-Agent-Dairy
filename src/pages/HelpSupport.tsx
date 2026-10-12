@@ -27,6 +27,7 @@ import SEO from "@/components/SEO";
 import RequestCallDialog from "@/components/RequestCallDialog";
 import { BUSINESS_HOURS_LABELS } from "@/config/businessHours";
 import siteConfig from "@/config/siteConfig";
+import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import { createTicket, getMyTickets } from "../../services/supportService";
 import { createSuggestion, getMySuggestions } from "../../services/suggestionService";
 import { getMyCallRequests } from "../../services/callRequestService";
@@ -34,14 +35,15 @@ import axios from "axios";
 import type { Ticket, Suggestion, FaqItem } from "@/types/pages/HelpSupport.types";
 import type { CallRequestSummary } from "@/types/components/RequestCallDialog.types";
 import { formatISTDate as fmt, formatISTDateTime } from "@/utils/dateFormat";
-const faqs: FaqItem[] = [
+const ALL_FAQS: FaqItem[] = [
+  { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. You can move between the Free trial, Starter, Basic, Standard, and Premium plans — checkout runs through Razorpay" + (REFERRAL_PROGRAM_ENABLED ? ", and you can apply your referral wallet balance toward the cost at checkout." : ".") },
   { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. You can move between the Free trial, Starter, Basic, Standard, and Premium plans — checkout runs through Razorpay, and you can apply your referral wallet balance toward the cost at checkout." },
   { category: "Account & Billing", q: "What happens when my plan expires?", a: "Your records stay safe and backed up, but you'll need to renew to add new records or access due/missed payment tracking again." },
   { category: "Account & Billing", q: "What is your cancellation and refund policy?", a: "Plans are one-time payments and never renew automatically. Fees are non-refundable once a plan is activated, except for duplicate charges or a payment taken without the plan being activated, which must be reported within 7 days. Full details are on the Cancellation & Refund Policy page." },
   { category: "Account & Billing", q: "Can I change my registered name or Easy ID?", a: "No — your name and Easy ID are permanently assigned at signup for record integrity. Everything else on your profile (mobile number, address, email) can be updated any time." },
   { category: "Account & Billing", q: "Can I switch between light and dark mode?", a: "Yes — use the theme toggle in the navigation bar to switch between light and dark mode. Your choice is remembered the next time you log in." },
   { category: "Account & Billing", q: "Can I see my account activity or sign out of a session?", a: "Yes. My Activity shows a log of recent actions on your account, and Sessions lets you see every device currently signed in and sign any of them out yourself. You can also turn policy due-date and subscription reminders on or off individually from Notification Preferences." },
-  { category: "Policies & Records", q: "Can I manage policies other than life insurance?", a: "Yes. The platform isn't limited to one insurance category — life, health, motor, and general insurance policies can all be tracked the same way." },
+  { category: "Policies & Records", q: "Can I manage policies other than life insurance?", a: "Yes. The platform isn't limited to one insurance category — life, health, motor, and all insurance policies can be tracked the same way." },
   { category: "Policies & Records", q: "How does due-date and missed-payment tracking work?", a: "Every policy with a payment due this month, or one that missed its last payment, is automatically surfaced on dedicated pages — no manual tracking spreadsheet needed." },
   { category: "Policies & Records", q: "Can I delete a policy record?", a: "Record deletion is currently disabled from the interface to prevent accidental data loss. Contact support if a record genuinely needs to be removed." },
   { category: "Policies & Records", q: "Can I call or WhatsApp a policyholder directly from a record?", a: "Yes — open a record from the Missed, Due, or Upcoming payment pages and use the contact action to call or message the policyholder on WhatsApp without leaving the page." },
@@ -59,7 +61,21 @@ const faqs: FaqItem[] = [
   { category: "Technical", q: "I saw a short walkthrough when I logged in — can I see it again?", a: "A short guided tour appears automatically the first time you log in, highlighting the main parts of the workspace. It won't reappear on its own after that — let us know via the contact form if you'd like it shown again." },
 ];
 
-const categories = [
+// While the referral program is off, its FAQs and category are hidden and a
+// single explanatory entry is shown instead (existing users may still have
+// a balance and wonder what happened to it).
+const REFERRAL_CATEGORY = "Payments & Referrals";
+const REFERRAL_OFF_FAQ: FaqItem = {
+  category: "Account & Billing",
+  q: "Is there a referral program?",
+  a: "Not at the moment. Referral codes, referral discounts and referral rewards are currently unavailable. Any referral balance recorded on your account earlier stays on your account, and we'll let you know if anything changes. Questions? Contact us from this page.",
+};
+const faqs: FaqItem[] = [
+  ...ALL_FAQS.filter((f) => REFERRAL_PROGRAM_ENABLED || f.category !== REFERRAL_CATEGORY),
+  ...(REFERRAL_PROGRAM_ENABLED ? [] : [REFERRAL_OFF_FAQ]),
+];
+
+const ALL_CATEGORIES = [
   { icon: UserCog, title: "Account & Billing", description: "Plans, upgrades, profile details, and login issues." },
   { icon: FileText, title: "Policies & Records", description: "Adding, editing, and tracking policy records of any type." },
   { icon: Wallet, title: "Payments & Referrals", description: "Referral wallet, rewards, and plan renewals." },
@@ -67,6 +83,9 @@ const categories = [
   { icon: Lock, title: "Security & Data", description: "How your data is protected, backed up, and accessed." },
   { icon: ShieldCheck, title: "Technical", description: "Bugs, loading issues, or anything not working as expected." },
 ];
+const categories = ALL_CATEGORIES.filter(
+  (c) => REFERRAL_PROGRAM_ENABLED || c.title !== REFERRAL_CATEGORY
+);
 
 const ticketStatusStyle: Record<string, string> = {
   open:        "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900",

@@ -31,6 +31,24 @@ describe("prerender snapshot extraction", () => {
   });
 });
 
+describe("toasts never reach a snapshot", () => {
+  it("strips a toast from rootHtml and reports it", () => {
+    document.head.innerHTML = "";
+    document.body.innerHTML = `<div id="root"><main>${"page content ".repeat(60)}</main>
+      <section aria-label="Notifications"><ol data-sonner-toaster>
+        <li data-sonner-toast><div>Not Found</div><div>no backend during prerender</div></li>
+      </ol></section></div>`;
+    const snap = extractSnapshot();
+    expect(snap.toastCount).toBe(1);
+    expect(snap.rootHtml).not.toMatch(/Not Found|no backend during prerender/);
+    expect(snap.rootHtml).toMatch(/page content/);           // real content untouched
+  });
+  it("validateSnapshot refuses a capture that had a toast on screen", () => {
+    const p = validateSnapshot("/our-plans", { canonical: `${PROD}/our-plans`, rootHtml: goodBody, toastCount: 1 }, PROD);
+    expect(p.join()).toMatch(/toast/);
+  });
+});
+
 describe("validateSnapshot", () => {
   const ok = { canonical: `${PROD}/refund-policy`, rootHtml: goodBody };
   it("accepts a correct snapshot", () => {

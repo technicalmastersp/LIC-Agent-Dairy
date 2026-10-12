@@ -31,6 +31,7 @@ import {
 } from "../../services/userService";
 import { resizeImageToSquare } from "@/utils/imageResize";
 import { getReferralDashboard }        from "../../services/referralService";
+import { REFERRAL_PROGRAM_ENABLED }   from "@/config/featureFlags";
 import { convertDateToIndianFormat }   from "@/utils/tools";
 import type { ReferralDashboardData } from "@/types/pages/Profile.types";
 import type { Session }               from "@/types/pages/SessionManagement.types";
@@ -118,7 +119,7 @@ const Profile = () => {
     try {
       const [u, ref, sess, np, act] = await Promise.all([
         getProfile(),
-        getReferralDashboard().catch(() => null),
+        REFERRAL_PROGRAM_ENABLED ? getReferralDashboard().catch(() => null) : Promise.resolve(null),
         getMySessions().catch(() => null),
         getNotificationPreferences().catch(() => null),
         getMyActivity({ page: 1 }).catch(() => null),
@@ -416,11 +417,13 @@ const Profile = () => {
                     </Button>
                   </>
                 )}
+                {REFERRAL_PROGRAM_ENABLED && (
                 <Button size="sm" variant="outline" asChild>
                   <Link to="/referral-program">
                     <Users className="w-3.5 h-3.5 mr-1.5" /> Referral program
                   </Link>
                 </Button>
+                )}
                 <Button size="sm" variant="outline"
                   className="bg-red-50 hover:bg-red-100 border-red-200 text-red-700"
                   onClick={() => navigate("/change-password")}>
@@ -560,6 +563,7 @@ const Profile = () => {
                     </Badge>
                   },
                   { label: "Records",      val: <span className="text-blue-600 font-medium text-xs">{user.totalRecords ?? 0}</span> },
+                  ...(REFERRAL_PROGRAM_ENABLED ? [
                   { label: "Referral code",
                     val: <button
                       onClick={() => user.referralCode && handleCopy(user.referralCode, "referral")}
@@ -571,6 +575,7 @@ const Profile = () => {
                         : <Copy className="w-2.5 h-2.5 text-muted-foreground/70" />}
                     </button>
                   },
+                  ] : []),
                 ].map(({ label, val }) => (
                   <div key={label} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                     <span className="text-xs text-muted-foreground">{label}</span>
@@ -868,8 +873,8 @@ const Profile = () => {
                 )}
               </div>
 
-              {/* Referral summary */}
-              {referral && (
+              {/* Referral summary — REFERRAL-PROGRAM only */}
+              {REFERRAL_PROGRAM_ENABLED && referral && (
                 <div className="bg-card border border-border rounded-xl p-4">
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">

@@ -51,7 +51,7 @@ const siteConfig = {
   // PLACEHOLDERS — update with real profile links when available.
   socialLinks: {
     twitter: "https://twitter.com/yourhandle",
-    twitterHandle: "@yourhandle",
+    twitterHandle: "@policyniketan",
     github: "https://github.com/yourrepo",
   }
 };
