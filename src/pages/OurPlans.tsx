@@ -111,10 +111,12 @@ const OurPlans = () => {
     }
   ];
 
-  // Free trial is signup-only in spirit — hide it entirely once someone
-  // has already taken any paid plan (current planId isn't the free plan),
-  // rather than only blocking re-selection after the fact.
-  const hasHadPaidPlan = currentUser?.subscription && currentUser.subscription.planId !== "1month-free";
+  // The free trial is signup-only. Hide the Free card once it can't be selected, rather than
+  // blocking it after the fact: the backend refuses with 403 FREE_TRIAL_INELIGIBLE whenever the
+  // account's `isFreeTrial` flag is set (it is sticky — an expired trial keeps planId
+  // "1month-free"), so for those users the button could only ever show an error.
+  const sub = currentUser?.subscription as { planId?: string; isFreeTrial?: boolean } | undefined;
+  const hasHadPaidPlan = !!sub && (sub.planId !== "1month-free" || sub.isFreeTrial === true);
   const plans = allPlans.filter(p => p.id !== "1month-free" || !hasHadPaidPlan);
 
   const handleSelectPlan = async (planId: string) => {
