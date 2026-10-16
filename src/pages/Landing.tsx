@@ -13,13 +13,17 @@ import {
   TrendingUp, CircleDot, Bell, Languages, IdCard,
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
+import { signupPathForPlan } from "@/config/plans";
+import { HOME_STATS } from "@/config/siteStats";
 import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import SEO from "@/components/SEO";
 import BusinessCard, { BUSINESS_CARD_TEMPLATES } from "@/components/BusinessCard";
 import type { BusinessCardTheme } from "@/types/components/BusinessCard.types";
 
 const plans = [
-  { id: "1month-free", name: "1 Month", price: "Free", tag: "Try it out", color: "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border", accent: "text-gray-600 dark:text-muted-foreground" },
+  { id: "1month-free", name: "1 Month Free", price: "Free", tag: "Try it out", color: "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border", accent: "text-gray-600 dark:text-muted-foreground" },
+  // The paid 1-month "Starter" plan (backend id "1month") — it was missing from this section.
+  { id: "1month", name: "1 Month", price: "Pay month to month", tag: "", color: "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-900", accent: "text-emerald-700 dark:text-emerald-400" },
   { id: "3months", name: "3 Months", price: "For starting agents", tag: "", color: "bg-violet-50 border-violet-200 dark:bg-violet-950/40 dark:border-violet-900", accent: "text-violet-700 dark:text-violet-400" },
   { id: "6months", name: "6 Months", price: "Most popular", tag: "Recommended", color: "bg-blue-50 border-blue-300 ring-2 ring-blue-200 dark:bg-blue-950/40 dark:border-blue-800 dark:ring-blue-900", accent: "text-blue-700 dark:text-blue-400" },
   { id: "12months", name: "12 Months", price: "Best value", tag: "", color: "bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900", accent: "text-amber-700 dark:text-amber-400" },
@@ -195,6 +199,21 @@ const Landing = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ══════════ STATS BAND — numbers come from src/config/siteStats.ts (single source of truth) ══════════ */}
+        <section aria-label="Policy Niketan in numbers" className="bg-background py-12">
+          <div className="container mx-auto px-4">
+            <dl className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-y-8 md:gap-y-0 md:divide-x md:divide-border text-center">
+              {HOME_STATS.map(({ key, value, label }) => (
+                <div key={key} className="px-4" data-testid={`home-stat-${key}`}>
+                  <dt className="sr-only">{label}</dt>
+                  <dd className="text-3xl md:text-4xl font-bold text-primary tabular-nums">{value}</dd>
+                  <p className="mt-1 text-sm text-muted-foreground" aria-hidden="true">{label}</p>
+                </div>
+              ))}
+            </dl>
           </div>
         </section>
 
@@ -455,7 +474,7 @@ const Landing = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
                 {plans.map(({ id, name, price, tag, color, accent }) => (
                   <div key={id} className={`rounded-2xl border p-6 ${color} relative flex flex-col bg-background`}>
                     {tag && (
@@ -470,7 +489,8 @@ const Landing = () => {
                       <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> Due & lapse tracking</li>
                       <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> Daily backups</li>
                     </ul>
-                    <Link to="/signup">
+                    {/* ?plan=<id> → the signup page opens with this plan already selected */}
+                    <Link to={signupPathForPlan(id)}>
                       <Button variant="outline" size="sm" className="w-full bg-background">
                         Choose plan
                       </Button>

@@ -14,6 +14,7 @@ import { getReferralConfig } from "../../services/configService";
 import { getProfile } from "../../services/userService";
 import { getReferralDashboard } from "../../services/referralService";
 import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
+import { signupPathForPlan } from "@/config/plans";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
 import SEO from "@/components/SEO";
 import type { Plan } from "@/types/pages/OurPlans.types";
@@ -121,7 +122,7 @@ const OurPlans = () => {
 
   const handleSelectPlan = async (planId: string) => {
     if (processingPlanId) return; // already checking out a plan — ignore extra clicks
-    if (!currentUser) { navigate("/signup"); return; }
+    if (!currentUser) { navigate(signupPathForPlan(planId)); return; }
     if (currentUser.role === "admin" || currentUser.role === "superadmin") {
       toast({ title: "Not applicable", description: "Admin accounts don't use subscription plans." });
       return;

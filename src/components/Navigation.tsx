@@ -5,6 +5,7 @@ import {
   Home, Plus, Table, LogOut, User, Menu, X,
   UserRoundCog, CircleHelp, Phone, MapPinnedIcon, Wrench,
   Cake, TrendingUp, Receipt, ShieldCheck, LineChart, ChevronDown,
+  Banknote, Landmark, PiggyBank,
   LucideIcon
 } from "lucide-react";
 import { Button }        from "@/components/ui/button";
@@ -51,6 +52,9 @@ const getAdminNavItems = (t: (key: keyof Translations) => string) => [
 const TOOLS = [
   { to: "/tools/age-calculator", icon: Cake, label: "Age Calculator" },
   { to: "/tools/sip-calculator", icon: TrendingUp, label: "SIP Calculator" },
+  { to: "/tools/lumpsum-calculator", icon: Banknote, label: "Lumpsum Calculator" },
+  { to: "/tools/rd-calculator", icon: PiggyBank, label: "RD Calculator" },
+  { to: "/tools/fd-calculator", icon: Landmark, label: "FD Calculator" },
   { to: "/tools/income-tax-calculator", icon: Receipt, label: "Income Tax Calculator" },
   { to: "/tools/home-loan-emi-calculator", icon: Home, label: "Home Loan EMI Calculator" },
   { to: "/tools/term-insurance-calculator", icon: ShieldCheck, label: "Term Insurance Calculator" },

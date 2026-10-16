@@ -55,10 +55,23 @@ const Login = () => {
       // Don't blame the password for an outage or a timeout.
       if (axios.isAxiosError(err) && (!err.response || err.response.status >= 500)) {
         setError(t('loginServerError'));
+      } else if (axios.isAxiosError(err) && err.response?.status === 429) {
+        // Account temporarily locked after repeated wrong passwords (or the IP rate limit).
+        const data = err.response.data;
+        if (data?.code === "LOGIN_LOCKED" && typeof data.retryAfterSeconds === "number") {
+          setError(t('accountLocked').replace('{n}', String(Math.max(1, Math.ceil(data.retryAfterSeconds / 60)))));
+        } else {
+          setError(data?.message || t('accountLocked').replace('{n}', '15'));
+        }
       } else if (axios.isAxiosError(err) && err.response?.status === 403 && err.response.data?.message) {
         setError(err.response.data.message); // e.g. email not verified / account disabled
       } else {
-        setError(t('invalidCredentials'));
+        // Wrong password: warn when the account is about to lock (server sends attemptsLeft).
+        const left = (err as { attemptsLeft?: number })?.attemptsLeft;
+        const hint = typeof left === "number" && left > 0 && left <= 2
+          ? ` ${t(left === 1 ? 'attemptsLeftOne' : 'attemptsLeftMany').replace('{n}', String(left))}`
+          : "";
+        setError(t('invalidCredentials') + hint);
       }
     } finally {
       setIsLoading(false);

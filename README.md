@@ -127,6 +127,35 @@ public/             # Static assets, robots.txt, sitemap.xml, logos
 
 ---
 
+## Content maintenance (stats, tools, plans)
+
+**Marketing numbers — one place only: `src/config/siteStats.ts`.** The home page stats band and the About
+page bar both read it ("200+ Agents joined", "2,200+ Records managed", "9 Free calculators", "30 days free trial").
+These are claims about the business, so keep them true: run `npm run site-stats` in the **backend** repo (read-only; it
+counts real agents and policy records and prints rounded-down figures), paste the two numbers, and bump `lastVerified`.
+`freeTools` is enforced by a test against the real number of `/tools/*` routes.
+
+**Adding a calculator** touches these places (a test in `src/test/registry.test.ts` fails if any is missed):
+`src/pages/tools/<Name>.tsx`, `src/App.tsx` (lazy import + route), `Navigation.tsx`, `Footer.tsx`, `ToolsHub.tsx`,
+`About.tsx`, `scripts/publicRoutes.mjs` (sitemap + prerender) and `scripts/verify-live.mjs`; then bump `SITE_STATS.freeTools`.
+The page's math belongs in `src/utils/` with unit tests, not inside the component.
+
+**Plans.** The valid plan ids live in `src/config/plans.ts` and must match the backend
+(`utils/ourSubscriptionPlans.js`). Every "Choose plan" link goes to `/signup?plan=<id>`, and the signup page
+pre-selects that plan (an unknown id is ignored).
+
+**After changing any public page**, regenerate the SEO snapshots and commit them together with the sitemap:
+
+```bash
+npm run build                 # fresh dist/
+npm run prerender:generate    # rewrites prerendered/*.json (needs Edge/Chrome)
+npm run build                 # merges them and regenerates public/sitemap.xml
+git add prerendered public/sitemap.xml
+```
+
+> `public/sitemap.xml` is written *after* Vite copies `public/` into `dist/`, so the sitemap that gets deployed is
+> the one you committed — always commit the regenerated file, or the live sitemap lags one build behind.
+
 ## Commit & Deploy Process
 
 ### On every commit (automatic, local)

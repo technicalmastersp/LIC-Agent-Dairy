@@ -27,7 +27,8 @@ export const login = async (credentials) => {
     localStorage.removeItem('userName')
     return res.data;
   } else {
-    throw new Error(res.data.message);
+    // Carry the server's "attempts left" countdown (wrong password) to the Login page.
+    throw Object.assign(new Error(res.data.message), { attemptsLeft: res.data.attemptsLeft });
   }
 };
 

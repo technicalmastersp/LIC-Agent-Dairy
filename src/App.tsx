@@ -39,6 +39,9 @@ const LicInfoHub = lazy(() => import("./pages/LicInfoHub"));
 const ToolsHub = lazy(() => import("./pages/tools/ToolsHub"));
 const AgeCalculator = lazy(() => import("./pages/tools/AgeCalculator"));
 const SipCalculator = lazy(() => import("./pages/tools/SipCalculator"));
+const LumpsumCalculator = lazy(() => import("./pages/tools/LumpsumCalculator"));
+const RdCalculator = lazy(() => import("./pages/tools/RdCalculator"));
+const FdCalculator = lazy(() => import("./pages/tools/FdCalculator"));
 const IncomeTaxCalculator = lazy(() => import("./pages/tools/IncomeTaxCalculator"));
 const HomeLoanEmiCalculator = lazy(() => import("./pages/tools/HomeLoanEmiCalculator"));
 const TermInsuranceCalculator = lazy(() => import("./pages/tools/TermInsuranceCalculator"));
@@ -116,6 +119,9 @@ const App = () => (
                   <Route path="/tools" element={<ToolsHub />} />
                   <Route path="/tools/age-calculator" element={<AgeCalculator />} />
                   <Route path="/tools/sip-calculator" element={<SipCalculator />} />
+                  <Route path="/tools/lumpsum-calculator" element={<LumpsumCalculator />} />
+                  <Route path="/tools/rd-calculator" element={<RdCalculator />} />
+                  <Route path="/tools/fd-calculator" element={<FdCalculator />} />
                   <Route path="/tools/income-tax-calculator" element={<IncomeTaxCalculator />} />
                   <Route path="/tools/home-loan-emi-calculator" element={<HomeLoanEmiCalculator />} />
                   <Route path="/tools/term-insurance-calculator" element={<TermInsuranceCalculator />} />

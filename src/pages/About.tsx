@@ -4,6 +4,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
+import { SITE_STATS, SOCIAL_PROOF_STATS } from "@/config/siteStats";
 import {
   ShieldCheck,
   FileText,
@@ -50,7 +51,9 @@ const About = () => {
     { label: "All", icon: HomeIcon, rotate: "rotate-6", offset: "-translate-y-1", bg: "bg-violet-50 dark:bg-violet-950/40", accent: "text-violet-600 dark:text-violet-400", chip: "Renewed" },
   ];
 
+  // The first two come from src/config/siteStats.ts (single source of truth — also used on the home page).
   const trustStats = [
+    ...SOCIAL_PROOF_STATS.map(({ value, label }) => ({ value, label })),
     { value: "Daily", label: "Data backups" },
     { value: "< few hrs", label: "Support response" },
     { value: "0", label: "Queries pending overnight" },
@@ -112,6 +115,9 @@ const About = () => {
   const freeTools = [
     { to: "/tools/age-calculator", icon: Calculator, title: "Age Calculator", accent: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-950/40" },
     { to: "/tools/sip-calculator", icon: Calculator, title: "SIP Calculator", accent: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-950/40" },
+    { to: "/tools/lumpsum-calculator", icon: Calculator, title: "Lumpsum Calculator", accent: "text-indigo-600 dark:text-indigo-400", bg: "bg-indigo-50 dark:bg-indigo-950/40" },
+    { to: "/tools/rd-calculator", icon: Calculator, title: "RD Calculator", accent: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-950/40" },
+    { to: "/tools/fd-calculator", icon: Calculator, title: "FD Calculator", accent: "text-green-600 dark:text-green-400", bg: "bg-green-50 dark:bg-green-950/40" },
     { to: "/tools/income-tax-calculator", icon: Calculator, title: "Income Tax Calculator", accent: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/40" },
     { to: "/tools/home-loan-emi-calculator", icon: Calculator, title: "Home Loan EMI Calculator", accent: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/40" },
     { to: "/tools/term-insurance-calculator", icon: Calculator, title: "Term Insurance Calculator", accent: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-950/40" },
@@ -214,7 +220,7 @@ const About = () => {
         {/* ══════════ TRUST STRIP — full width stat bar ══════════ */}
         <section className="bg-form-subheader text-primary-foreground">
           <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-primary-foreground/15">
+            <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-primary-foreground/15">
               {trustStats.map(({ value, label }) => (
                 <div key={label} className="px-4 py-6 text-center">
                   <p className="text-2xl md:text-3xl font-bold">{value}</p>
@@ -297,7 +303,7 @@ const About = () => {
                 <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Beyond record-keeping</p>
                 <h2 className="text-3xl font-bold text-form-header">Free tools, built right in</h2>
                 <p className="text-muted-foreground mt-3 leading-relaxed">
-                  Six financial calculators agents actually need day to day, plus a searchable glossary
+                  {SITE_STATS.freeTools} financial calculators agents actually need day to day, plus a searchable glossary
                   of LIC terms — no separate app, no sign-up wall.
                 </p>
               </div>

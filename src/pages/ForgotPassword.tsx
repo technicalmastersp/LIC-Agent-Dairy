@@ -125,11 +125,21 @@ const ForgotPassword = () => {
       setOtp(["", "", "", "", "", ""]);
       setError("OTP has expired. Please request a new one.");
       setCanResend(true);
+      } else if (code === "OTP_ATTEMPTS_EXCEEDED" || code === "NO_OTP") {
+      // Too many wrong guesses: the server destroyed this OTP. A fresh one is required.
+      setOtp(["", "", "", "", "", ""]);
+      setError(message || "Too many incorrect attempts. Please request a new OTP.");
+      setCanResend(true);
       } else if (code === "OTP_INVALID") {
       // Clear boxes, focus first box, let user retry
       setOtp(["", "", "", "", "", ""]);
       setTimeout(() => otpRefs.current[0]?.focus(), 50);
-      setError("Invalid OTP. Please check and try again.");
+      const left = axios.isAxiosError(err) ? err.response?.data?.attemptsLeft : undefined;
+      setError(
+        typeof left === "number" && left > 0 && left <= 2
+          ? `Invalid OTP. ${left} attempt${left === 1 ? "" : "s"} left.`
+          : "Invalid OTP. Please check and try again."
+      );
       } else {
       setError(message || "Something went wrong. Please try again.");
       }
@@ -144,7 +154,14 @@ const ForgotPassword = () => {
       await resetPassword({ email, otp: otp.join(""), newPassword: data.newPassword });
       setStep("success");
     } catch (err: unknown) {
+      const code    = axios.isAxiosError(err) ? err.response?.data?.code : undefined;
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      if (code === "OTP_ATTEMPTS_EXCEEDED" || code === "NO_OTP" || code === "OTP_EXPIRED") {
+        // This OTP can no longer be used — send the user back to get a new one instead of stranding them.
+        setOtp(["", "", "", "", "", ""]);
+        setStep("otp");
+        setCanResend(true);
+      }
       setError(message || "Invalid OTP or request expired.");
     } finally { setLoading(false); }
   };

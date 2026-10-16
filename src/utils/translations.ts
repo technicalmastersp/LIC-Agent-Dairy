@@ -93,6 +93,9 @@ export const translations: Record<string, Translations> = {
     signupSuccess: "Account created successfully!",
     invalidCredentials: "Invalid User ID or Password",
     loginServerError: "We couldn't reach the server. Please wait a moment and try again.",
+    accountLocked: "Too many failed attempts. Please try again in {n} minute(s), or reset your password.",
+    attemptsLeftOne: "1 attempt left before this account is temporarily locked.",
+    attemptsLeftMany: "{n} attempts left before this account is temporarily locked.",
     userExists: "User with this email or mobile already exists",
     
     // Forms
@@ -211,6 +214,9 @@ export const translations: Record<string, Translations> = {
     signupSuccess: "खाता सफलतापूर्वक बनाया गया!",
     invalidCredentials: "गलत यूजर आईडी या पासवर्ड",
     loginServerError: "सर्वर से संपर्क नहीं हो पाया। कृपया थोड़ी देर बाद फिर प्रयास करें।",
+    accountLocked: "बहुत अधिक गलत प्रयास हुए। कृपया {n} मिनट बाद फिर प्रयास करें, या पासवर्ड रीसेट करें।",
+    attemptsLeftOne: "अकाउंट अस्थायी रूप से लॉक होने से पहले 1 प्रयास बचा है।",
+    attemptsLeftMany: "अकाउंट अस्थायी रूप से लॉक होने से पहले {n} प्रयास बचे हैं।",
     userExists: "इस ईमेल या मोबाइल का उपयोगकर्ता पहले से मौजूद है",
     
     // Forms

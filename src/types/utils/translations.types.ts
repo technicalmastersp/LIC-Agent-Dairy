@@ -90,6 +90,9 @@ export interface Translations {
   signupSuccess: string;
   invalidCredentials: string;
   loginServerError: string;
+  accountLocked: string;
+  attemptsLeftOne: string;
+  attemptsLeftMany: string;
   userExists: string;
   
   // Forms
