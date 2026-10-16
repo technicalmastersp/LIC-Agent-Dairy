@@ -4,74 +4,25 @@ import NumberField from "@/components/tools/NumberField";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Receipt, AlertTriangle } from "lucide-react";
+import { computeIncomeTax, type Regime } from "@/utils/incomeTax";
 
 const inr = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
-// ⚠️ Rates as understood for FY 2025-26 (AY 2026-27) — VERIFY against the
-// official Income Tax Department before relying on this for real filing.
-// Tax law changes with every Union Budget; update these slabs each year.
-const NEW_REGIME_SLABS = [
-  { upTo: 400000, rate: 0 },
-  { upTo: 800000, rate: 0.05 },
-  { upTo: 1200000, rate: 0.10 },
-  { upTo: 1600000, rate: 0.15 },
-  { upTo: 2000000, rate: 0.20 },
-  { upTo: 2400000, rate: 0.25 },
-  { upTo: Infinity, rate: 0.30 },
-];
-const NEW_REGIME_STANDARD_DEDUCTION = 75000;
-const NEW_REGIME_REBATE_LIMIT = 1200000; // taxable income up to this = effectively nil tax (Sec 87A)
-
-const OLD_REGIME_SLABS = [
-  { upTo: 250000, rate: 0 },
-  { upTo: 500000, rate: 0.05 },
-  { upTo: 1000000, rate: 0.20 },
-  { upTo: Infinity, rate: 0.30 },
-];
-const OLD_REGIME_STANDARD_DEDUCTION = 50000;
-const OLD_REGIME_REBATE_LIMIT = 500000;
-
-const calcSlabTax = (taxableIncome: number, slabs: typeof NEW_REGIME_SLABS) => {
-  let tax = 0;
-  let lower = 0;
-  for (const slab of slabs) {
-    if (taxableIncome <= lower) break;
-    const taxableInSlab = Math.min(taxableIncome, slab.upTo) - lower;
-    tax += taxableInSlab * slab.rate;
-    lower = slab.upTo;
-  }
-  return tax;
-};
-
 const IncomeTaxCalculator = () => {
-  const [regime, setRegime] = useState<"new" | "old">("new");
+  const [regime, setRegime] = useState<Regime>("new");
   const [grossIncome, setGrossIncome] = useState(1200000);
   const [deductions, setDeductions] = useState(150000); // 80C/80D/etc — old regime only
 
-  const result = useMemo(() => {
-    const isNew = regime === "new";
-    const standardDeduction = isNew ? NEW_REGIME_STANDARD_DEDUCTION : OLD_REGIME_STANDARD_DEDUCTION;
-    const rebateLimit = isNew ? NEW_REGIME_REBATE_LIMIT : OLD_REGIME_REBATE_LIMIT;
-    const slabs = isNew ? NEW_REGIME_SLABS : OLD_REGIME_SLABS;
-
-    const otherDeductions = isNew ? 0 : deductions;
-    const taxableIncome = Math.max(0, grossIncome - standardDeduction - otherDeductions);
-
-    let tax = calcSlabTax(taxableIncome, slabs);
-    const rebateApplied = taxableIncome <= rebateLimit;
-    if (rebateApplied) tax = 0;
-
-    const cess = tax * 0.04;
-    const totalTax = tax + cess;
-
-    return { taxableIncome, tax, cess, totalTax, rebateApplied, takeHome: grossIncome - totalTax };
-  }, [regime, grossIncome, deductions]);
+  const result = useMemo(
+    () => computeIncomeTax(regime, grossIncome, deductions),
+    [regime, grossIncome, deductions]
+  );
 
   return (
     <ToolPageLayout
       icon={Receipt}
       title="Income Tax Calculator"
-      description="Estimate your income tax liability under India's old and new tax regimes."
+      description="Free income tax calculator for FY 2026-27: compare India's old and new regimes and estimate your tax, 4% cess and in-hand income."
       accent="amber"
     >
       <Card className="rounded-2xl mt-3">
@@ -79,9 +30,10 @@ const IncomeTaxCalculator = () => {
           <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl p-3.5">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <p className="text-xs text-amber-800 leading-relaxed">
-              Estimate only, based on FY 2025-26 slabs as commonly understood — tax law changes every
-              Budget. Please verify current rates with the Income Tax Department or a tax professional
-              before making real decisions.
+              Estimate only, using the individual slab rates for FY 2026-27 (unchanged from FY 2025-26).
+              The ₹75,000 / ₹50,000 standard deduction applies to salaried individuals and pensioners.
+              Surcharge, senior-citizen slabs and other income are not included. Tax law changes every
+              Budget — verify with the Income Tax Department or a tax professional before making real decisions.
             </p>
           </div>
 
@@ -109,6 +61,12 @@ const IncomeTaxCalculator = () => {
               <p className="text-lg font-semibold text-form-header">{inr(result.cess)}</p>
             </div>
           </div>
+
+          {result.marginalReliefApplied && (
+            <p className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+              Marginal relief applies — your tax is limited to the income earned above ₹12,00,000.
+            </p>
+          )}
 
           {result.rebateApplied && (
             <p className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">

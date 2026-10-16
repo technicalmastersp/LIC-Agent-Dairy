@@ -13,7 +13,7 @@ export const openRazorpayCheckout = async (
     }
     const rzp = new window.Razorpay({
       key: options.order.keyId,
-      amount: options.order.amount * 100, // paise
+      amount: Math.round(options.order.amount * 100), // paise (rounded: avoids float drift e.g. 0.29*100)
       currency: options.order.currency,
       order_id: options.order.razorpayOrderId,
       name: siteConfig.companyName,
@@ -30,7 +30,12 @@ export const openRazorpayCheckout = async (
       theme: { color: "#2563eb" },
     });
 
-    rzp.on("payment.failed", () => reject(new Error("PAYMENT_FAILED")));
+    // Do NOT reject here. Razorpay keeps the modal open after a failed attempt so the
+    // user can retry (another card / UPI). Rejecting would settle the promise early and
+    // silently drop a later successful `handler` call -> customer charged, plan not
+    // activated, verify never called. The terminal outcomes are `handler` (paid) and
+    // `ondismiss` (user closed the modal). Failed attempts are surfaced via onFailure.
+    rzp.on("payment.failed", (resp?: unknown) => options.onFailure?.(resp));
     rzp.open();
   });
 };

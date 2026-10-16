@@ -26,6 +26,9 @@ const siteConfig = {
   // Social-share size (512x512 PNG, ~256KB) — used for og:image/twitter:image
   // where crawlers need a real raster image, not a tiny icon.
   logo_social: "/logos/logo_social.png",
+  // 1200x630 PNG (~200KB) — the correct shape for summary_large_image / og:image.
+  // (The 512x512 logo above gets cropped or letterboxed by large-image cards.)
+  og_image: "/logos/og_image.png",
 
   description: "Professional insurance policy record management system for all types of agents and customers",
   author: "Mr. Shashank S Pandey",

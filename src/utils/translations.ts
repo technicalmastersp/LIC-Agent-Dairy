@@ -92,6 +92,7 @@ export const translations: Record<string, Translations> = {
     loginSuccess: "Login successful!",
     signupSuccess: "Account created successfully!",
     invalidCredentials: "Invalid User ID or Password",
+    loginServerError: "We couldn't reach the server. Please wait a moment and try again.",
     userExists: "User with this email or mobile already exists",
     
     // Forms
@@ -99,11 +100,6 @@ export const translations: Record<string, Translations> = {
     personalInformation: "Personal Information",
     familyInformation: "Family Information",
     beneficiaryInformation: "Beneficiary Information",
-    
-    // Test credentials
-    testCredentials: "Test Credentials",
-    testUserId: "User ID: UID123456 or test123demo",
-    testPassword: "Password: test123",
     
     // Records
     loadingRecords: "Loading Records...",
@@ -214,6 +210,7 @@ export const translations: Record<string, Translations> = {
     loginSuccess: "लॉग इन सफल!",
     signupSuccess: "खाता सफलतापूर्वक बनाया गया!",
     invalidCredentials: "गलत यूजर आईडी या पासवर्ड",
+    loginServerError: "सर्वर से संपर्क नहीं हो पाया। कृपया थोड़ी देर बाद फिर प्रयास करें।",
     userExists: "इस ईमेल या मोबाइल का उपयोगकर्ता पहले से मौजूद है",
     
     // Forms
@@ -221,11 +218,6 @@ export const translations: Record<string, Translations> = {
     personalInformation: "व्यक्तिगत जानकारी",
     familyInformation: "पारिवारिक जानकारी",
     beneficiaryInformation: "लाभार्थी की जानकारी",
-    
-    // Test credentials
-    testCredentials: "परीक्षण प्रमाण पत्र",
-    testUserId: "यूजर आईडी: UID123456 या test123demo",
-    testPassword: "पासवर्ड: test123",
     
     // Records
     loadingRecords: "रिकॉर्ड लोड हो रहे हैं...",

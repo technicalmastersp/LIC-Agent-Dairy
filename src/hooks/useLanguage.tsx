@@ -7,6 +7,12 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLang] = useState<Language>(getStoredLanguage());
 
+  // Keep <html lang> in sync so screen readers pick the right voice and
+  // browsers don't offer to "translate" Hindi content from English.
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
   const setLanguage = (lang: Language) => {
     setLang(lang);
     setStoredLanguage(lang);
