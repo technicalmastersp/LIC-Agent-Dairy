@@ -268,7 +268,7 @@ const AdminUserDetail = () => {
                           <p className="text-[9px] uppercase text-primary-foreground/60">{user.paymentDetails.bankName || "Bank"}</p>
                           <p className="text-primary-foreground/80">
                             <SensitiveValue value={user.paymentDetails.ifscCode} />
-                            {!isEncryptedValue(user.paymentDetails.ifscCode) && user.paymentDetails.branchName ? ` · ${user.paymentDetails.branchName}` : ""}
+                            {!isEncryptedValue(user.paymentDetails.ifscCode ?? "") && user.paymentDetails.branchName ? ` · ${user.paymentDetails.branchName}` : ""}
                           </p>
                         </div>
                       </div>

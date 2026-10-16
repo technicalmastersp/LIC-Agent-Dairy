@@ -15,4 +15,6 @@ export interface OpenCheckoutOptions {
   userName?: string;
   userEmail?: string;
   userContact?: string;
+  /** Called on each failed attempt; the modal stays open so the user can retry. */
+  onFailure?: (response: unknown) => void;
 }

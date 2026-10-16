@@ -41,7 +41,7 @@ const AgeCalculator = () => {
     <ToolPageLayout
       icon={Cake}
       title="Age Calculator"
-      description="Enter a date of birth to find the exact age in years, months, and days."
+      description="Free age calculator: enter a date of birth to get the exact age in years, months and days, plus the time left until the next birthday."
       accent="blue"
     >
       <Card className="rounded-2xl mt-3">

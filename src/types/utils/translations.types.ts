@@ -89,6 +89,7 @@ export interface Translations {
   loginSuccess: string;
   signupSuccess: string;
   invalidCredentials: string;
+  loginServerError: string;
   userExists: string;
   
   // Forms
@@ -98,9 +99,6 @@ export interface Translations {
   beneficiaryInformation: string;
   
   // Test credentials
-  testCredentials: string;
-  testUserId: string;
-  testPassword: string;
   
   // Records
   loadingRecords: string;

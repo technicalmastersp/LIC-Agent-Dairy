@@ -13,7 +13,9 @@ const apiClient = axios.create({
   // through a same-origin path makes it a first-party cookie everywhere.
   baseURL: "/api",
   headers: { "Content-Type": "application/json" },
-  timeout: 10000,
+  // 30s, not 10s: the backend runs on Render, whose cold start after idle can take
+  // 20-50s. A 10s timeout turned every first request after idle into "Network Error".
+  timeout: 30000,
   // Still needed even same-origin — withCredentials controls whether the
   // browser attaches/accepts cookies on this axios instance's requests at
   // all. Backend CORS (app.js) also still needs credentials: true, even
@@ -32,6 +34,17 @@ const apiClient = axios.create({
 // cookie via /auth/logout, or the browser keeps sending the stale cookie
 // on every request after the "logged out" redirect. Fired via plain
 // fetch() (not apiClient) so it can't recurse into this same interceptor.
+// Wipe session/user data on logout-style events, but keep UI preferences. A bare
+// localStorage.clear() also reset the user's theme and language on every expiry.
+const KEEP_KEYS = ["language", "theme"];
+const clearAuthStorage = () => {
+  const keep = KEEP_KEYS.map((k) => [k, localStorage.getItem(k)]);
+  localStorage.clear();
+  keep.forEach(([k, v]) => {
+    if (v !== null) localStorage.setItem(k, v);
+  });
+};
+
 const clearServerSession = () => {
   fetch("/api/auth/logout", {
     method: "POST",
@@ -63,6 +76,13 @@ apiClient.interceptors.response.use(
     const message = error.response.data?.message || "Something went wrong.";
     const code    = error.response.data?.code;
 
+    // 401 on the login call itself means "wrong credentials", not "session expired".
+    // Without this a bad password toasted "Session Expired" and hard-redirected to /login,
+    // so the Login page never got to show its own inline error.
+    if (status === 401 && /\/auth\/login\/?$/.test(error.config?.url || "")) {
+      return Promise.reject(error);
+    }
+
     // 401 — unauthorized / session expired
     if (status === 401) {
       const code = error.response?.data?.code;
@@ -70,7 +90,7 @@ apiClient.interceptors.response.use(
       if (code === "SESSION_INVALIDATED") {
         // Clear everything and redirect with a message
         clearServerSession();
-        localStorage.clear();
+        clearAuthStorage();
         window.location.href = "/login?reason=session_ended";
         return Promise.reject(error);
       }
@@ -81,7 +101,7 @@ apiClient.interceptors.response.use(
         variant:     "destructive",
       });
       clearServerSession();
-      localStorage.clear();
+      clearAuthStorage();
       window.location.href = "/login";
       return Promise.reject(error);
     }

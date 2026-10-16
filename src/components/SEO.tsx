@@ -1,9 +1,10 @@
 import { Helmet } from "react-helmet-async";
 import siteConfig from "@/config/siteConfig";
 import type { SEOProps } from "@/types/components/SEO.types";
-// Social/crawler images need a real raster size (not the 128px UI icon),
-// so this points at the dedicated 512x512 social asset.
-const DEFAULT_IMAGE = `${siteConfig.productionUrl}${siteConfig.logo_social}`;
+// Social/crawler images need a real raster size (not the 128px UI icon), and
+// the large-image cards want a 1.91:1 shape, so this points at the dedicated
+// 1200x630 share image.
+const DEFAULT_IMAGE = `${siteConfig.productionUrl}${siteConfig.og_image}`;
 
 /**
  * Sets the browser-tab title, canonical URL, and social/search meta tags
@@ -29,6 +30,9 @@ const SEO = ({ title, description, image, jsonLd, path, noindex, ogType = "websi
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={resolvedImage} />
+      {!image && <meta property="og:image:width" content="1200" />}
+      {!image && <meta property="og:image:height" content="630" />}
+      <meta property="og:image:alt" content={`${siteConfig.companyName} — ${siteConfig.description}`} />
 
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
