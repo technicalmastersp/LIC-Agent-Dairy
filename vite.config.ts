@@ -205,6 +205,12 @@ export default defineConfig(({ mode }) => {
     environment: "jsdom",
     globals: true,
     setupFiles: "./src/test/setup.ts",
+    // Vitest's default is 5s per test. On a slow or busy machine (Windows antivirus scanning every
+    // module the tests import, many jsdom files running in parallel) a perfectly correct test can
+    // simply take longer than that and fail with "Test timed out in 5000ms" — and the timed-out
+    // test's late async work then leaks into the NEXT test, producing a second, misleading failure.
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
     // Playwright's e2e/*.spec.ts files use test.describe() from
     // @playwright/test, which is not a Vitest suite — without this
     // exclusion `vitest run` picks them up and fails immediately.
