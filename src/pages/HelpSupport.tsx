@@ -52,7 +52,7 @@ const ALL_FAQS: FaqItem[] = [
   { category: "Payments & Referrals", q: "Can I withdraw my referral wallet balance to my bank account or UPI?", a: "Not at the moment. Withdrawals to a bank account or UPI ID are paused, and wallet balance can only be used for plan renewals and upgrades. We plan to offer transfers to your own account in the future — we'll let you know in the app and update this page when it's available." },
   { category: "Payments & Referrals", q: "I requested a withdrawal before this change — what happens to it?", a: "Requests made before withdrawals were paused are still reviewed by our team, and you can follow the status on the Referral Program page. If one is declined, it always comes with a reason and the amount is returned to your wallet automatically." },
   { category: "Tools & Calculators", q: "What free calculators are available?", a: "Age, SIP, Income Tax, Home Loan EMI, Term Insurance, and Inflation calculators are all available from the Tools menu — free to use, and no login required." },
-  { category: "Tools & Calculators", q: "What's the LIC Info Hub?", a: "It's a searchable reference of LIC and insurance terms and abbreviations — DOC, SA, KYC, ULIP, and more — with a plain-language explanation for each one. Also free to use without logging in." },
+  { category: "Tools & Calculators", q: "What's the Policy Niketan Info Hub?", a: "It's a searchable reference of insurance & Policy terms and abbreviations — DOC, SA, KYC, ULIP, and more — with a plain-language explanation for each one. Also free to use without logging in." },
   { category: "Security & Data", q: "Is my policyholder data backed up?", a: "Yes — records are backed up daily without exception, so a single failure never means lost work." },
   { category: "Security & Data", q: "Who can see sensitive fields like Aadhaar or PAN?", a: "Only you and admins acting within their role can view sensitive fields. Access is authenticated and scoped by design, not open by default." },
   { category: "Account & Billing", q: "Can I talk to someone on the phone?", a: "Yes — use \"Request a call\" on this page. Enter your mobile number and a short reason, and our team will call you back. We don't publish a direct number, and calls are placed only during business hours (Mon–Fri 9 AM – 9 PM, Sat–Sun 10 AM – 8 PM IST). Requests made outside those hours are queued and called at the next opening." },
@@ -79,7 +79,7 @@ const ALL_CATEGORIES = [
   { icon: UserCog, title: "Account & Billing", description: "Plans, upgrades, profile details, and login issues." },
   { icon: FileText, title: "Policies & Records", description: "Adding, editing, and tracking policy records of any type." },
   { icon: Wallet, title: "Payments & Referrals", description: "Referral wallet, rewards, and plan renewals." },
-  { icon: Calculator, title: "Tools & Calculators", description: "Free calculators and the LIC terms reference." },
+  { icon: Calculator, title: "Tools & Calculators", description: "Free calculators and the Insurance & Policy terms reference." },
   { icon: Lock, title: "Security & Data", description: "How your data is protected, backed up, and accessed." },
   { icon: ShieldCheck, title: "Technical", description: "Bugs, loading issues, or anything not working as expected." },
 ];
@@ -710,7 +710,7 @@ const HelpSupport = () => {
                 <h2 className="text-2xl md:text-3xl font-bold mb-1">Looking for policy terms & codes?</h2>
                 <p className="text-primary-foreground/90">Check the Insurance Abbreviations & Codes reference for quick lookups.</p>
               </div>
-              <Link to="/lic-info-hub" className="shrink-0">
+              <Link to="/policy-niketan-info-hub" className="shrink-0">
                 <Button size="lg" className="bg-white text-[hsl(195,85%,25%)] hover:bg-white/90 font-medium">
                   <BookOpenText className="w-4 h-4 mr-2" />
                   Open reference

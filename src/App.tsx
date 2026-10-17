@@ -115,7 +115,7 @@ const App = () => (
                   <Route path="/help-support" element={<HelpSupport />} />
                   <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                   <Route path="/our-plans" element={<OurPlans />} />
-                  <Route path="/lic-info-hub" element={<LicInfoHub />} />
+                  <Route path="/policy-niketan-info-hub" element={<LicInfoHub />} />
                   <Route path="/tools" element={<ToolsHub />} />
                   <Route path="/tools/age-calculator" element={<AgeCalculator />} />
                   <Route path="/tools/sip-calculator" element={<SipCalculator />} />

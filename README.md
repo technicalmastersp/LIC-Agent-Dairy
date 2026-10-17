@@ -1,6 +1,6 @@
 # Policy Niketan — Insurance Records
 
-A web application for LIC agents to manage policyholder records — capture
+A web application for Insurance agents to manage policyholder records — capture
 applicant details, track policy/premium due dates, monitor missed and
 upcoming payments, and (for admins) oversee users, revenue, support
 tickets, and subscriptions.
@@ -38,7 +38,7 @@ tickets, and subscriptions.
 - **Forms**: react-hook-form + zod are installed for incremental adoption;
   most forms currently use manual `useState`-based validation
 - **Backend**: separate Node.js/Express/MongoDB API
-  (`LIC-Agent-Dairy-Backend-development`) — not part of this repo
+  (`Backend-development`) — not part of this repo
 - **Hosting**: Vercel (SPA rewrite configured in `vercel.json`)
 
 ---
@@ -47,7 +47,7 @@ tickets, and subscriptions.
 
 - Node.js 18+ and npm
 - A running instance of the companion backend API
-  (`LIC-Agent-Dairy-Backend-development`), or access to a deployed one
+  (`Backend-development`), or access to a deployed one
 
 ---
 
@@ -56,7 +56,7 @@ tickets, and subscriptions.
 ```bash
 # 1. Clone the repo
 git clone <repo-url>
-cd LIC-Agent-Dairy-devlopment
+cd <repo-folder-name>
 
 # 2. Install dependencies
 npm install
@@ -244,14 +244,14 @@ The app is deployed on **Vercel**. `vercel.json` handles three things:
    `*.vercel.app` domains and `www.policyniketan.com` to `https://policyniketan.com`,
    so the site is only ever indexed/linked under one canonical host.
 2. **Rewrites** — `/api/:path*` is proxied straight through to the backend
-   (`https://lic-agent-dairy-backend.onrender.com/api/:path*`), and everything
+   (`https://<backend-uri>/api/:path*`), and everything
    else that isn't a real static file (`/assets/...` or anything containing a
    dot, e.g. `favicon.ico`) falls through to `/index.html` so React Router can
    handle client-side routing on direct loads and refreshes:
    ```json
    {
      "rewrites": [
-       { "source": "/api/:path*", "destination": "https://lic-agent-dairy-backend.onrender.com/api/:path*" },
+       { "source": "/api/:path*", "destination": "https://<backend-uri>/api/:path*" },
        { "source": "/((?!assets/|.*\\..*).*)", "destination": "/" }
      ]
    }

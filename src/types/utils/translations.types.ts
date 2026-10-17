@@ -2,7 +2,6 @@
 export interface Translations {
   // Project Lable
   title: string,
-  // LIC: string,
 
   // Navigation
   home: string;

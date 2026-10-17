@@ -122,7 +122,7 @@ const About = () => {
     { to: "/tools/home-loan-emi-calculator", icon: Calculator, title: "Home Loan EMI Calculator", accent: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/40" },
     { to: "/tools/term-insurance-calculator", icon: Calculator, title: "Term Insurance Calculator", accent: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-950/40" },
     { to: "/tools/inflation-calculator", icon: Calculator, title: "Inflation Calculator", accent: "text-cyan-600 dark:text-cyan-400", bg: "bg-cyan-50 dark:bg-cyan-950/40" },
-    { to: "/lic-info-hub", icon: BookOpenText, title: "LIC Info Hub", accent: "text-primary", bg: "bg-primary/10" },
+    { to: "/policy-niketan-info-hub", icon: BookOpenText, title: "Policy Niketan Info Hub", accent: "text-primary", bg: "bg-primary/10" },
   ];
 
   return (
@@ -231,7 +231,7 @@ const About = () => {
           </div>
         </section>
 
-        {/* ══════════ NOT JUST FOR LIC — split, icon panel right ══════════ */}
+        {/* ══════════ NOT JUST FOR One Insurance Type — split, icon panel right ══════════ */}
         <section className="bg-background py-16 md:py-20">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -295,7 +295,7 @@ const About = () => {
           </div>
         </section>
 
-        {/* ══════════ FREE TOOLS — calculators + LIC Info Hub grid ══════════ */}
+        {/* ══════════ FREE TOOLS — calculators + Policy Niketan Info Hub grid ══════════ */}
         <section className="bg-background py-16 md:py-20">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
@@ -304,7 +304,7 @@ const About = () => {
                 <h2 className="text-3xl font-bold text-form-header">Free tools, built right in</h2>
                 <p className="text-muted-foreground mt-3 leading-relaxed">
                   {SITE_STATS.freeTools} financial calculators agents actually need day to day, plus a searchable glossary
-                  of LIC terms — no separate app, no sign-up wall.
+                  of Insurance & Policy terms — no separate app, no sign-up wall.
                 </p>
               </div>
 

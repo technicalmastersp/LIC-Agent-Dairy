@@ -12,7 +12,7 @@ export const PUBLIC_ROUTES = [
   { path: "/",                                   changefreq: "weekly",  priority: 1.0 },
   { path: "/about",                               changefreq: "monthly", priority: 0.7 },
   { path: "/our-plans",                           changefreq: "monthly", priority: 0.8 },
-  { path: "/lic-info-hub",                        changefreq: "weekly",  priority: 0.8 },
+  { path: "/policy-niketan-info-hub",             changefreq: "weekly",  priority: 0.8 },
   { path: "/help-support",                        changefreq: "monthly", priority: 0.6 },
   { path: "/tools",                               changefreq: "monthly", priority: 0.7 },
   { path: "/tools/age-calculator",                changefreq: "monthly", priority: 0.6 },

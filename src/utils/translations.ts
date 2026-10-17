@@ -5,7 +5,6 @@ export const translations: Record<string, Translations> = {
   en: {
     // Project Lable
     title: siteConfig.companyName,
-    // LIC: "Life Insurance Corporation of India",
 
     // Navigation
     home: "Home",
@@ -126,7 +125,6 @@ export const translations: Record<string, Translations> = {
     // Project Lable
     // title: "एलआईसी एजेंट डायरी",
     title: "पॉलिसी निकेतन",
-    // LIC: "भारतीय जीवन बीमा निगम",
 
     // Navigation
     home: "मुख्य पृष्ठ",

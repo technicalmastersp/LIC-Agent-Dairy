@@ -144,9 +144,9 @@ const Landing = () => {
                         <span>Name</span><span>Policy</span><span className="text-right">Status</span>
                       </div>
                       {[
-                        { name: "R. Sharma", policy: "LIC-2291", status: "Active", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
-                        { name: "A. Verma", policy: "HDFC-8823", status: "Due", color: "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400" },
-                        { name: "S. Iyer", policy: "ICICI-4410", status: "Active", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
+                        { name: "S. Sharma", policy: "XXX-2291", status: "Active", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
+                        { name: "S. Verma", policy: "XXXX-8823", status: "Due", color: "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400" },
+                        { name: "P. Kumar", policy: "XXXXX-4410", status: "Active", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
                       ].map((row) => (
                         <div key={row.name} className="grid grid-cols-3 items-center px-3 py-2 text-xs border-t border-border">
                           <span className="text-form-header font-medium">{row.name}</span>

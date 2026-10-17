@@ -234,7 +234,7 @@ const Navigation = () => {
   const publicLinks = [
     { href: "/tools",     label: "Tools"          },
     { href: "/our-plans",     label: "Plans"          },
-    { href: "/lic-info-hub",  label: "Best Info Hub"  },
+    { href: "/policy-niketan-info-hub",  label: "Best Info Hub"  },
     // { href: "#Career",  label: "Career"   },
     { href: "/help-support",  label: "Help & Support" },
     { href: "/about",         label: "About"          },

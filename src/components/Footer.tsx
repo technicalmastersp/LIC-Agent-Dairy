@@ -53,14 +53,14 @@ const Footer = () => {
       ? [
           { label: t("profile"), to: "/profile" },
           { label: t("ourPlans"), to: "/our-plans" },
-          { label: t("bestInfoHub"), to: "/lic-info-hub" },
+          { label: t("bestInfoHub"), to: "/policy-niketan-info-hub" },
           { label: t("aboutUs"), to: "/about" },
           { label: ("Help & Support"), to: "/help-support" },
           { label: ("Contact Us"), to: "/contact" },
         ]
       : [
           { label: t("ourPlans"), to: "/our-plans" },
-          { label: t("bestInfoHub"), to: "/lic-info-hub" },
+          { label: t("bestInfoHub"), to: "/policy-niketan-info-hub" },
           { label: t("aboutUs"), to: "/about" },
       ]),
     // { label: t("referral"), to: "/referral-program" },
