@@ -4,10 +4,9 @@ import React, { useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { BookOpenText, Search, X } from 'lucide-react';
 import SEO from '@/components/SEO';
-import type { AbbreviationItem, LICAbbreviationsData } from "@/types/pages/LicInfoHub.types";
-const data: LICAbbreviationsData = {
-  LIC_Abbreviations: [
-    { abbreviation: 'LIC', full_form: 'Life Insurance Corporation', description: "India's largest government-owned life insurance company" },
+import type { AbbreviationItem, InsuranceAbbreviationsData } from "@/types/pages/LicInfoHub.types";
+const data: InsuranceAbbreviationsData = {
+  Insurance_Abbreviations: [
     { abbreviation: 'DOC', full_form: 'Date of Commencement', description: 'Start date of the insurance policy' },
     { abbreviation: 'DLP', full_form: 'Date of Last Premium', description: 'Date when the last premium was paid' },
     { abbreviation: 'DOM', full_form: 'Date of Maturity', description: 'Date when the policy matures' },
@@ -38,13 +37,12 @@ const data: LICAbbreviationsData = {
     { abbreviation: 'UIN', full_form: 'Unique Identification Number', description: 'The IRDAI-issued number that uniquely identifies an approved insurance product' },
     { abbreviation: 'CKYC', full_form: 'Central KYC Registry', description: "A centralized system that stores a customer's KYC records for reuse across financial institutions" },
   ],
-  LIC_Internal_Codes: [
+  Insurance_Internal_Codes: [
     { abbreviation: 'PWB', full_form: 'Premium Waiver Benefit', description: '' },
     { abbreviation: 'AB', full_form: 'Accidental Benefit', description: '' },
     { abbreviation: 'DAB', full_form: 'Double Accident Benefit', description: '' },
     { abbreviation: 'CIB', full_form: 'Critical Illness Benefit', description: '' },
     { abbreviation: 'GT', full_form: 'Group Term Insurance', description: '' },
-    { abbreviation: 'JE', full_form: 'Jeevan', description: 'Used in LIC policy names, e.g., Jeevan Anand' },
     { abbreviation: 'SV', full_form: 'Surrender Value', description: '' },
     { abbreviation: 'FV', full_form: 'Face Value', description: '' },
     { abbreviation: 'Loan A/V', full_form: 'Loan Available', description: '' },
@@ -82,9 +80,9 @@ const data: LICAbbreviationsData = {
   ],
 };
 
-const sectionMeta: Record<keyof LICAbbreviationsData, { title: string; accent: string; bg: string }> = {
-  LIC_Abbreviations:   { title: 'General LIC Abbreviations', accent: 'text-blue-700',   bg: 'bg-blue-50' },
-  LIC_Internal_Codes:  { title: 'LIC Internal Codes',        accent: 'text-violet-700', bg: 'bg-violet-50' },
+const sectionMeta: Record<keyof InsuranceAbbreviationsData, { title: string; accent: string; bg: string }> = {
+  Insurance_Abbreviations:   { title: 'General Insurance Abbreviations', accent: 'text-blue-700',   bg: 'bg-blue-50' },
+  Insurance_Internal_Codes:  { title: 'Insurance Internal Codes',        accent: 'text-violet-700', bg: 'bg-violet-50' },
   Private_Insurers:    { title: 'Private Insurers',          accent: 'text-emerald-700',bg: 'bg-emerald-50' },
   Common_Policy_Terms: { title: 'Common Policy Terms',       accent: 'text-amber-700',  bg: 'bg-amber-50' },
 };
@@ -128,7 +126,7 @@ const Section = ({
 const LicInfoHub: React.FC = () => {
   const [query, setQuery] = useState("");
 
-  const filtered = useMemo<LICAbbreviationsData>(() => {
+  const filtered = useMemo<InsuranceAbbreviationsData>(() => {
     if (!query.trim()) return data;
     const q = query.trim().toLowerCase();
     const match = (item: AbbreviationItem) =>
@@ -137,18 +135,18 @@ const LicInfoHub: React.FC = () => {
       item.description.toLowerCase().includes(q);
 
     return {
-      LIC_Abbreviations: data.LIC_Abbreviations.filter(match),
-      LIC_Internal_Codes: data.LIC_Internal_Codes.filter(match),
+      Insurance_Abbreviations: data.Insurance_Abbreviations.filter(match),
+      Insurance_Internal_Codes: data.Insurance_Internal_Codes.filter(match),
       Private_Insurers: data.Private_Insurers.filter(match),
       Common_Policy_Terms: data.Common_Policy_Terms.filter(match),
     };
   }, [query]);
 
   const totalResults =
-    filtered.LIC_Abbreviations.length + filtered.LIC_Internal_Codes.length +
+    filtered.Insurance_Abbreviations.length + filtered.Insurance_Internal_Codes.length +
     filtered.Private_Insurers.length + filtered.Common_Policy_Terms.length;
   const totalAll =
-    data.LIC_Abbreviations.length + data.LIC_Internal_Codes.length +
+    data.Insurance_Abbreviations.length + data.Insurance_Internal_Codes.length +
     data.Private_Insurers.length + data.Common_Policy_Terms.length;
 
   // This page is a searchable glossary (term → full form → definition),
@@ -159,11 +157,11 @@ const LicInfoHub: React.FC = () => {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "DefinedTermSet",
-    name: "LIC Info Hub — Insurance Abbreviations & Terms Glossary",
-    description: "Glossary of LIC abbreviations, internal codes, private insurer names, and common life-insurance policy terms.",
+    name: "Policy Niketan Info Hub — Insurance Abbreviations & Terms Glossary",
+    description: "Glossary of Insurance abbreviations, internal codes, private insurer names, and common life-insurance policy terms.",
     hasDefinedTerm: [
-      ...data.LIC_Abbreviations,
-      ...data.LIC_Internal_Codes,
+      ...data.Insurance_Abbreviations,
+      ...data.Insurance_Internal_Codes,
       ...data.Private_Insurers,
       ...data.Common_Policy_Terms,
     ].map(item => ({
@@ -177,10 +175,10 @@ const LicInfoHub: React.FC = () => {
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
       <SEO
-        title="LIC Info Hub — Insurance Abbreviations & Terms Explained"
-        description="Look up LIC abbreviations, internal codes, private insurer names, and common policy terms — a searchable glossary built for life insurance agents."
+        title="Policy Niketan Info Hub — Insurance Abbreviations & Terms Explained"
+        description="Look up Insurance & Policy abbreviations, internal codes, private insurer names, and common policy terms — a searchable glossary built for life insurance agents."
         jsonLd={jsonLd}
-        path="/lic-info-hub"
+        path="/policy-niketan-info-hub"
       />
       <Navigation />
 
@@ -194,7 +192,7 @@ const LicInfoHub: React.FC = () => {
             <div>
               <h1 className="text-2xl font-semibold text-form-header">Insurance Abbreviations & Codes</h1>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Quick reference for LIC terminology, internal codes, private insurers, and common policy terms
+                Quick reference for Insurance & Policy terminology, internal codes, private insurers, and common policy terms
               </p>
             </div>
           </div>
@@ -218,7 +216,7 @@ const LicInfoHub: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap gap-2 mb-8">
-            {(Object.keys(sectionMeta) as (keyof LICAbbreviationsData)[]).map((key) => (
+            {(Object.keys(sectionMeta) as (keyof InsuranceAbbreviationsData)[]).map((key) => (
               <a
                 key={key}
                 href={`#${key}`}
@@ -241,8 +239,8 @@ const LicInfoHub: React.FC = () => {
             </p>
           ) : (
             <>
-              <Section id="LIC_Abbreviations" title={sectionMeta.LIC_Abbreviations.title} accent={sectionMeta.LIC_Abbreviations.accent} bg={sectionMeta.LIC_Abbreviations.bg} items={filtered.LIC_Abbreviations} />
-              <Section id="LIC_Internal_Codes" title={sectionMeta.LIC_Internal_Codes.title} accent={sectionMeta.LIC_Internal_Codes.accent} bg={sectionMeta.LIC_Internal_Codes.bg} items={filtered.LIC_Internal_Codes} />
+              <Section id="Insurance_Abbreviations" title={sectionMeta.Insurance_Abbreviations.title} accent={sectionMeta.Insurance_Abbreviations.accent} bg={sectionMeta.Insurance_Abbreviations.bg} items={filtered.Insurance_Abbreviations} />
+              <Section id="Insurance_Internal_Codes" title={sectionMeta.Insurance_Internal_Codes.title} accent={sectionMeta.Insurance_Internal_Codes.accent} bg={sectionMeta.Insurance_Internal_Codes.bg} items={filtered.Insurance_Internal_Codes} />
               <Section id="Private_Insurers" title={sectionMeta.Private_Insurers.title} accent={sectionMeta.Private_Insurers.accent} bg={sectionMeta.Private_Insurers.bg} items={filtered.Private_Insurers} />
               <Section id="Common_Policy_Terms" title={sectionMeta.Common_Policy_Terms.title} accent={sectionMeta.Common_Policy_Terms.accent} bg={sectionMeta.Common_Policy_Terms.bg} items={filtered.Common_Policy_Terms} />
             </>

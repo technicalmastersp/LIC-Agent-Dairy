@@ -53,14 +53,14 @@ const Footer = () => {
       ? [
           { label: t("profile"), to: "/profile" },
           { label: t("ourPlans"), to: "/our-plans" },
-          { label: t("bestInfoHub"), to: "/lic-info-hub" },
+          { label: t("bestInfoHub"), to: "/policy-niketan-info-hub" },
           { label: t("aboutUs"), to: "/about" },
           { label: ("Help & Support"), to: "/help-support" },
           { label: ("Contact Us"), to: "/contact" },
         ]
       : [
           { label: t("ourPlans"), to: "/our-plans" },
-          { label: t("bestInfoHub"), to: "/lic-info-hub" },
+          { label: t("bestInfoHub"), to: "/policy-niketan-info-hub" },
           { label: t("aboutUs"), to: "/about" },
       ]),
     // { label: t("referral"), to: "/referral-program" },
@@ -72,6 +72,9 @@ const Footer = () => {
     { label: "All Tools",                    to: "/tools" },
     { label: "Age Calculator",               to: "/tools/age-calculator" },
     { label: "SIP Calculator",                to: "/tools/sip-calculator" },
+    { label: "Lumpsum Calculator",            to: "/tools/lumpsum-calculator" },
+    { label: "RD Calculator",                 to: "/tools/rd-calculator" },
+    { label: "FD Calculator",                 to: "/tools/fd-calculator" },
     { label: "Income Tax Calculator",         to: "/tools/income-tax-calculator" },
     { label: "Home Loan EMI Calculator",      to: "/tools/home-loan-emi-calculator" },
     { label: "Term Insurance Calculator",     to: "/tools/term-insurance-calculator" },

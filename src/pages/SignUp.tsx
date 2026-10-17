@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -24,6 +24,7 @@ import { createCheckoutOrder, verifyPayment } from "../../services/subscriptionS
 import { setCurrentUser } from "@/utils/auth";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
 import { signUpSchema } from "@/schemas/signUpSchema";
+import { isValidPlanId } from "@/config/plans";
 import type { SignUpFormValues } from "@/types/schemas/signUpSchema.types";
 
 const SignUp = () => {
@@ -43,12 +44,19 @@ const SignUp = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
 
+  // "?plan=6months" comes from the plan cards on the home page and /our-plans. Validate it —
+  // a stale, mistyped or tampered value must never select a plan that doesn't exist.
+  const [searchParams] = useSearchParams();
+  const planFromUrl = searchParams.get("plan");
+  const preselectedPlan = isValidPlanId(planFromUrl) ? planFromUrl : "";
+
   const {
     register,
     control,
     handleSubmit,
     watch,
     getValues,
+    setValue,
     formState: { errors },
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -59,11 +67,17 @@ const SignUp = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      selectedPlan: "",
+      selectedPlan: preselectedPlan,
       referralCode: "",
       acceptTerms: false,
     },
   });
+
+  // If the URL's plan changes while this page stays mounted (browser back/forward), follow it.
+  // Only fires when the URL value changes, so it never overrides a choice the user makes by hand.
+  useEffect(() => {
+    if (preselectedPlan) setValue("selectedPlan", preselectedPlan);
+  }, [preselectedPlan, setValue]);
 
   const password = watch("password");
   const selectedPlanId = watch("selectedPlan");

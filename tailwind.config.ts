@@ -4,6 +4,12 @@ import tailwindcssAnimate from "tailwindcss-animate";
 export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  // ToolPageLayout and ToolsHub build these class names at runtime (`bg-${accent}-100 text-${accent}-700`).
+  // Tailwind only generates CSS for class names it can read literally in source, so without this a tool
+  // whose accent colour isn't spelled out somewhere else would render with NO icon background.
+  safelist: [
+    { pattern: /^(bg|text)-(blue|violet|amber|emerald|rose|cyan|indigo|orange|green)-(100|700)$/ },
+  ],
   prefix: "",
   theme: {
     container: {
