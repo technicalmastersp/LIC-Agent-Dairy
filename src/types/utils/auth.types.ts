@@ -32,6 +32,10 @@ export interface User {
   permissions?: Record<string, boolean>;
   paymentDetails?: PaymentDetails | null;
   hasSeenOnboarding?: boolean;
+  /** Saved Hide/Show choice (true = sensitive data hidden). Stored in the DB. */
+  maskSensitiveData?: boolean;
+  /** Backend master switch (SENSITIVE_MASKING_ENABLED). false = feature off. */
+  sensitiveMaskingEnabled?: boolean;
   notificationPreferences?: {
     policyDueReminders: boolean;
     subscriptionReminders: boolean;

@@ -12,6 +12,7 @@ import { CheckCircle2, XCircle, RefreshCw } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { PendingUpiVerification } from "@/types/pages/admin/PaymentVerifications.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -137,7 +138,7 @@ const PaymentVerifications = () => {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <p className="text-sm font-mono">{p.upiId}</p>
+                              <p className="text-sm font-mono"><SensitiveValue field="upiId" value={p.upiId} /></p>
                               {p.upiRejectionReason && (
                                 <p className="text-xs text-red-600 mt-0.5">Previously rejected: {p.upiRejectionReason}</p>
                               )}
@@ -186,7 +187,7 @@ const PaymentVerifications = () => {
               <CardContent className="space-y-4">
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
                   <p className="font-medium text-red-700">{rejectModal.name}</p>
-                  <p className="text-red-600 font-mono text-xs mt-0.5">{rejectModal.upiId}</p>
+                  <p className="text-red-600 font-mono text-xs mt-0.5"><SensitiveValue field="upiId" value={rejectModal.upiId} /></p>
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Reason for rejection (user will see this)</label>

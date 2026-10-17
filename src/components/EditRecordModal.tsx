@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentUser } from "@/utils/auth";
+import { useSensitiveInputClass } from "@/hooks/useSensitiveMask";
 import {
   Save, Plus, Trash2, User, X,
   IdCard, Users, HeartPulse, ShieldCheck, History,
@@ -46,6 +47,12 @@ const SectionTitle = ({ icon: Icon, step, children }: { icon: LucideIcon; step?:
 const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalProps) => {
   const { toast } = useToast();
   const currentUser = getCurrentUser();
+  // Hide/Show sensitive data: obscure these inputs (CSS only — value untouched) while hidden
+  const aadhaarMask = useSensitiveInputClass("aadhaarNumber");
+  const panMask     = useSensitiveInputClass("panNumber");
+  const mobileMask  = useSensitiveInputClass("mobileNumber");
+  const accountMask = useSensitiveInputClass("bankAccountNumber");
+  const ifscMask    = useSensitiveInputClass("ifscCode");
 
   // Insurance type editing — same shape/behavior as AddRecord. Defaults to
   // Life Insurance until the record loads and overrides it in the effect below.
@@ -413,6 +420,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     onBlur={register("aadhaarNumber").onBlur}
                     maxLength={14}
                     inputMode="numeric"
+                    autoComplete="off"
+                    className={aadhaarMask}
                   />
                 </div>
                 <div className="space-y-2">
@@ -420,7 +429,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                   <Input 
                     id="panNumber" 
                     {...register("panNumber")}
-                    className="uppercase"
+                    autoComplete="off"
+                    className={`uppercase ${panMask}`}
                     maxLength={10}
                   />
                 </div>
@@ -575,6 +585,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     value={formatMobileNumber(watch("aadhaarLinkedMobileNumber"))}
                     onChange={(e) => setValue("aadhaarLinkedMobileNumber", unformatMobileNumber(e.target.value), { shouldValidate: true })}
                     onBlur={register("aadhaarLinkedMobileNumber").onBlur}
+                    autoComplete="off"
+                    className={mobileMask}
                     // {...register("aadhaarLinkedMobileNumber")}
                     // maxLength={10}
                   />
@@ -831,6 +843,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                     id="bankAccountNumber" 
                     placeholder="Enter bank account number"
                     {...register("bankAccountNumber")}
+                    autoComplete="off"
+                    className={accountMask}
                     maxLength={30}
                   />
                 </div>
@@ -843,7 +857,8 @@ const EditRecordModal = ({ record, isOpen, onClose, onUpdate }: EditRecordModalP
                       onChange: () => setIfscLookupState({ status: "idle" }),
                     })}
                     onBlur={(e) => { register("ifscCode").onBlur(e); handleIfscBlur(); }}
-                    className="uppercase"
+                    autoComplete="off"
+                    className={`uppercase ${ifscMask}`}
                     maxLength={11}
                   />
                 </div>

@@ -30,6 +30,8 @@ import {
 } from "recharts";
 import type { ExpenseBreakdownItem, RevenueSummary, RevenueTrendPoint, RevenueTransaction } from "@/types/pages/admin/AdminRevenue.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
+import { SensitiveValue } from "@/components/SensitiveValue";
+import { useSensitiveMask } from "@/hooks/useSensitiveMask";
 
 const EXPENSE_CATEGORIES = [
   "Hosting & Infrastructure", "Software & Tools", "Marketing & Ads",
@@ -40,9 +42,14 @@ const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: 5 }, (_, i) => currentYear - i);
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
+// ₹ amount that follows the Hide/Show button (registry field: revenueAmount)
+const Inr = ({ n }: { n: number | undefined }) => (
+  <SensitiveValue field="revenueAmount" value={n ?? 0} render={() => inr(n)} />
+);
 const inr = (n: number | undefined) => `₹${(n ?? 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 // (date formatting now imported from dateFormat.ts as `fmt`)
 const AdminRevenue = () => {
+  const { hidden } = useSensitiveMask(); // charts can't use <SensitiveValue>
   const navigate      = useNavigate();
   const { toast }     = useToast();
   const currentUser   = getCurrentUser();
@@ -231,7 +238,7 @@ const AdminRevenue = () => {
                       <div className="flex items-center justify-between mb-2">
                         {icon}
                       </div>
-                      <p className="text-xl font-semibold">{inr(val)}</p>
+                      <p className="text-xl font-semibold"><Inr n={val} /></p>
                       <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
                     </CardContent>
                   </Card>
@@ -253,7 +260,7 @@ const AdminRevenue = () => {
                   ].filter(r => (r.val ?? 0) > 0).map(({ label, val }) => (
                     <div key={label} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
                       <span className="text-sm text-muted-foreground">{label}</span>
-                      <span className="text-sm font-medium">{inr(val)}</span>
+                      <span className="text-sm font-medium"><Inr n={val} /></span>
                     </div>
                   ))}
                 </CardContent>
@@ -270,8 +277,8 @@ const AdminRevenue = () => {
                   <LineChart data={trend}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-                    <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `₹${v / 1000}k`} />
-                    <Tooltip formatter={(v: number) => inr(v)} />
+                    <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => (hidden ? "" : `₹${v / 1000}k`)} />
+                    <Tooltip formatter={(v: number) => (hidden ? "₹ ••••••" : inr(v))} />
                     <Legend />
                     <Line type="monotone" dataKey="income" stroke="#2563eb" name="Income" strokeWidth={2} />
                     <Line type="monotone" dataKey="expenses" stroke="#f97316" name="Expenses" strokeWidth={2} />
@@ -358,7 +365,7 @@ const AdminRevenue = () => {
                               {t.user && <span className="text-muted-foreground"> — {t.user}</span>}
                               {t.refundStatus && t.refundStatus !== "none" && (
                                 <Badge variant="outline" className="ml-2 text-[10px]">
-                                  {t.refundStatus === "full" ? "Fully refunded" : `Refunded ₹${t.refundedAmount}`}
+                                  {t.refundStatus === "full" ? "Fully refunded" : <>Refunded <SensitiveValue field="revenueAmount" value={t.refundedAmount ?? 0} render={(v) => `₹${v}`} /></>}
                                 </Badge>
                               )}
                             </TableCell>
@@ -372,7 +379,7 @@ const AdminRevenue = () => {
                                 {t.kind}
                               </Badge>
                             </TableCell>
-                            <TableCell className="text-xs text-right font-medium">{inr(t.amount)}</TableCell>
+                            <TableCell className="text-xs text-right font-medium"><Inr n={t.amount} /></TableCell>
                             <TableCell className="text-right">
                               {t.kind === "income" && canManageExpenses && t.refundStatus !== "full" && (
                                 <Button size="sm" variant="outline" className="h-6 text-[11px] px-2"
@@ -417,7 +424,7 @@ const AdminRevenue = () => {
               <CardContent className="space-y-4">
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
                   <p className="font-medium text-amber-800">{refundModal.description}</p>
-                  <p className="text-amber-700 text-xs mt-0.5">Original amount: {inr(refundModal.amount)}</p>
+                  <p className="text-amber-700 text-xs mt-0.5">Original amount: <Inr n={refundModal.amount} /></p>
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">Refund amount (₹)</Label>
@@ -446,7 +453,7 @@ const AdminRevenue = () => {
               <AlertDialogDescription>
                 {expenseToDelete && (
                   <>
-                    You're about to delete <span className="font-medium text-foreground">{expenseToDelete.description}</span> ({inr(expenseToDelete.amount)}).
+                    You're about to delete <span className="font-medium text-foreground">{expenseToDelete.description}</span> (<Inr n={expenseToDelete.amount} />).
                     {" "}This will remove it from the revenue records permanently and cannot be undone.
                   </>
                 )}

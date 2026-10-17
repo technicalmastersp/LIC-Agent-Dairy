@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getRecordsWithoutLastPayment, deleteRecord } from "../../services/recordService";
 import type { Record } from "@/types/pages/MissedPayments.types";
 import { formatISTMonthYear } from "@/utils/dateFormat";
+import { SensitiveValue } from "@/components/SensitiveValue";
 const avatarPalette = [
   "bg-blue-100 text-blue-700",
   "bg-violet-100 text-violet-700",
@@ -175,7 +176,7 @@ const MissedPayments = () => {
             {[
               { label: "Total missed", val: records.length, icon: <AlertTriangle className="w-4 h-4" />, sub: "Need follow-up", bg: "bg-red-50", color: "text-red-600" },
               { label: "Never paid", val: summaryStats.neverPaid, icon: <Ban className="w-4 h-4" />, sub: "No payment on record", bg: "bg-rose-50", color: "text-rose-700" },
-              { label: "At-risk value", val: `₹${summaryStats.totalSumAssured.toLocaleString("en-IN")}`, icon: <ReceiptText className="w-4 h-4" />, sub: "Sum assured", bg: "bg-amber-50", color: "text-amber-700" },
+              { label: "At-risk value", val: <SensitiveValue field="sumAssured" value={summaryStats.totalSumAssured} render={(v) => `₹${Number(v).toLocaleString("en-IN")}`} />, icon: <ReceiptText className="w-4 h-4" />, sub: "Sum assured", bg: "bg-amber-50", color: "text-amber-700" },
               { label: "Branches", val: summaryStats.branches, icon: <FolderOpen className="w-4 h-4" />, sub: "Affected branches", bg: "bg-violet-50", color: "text-violet-700" },
             ].map(({ label, val, icon, sub, bg, color }) => (
               <Card key={label} className={`${bg} border-transparent hover:shadow-sm transition-shadow`}>
@@ -261,14 +262,14 @@ const MissedPayments = () => {
                             </div>
                           </TableCell>
                           <TableCell className="border border-table-border text-muted-foreground">
-                            {record.aadhaarLinkedMobileNumber}
+                            <SensitiveValue field="mobileNumber" value={record.aadhaarLinkedMobileNumber} placeholder="" />
                           </TableCell>
                           <TableCell className="border border-table-border">
                             {record.age}
                           </TableCell>
                           <TableCell className="border border-table-border">
                             <Badge variant="outline" className="font-mono text-xs">
-                              {record.currentPolicy.policyNumber || "N/A"}
+                              <SensitiveValue field="policyNumber" value={record.currentPolicy.policyNumber} placeholder="N/A" />
                             </Badge>
                           </TableCell>
                           <TableCell className="border border-table-border text-muted-foreground">

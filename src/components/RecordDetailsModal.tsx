@@ -87,9 +87,9 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <InfoItem icon={User} label="Date" value={convertDateToIndianFormat(record.date)} />
-                <InfoItem icon={Calendar} label="Aadhaar Number" value={<SensitiveValue value={record.aadhaarNumber} render={formatAadhaar} />} />
-                <InfoItem icon={MapPin} label="Pan Number" value={<SensitiveValue value={record.panNumber} />} />
-                <InfoItem icon={User} label="E Mail" value={record.email} />
+                <InfoItem icon={Calendar} label="Aadhaar Number" value={<SensitiveValue field="aadhaarNumber" value={record.aadhaarNumber} render={formatAadhaar} />} />
+                <InfoItem icon={MapPin} label="Pan Number" value={<SensitiveValue field="panNumber" value={record.panNumber} />} />
+                <InfoItem icon={User} label="E Mail" value={<SensitiveValue field="email" value={record.email} />} />
               </div>
             </CardContent>
           </Card>
@@ -148,10 +148,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 <InfoItem icon={User} label="Father's Name" value={record.fatherName || ""} />
                 <InfoItem icon={User} label="Mother's Name" value={record.motherName || ""} />
                 <InfoItem icon={User} label="Spouse's Name" value={record.spouseName || ""} />
-                <InfoItem icon={MapPin} label="Address" value={record.address || ""} />
-                <InfoItem icon={Calendar} label="Date of Birth" value={convertDateToIndianFormat(record.dateOfBirth) || ""} />
+                <InfoItem icon={MapPin} label="Address" value={<SensitiveValue field="address" value={record.address} />} />
+                <InfoItem icon={Calendar} label="Date of Birth" value={<SensitiveValue field="dateOfBirth" value={convertDateToIndianFormat(record.dateOfBirth)} />} />
                 <InfoItem icon={User} label="Age" value={record.age || ""} />
-                <InfoItem icon={Phone} label="Aadhaar Linked Mobile Number" value={<SensitiveValue value={record.aadhaarLinkedMobileNumber} render={formatMobileNumber} />} />
+                <InfoItem icon={Phone} label="Aadhaar Linked Mobile Number" value={<SensitiveValue field="mobileNumber" value={record.aadhaarLinkedMobileNumber} render={formatMobileNumber} />} />
                 <InfoItem icon={User} label="Name of Nominee" value={record.nameOfNominee || ""} />
                 <InfoItem icon={User} label="Age of Nominee" value={record.ageOfNominee || ""} />
                 <InfoItem icon={User} label="Relation Name" value={record.relationName || ""} />
@@ -169,7 +169,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 <InfoItem icon={Briefcase} label="Educational Qualification" value={record.educationalQualification || ""} />
                 <InfoItem icon={Briefcase} label="Occupation" value={record.occupation || ""} />
                 <InfoItem icon={Briefcase} label="Designation" value={record.designationOfPolicyHolder || ""} />
-                <InfoItem icon={Briefcase} label="Annual Income" value={formatIndianNumber(record.annualIncome) || ""} />
+                <InfoItem icon={Briefcase} label="Annual Income" value={<SensitiveValue field="annualIncome" value={record.annualIncome} render={(v) => formatIndianNumber(v)} />} />
                 <InfoItem icon={Briefcase} label="Period of Service" value={record.periodOfService || ""} />
                 <InfoItem icon={Briefcase} label="Employer Name" value={record.employerName || ""} />
               </div>
@@ -197,8 +197,8 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <InfoItem icon={CreditCard} label="Bank Account Number" value={<SensitiveValue value={record.bankAccountNumber} />} />
-                <InfoItem icon={CreditCard} label="IFSC Code" value={<SensitiveValue value={record.ifscCode} />} />
+                <InfoItem icon={CreditCard} label="Bank Account Number" value={<SensitiveValue field="bankAccountNumber" value={record.bankAccountNumber} />} />
+                <InfoItem icon={CreditCard} label="IFSC Code" value={<SensitiveValue field="ifscCode" value={record.ifscCode} />} />
                 <InfoItem icon={HomeIcon} label="Bank Name" value={record.bankName} />
                 <InfoItem icon={MapPin} label="Branch Name" value={record.branchName} />
               </div>
@@ -296,10 +296,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 <div className="md:hidden rounded-lg border border-table-border p-3 bg-muted/20 space-y-3">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <Badge variant="outline" className="font-mono">
-                      {record.currentPolicy.policyNumber || "N/A"}
+                      <SensitiveValue field="policyNumber" value={record.currentPolicy.policyNumber} placeholder="N/A" />
                     </Badge>
                     <span className="text-sm font-medium text-emerald-700">
-                      ₹{formatIndianNumber(record.currentPolicy.sumAssured) || "0"}
+                      <SensitiveValue field="sumAssured" value={record.currentPolicy.sumAssured} placeholder="₹0" render={(v) => `₹${formatIndianNumber(v) || "0"}`} />
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
@@ -339,14 +339,14 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                       <TableRow className="hover:bg-muted/40">
                         <TableCell className="border border-table-border">
                           <Badge variant="outline" className="font-mono">
-                            {record.currentPolicy.policyNumber || "N/A"}
+                            <SensitiveValue field="policyNumber" value={record.currentPolicy.policyNumber} placeholder="N/A" />
                           </Badge>
                         </TableCell>
                         <TableCell className="border border-table-border">
                           {record.currentPolicy.planAndTerm || "-"}
                         </TableCell>
                         <TableCell className="border border-table-border font-medium text-emerald-700">
-                          ₹{formatIndianNumber(record.currentPolicy.sumAssured) || "0"}
+                          <SensitiveValue field="sumAssured" value={record.currentPolicy.sumAssured} placeholder="₹0" render={(v) => `₹${formatIndianNumber(v) || "0"}`} />
                         </TableCell>
                         <TableCell className="border border-table-border">
                           {record.currentPolicy.modeOfPayment || "-"}
@@ -376,10 +376,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                 <div className="md:hidden rounded-lg border border-table-border p-3 bg-muted/20 space-y-3">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <Badge variant="outline" className="font-mono">
-                      {record.previousPolicy.policyNumber || "N/A"}
+                      <SensitiveValue field="policyNumber" value={record.previousPolicy.policyNumber} placeholder="N/A" />
                     </Badge>
                     <span className="text-sm font-medium text-emerald-700">
-                      ₹{formatIndianNumber(record.previousPolicy.sumAssured) || "0"}
+                      <SensitiveValue field="sumAssured" value={record.previousPolicy.sumAssured} placeholder="₹0" render={(v) => `₹${formatIndianNumber(v) || "0"}`} />
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
@@ -419,14 +419,14 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
                       <TableRow className="hover:bg-muted/40">
                         <TableCell className="border border-table-border">
                           <Badge variant="outline" className="font-mono">
-                            {record.previousPolicy.policyNumber || "N/A"}
+                            <SensitiveValue field="policyNumber" value={record.previousPolicy.policyNumber} placeholder="N/A" />
                           </Badge>
                         </TableCell>
                         <TableCell className="border border-table-border">
                           {record.previousPolicy.planAndTerm || "-"}
                         </TableCell>
                         <TableCell className="border border-table-border font-medium text-emerald-700">
-                          ₹{formatIndianNumber(record.previousPolicy.sumAssured) || "0"}
+                          <SensitiveValue field="sumAssured" value={record.previousPolicy.sumAssured} placeholder="₹0" render={(v) => `₹${formatIndianNumber(v) || "0"}`} />
                         </TableCell>
                         <TableCell className="border border-table-border">
                           {record.previousPolicy.modeOfPayment || "-"}

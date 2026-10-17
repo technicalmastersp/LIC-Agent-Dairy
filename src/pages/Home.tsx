@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navigation     from "@/components/Navigation";
 import Footer         from "@/components/Footer";
 import OnboardingTour from "@/components/OnboardingTour";
+import PrivacyToggleButton from "@/components/PrivacyToggleButton";
+import { SensitiveValue } from "@/components/SensitiveValue";
 import { getCurrentUser, setCurrentUser } from "@/utils/auth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { dueThisMonth, dueNextMonth, getMonthlyTrend, getRecordsWithoutLastPayment } from "../../services/recordService";
@@ -131,7 +133,7 @@ const Home = () => {
       val:   (referralData?.totalL1 ?? 0) + (referralData?.totalL2 ?? 0),
       icon:  <Users className="w-5 h-5" />,
       color: "text-green-600",
-      sub:   `₹${referralData?.availableBalance ?? 0} in wallet`,
+      sub:   <><SensitiveValue field="walletAmount" value={referralData?.availableBalance ?? 0} render={(v) => `₹${v}`} /> in wallet</>,
       link:  "/referral-program",
       bg: "bg-amber-50"
     },
@@ -196,14 +198,18 @@ const Home = () => {
         <div className="max-w-5xl mx-auto space-y-5">
 
           {/* ── Greeting ── */}
-          <div>
-            <h1 className="text-2xl font-medium text-form-header">
-              {getGreeting()}, {currentUser.name}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {formatISTFullDate()}
-              {sub && ` · ${sub.planType} plan · ${daysLeft} days left`}
-            </p>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-medium text-form-header">
+                {getGreeting()}, {currentUser.name}
+              </h1>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {formatISTFullDate()}
+                {sub && ` · ${sub.planType} plan · ${daysLeft} days left`}
+              </p>
+            </div>
+            {/* Hide/Show sensitive data — renders nothing if the backend switch is off */}
+            <PrivacyToggleButton />
           </div>
 
           {/* ── First-time welcome banner ── */}
@@ -379,9 +385,9 @@ const Home = () => {
               </CardHeader>
               <CardContent className="space-y-0 pt-0">
                 {[
-                  { label: "Available balance", val: <span className="text-green-600 font-medium text-xs">₹{referralData?.availableBalance ?? 0}</span> },
-                  { label: "Pending rewards",   val: <span className="text-yellow-600 font-medium text-xs">₹{referralData?.pendingEarnings ?? 0}</span> },
-                  { label: "Total earned",      val: `₹${referralData?.totalEarned ?? 0}` },
+                  { label: "Available balance", val: <SensitiveValue field="walletAmount" value={referralData?.availableBalance ?? 0} render={(v) => `₹${v}`} className="text-green-600 font-medium text-xs" /> },
+                  { label: "Pending rewards",   val: <SensitiveValue field="walletAmount" value={referralData?.pendingEarnings ?? 0} render={(v) => `₹${v}`} className="text-yellow-600 font-medium text-xs" /> },
+                  { label: "Total earned",      val: <SensitiveValue field="walletAmount" value={referralData?.totalEarned ?? 0} render={(v) => `₹${v}`} /> },
                   { label: "Direct referrals",  val: referralData?.totalL1 ?? 0 },
                   { label: "Level 2 referrals", val: referralData?.totalL2 ?? 0 },
                 ].map(({ label, val }) => (

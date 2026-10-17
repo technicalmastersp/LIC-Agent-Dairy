@@ -146,6 +146,16 @@ export const updateNotificationPreferences = async (prefs) => {
   return res.data; // { statusCode, message, data }
 };
 
+export const getPrivacySettings = async () => {
+  const res = await apiClient.get("/user/privacy-settings");
+  return res.data.data; // { featureEnabled, maskSensitiveData }
+};
+
+export const updatePrivacySettings = async (maskSensitiveData) => {
+  const res = await apiClient.put("/user/privacy-settings", { maskSensitiveData });
+  return res.data; // { statusCode, message, data: { featureEnabled, maskSensitiveData } }
+};
+
 export const getMySessions = async () => {
   const res = await apiClient.get("/user/sessions");
   return res.data.data; // array of { sessionId, device, ip, createdAt, isCurrent }

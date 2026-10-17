@@ -26,8 +26,8 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { getReferralConfig } from "../../services/configService";
 import type { Dashboard, WithdrawalRowProps, ReferralRowProps } from "@/types/pages/ReferralProgram.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
-import { isEncryptedValue } from "@/utils/inputValueFormats";
 import { SensitiveValue } from "@/components/SensitiveValue";
+import { useSensitiveMask } from "@/hooks/useSensitiveMask";
 
 // ── types ─────────────────────────────────────────────────────────────────────
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -94,11 +94,16 @@ const withdrawStatusStyle: Record<string, string> = {
 
 const initials = (name: string) =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+// ₹ amount that follows the Hide/Show button (registry field: walletAmount)
+const Rs = ({ n, pre = "" }: { n: number | string; pre?: string }) => (
+  <SensitiveValue field="walletAmount" value={n} render={(v) => `${pre}₹${v}`} />
+);
+
 const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: WithdrawalRowProps) => (
   <div className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
     <div className="flex-1">
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm font-medium">₹{w.amount}</span>
+        <span className="text-sm font-medium"><Rs n={w.amount} /></span>
         <Badge className={`text-xs ${withdrawStatusStyle[w.status]}`}>
           {w.status.charAt(0).toUpperCase() + w.status.slice(1)}
         </Badge>
@@ -112,9 +117,7 @@ const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: WithdrawalRowProps) => (
       {w.accountNumber && (
         <p className="text-xs text-muted-foreground">
           {w.bankName}{" "}
-          {isEncryptedValue(w.accountNumber)
-            ? <SensitiveValue value={w.accountNumber} />
-            : <>••••{w.accountNumber.slice(-4)}</>}
+          <SensitiveValue field="bankAccountNumber" value={w.accountNumber} render={(v) => `••••${v.slice(-4)}`} />
         </p>
       )}
       {(w.status === "failed") && (
@@ -148,7 +151,7 @@ const ReferralRow = ({ u, fmt, initials, statusStyle }: ReferralRowProps) => (
     </div>
     <div className="flex items-center gap-3 py-1">
       <span className={`text-sm font-medium ${u.earning > 0 ? "text-green-600" : "text-muted-foreground"}`}>
-        {u.earning > 0 ? `+₹${u.earning}` : "₹0"}
+        {u.earning > 0 ? <Rs n={u.earning} pre="+" /> : <Rs n={0} />}
       </span>
       {u.rewardPaid && (<Badge className="text-xs bg-green-100 text-green-700 border border-green-200">Paid</Badge>)}
       {u.rewardExpired && !u.rewardPaid && (<Badge className="text-xs bg-red-100 text-red-700 border border-red-200">Expired</Badge>)}
@@ -165,6 +168,7 @@ const ReferralRow = ({ u, fmt, initials, statusStyle }: ReferralRowProps) => (
 
 // ── component ─────────────────────────────────────────────────────────────────
 const ReferralProgram = () => {
+  const { hidden } = useSensitiveMask(); // charts can't use <SensitiveValue>
   const navigate      = useNavigate();
   const { toast }     = useToast();
   const currentUser   = getCurrentUser();
@@ -424,8 +428,8 @@ const ReferralProgram = () => {
             {[
               { icon: <Users className="w-5 h-5 text-blue-600" />,       label: "Direct referrals",  val: d.totalL1,                    color: "text-blue-600"   },
               { icon: <Gift  className="w-5 h-5 text-purple-600" />,     label: "Level 2 referrals", val: d.totalL2,                    color: "text-purple-600" },
-              { icon: <TrendingUp className="w-5 h-5 text-green-600" />, label: "Total earned",      val: `₹${d.totalEarned}`,          color: "text-green-600"  },
-              { icon: <Clock className="w-5 h-5 text-yellow-600" />,     label: "Pending",           val: `₹${d.pendingEarnings}`,      color: "text-yellow-600" },
+              { icon: <TrendingUp className="w-5 h-5 text-green-600" />, label: "Total earned",      val: <Rs n={d.totalEarned} />,          color: "text-green-600"  },
+              { icon: <Clock className="w-5 h-5 text-yellow-600" />,     label: "Pending",           val: <Rs n={d.pendingEarnings} />,      color: "text-yellow-600" },
             ].map(({ icon, label, val, color }) => (
               <Card key={label}>
                 <CardContent className="p-4 text-center">
@@ -458,8 +462,8 @@ const ReferralProgram = () => {
                     <BarChart data={monthlyTrend}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
                       <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-                      <YAxis tick={{ fontSize: 12 }} allowDecimals={false} width={36} />
-                      <Tooltip formatter={(v: number) => [`₹${v}`, "Earned"]} />
+                      <YAxis tick={{ fontSize: 12 }} allowDecimals={false} width={36} tickFormatter={hidden ? () => "" : undefined} />
+                      <Tooltip formatter={(v: number) => [hidden ? "₹ ••••••" : `₹${v}`, "Earned"]} />
                       <Bar dataKey="earned" radius={[4, 4, 0, 0]}>
                         {monthlyTrend.map((m, i) => (
                           <Cell key={m.key} fill={i === monthlyTrend.length - 1 ? "hsl(195,85%,25%)" : "hsl(195,60%,70%)"} />
@@ -479,7 +483,7 @@ const ReferralProgram = () => {
                       <div>
                         <div className="flex items-center justify-between text-xs mb-1">
                           <span className="font-medium text-blue-700">Direct (L1)</span>
-                          <span className="text-muted-foreground">₹{l1Earned}</span>
+                          <span className="text-muted-foreground"><Rs n={l1Earned} /></span>
                         </div>
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                           <div className="h-full bg-blue-600 rounded-full" style={{ width: `${(l1Earned / splitTotal) * 100}%` }} />
@@ -488,7 +492,7 @@ const ReferralProgram = () => {
                       <div>
                         <div className="flex items-center justify-between text-xs mb-1">
                           <span className="font-medium text-purple-700">Indirect (L2)</span>
-                          <span className="text-muted-foreground">₹{l2Earned}</span>
+                          <span className="text-muted-foreground"><Rs n={l2Earned} /></span>
                         </div>
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                           <div className="h-full bg-purple-600 rounded-full" style={{ width: `${(l2Earned / splitTotal) * 100}%` }} />
@@ -512,11 +516,11 @@ const ReferralProgram = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                   <p className="text-xs font-medium text-green-700 mb-1">Available balance</p>
-                  <p className="text-3xl font-medium text-green-700">₹{d.availableBalance}</p>
+                  <p className="text-3xl font-medium text-green-700"><Rs n={d.availableBalance} /></p>
                   {withdrawalsEnabled ? (
                     <>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Withdrawn: ₹{d.totalWithdrawn} · Min: ₹{config.MIN_WITHDRAWAL}
+                        Withdrawn: <Rs n={d.totalWithdrawn} /> · Min: ₹{config.MIN_WITHDRAWAL}
                       </p>
                       {/* Bank details warning */}
                       {!d.hasPaymentDetails && (
@@ -540,7 +544,7 @@ const ReferralProgram = () => {
                       {/* WALLET-TRANSFER-PAUSED */}
                       <p className="text-xs text-muted-foreground mt-1">
                         Use it to renew or upgrade your plan
-                        {d.totalWithdrawn > 0 && ` · Previously withdrawn: ₹${d.totalWithdrawn}`}
+                        {d.totalWithdrawn > 0 && <> · Previously withdrawn: <Rs n={d.totalWithdrawn} /></>}
                       </p>
                       <div className="flex items-start gap-1.5 mt-2 text-xs text-blue-800 bg-blue-50 border border-blue-200 rounded px-2 py-1.5">
                         <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
@@ -562,14 +566,14 @@ const ReferralProgram = () => {
                 </div>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <p className="text-xs font-medium text-yellow-700 mb-1">Pending rewards</p>
-                  <p className="text-3xl font-medium text-yellow-700">₹{d.pendingEarnings}</p>
+                  <p className="text-3xl font-medium text-yellow-700"><Rs n={d.pendingEarnings} /></p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Credited when referral activates a paid plan within {config.REWARD_WINDOW_DAYS} days
                   </p>
                   {/* Last withdrawal summary */}
                   {d.lastWithdrawal && (
                     <div className="mt-3 text-xs text-muted-foreground border-t border-yellow-200 pt-2">
-                      Last: ₹{d.lastWithdrawal.amount} ·{" "}
+                      Last: <Rs n={d.lastWithdrawal.amount} /> ·{" "}
                       <Badge className={`text-xs ${withdrawStatusStyle[d.lastWithdrawal.status]}`}>
                         {d.lastWithdrawal.status}
                       </Badge>
@@ -629,9 +633,7 @@ const ReferralProgram = () => {
                         )}
                       </div>
                       <p className="font-mono text-lg tracking-[0.2em] mb-4">
-                        {isEncryptedValue(d.paymentDetails.accountNumber)
-                          ? <SensitiveValue value={d.paymentDetails.accountNumber} />
-                          : <>•••• •••• •••• {d.paymentDetails.accountNumber.slice(-4)}</>}
+                        <SensitiveValue field="bankAccountNumber" value={d.paymentDetails.accountNumber} render={(v) => `•••• •••• •••• ${v.slice(-4)}`} />
                       </p>
                       <div className="flex items-end justify-between">
                         <div>
@@ -670,9 +672,7 @@ const ReferralProgram = () => {
                         )}
                       </div>
                       <p className="font-mono text-lg mb-1">
-                        {isEncryptedValue(d.paymentDetails.upiId)
-                          ? <SensitiveValue value={d.paymentDetails.upiId} />
-                          : <>••••••{d.paymentDetails.upiId.slice(6)}</>}
+                        <SensitiveValue field="upiId" value={d.paymentDetails.upiId} render={(v) => `••••••${v.slice(6)}`} />
                       </p>
                       <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60">UPI ID</p>
                       {d.paymentDetails.upiRejectionReason && (
@@ -969,7 +969,7 @@ const ReferralProgram = () => {
                       <span className="text-xs text-muted-foreground">{fmt(e.date)}</span>
                       <span className="text-xs text-foreground">{e.description}</span>
                       <span className={`text-sm font-medium text-right ${e.status === "credited" ? "text-green-600" : "text-yellow-600"}`}>
-                        +₹{e.amount}
+                        {"+"}<Rs n={e.amount} />
                       </span>
                     </div>
                   ))}
@@ -993,7 +993,7 @@ const ReferralProgram = () => {
                     <span className="text-xs text-muted-foreground">{fmt(e.date)}</span>
                     <span className="text-xs text-foreground">{e.description}</span>
                     <span className={`text-sm font-medium text-right ${e.status === "credited" ? "text-green-600" : "text-yellow-600"}`}>
-                      +₹{e.amount}
+                      {"+"}<Rs n={e.amount} />
                     </span>
                   </div>
                 ))}

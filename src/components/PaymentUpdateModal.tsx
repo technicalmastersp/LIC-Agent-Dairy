@@ -15,6 +15,7 @@ import { updateRecord } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
 import type { PaymentUpdateModalProps } from "@/types/components/PaymentUpdateModal.types";
 import { formatIndianNumber } from "@/utils/inputValueFormats";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 // Loosely-typed on purpose: CurrentMonthDue.tsx, MissedPayments.tsx, and
 // UpcomingDuePolicies.tsx each keep their own local `Record` interface
@@ -108,7 +109,7 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate }: PaymentUpdate
                     <TableHead className="border border-table-border w-1/2">Policy Number</TableHead>
                     <TableCell className="border border-table-border">
                       <Badge variant="outline" className="font-mono">
-                        {policy?.policyNumber || "N/A"}
+                        <SensitiveValue field="policyNumber" value={policy?.policyNumber} placeholder="N/A" />
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -119,7 +120,7 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate }: PaymentUpdate
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="border border-table-border">Sum Assured</TableHead>
                     <TableCell className="border border-table-border font-medium text-emerald-700">
-                      ₹{formatIndianNumber(policy?.sumAssured) || "0"}
+                      <SensitiveValue field="sumAssured" value={policy?.sumAssured} placeholder="₹0" render={(v) => `₹${formatIndianNumber(v) || "0"}`} />
                     </TableCell>
                   </TableRow>
                   <TableRow className="hover:bg-transparent">

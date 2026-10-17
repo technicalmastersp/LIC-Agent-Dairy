@@ -1,8 +1,11 @@
 import type { User } from "@/types/utils/auth.types";
+import { USER_UPDATED_EVENT } from "@/utils/userEvents";
 // Authentication utilities and user management
 // Set current user session
 export const setCurrentUser = (user: User): void => {
   localStorage.setItem('currentUser', JSON.stringify(user));
+  // Let listeners (e.g. the Hide/Show sensitive-data provider) re-read it.
+  window.dispatchEvent(new Event(USER_UPDATED_EVENT));
 };
 
 // Get current user

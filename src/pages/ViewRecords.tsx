@@ -25,6 +25,7 @@ import { dedupeRecords } from "@/utils/recordDedupe";
 import { convertDateToIndianFormat } from "@/utils/tools";
 import { INSURANCE_TYPES, getInsuranceTypeDef } from "@/config/insuranceTypes";
 import { formatIndianNumber } from "@/utils/inputValueFormats";
+import { SensitiveValue } from "@/components/SensitiveValue";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Record } from "@/types/Record";
 import jsPDF from "jspdf";
@@ -362,7 +363,7 @@ const ViewRecords = () => {
               },
               {
                 label: "Total sum assured",
-                val: `₹${summaryStats.totalSumAssured.toLocaleString("en-IN")}`,
+                val: <SensitiveValue field="sumAssured" value={summaryStats.totalSumAssured} render={(v) => `₹${Number(v).toLocaleString("en-IN")}`} />,
                 icon: <IndianRupee className="w-4 h-4" />,
                 sub: "Across all policies",
                 bg: "bg-emerald-50",
@@ -518,7 +519,7 @@ const ViewRecords = () => {
                                   {recordTypeLabel(record)}
                                 </Badge>
                                 <Badge variant="outline" className="font-mono text-[11px]">
-                                  {record.currentPolicy.policyNumber || "N/A"}
+                                  <SensitiveValue field="policyNumber" value={record.currentPolicy.policyNumber} placeholder="N/A" />
                                 </Badge>
                               </div>
                             </div>
@@ -535,7 +536,7 @@ const ViewRecords = () => {
                             Sum Assured
                           </span>
                           <span className="text-base font-semibold text-emerald-700 dark:text-emerald-400">
-                            ₹{formatIndianNumber(record.currentPolicy.sumAssured) || "0"}
+                            <SensitiveValue field="sumAssured" value={record.currentPolicy.sumAssured} placeholder="₹0" render={(v) => `₹${formatIndianNumber(v) || "0"}`} />
                           </span>
                         </div>
 
@@ -651,11 +652,11 @@ const ViewRecords = () => {
                           </TableCell>
                           <TableCell className="border border-table-border">
                             <Badge variant="outline" className="font-mono text-xs">
-                              {record.currentPolicy.policyNumber || "N/A"}
+                              <SensitiveValue field="policyNumber" value={record.currentPolicy.policyNumber} placeholder="N/A" />
                             </Badge>
                           </TableCell>
                           <TableCell className="border border-table-border font-medium text-emerald-700">
-                            ₹{formatIndianNumber(record.currentPolicy.sumAssured) || "0"}
+                            <SensitiveValue field="sumAssured" value={record.currentPolicy.sumAssured} placeholder="₹0" render={(v) => `₹${formatIndianNumber(v) || "0"}`} />
                           </TableCell>
                           <TableCell className="border border-table-border text-muted-foreground">
                             {record.currentPolicy.branch || "-"}
