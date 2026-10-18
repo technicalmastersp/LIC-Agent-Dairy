@@ -35,6 +35,7 @@ import axios from "axios";
 import type { Ticket, Suggestion, FaqItem } from "@/types/pages/HelpSupport.types";
 import type { CallRequestSummary } from "@/types/components/RequestCallDialog.types";
 import { formatISTDate as fmt, formatISTDateTime } from "@/utils/dateFormat";
+import { SensitiveValue } from "@/components/SensitiveValue";
 const ALL_FAQS: FaqItem[] = [
   { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. You can move between the Free trial, Starter, Basic, Standard, and Premium plans — checkout runs through Razorpay" + (REFERRAL_PROGRAM_ENABLED ? ", and you can apply your referral wallet balance toward the cost at checkout." : ".") },
   { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. You can move between the Free trial, Starter, Basic, Standard, and Premium plans — checkout runs through Razorpay, and you can apply your referral wallet balance toward the cost at checkout." },
@@ -539,7 +540,7 @@ const HelpSupport = () => {
                   </AlertDialogHeader>
                   <div className="rounded-lg bg-muted/50 border border-border px-4 py-3 text-sm space-y-1">
                     <p><span className="text-muted-foreground">Name:</span> <span className="font-medium text-form-header">{form.name || "—"}</span></p>
-                    <p><span className="text-muted-foreground">Email:</span> <span className="font-medium text-form-header">{form.email || "—"}</span></p>
+                    <p><span className="text-muted-foreground">Email:</span> <span className="font-medium text-form-header"><SensitiveValue field="email" value={form.email} /></span></p>
                   </div>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Let me check again</AlertDialogCancel>
@@ -619,7 +620,7 @@ const HelpSupport = () => {
                           <div>
                             <CardTitle className="text-sm font-mono">{c.requestId}</CardTitle>
                             <p className="text-xs text-muted-foreground mt-1">
-                              {c.category} · {fmt(c.createdAt)} · +91 {c.phone}
+                              {c.category} · {fmt(c.createdAt)} · +91 <SensitiveValue field="mobileNumber" value={c.phone} />
                             </p>
                           </div>
                           <Badge className={`text-xs ${callStatusStyle[c.status].cls}`}>{callStatusStyle[c.status].label}</Badge>

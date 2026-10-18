@@ -32,6 +32,7 @@ import type { PolicyRecordFormValues } from "@/types/schemas/policyRecordSchema.
 import type { PolicyDetail } from "@/types/pages/AddRecord.types";
 import { isValidCalendarDate } from "@/utils/dateFormat";
 import { formatAadhaar, unformatAadhaar, formatIndianNumber, unformatIndianNumber, formatMobileNumber, unformatMobileNumber, digitsOnly } from "@/utils/inputValueFormats";
+import { useSensitiveInputClass } from "@/hooks/useSensitiveMask";
 // Small section header used across the form cards — a plain sequential
 // step number (Step 1 – Step 8) through the whole form, not tied to any
 // external document.
@@ -49,6 +50,12 @@ const AddRecord = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+  // Hide/Show sensitive data: obscure these inputs (CSS only — value untouched) while hidden
+  const aadhaarMask = useSensitiveInputClass("aadhaarNumber");
+  const panMask     = useSensitiveInputClass("panNumber");
+  const mobileMask  = useSensitiveInputClass("mobileNumber");
+  const accountMask = useSensitiveInputClass("bankAccountNumber");
+  const ifscMask    = useSensitiveInputClass("ifscCode");
 
   // Insurance type selection — drives which type-specific fields (or the
   // custom field builder, for "Other") render below the common form.
@@ -372,7 +379,8 @@ const AddRecord = () => {
                     value={formatAadhaar(watch("aadhaarNumber"))}
                     onChange={(e) => setValue("aadhaarNumber", unformatAadhaar(e.target.value), { shouldValidate: true })}
                     onBlur={register("aadhaarNumber").onBlur}
-                    className="mt-1"
+                    autoComplete="off"
+                    className={`mt-1 ${aadhaarMask}`}
                     maxLength={14}
                     inputMode="numeric"
                   />
@@ -386,7 +394,8 @@ const AddRecord = () => {
                     id="panNumber" 
                     placeholder="e.g. ABCDE1234F"
                     {...register("panNumber")}
-                    className="mt-1 uppercase"
+                    autoComplete="off"
+                    className={`mt-1 uppercase ${panMask}`}
                     maxLength={10}
                   />
                   {errors.panNumber && (
@@ -562,7 +571,8 @@ const AddRecord = () => {
                     onChange={(e) => setValue("aadhaarLinkedMobileNumber", unformatMobileNumber(e.target.value), { shouldValidate: true })}
                     onBlur={register("aadhaarLinkedMobileNumber").onBlur}
                     // {...register("aadhaarLinkedMobileNumber")}
-                    className="mt-1"
+                    autoComplete="off"
+                    className={`mt-1 ${mobileMask}`}
                   />
                 </div>
                 <div>
@@ -749,7 +759,8 @@ const AddRecord = () => {
                     id="bankAccount" 
                     placeholder="Enter bank account number"
                     {...register("bankAccountNumber")}
-                    className="mt-1"
+                    autoComplete="off"
+                    className={`mt-1 ${accountMask}`}
                     maxLength={30}
                   />
                 </div>
@@ -762,7 +773,8 @@ const AddRecord = () => {
                       onChange: () => setIfscLookupState({ status: "idle" }),
                     })}
                     onBlur={(e) => { register("ifscCode").onBlur(e); handleIfscBlur(); }}
-                    className="mt-1 uppercase"
+                    autoComplete="off"
+                    className={`mt-1 uppercase ${ifscMask}`}
                     maxLength={11}
                   />
                 </div>

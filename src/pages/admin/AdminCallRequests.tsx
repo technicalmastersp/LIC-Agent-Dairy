@@ -11,6 +11,7 @@ import { RefreshCw, Phone, Copy, User as UserIcon, Clock, CheckCircle2, PhoneMis
 import { formatISTDateTime as fmt } from "@/utils/dateFormat";
 import { BUSINESS_HOURS_LABELS, isTeamAvailableNow } from "@/config/businessHours";
 import type { AdminCallRequest, CallRequestFilter, CallRequestStatus } from "@/types/pages/admin/AdminCallRequests.types";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 const statusStyle: Record<CallRequestStatus, { label: string; cls: string }> = {
   pending:   { label: "Waiting for call",   cls: "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900" },
@@ -151,7 +152,7 @@ const AdminCallRequests = () => {
                             href={`tel:+91${r.phone}`}
                             className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:bg-primary-light"
                           >
-                            <Phone className="w-3.5 h-3.5" /> +91 {r.phone}
+                            <Phone className="w-3.5 h-3.5" /> +91 <SensitiveValue field="mobileNumber" value={r.phone} />
                           </a>
                           <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => copy(r.phone)}>
                             <Copy className="w-3 h-3 mr-1.5" /> Copy

@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import { LanguageProvider } from "@/hooks/useLanguage";
+import { SensitiveMaskProvider } from "@/hooks/useSensitiveMask";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PageLoader from "./components/PageLoader";
@@ -87,6 +88,7 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <LanguageProvider>
+        <SensitiveMaskProvider>
           <Toaster />
           <Sonner />
           <GlobalToastListener />
@@ -163,6 +165,7 @@ const App = () => (
               </Suspense>
             </ErrorBoundary>
           </BrowserRouter>
+        </SensitiveMaskProvider>
         </LanguageProvider>
       </TooltipProvider>
     </QueryClientProvider>

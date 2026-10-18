@@ -122,7 +122,7 @@ const AdminUserDetail = () => {
             </Button>
             <div>
               <h1 className="text-xl font-medium">{user.name}</h1>
-              <p className="text-xs text-muted-foreground">{user.email} · {user.easyId}</p>
+              <p className="text-xs text-muted-foreground"><SensitiveValue field="email" value={user.email} /> · {user.easyId}</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -169,9 +169,9 @@ const AdminUserDetail = () => {
               </div>
               {[
                 { label: "Name",         val: user.name },
-                { label: "Email",        val: user.email },
-                { label: "Mobile",       val: user.mobileNumber || "—" },
-                { label: "Address",      val: user.fullAddress  || "—" },
+                { label: "Email",        val: <SensitiveValue field="email" value={user.email} /> },
+                { label: "Mobile",       val: <SensitiveValue field="mobileNumber" value={user.mobileNumber} /> },
+                { label: "Address",      val: <SensitiveValue field="address" value={user.fullAddress} /> },
                 { label: "Referral Code",  val: user.referralCode   || "—" },
                 { label: "Joined",       val: fmt(user.createdAt) },
                 { label: "Referred by",  val: user.referredBy   || "—" },
@@ -255,9 +255,8 @@ const AdminUserDetail = () => {
                         )}
                       </div>
                       <p className="font-mono text-base tracking-[0.15em] mb-3">
-                        {isEncryptedValue(user.paymentDetails.accountNumber)
-                          ? <SensitiveValue value={user.paymentDetails.accountNumber} />
-                          : <>•••• •••• •••• {user.paymentDetails.accountNumber.slice(-4)}</>}
+                        <SensitiveValue field="bankAccountNumber" value={user.paymentDetails.accountNumber}
+                          render={(v) => `•••• •••• •••• ${v.slice(-4)}`} />
                       </p>
                       <div className="flex items-end justify-between text-xs">
                         <div>
@@ -267,7 +266,7 @@ const AdminUserDetail = () => {
                         <div className="text-right">
                           <p className="text-[9px] uppercase text-primary-foreground/60">{user.paymentDetails.bankName || "Bank"}</p>
                           <p className="text-primary-foreground/80">
-                            <SensitiveValue value={user.paymentDetails.ifscCode} />
+                            <SensitiveValue field="ifscCode" value={user.paymentDetails.ifscCode} />
                             {!isEncryptedValue(user.paymentDetails.ifscCode ?? "") && user.paymentDetails.branchName ? ` · ${user.paymentDetails.branchName}` : ""}
                           </p>
                         </div>
@@ -288,7 +287,7 @@ const AdminUserDetail = () => {
                           <Badge className="bg-amber-400/90 text-amber-950 border-0 text-[10px]"><Clock className="w-3 h-3 mr-1" />Pending review</Badge>
                         )}
                       </div>
-                      <p className="font-mono text-base"><SensitiveValue value={user.paymentDetails.upiId} /></p>
+                      <p className="font-mono text-base"><SensitiveValue field="upiId" value={user.paymentDetails.upiId} /></p>
                       {user.paymentDetails.upiRejectionReason && (
                         <p className="text-xs text-red-100 mt-2 bg-red-950/30 rounded px-2 py-1">{user.paymentDetails.upiRejectionReason}</p>
                       )}
@@ -306,9 +305,9 @@ const AdminUserDetail = () => {
                 </CardHeader>
                 <CardContent className="space-y-0">
                   {[
-                    { label: "Total earned",    val: `₹${user.referral.totalEarned}` },
-                    { label: "Available",       val: `₹${user.referral.availableBalance}` },
-                    { label: "Withdrawn",       val: `₹${user.referral.totalWithdrawn}` },
+                    { label: "Total earned",    val: <SensitiveValue field="walletAmount" value={user.referral.totalEarned} render={(v) => `₹${v}`} /> },
+                    { label: "Available",       val: <SensitiveValue field="walletAmount" value={user.referral.availableBalance} render={(v) => `₹${v}`} /> },
+                    { label: "Withdrawn",       val: <SensitiveValue field="withdrawalAmount" value={user.referral.totalWithdrawn} render={(v) => `₹${v}`} /> },
                     { label: "L1 referrals",    val: user.referral.totalL1 },
                     { label: "L2 referrals",    val: user.referral.totalL2 },
                   ].map(({ label, val }) => (
@@ -357,10 +356,10 @@ const AdminUserDetail = () => {
                         </td>
                         <td className="p-2.5">
                           <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">
-                            {r.currentPolicy?.policyNumber || "—"}
+                            <SensitiveValue field="policyNumber" value={r.currentPolicy?.policyNumber} />
                           </span>
                         </td>
-                        <td className="p-2.5 text-xs">₹{formatIndianNumber(r.currentPolicy?.sumAssured) || "0"}</td>
+                        <td className="p-2.5 text-xs"><SensitiveValue field="sumAssured" value={r.currentPolicy?.sumAssured} placeholder="₹0" render={(v) => `₹${formatIndianNumber(v) || "0"}`} /></td>
                         <td className="p-2.5 text-xs">{r.currentPolicy?.branch || "—"}</td>
                         <td className="p-2.5">
                           <Button size="sm" variant="outline" className="h-7 w-7 p-0"
@@ -383,6 +382,7 @@ const AdminUserDetail = () => {
         record={selectedRecord}
         isOpen={!!selectedRecord}
         onClose={() => setSelectedRecord(null)}
+        hidePaymentHistory
       />
 
       {/* Delete modal */}

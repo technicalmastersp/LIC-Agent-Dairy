@@ -11,6 +11,7 @@ import { getAllSuggestions, updateSuggestionStatus } from "../../../services/adm
 import { RefreshCw, User as UserIcon } from "lucide-react";
 import type { Suggestion } from "@/types/pages/admin/AdminSuggestions.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 // (date formatting now imported from dateFormat.ts as `fmt`)
 
@@ -92,7 +93,7 @@ const AdminSuggestions = () => {
                           <CardTitle className="text-sm">{s.title}</CardTitle>
                           <p className="text-xs text-muted-foreground mt-1 flex items-center gap-3 flex-wrap">
                             <span className="flex items-center gap-1"><UserIcon className="w-3 h-3" />{s.name}</span>
-                            <span>{s.email}</span>
+                            <span><SensitiveValue field="email" value={s.email} /></span>
                             <span>{fmt(s.createdAt)}</span>
                           </p>
                         </div>

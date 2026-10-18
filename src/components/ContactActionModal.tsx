@@ -4,6 +4,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Phone, MessageCircle } from "lucide-react";
 import type { ContactActionModalProps } from "@/types/components/ContactActionModal.types";
+import { SensitiveValue } from "@/components/SensitiveValue";
 // The stored number (aadhaarLinkedMobileNumber) has no enforced format
 // beyond a max length — see policyRecordSchema.ts — so it's typically a
 // bare 10-digit Indian mobile number with no country code. wa.me needs a
@@ -45,7 +46,7 @@ const ContactActionModal = ({ phone, name, isOpen, onClose }: ContactActionModal
             Contact{name ? ` — ${name}` : ""}
           </DialogTitle>
           <DialogDescription>
-            {hasPhone ? phone : "No mobile number on file for this record."}
+            {hasPhone ? <SensitiveValue field="mobileNumber" value={phone} /> : "No mobile number on file for this record."}
           </DialogDescription>
         </DialogHeader>
 

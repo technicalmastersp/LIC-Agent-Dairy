@@ -22,6 +22,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { AdminAdminDetailData } from "@/types/pages/admin/AdminAdminDetail.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
 import { PERMISSION_DEFS, PERMISSION_RISK_COLOR } from "@/config/adminPermissions";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -167,7 +168,7 @@ const AdminAdminDetail = () => {
             </Button>
             <div>
               <h1 className="text-xl font-medium">{data.name}</h1>
-              <p className="text-xs text-muted-foreground">{data.email} · {data.easyId}</p>
+              <p className="text-xs text-muted-foreground"><SensitiveValue field="email" value={data.email} /> · {data.easyId}</p>
             </div>
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -244,9 +245,9 @@ const AdminAdminDetail = () => {
                 </div>
               </div>
               {[
-                { label: "Email",    val: data.email,        icon: Mail },
-                { label: "Mobile",   val: data.mobileNumber || "—", icon: Smartphone },
-                { label: "Address",  val: data.fullAddress || "—",  icon: Building2 },
+                { label: "Email",    val: <SensitiveValue field="email" value={data.email} />, icon: Mail },
+                { label: "Mobile",   val: <SensitiveValue field="mobileNumber" value={data.mobileNumber} />, icon: Smartphone },
+                { label: "Address",  val: <SensitiveValue field="address" value={data.fullAddress} />, icon: Building2 },
                 { label: "Joined",   val: fmt(data.createdAt),      icon: CalendarClock },
               ].map(({ label, val, icon: Icon }) => (
                 <div key={label} className="flex items-center gap-2.5 py-2 border-b border-border last:border-0">
