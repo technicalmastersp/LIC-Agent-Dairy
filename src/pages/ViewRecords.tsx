@@ -722,6 +722,7 @@ const ViewRecords = () => {
         record={selectedRecord}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onPaymentsChanged={handleUpdateRecord}
       />
 
       {/* Edit Record Modal */}

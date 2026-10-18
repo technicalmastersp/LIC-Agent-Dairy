@@ -17,7 +17,7 @@ import {
   Plus, Eye, FileClock, ReceiptText,
   Crown, Wallet, User, Lock, BarChart3,
   ArrowRight, AlertTriangle, TrendingUp,
-  FileText, Users,
+  FileText, Users, Loader2,
 } from "lucide-react";
 import { getReferralDashboard } from "../../services/referralService";
 import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
@@ -288,7 +288,13 @@ const Home = () => {
               <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">Last 6 months</CardTitle>
             </CardHeader>
             <CardContent>
-              {isFirstTimeUser ? (
+              {loading ? (
+                // Shown while the dashboard data (incl. the trend) loads
+                <div role="status" aria-live="polite" className="flex flex-col items-center justify-center gap-2 text-muted-foreground" style={{ height: 260 }}>
+                  <Loader2 className="w-6 h-6 animate-spin" aria-hidden="true" />
+                  <span className="text-sm">Loading your activity trend…</span>
+                </div>
+              ) : isFirstTimeUser ? (
                 <div className="flex flex-col items-center justify-center text-center py-14 px-4">
                   <TrendingUp className="w-8 h-8 text-muted-foreground/50 mb-3" />
                   <p className="text-sm text-muted-foreground">
@@ -305,8 +311,14 @@ const Home = () => {
                     <Legend />
                     <Line type="monotone" dataKey="recordsAdded" stroke="#2563eb" name="Records added" strokeWidth={2} />
                     <Line type="monotone" dataKey="duePolicies" stroke="#f97316" name="Policies due" strokeWidth={2} />
+                    <Line type="monotone" dataKey="missedPayments" stroke="#dc2626" name="Missed payments" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
                   </LineChart>
                 </ResponsiveContainer>
+              )}
+              {!loading && !isFirstTimeUser && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Missed payments = due months still unpaid. The current month isn't counted until it ends.
+                </p>
               )}
             </CardContent>
           </Card>

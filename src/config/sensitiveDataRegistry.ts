@@ -187,7 +187,6 @@ export const SENSITIVE_FIELDS = {
     label: "Sum assured", category: "financial", style: "money",
     why: "A client's coverage amount, including portfolio totals.",
     surfaces: [
-      "components/PaymentUpdateModal.tsx",
       "components/RecordDetailsModal.tsx",
       "pages/MissedPayments.tsx",
       "pages/ViewRecords.tsx",
@@ -199,6 +198,14 @@ export const SENSITIVE_FIELDS = {
     why: "A client's income.",
     surfaces: [
       "components/RecordDetailsModal.tsx",
+    ],
+  },
+  paymentAmount: {
+    label: "Premium payment amounts", category: "financial", style: "money",
+    why: "What a client paid and any additional charges.",
+    surfaces: [
+      "components/PaymentHistoryModal.tsx",
+      "components/PaymentUpdateModal.tsx",
     ],
   },
   walletAmount: {
@@ -245,6 +252,7 @@ export const NOT_MASKED_BY_DESIGN: readonly { what: string; reason: string }[] =
   { what: "CSV / Excel exports, vCard and WhatsApp/tel/mailto links", reason: "Deliberate user actions that must carry the real value; the on-screen text is masked, the action still works." },
   { what: "Form inputs while editing (shown as dots, not removed)", reason: "Editing needs the real value; inputs are visually obscured instead — see useSensitiveInputClass." },
   { what: "Add/Edit record form inputs other than Aadhaar, PAN, Aadhaar-linked mobile, bank account and IFSC (e.g. email, address, date of birth, income, policy number)", reason: "Obscured inputs are limited to the government-ID and bank fields; date pickers can't be obscured. Extend by adding useSensitiveInputClass to more inputs." },
+  { what: "Payment notes (free text) and payment/due dates", reason: "Dates aren't personal data and notes are written by the agent; amounts are masked, notes are not." },
   { what: "Agent-defined custom fields and insurance-type-specific details on a record", reason: "Free-form, so they can't be classified in advance." },
   { what: "The agent's own digital business card (preview and download)", reason: "It is made to be shared; its contents are chosen by the agent." },
   { what: "Subscription plan price and payment history of the agent's own plan", reason: "The agent's own billing, not client or business data." },

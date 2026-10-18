@@ -16,6 +16,9 @@ const ACTION_COLORS: Record<string, string> = {
   RECORD_CREATED:        "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
   RECORD_UPDATED:        "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
   RECORD_DELETED:        "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  PAYMENT_RECORDED:      "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
+  PAYMENT_UPDATED:       "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  PAYMENT_DELETED:       "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
   RECORDS_BULK_IMPORTED: "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
   PASSWORD_CHANGED:      "bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400",
   PROFILE_UPDATED:       "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
@@ -43,6 +46,12 @@ const summarize = (action: string, details: unknown): string | null => {
     case "RECORD_CREATED":
     case "RECORD_DELETED":
       return typeof d.name === "string" ? `Record: ${d.name}` : null;
+    case "PAYMENT_RECORDED":
+    case "PAYMENT_UPDATED":
+    case "PAYMENT_DELETED": {
+      const months = Array.isArray(d.months) ? ` · ${d.months.length} month${d.months.length === 1 ? "" : "s"}` : "";
+      return typeof d.name === "string" ? `Record: ${d.name}${months}` : null;
+    }
     case "RECORDS_BULK_IMPORTED":
       return typeof d.count === "number" ? `${d.count} records imported` : null;
     default:

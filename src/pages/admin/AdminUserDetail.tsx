@@ -382,6 +382,7 @@ const AdminUserDetail = () => {
         record={selectedRecord}
         isOpen={!!selectedRecord}
         onClose={() => setSelectedRecord(null)}
+        hidePaymentHistory
       />
 
       {/* Delete modal */}

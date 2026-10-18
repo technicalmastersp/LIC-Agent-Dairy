@@ -4,13 +4,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import PaymentHistoryModal from "@/components/PaymentHistoryModal";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import {
   Calendar, User, MapPin, Briefcase, Phone, CreditCard, HomeIcon,
-  IdCard, HeartPulse, Users, ShieldCheck, History,
+  IdCard, HeartPulse, Users, ShieldCheck, History, Receipt,
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
 import { convertDateToIndianFormat } from "@/utils/tools";
@@ -27,7 +30,8 @@ const SectionTitle = ({ icon: Icon, children }: { icon: IconType; children: Reac
   </CardTitle>
 );
 
-const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps) => {
+const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = false, onPaymentsChanged }: RecordDetailsModalProps) => {
+  const [paymentHistoryOpen, setPaymentHistoryOpen] = useState(false);
   if (!record) return null;
 
   const InfoItem = ({ icon: Icon, label, value }: { icon: IconType; label: string; value?: React.ReactNode }) => (
@@ -41,6 +45,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
   );
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
@@ -289,7 +294,14 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
           {record.currentPolicy && (
             <Card>
               <CardHeader>
-                <SectionTitle icon={ShieldCheck}>Current Policy Details</SectionTitle>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <SectionTitle icon={ShieldCheck}>Current Policy Details</SectionTitle>
+                  {!hidePaymentHistory && record.recordId && (
+                    <Button variant="outline" size="sm" onClick={() => setPaymentHistoryOpen(true)}>
+                      <Receipt className="w-4 h-4 mr-1.5" /> Payment history
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {/* Mobile: stacked card */}
@@ -447,6 +459,17 @@ const RecordDetailsModal = ({ record, isOpen, onClose }: RecordDetailsModalProps
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Payments for the current policy — hidden where the viewer isn't the record's owner (admin) */}
+    {!hidePaymentHistory && record.recordId && (
+      <PaymentHistoryModal
+        record={record}
+        isOpen={paymentHistoryOpen}
+        onClose={() => setPaymentHistoryOpen(false)}
+        onChanged={onPaymentsChanged}
+      />
+    )}
+    </>
   );
 };
 

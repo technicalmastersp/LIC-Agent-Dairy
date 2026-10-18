@@ -329,6 +329,7 @@ const MissedPayments = () => {
         record={selectedRecord}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onPaymentsChanged={handleUpdateRecord}
       />
 
 

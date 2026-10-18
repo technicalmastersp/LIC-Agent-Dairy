@@ -330,6 +330,7 @@ const UpcomingDuePolicies = () => {
         record={selectedRecord}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onPaymentsChanged={fetchRecords}
       />
 
       <ContactActionModal

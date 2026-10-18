@@ -25,8 +25,9 @@
 | `email` | Email address | contact | email | `components/RecordDetailsModal.tsx`<br>`pages/HelpSupport.tsx`<br>`pages/Profile.tsx`<br>`pages/admin/AdminAdminDetail.tsx`<br>`pages/admin/AdminAdmins.tsx`<br>`pages/admin/AdminDashboard.tsx`<br>`pages/admin/AdminSuggestions.tsx`<br>`pages/admin/AdminSupportTickets.tsx`<br>`pages/admin/AdminUserDetail.tsx`<br>`pages/admin/AdminUsers.tsx` |
 | `address` | Postal address | contact | full | `components/RecordDetailsModal.tsx`<br>`pages/Profile.tsx`<br>`pages/admin/AdminAdminDetail.tsx`<br>`pages/admin/AdminUserDetail.tsx` |
 | `policyNumber` | Policy number | policy | last4 | `components/PaymentUpdateModal.tsx`<br>`components/RecordDetailsModal.tsx`<br>`pages/CurrentMonthDue.tsx`<br>`pages/MissedPayments.tsx`<br>`pages/UpcomingDuePolicies.tsx`<br>`pages/ViewRecords.tsx`<br>`pages/admin/AdminUserDetail.tsx` |
-| `sumAssured` | Sum assured | financial | money | `components/PaymentUpdateModal.tsx`<br>`components/RecordDetailsModal.tsx`<br>`pages/MissedPayments.tsx`<br>`pages/ViewRecords.tsx`<br>`pages/admin/AdminUserDetail.tsx` |
+| `sumAssured` | Sum assured | financial | money | `components/RecordDetailsModal.tsx`<br>`pages/MissedPayments.tsx`<br>`pages/ViewRecords.tsx`<br>`pages/admin/AdminUserDetail.tsx` |
 | `annualIncome` | Annual income | financial | money | `components/RecordDetailsModal.tsx` |
+| `paymentAmount` | Premium payment amounts | financial | money | `components/PaymentHistoryModal.tsx`<br>`components/PaymentUpdateModal.tsx` |
 | `walletAmount` | Referral wallet amounts | financial | money | `pages/Home.tsx`<br>`pages/Profile.tsx`<br>`pages/ReferralProgram.tsx`<br>`pages/admin/AdminDashboard.tsx`<br>`pages/admin/AdminUserDetail.tsx` |
 | `withdrawalAmount` | Withdrawal amounts | financial | money | `pages/admin/AdminDashboard.tsx`<br>`pages/admin/AdminUserDetail.tsx`<br>`pages/admin/WithdrawalRequests.tsx` |
 | `revenueAmount` | Business revenue & expense amounts | financial | money | `pages/admin/AdminDashboard.tsx`<br>`pages/admin/AdminRevenue.tsx` |
@@ -40,6 +41,7 @@ Mask styles: **last4** — all but the last 4 characters hidden (`••••�
 - **CSV / Excel exports, vCard and WhatsApp/tel/mailto links** — Deliberate user actions that must carry the real value; the on-screen text is masked, the action still works.
 - **Form inputs while editing (shown as dots, not removed)** — Editing needs the real value; inputs are visually obscured instead — see useSensitiveInputClass.
 - **Add/Edit record form inputs other than Aadhaar, PAN, Aadhaar-linked mobile, bank account and IFSC (e.g. email, address, date of birth, income, policy number)** — Obscured inputs are limited to the government-ID and bank fields; date pickers can't be obscured. Extend by adding useSensitiveInputClass to more inputs.
+- **Payment notes (free text) and payment/due dates** — Dates aren't personal data and notes are written by the agent; amounts are masked, notes are not.
 - **Agent-defined custom fields and insurance-type-specific details on a record** — Free-form, so they can't be classified in advance.
 - **The agent's own digital business card (preview and download)** — It is made to be shared; its contents are chosen by the agent.
 - **Subscription plan price and payment history of the agent's own plan** — The agent's own billing, not client or business data.

@@ -20,6 +20,7 @@ export interface CustomFieldValue {
   value?: string | number;
 }
 export interface DisplayRecord {
+  recordId?: string;
   name?: string;
   date?: string;
   aadhaarNumber?: string;
@@ -62,5 +63,9 @@ export interface RecordDetailsModalProps {
   record: DisplayRecord | null;
   isOpen: boolean;
   onClose: () => void;
+  /** Hide the Payment history button (e.g. admin viewing another agent's record). */
+  hidePaymentHistory?: boolean;
+  /** Called after a payment is recorded / corrected / deleted from the history modal. */
+  onPaymentsChanged?: () => void;
 }
 export type IconType = React.ComponentType<{ className?: string }>;
