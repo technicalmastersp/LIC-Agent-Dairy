@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Check, Sparkles, Star, Award, Crown, ShieldCheck, Wallet as WalletIcon, RefreshCw, Gift, AlertTriangle, Info, type LucideIcon } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -14,9 +15,11 @@ import { getReferralConfig } from "../../services/configService";
 import { getProfile } from "../../services/userService";
 import { getReferralDashboard } from "../../services/referralService";
 import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
+import { signupPathForPlan } from "@/config/plans";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
 import SEO from "@/components/SEO";
 import type { Plan } from "@/types/pages/OurPlans.types";
+
 const OurPlans = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -121,7 +124,7 @@ const OurPlans = () => {
 
   const handleSelectPlan = async (planId: string) => {
     if (processingPlanId) return; // already checking out a plan — ignore extra clicks
-    if (!currentUser) { navigate("/signup"); return; }
+    if (!currentUser) { navigate(signupPathForPlan(planId)); return; }
     if (currentUser.role === "admin" || currentUser.role === "superadmin") {
       toast({ title: "Not applicable", description: "Admin accounts don't use subscription plans." });
       return;
@@ -230,6 +233,26 @@ const OurPlans = () => {
     Standard: { icon: Award, accent: "text-amber-600 dark:text-amber-400", iconBg: "bg-amber-100 dark:bg-amber-950/40" },
     Premium: { icon: Crown, accent: "text-rose-600 dark:text-rose-400", iconBg: "bg-rose-100 dark:bg-rose-950/40" },
   };
+
+  // "Save more with longer plans" table — derived from allPlans so it can never disagree
+  // with the cards above. Per-month cost = price ÷ months, rounded to the nearest rupee.
+  const VALUE_PLAN_IDS = ["1month", "3months", "6months", "12months"];
+  const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
+  const valueRows = allPlans
+    .filter((p) => VALUE_PLAN_IDS.includes(p.id))
+    .map((p) => {
+      const months = parseInt(p.duration, 10) || 1;
+      const original = p.originalPrice ?? p.price;
+      return {
+        id: p.id,
+        label: `${p.duration} (${p.planType} Plan)`,
+        price: p.price,
+        original,
+        saving: original - p.price,
+        perMonth: Math.round(p.price / months),
+        popular: !!p.popular,
+      };
+    });
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -404,6 +427,53 @@ const OurPlans = () => {
             );
           })}
         </div>
+
+        {/* Value comparison — longer plans cost less per month */}
+        <section className="max-w-4xl mx-auto mt-14" aria-labelledby="plan-value-heading">
+          <div className="text-center mb-5">
+            <h2 id="plan-value-heading" className="text-xl sm:text-2xl font-bold text-form-header">
+              Save more with longer plans
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              The longer you commit, the less each month costs you.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-border bg-card overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="whitespace-nowrap">Plan Duration</TableHead>
+                  <TableHead className="whitespace-nowrap">Current Price</TableHead>
+                  <TableHead className="whitespace-nowrap">Total Savings</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">Effective Cost Per Month</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {valueRows.map((row) => (
+                  <TableRow key={row.id} className={row.popular ? "bg-primary/5" : undefined}>
+                    <TableCell className="font-medium text-form-header whitespace-nowrap">
+                      {row.label}
+                      {row.popular && (
+                        <Badge className="ml-2 bg-primary text-primary-foreground text-[10px] align-middle">Most Popular</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      <span className="font-semibold text-form-header">{inr(row.price)}</span>{" "}
+                      <span className="text-xs text-muted-foreground">(Originally {inr(row.original)})</span>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap font-medium text-emerald-700 dark:text-emerald-400">
+                      Save {inr(row.saving)}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-right font-semibold text-form-header">
+                      ~{inr(row.perMonth)} / month
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </section>
 
         <div className="text-center mt-10">
           <p className="text-sm text-muted-foreground">

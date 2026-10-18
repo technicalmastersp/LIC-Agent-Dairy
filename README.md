@@ -1,6 +1,6 @@
 # Policy Niketan — Insurance Records
 
-A web application for LIC agents to manage policyholder records — capture
+A web application for Insurance agents to manage policyholder records — capture
 applicant details, track policy/premium due dates, monitor missed and
 upcoming payments, and (for admins) oversee users, revenue, support
 tickets, and subscriptions.
@@ -38,7 +38,7 @@ tickets, and subscriptions.
 - **Forms**: react-hook-form + zod are installed for incremental adoption;
   most forms currently use manual `useState`-based validation
 - **Backend**: separate Node.js/Express/MongoDB API
-  (`LIC-Agent-Dairy-Backend-development`) — not part of this repo
+  (`Backend-development`) — not part of this repo
 - **Hosting**: Vercel (SPA rewrite configured in `vercel.json`)
 
 ---
@@ -47,7 +47,7 @@ tickets, and subscriptions.
 
 - Node.js 18+ and npm
 - A running instance of the companion backend API
-  (`LIC-Agent-Dairy-Backend-development`), or access to a deployed one
+  (`Backend-development`), or access to a deployed one
 
 ---
 
@@ -56,7 +56,7 @@ tickets, and subscriptions.
 ```bash
 # 1. Clone the repo
 git clone <repo-url>
-cd LIC-Agent-Dairy-devlopment
+cd <repo-folder-name>
 
 # 2. Install dependencies
 npm install
@@ -126,6 +126,35 @@ public/             # Static assets, robots.txt, sitemap.xml, logos
 ```
 
 ---
+
+## Content maintenance (stats, tools, plans)
+
+**Marketing numbers — one place only: `src/config/siteStats.ts`.** The home page stats band and the About
+page bar both read it ("200+ Agents joined", "2,200+ Records managed", "9 Free calculators", "30 days free trial").
+These are claims about the business, so keep them true: run `npm run site-stats` in the **backend** repo (read-only; it
+counts real agents and policy records and prints rounded-down figures), paste the two numbers, and bump `lastVerified`.
+`freeTools` is enforced by a test against the real number of `/tools/*` routes.
+
+**Adding a calculator** touches these places (a test in `src/test/registry.test.ts` fails if any is missed):
+`src/pages/tools/<Name>.tsx`, `src/App.tsx` (lazy import + route), `Navigation.tsx`, `Footer.tsx`, `ToolsHub.tsx`,
+`About.tsx`, `scripts/publicRoutes.mjs` (sitemap + prerender) and `scripts/verify-live.mjs`; then bump `SITE_STATS.freeTools`.
+The page's math belongs in `src/utils/` with unit tests, not inside the component.
+
+**Plans.** The valid plan ids live in `src/config/plans.ts` and must match the backend
+(`utils/ourSubscriptionPlans.js`). Every "Choose plan" link goes to `/signup?plan=<id>`, and the signup page
+pre-selects that plan (an unknown id is ignored).
+
+**After changing any public page**, regenerate the SEO snapshots and commit them together with the sitemap:
+
+```bash
+npm run build                 # fresh dist/
+npm run prerender:generate    # rewrites prerendered/*.json (needs Edge/Chrome)
+npm run build                 # merges them and regenerates public/sitemap.xml
+git add prerendered public/sitemap.xml
+```
+
+> `public/sitemap.xml` is written *after* Vite copies `public/` into `dist/`, so the sitemap that gets deployed is
+> the one you committed — always commit the regenerated file, or the live sitemap lags one build behind.
 
 ## Commit & Deploy Process
 
@@ -215,14 +244,14 @@ The app is deployed on **Vercel**. `vercel.json` handles three things:
    `*.vercel.app` domains and `www.policyniketan.com` to `https://policyniketan.com`,
    so the site is only ever indexed/linked under one canonical host.
 2. **Rewrites** — `/api/:path*` is proxied straight through to the backend
-   (`https://lic-agent-dairy-backend.onrender.com/api/:path*`), and everything
+   (`https://<backend-uri>/api/:path*`), and everything
    else that isn't a real static file (`/assets/...` or anything containing a
    dot, e.g. `favicon.ico`) falls through to `/index.html` so React Router can
    handle client-side routing on direct loads and refreshes:
    ```json
    {
      "rewrites": [
-       { "source": "/api/:path*", "destination": "https://lic-agent-dairy-backend.onrender.com/api/:path*" },
+       { "source": "/api/:path*", "destination": "https://<backend-uri>/api/:path*" },
        { "source": "/((?!assets/|.*\\..*).*)", "destination": "/" }
      ]
    }

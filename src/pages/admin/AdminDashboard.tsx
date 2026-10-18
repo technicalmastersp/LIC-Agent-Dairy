@@ -20,6 +20,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import type { ActivityLogItem, RecentUserItem, DashboardStats } from "@/types/pages/admin/AdminDashboard.types";
 import { formatISTDate as fmt, formatISTDateTime as fmtTime } from "@/utils/dateFormat";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 const ACTION_COLORS: Record<string, string> = {
   WITHDRAWAL_APPROVED:       "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400",
@@ -167,7 +168,7 @@ const AdminDashboard = () => {
             },
             ...(currentUser?.role === "superadmin" || permissions?.can_view_revenue ? [{
               label:   "Total revenue",
-              val:     `₹${(revenue.total ?? 0).toLocaleString("en-IN")}`,
+              val:     <SensitiveValue field="revenueAmount" value={revenue.total ?? 0} render={(v) => `₹${Number(v).toLocaleString("en-IN")}`} />,
               icon:    <TrendingUp className="w-5 h-5 text-purple-600" />,
               bg:      "bg-purple-50 border-purple-200 dark:bg-purple-950/40 dark:border-purple-900",
               sub:     `${subscriptions.paid} paid users`,
@@ -175,7 +176,7 @@ const AdminDashboard = () => {
             }] : []),
             ...(currentUser?.role === "superadmin" || permissions?.can_view_revenue ? [{
               label:   "This month's income",
-              val:     `₹${(stats.revenue?.thisMonthIncome ?? 0).toLocaleString("en-IN")}`,
+              val:     <SensitiveValue field="revenueAmount" value={stats.revenue?.thisMonthIncome ?? 0} render={(v) => `₹${Number(v).toLocaleString("en-IN")}`} />,
               icon:    <IndianRupee className="w-5 h-5 text-green-600" />,
               bg:      "border bg-green-50 border-green-200 dark:bg-green-950/40 dark:border-green-900",
               sub:     "View full revenue report",
@@ -187,7 +188,7 @@ const AdminDashboard = () => {
               val:     withdrawals.pending,
               icon:    <Clock className="w-5 h-5 text-amber-600" />,
               bg:      `border ${withdrawals.pending > 0 ? "bg-amber-50 border-amber-300 dark:bg-amber-950/40 dark:border-amber-800" : "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border"}`,
-              sub:     `₹${withdrawals.pendingAmount.toLocaleString("en-IN")} pending`,
+              sub:     <><SensitiveValue field="withdrawalAmount" value={withdrawals.pendingAmount} render={(v) => `₹${Number(v).toLocaleString("en-IN")}`} /> pending</>,
               link:    "/admin/withdrawals",
               urgent:  withdrawals.pending > 0,
               dot:     withdrawals.pending > 0,
@@ -271,8 +272,8 @@ const AdminDashboard = () => {
           {[
             { label: "Expired subscriptions", val: subscriptions.expired, color: "text-red-600",    icon: <UserX    className="w-4 h-4" /> },
             { label: "Deactivated users",     val: users.deactivated,     color: "text-orange-600", icon: <UserX    className="w-4 h-4" /> },
-            { label: "Total paid out",        val: `₹${withdrawals.processedAmount.toLocaleString("en-IN")}`, color: "text-green-600", icon: <Wallet className="w-4 h-4" /> },
-            { label: "Total referral rewards",val: `₹${referrals.totalEarnings.toLocaleString("en-IN")}`,    color: "text-blue-600",  icon: <Gift   className="w-4 h-4" /> },
+            { label: "Total paid out",        val: <SensitiveValue field="withdrawalAmount" value={withdrawals.processedAmount} render={(v) => `₹${Number(v).toLocaleString("en-IN")}`} />, color: "text-green-600", icon: <Wallet className="w-4 h-4" /> },
+            { label: "Total referral rewards",val: <SensitiveValue field="walletAmount" value={referrals.totalEarnings} render={(v) => `₹${Number(v).toLocaleString("en-IN")}`} />,    color: "text-blue-600",  icon: <Gift   className="w-4 h-4" /> },
           ].map(({ label, val, color, icon }) => (
             <Card key={label}>
               <CardContent className="p-4 flex items-center gap-3">
@@ -464,7 +465,7 @@ const AdminDashboard = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{u.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                        <p className="text-xs text-muted-foreground truncate"><SensitiveValue field="email" value={u.email} /></p>
                       </div>
                       <div className="shrink-0 text-right">
                         <Badge className={`text-xs ${PLAN_COLOR[u.planId] || "bg-gray-100 text-gray-600 dark:bg-muted dark:text-muted-foreground"}`}>

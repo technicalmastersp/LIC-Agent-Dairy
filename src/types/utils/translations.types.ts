@@ -2,7 +2,6 @@
 export interface Translations {
   // Project Lable
   title: string,
-  // LIC: string,
 
   // Navigation
   home: string;
@@ -90,6 +89,9 @@ export interface Translations {
   signupSuccess: string;
   invalidCredentials: string;
   loginServerError: string;
+  accountLocked: string;
+  attemptsLeftOne: string;
+  attemptsLeftMany: string;
   userExists: string;
   
   // Forms

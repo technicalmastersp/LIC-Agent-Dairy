@@ -35,8 +35,8 @@ const PAGE_RULES = {
 };
 
 const FALLBACK_ROUTES = [
-  "/", "/about", "/our-plans", "/lic-info-hub", "/help-support", "/contact", "/refund-policy",
-  "/tools", "/tools/age-calculator", "/tools/sip-calculator", "/tools/income-tax-calculator",
+  "/", "/about", "/our-plans", "/policy-niketan-info-hub", "/help-support", "/contact", "/refund-policy",
+  "/tools", "/tools/age-calculator", "/tools/sip-calculator", "/tools/lumpsum-calculator", "/tools/rd-calculator", "/tools/fd-calculator", "/tools/income-tax-calculator",
   "/tools/home-loan-emi-calculator", "/tools/term-insurance-calculator", "/tools/inflation-calculator",
   "/privacy-policy", "/terms-of-service", "/login", "/signup",
 ];

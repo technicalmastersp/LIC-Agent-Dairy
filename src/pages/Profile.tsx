@@ -4,6 +4,8 @@ import { useNavigate, Link }            from "react-router-dom";
 import Navigation                        from "@/components/Navigation";
 import Footer                            from "@/components/Footer";
 import { useLanguage }                   from "@/hooks/useLanguage";
+import { SensitiveValue } from "@/components/SensitiveValue";
+import { useSensitiveInputClass } from "@/hooks/useSensitiveMask";
 import { getCurrentUser, setCurrentUser } from "@/utils/auth";
 import type { User } from "@/types/utils/auth.types";
 import { Button }    from "@/components/ui/button";
@@ -89,6 +91,10 @@ const PERMISSION_LABELS: Record<string, string> = {
 const Profile = () => {
   const navigate      = useNavigate();
   const { t }         = useLanguage();
+  // Hide/Show sensitive data: obscure these inputs (CSS only) while hidden
+  const mobileMask  = useSensitiveInputClass("mobileNumber");
+  const emailMask   = useSensitiveInputClass("email");
+  const addressMask = useSensitiveInputClass("address");
   const { toast }     = useToast();
   const fileRef       = useRef<HTMLInputElement>(null);
 
@@ -632,7 +638,7 @@ const Profile = () => {
                         <span className="text-muted-foreground flex items-center gap-1.5">
                           <CreditCard className="w-3.5 h-3.5" /> UPI
                         </span>
-                        <span className="font-mono">••••••{payment.upiId.slice(6)}</span>
+                        <SensitiveValue field="upiId" value={payment.upiId} render={(v) => `••••••${v.slice(6)}`} className="font-mono" />
                       </div>
                     )}
                     {payment?.accountNumber && (
@@ -640,7 +646,7 @@ const Profile = () => {
                         <span className="text-muted-foreground flex items-center gap-1.5">
                           <Landmark className="w-3.5 h-3.5" /> {payment.bankName || "Bank"}
                         </span>
-                        <span className="font-mono">••••{payment.accountNumber.slice(-4)}</span>
+                        <SensitiveValue field="bankAccountNumber" value={payment.accountNumber} render={(v) => `••••${v.slice(-4)}`} className="font-mono" />
                       </div>
                     )}
                     {payment?.upiRejectionReason && (
@@ -785,7 +791,8 @@ const Profile = () => {
                     <Label className="text-xs text-muted-foreground">Mobile number</Label>
                     <Input name="mobileNumber" value={form.mobileNumber}
                       onChange={handleChange} disabled={!isEditing}
-                      className={`text-sm h-9 ${!isEditing ? "bg-muted text-muted-foreground" : ""}`} />
+                      autoComplete="off"
+                      className={`text-sm h-9 ${!isEditing ? "bg-muted text-muted-foreground" : ""} ${mobileMask}`} />
                   </div>
 
                   <div className="space-y-1.5 md:col-span-2">
@@ -802,7 +809,7 @@ const Profile = () => {
                     <div className="relative">
                       <Input name="email" type="email" value={form.email}
                         onChange={handleChange} disabled={!isEditing}
-                        className={`text-sm h-9 ${!isEditing ? "bg-muted text-muted-foreground" : ""} ${!user.isEmailVerified ? "pr-24" : ""}`} />
+                        className={`text-sm h-9 ${!isEditing ? "bg-muted text-muted-foreground" : ""} ${!user.isEmailVerified ? "pr-24" : ""} ${emailMask}`} />
                       {!user.isEmailVerified && (
                         <Button size="sm" variant="outline"
                           className="absolute right-1.5 top-1/2 -translate-y-1/2 h-7 text-xs bg-red-50 hover:bg-red-100 border-red-200 text-red-700 px-2"
@@ -817,8 +824,8 @@ const Profile = () => {
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">Full address</Label>
                   <Textarea name="fullAddress" value={form.fullAddress}
-                    onChange={handleChange} disabled={!isEditing} rows={3}
-                    className={`text-sm resize-none ${!isEditing ? "bg-muted text-muted-foreground" : ""}`} />
+                    onChange={handleChange} disabled={!isEditing} rows={3} autoComplete="off"
+                    className={`text-sm resize-none ${!isEditing ? "bg-muted text-muted-foreground" : ""} ${addressMask}`} />
                 </div>
 
                 <div className="space-y-1.5 mt-3">
@@ -888,9 +895,9 @@ const Profile = () => {
                     {[
                       { label: "Direct (L1)",   val: referral.totalL1 ?? 0,               color: "text-blue-600"   },
                       { label: "Indirect (L2)", val: referral.totalL2 ?? 0,               color: "text-purple-600" },
-                      { label: "Total earned",  val: `₹${referral.totalEarned ?? 0}`,     color: "text-green-600"  },
-                      { label: "Wallet",        val: `₹${referral.availableBalance ?? 0}`,color: "text-green-600"  },
-                      { label: "Pending",       val: `₹${referral.pendingEarnings ?? 0}`, color: "text-yellow-600" },
+                      { label: "Total earned",  val: <SensitiveValue field="walletAmount" value={referral.totalEarned ?? 0} render={(v) => `₹${v}`} />, color: "text-green-600"  },
+                      { label: "Wallet",        val: <SensitiveValue field="walletAmount" value={referral.availableBalance ?? 0} render={(v) => `₹${v}`} />, color: "text-green-600"  },
+                      { label: "Pending",       val: <SensitiveValue field="walletAmount" value={referral.pendingEarnings ?? 0} render={(v) => `₹${v}`} />, color: "text-yellow-600" },
                     ].map(({ label, val, color }) => (
                       <div key={label} className="text-center bg-muted rounded-lg p-3">
                         <p className={`text-lg font-medium ${color}`}>{val}</p>

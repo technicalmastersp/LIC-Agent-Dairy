@@ -35,9 +35,9 @@ import axios from "axios";
 import type { Ticket, Suggestion, FaqItem } from "@/types/pages/HelpSupport.types";
 import type { CallRequestSummary } from "@/types/components/RequestCallDialog.types";
 import { formatISTDate as fmt, formatISTDateTime } from "@/utils/dateFormat";
+import { SensitiveValue } from "@/components/SensitiveValue";
 const ALL_FAQS: FaqItem[] = [
   { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. You can move between the Free trial, Starter, Basic, Standard, and Premium plans — checkout runs through Razorpay" + (REFERRAL_PROGRAM_ENABLED ? ", and you can apply your referral wallet balance toward the cost at checkout." : ".") },
-  { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. You can move between the Free trial, Starter, Basic, Standard, and Premium plans — checkout runs through Razorpay, and you can apply your referral wallet balance toward the cost at checkout." },
   { category: "Account & Billing", q: "What happens when my plan expires?", a: "Your records stay safe and backed up, but you'll need to renew to add new records or access due/missed payment tracking again." },
   { category: "Account & Billing", q: "What is your cancellation and refund policy?", a: "Plans are one-time payments and never renew automatically. Fees are non-refundable once a plan is activated, except for duplicate charges or a payment taken without the plan being activated, which must be reported within 7 days. Full details are on the Cancellation & Refund Policy page." },
   { category: "Account & Billing", q: "Can I change my registered name or Easy ID?", a: "No — your name and Easy ID are permanently assigned at signup for record integrity. Everything else on your profile (mobile number, address, email) can be updated any time." },
@@ -51,8 +51,16 @@ const ALL_FAQS: FaqItem[] = [
   { category: "Payments & Referrals", q: "How does the referral wallet work?", a: "You earn rewards for direct (L1) and second-level (L2) referrals, and they're added to your referral wallet. Balances show as available or pending. For now, wallet balance can only be used toward renewing or upgrading your plan — tick \"Use my referral wallet\" on the Plans page at checkout." },
   { category: "Payments & Referrals", q: "Can I withdraw my referral wallet balance to my bank account or UPI?", a: "Not at the moment. Withdrawals to a bank account or UPI ID are paused, and wallet balance can only be used for plan renewals and upgrades. We plan to offer transfers to your own account in the future — we'll let you know in the app and update this page when it's available." },
   { category: "Payments & Referrals", q: "I requested a withdrawal before this change — what happens to it?", a: "Requests made before withdrawals were paused are still reviewed by our team, and you can follow the status on the Referral Program page. If one is declined, it always comes with a reason and the amount is returned to your wallet automatically." },
-  { category: "Tools & Calculators", q: "What free calculators are available?", a: "Age, SIP, Income Tax, Home Loan EMI, Term Insurance, and Inflation calculators are all available from the Tools menu — free to use, and no login required." },
-  { category: "Tools & Calculators", q: "What's the LIC Info Hub?", a: "It's a searchable reference of LIC and insurance terms and abbreviations — DOC, SA, KYC, ULIP, and more — with a plain-language explanation for each one. Also free to use without logging in." },
+  { category: "Tools & Calculators", q: "What free calculators are available?", a: "Nine calculators are available from the Tools menu — Age, SIP, Lumpsum, RD, FD, Income Tax, Home Loan EMI, Term Insurance, and Inflation. All are free to use, and no login is required." },
+  { category: "Tools & Calculators", q: "What's the Policy Niketan Info Hub?", a: "It's a searchable reference of insurance & Policy terms and abbreviations — DOC, SA, KYC, ULIP, and more — with a plain-language explanation for each one. Also free to use without logging in." },
+  { category: "Policies & Records", q: "Can I import my existing records from Excel or CSV?", a: "Yes — open Import Records, then drop in an .xlsx, .xls, or .csv file (up to 5 MB and 100 records per upload). You get a preview grid where every problem cell is highlighted so you can fix it before anything is saved. Core policyholder and policy fields are imported; add family members and previous-policy details afterwards from Edit." },
+  { category: "Policies & Records", q: "Can I export my records?", a: "Yes — View Records can export the records currently on screen, including any search or insurance-type filter you have applied, as a CSV file or a PDF." },
+  { category: "Policies & Records", q: "Which insurance types can I record?", a: "Life, Term Life, Health, Family Health, Vehicle (car and bike) and Travel policies each come with their own relevant fields. For anything else, choose Other (Custom) to name the type and build your own field list." },
+  { category: "Policies & Records", q: "Can I reach a policyholder straight from a record?", a: "Yes — the contact action on the Missed, Due, and Upcoming payment pages lets you call, WhatsApp, SMS, or email the policyholder in one tap, using the details already on the record." },
+  { category: "Security & Data", q: "How are Aadhaar, PAN and bank details protected?", a: "Those fields are encrypted before they are stored. On screen, the Hide / Show button on your Home page masks sensitive values — handy when a client is looking over your shoulder — and your choice is remembered on your account." },
+  { category: "Account & Billing", q: "What reminders will I get, and can I turn them off?", a: "The bell icon shows in-app alerts such as policies coming due and plan expiry. You can also turn on push notifications per device (phone or desktop), and choose whether to receive payment-due and subscription reminder emails — all from Notification preferences." },
+  { category: "Technical", q: "Can I install it on my phone or computer?", a: "Yes — it is an installable web app. Use your browser's Install or Add to Home Screen option to open it like a regular app. A banner also tells you right away if your internet connection drops." },
+  { category: "Security & Data", q: "Is there protection against someone guessing my password?", a: "Yes — after several wrong passwords your account is temporarily locked, and password-reset codes expire after a limited number of wrong guesses. You can also review every signed-in device under Sessions and sign any of them out." },
   { category: "Security & Data", q: "Is my policyholder data backed up?", a: "Yes — records are backed up daily without exception, so a single failure never means lost work." },
   { category: "Security & Data", q: "Who can see sensitive fields like Aadhaar or PAN?", a: "Only you and admins acting within their role can view sensitive fields. Access is authenticated and scoped by design, not open by default." },
   { category: "Account & Billing", q: "Can I talk to someone on the phone?", a: "Yes — use \"Request a call\" on this page. Enter your mobile number and a short reason, and our team will call you back. We don't publish a direct number, and calls are placed only during business hours (Mon–Fri 9 AM – 9 PM, Sat–Sun 10 AM – 8 PM IST). Requests made outside those hours are queued and called at the next opening." },
@@ -79,7 +87,7 @@ const ALL_CATEGORIES = [
   { icon: UserCog, title: "Account & Billing", description: "Plans, upgrades, profile details, and login issues." },
   { icon: FileText, title: "Policies & Records", description: "Adding, editing, and tracking policy records of any type." },
   { icon: Wallet, title: "Payments & Referrals", description: "Referral wallet, rewards, and plan renewals." },
-  { icon: Calculator, title: "Tools & Calculators", description: "Free calculators and the LIC terms reference." },
+  { icon: Calculator, title: "Tools & Calculators", description: "Free calculators and the Insurance & Policy terms reference." },
   { icon: Lock, title: "Security & Data", description: "How your data is protected, backed up, and accessed." },
   { icon: ShieldCheck, title: "Technical", description: "Bugs, loading issues, or anything not working as expected." },
 ];
@@ -539,7 +547,7 @@ const HelpSupport = () => {
                   </AlertDialogHeader>
                   <div className="rounded-lg bg-muted/50 border border-border px-4 py-3 text-sm space-y-1">
                     <p><span className="text-muted-foreground">Name:</span> <span className="font-medium text-form-header">{form.name || "—"}</span></p>
-                    <p><span className="text-muted-foreground">Email:</span> <span className="font-medium text-form-header">{form.email || "—"}</span></p>
+                    <p><span className="text-muted-foreground">Email:</span> <span className="font-medium text-form-header"><SensitiveValue field="email" value={form.email} /></span></p>
                   </div>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Let me check again</AlertDialogCancel>
@@ -619,7 +627,7 @@ const HelpSupport = () => {
                           <div>
                             <CardTitle className="text-sm font-mono">{c.requestId}</CardTitle>
                             <p className="text-xs text-muted-foreground mt-1">
-                              {c.category} · {fmt(c.createdAt)} · +91 {c.phone}
+                              {c.category} · {fmt(c.createdAt)} · +91 <SensitiveValue field="mobileNumber" value={c.phone} />
                             </p>
                           </div>
                           <Badge className={`text-xs ${callStatusStyle[c.status].cls}`}>{callStatusStyle[c.status].label}</Badge>
@@ -710,7 +718,7 @@ const HelpSupport = () => {
                 <h2 className="text-2xl md:text-3xl font-bold mb-1">Looking for policy terms & codes?</h2>
                 <p className="text-primary-foreground/90">Check the Insurance Abbreviations & Codes reference for quick lookups.</p>
               </div>
-              <Link to="/lic-info-hub" className="shrink-0">
+              <Link to="/policy-niketan-info-hub" className="shrink-0">
                 <Button size="lg" className="bg-white text-[hsl(195,85%,25%)] hover:bg-white/90 font-medium">
                   <BookOpenText className="w-4 h-4 mr-2" />
                   Open reference

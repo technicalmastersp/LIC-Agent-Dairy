@@ -31,9 +31,10 @@ const siteConfig = {
   og_image: "/logos/og_image.png",
 
   description: "Professional insurance policy record management system for all types of agents and customers",
-  author: "Mr. Shashank S Pandey",
+  author: "Mr. Shashank Shekhar Pandey",
   version: "1.0.0",
   productionUrl: "https://policyniketan.com",
+  linkedInUrl: "https://linkedin.com/company/policyniketan",
   // PLACEHOLDER — update with the real contact address when available.
   contactEmail: "contact@policyniketan.com",
   supportEmail: "support@policyniketan.com",

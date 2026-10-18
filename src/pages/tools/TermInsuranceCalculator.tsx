@@ -54,7 +54,7 @@ const TermInsuranceCalculator = () => {
 
           <p className="text-xs text-muted-foreground">
             This is a coverage-need estimate using the Human Life Value method, not a premium quote —
-            actual premiums depend on the insurer, your health, and underwriting. Talk to your LIC agent
+            actual premiums depend on the insurer, your health, and underwriting. Talk to your Insurance agent
             for a real quote tailored to you.
           </p>
         </CardContent>

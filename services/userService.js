@@ -27,7 +27,8 @@ export const login = async (credentials) => {
     localStorage.removeItem('userName')
     return res.data;
   } else {
-    throw new Error(res.data.message);
+    // Carry the server's "attempts left" countdown (wrong password) to the Login page.
+    throw Object.assign(new Error(res.data.message), { attemptsLeft: res.data.attemptsLeft });
   }
 };
 
@@ -143,6 +144,16 @@ export const updateNotificationPreferences = async (prefs) => {
   // prefs: { policyDueReminders?: boolean, subscriptionReminders?: boolean }
   const res = await apiClient.put("/user/notification-preferences", prefs);
   return res.data; // { statusCode, message, data }
+};
+
+export const getPrivacySettings = async () => {
+  const res = await apiClient.get("/user/privacy-settings");
+  return res.data.data; // { featureEnabled, maskSensitiveData }
+};
+
+export const updatePrivacySettings = async (maskSensitiveData) => {
+  const res = await apiClient.put("/user/privacy-settings", { maskSensitiveData });
+  return res.data; // { statusCode, message, data: { featureEnabled, maskSensitiveData } }
 };
 
 export const getMySessions = async () => {

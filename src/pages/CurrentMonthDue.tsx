@@ -15,6 +15,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { dueThisMonth } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
 import type { Record } from "@/types/pages/CurrentMonthDue.types";
+import { SensitiveValue } from "@/components/SensitiveValue";
 const avatarPalette = [
   "bg-blue-100 text-blue-700",
   "bg-violet-100 text-violet-700",
@@ -268,11 +269,11 @@ const CurrentMonthDue = () => {
                               </div>
                             </TableCell>
                             <TableCell className="border border-table-border text-muted-foreground">
-                              {record.aadhaarLinkedMobileNumber}
+                              <SensitiveValue field="mobileNumber" value={record.aadhaarLinkedMobileNumber} placeholder="" />
                             </TableCell>
                             <TableCell className="border border-table-border">
                               <Badge variant="outline" className="font-mono text-xs">
-                                {record.currentPolicy.policyNumber || "N/A"}
+                                <SensitiveValue field="policyNumber" value={record.currentPolicy.policyNumber} placeholder="N/A" />
                               </Badge>
                             </TableCell>
                             <TableCell className="border border-table-border text-muted-foreground">
@@ -341,6 +342,7 @@ const CurrentMonthDue = () => {
         record={selectedRecord}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onPaymentsChanged={handleUpdateRecord}
       />
 
       <PaymentUpdateModal
@@ -353,6 +355,7 @@ const CurrentMonthDue = () => {
       <ContactActionModal
         phone={contactingRecord?.aadhaarLinkedMobileNumber}
         name={contactingRecord?.name}
+        email={contactingRecord?.email}
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
       />

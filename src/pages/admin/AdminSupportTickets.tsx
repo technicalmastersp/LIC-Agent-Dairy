@@ -12,6 +12,7 @@ import { getSupportTickets, replyToTicket, getPendingCounts } from "../../../ser
 import { RefreshCw, Reply, Mail, User as UserIcon } from "lucide-react";
 import type { SupportTicket } from "@/types/pages/admin/AdminSupportTickets.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 // (date formatting now imported from dateFormat.ts as `fmt`)
 
@@ -140,7 +141,7 @@ const AdminSupportTickets = () => {
                           <CardTitle className="text-xs font-mono">{t.ticketId}</CardTitle>
                           <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-3 flex-wrap">
                             <span className="flex items-center gap-1"><UserIcon className="w-3 h-3" />{t.name}</span>
-                            <span className="flex items-center gap-1"><Mail className="w-3 h-3" />{t.email}</span>
+                            <span className="flex items-center gap-1"><Mail className="w-3 h-3" /><SensitiveValue field="email" value={t.email} /></span>
                             <span>{fmt(t.createdAt)}</span>
                             {t.isGuest && <Badge variant="outline" className="text-[10px]">Guest</Badge>}
                             {t.isGuest && t.guestMatchedAccount && (

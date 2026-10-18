@@ -14,6 +14,7 @@ import { Search, Eye, UserX, UserCheck, ChevronLeft, ChevronRight, RefreshCw, Ar
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { StatusFilter, PlanSort, AdminUserRow, ModalTarget } from "@/types/pages/admin/AdminUsers.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -273,7 +274,7 @@ const AdminUsers = () => {
                             </Avatar>
                             <div className="min-w-0">
                               <p className="text-sm font-medium truncate">{u.name}</p>
-                              <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                              <p className="text-xs text-muted-foreground truncate"><SensitiveValue field="email" value={u.email} /></p>
                             </div>
                           </div>
                         </TableCell>

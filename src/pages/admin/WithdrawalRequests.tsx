@@ -13,7 +13,6 @@ import { CheckCircle2, XCircle, Eye, Search, ArrowUpDown, X, RefreshCw, Info } f
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { SortField, SortDir, WithdrawalItem } from "@/types/pages/admin/WithdrawalRequests.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
-import { isEncryptedValue } from "@/utils/inputValueFormats";
 import { SensitiveValue } from "@/components/SensitiveValue";
 
 const initials = (name = "") =>
@@ -244,7 +243,7 @@ const WithdrawalRequests = () => {
                 { label: "Pending",       val: summary.totalPending,       color: "text-yellow-600", bg: "bg-yellow-50 border-yellow-200", target: "requested" },
                 { label: "Processed",     val: summary.totalProcessed,     color: "text-green-600",  bg: "bg-green-50 border-green-200",   target: "processed" },
                 { label: "Failed",        val: summary.totalFailed,        color: "text-red-600",    bg: "bg-red-50 border-red-200",       target: "failed"    },
-                { label: "Pending amount",val: `₹${summary.totalAmount}`,  color: "text-blue-600",   bg: "bg-blue-50 border-blue-200",     target: "requested" },
+                { label: "Pending amount",val: <SensitiveValue field="withdrawalAmount" value={summary.totalAmount} render={(v) => `₹${v}`} />,  color: "text-blue-600",   bg: "bg-blue-50 border-blue-200",     target: "requested" },
               ].map(({ label, val, color, bg, target }) => (
                 <Card
                   key={label}
@@ -376,7 +375,7 @@ const WithdrawalRequests = () => {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <p className="text-sm font-medium text-green-600">₹{w.amount}</p>
+                              <p className="text-sm font-medium text-green-600"><SensitiveValue field="withdrawalAmount" value={w.amount} render={(v) => `₹${v}`} /></p>
                             </TableCell>
                             <TableCell>
                               <Badge className="text-xs bg-blue-100 text-blue-700 border border-blue-200">
@@ -384,17 +383,16 @@ const WithdrawalRequests = () => {
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              {w.upiId && <p className="text-xs"><SensitiveValue value={w.upiId} /></p>}
+                              {w.upiId && <p className="text-xs"><SensitiveValue field="upiId" value={w.upiId} /></p>}
                               {w.accountNumber && (
                                 <>
                                   <p className="text-xs font-medium">{w.accountHolder}</p>
                                   <p className="text-xs text-muted-foreground">
                                     {w.bankName} ·{" "}
-                                    {isEncryptedValue(w.accountNumber)
-                                      ? <SensitiveValue value={w.accountNumber} />
-                                      : <>••••{w.accountNumber.slice(-4)}</>}
+                                    <SensitiveValue field="bankAccountNumber" value={w.accountNumber}
+                                      render={(v) => `••••${v.slice(-4)}`} />
                                   </p>
-                                  <p className="text-xs text-muted-foreground"><SensitiveValue value={w.ifscCode} /></p>
+                                  <p className="text-xs text-muted-foreground"><SensitiveValue field="ifscCode" value={w.ifscCode} /></p>
                                 </>
                               )}
                             </TableCell>

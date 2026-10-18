@@ -144,3 +144,11 @@
     @apply bg-background text-foreground;
   }
 }
+/* Hide/Show sensitive data: obscure a text input's contents without touching its
+   value (see hooks/useSensitiveMask.tsx useSensitiveInputClass). Chromium, Safari
+   and current Firefox support -webkit-text-security; where it is unsupported the
+   input simply stays readable, which is the pre-feature behavior. */
+.sensitive-input {
+  -webkit-text-security: disc;
+  text-security: disc;
+}

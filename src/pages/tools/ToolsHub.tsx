@@ -3,12 +3,15 @@ import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import {
-  Cake, TrendingUp, Receipt, Home, ShieldCheck, LineChart, ArrowRight,
+  Cake, TrendingUp, Receipt, Home, ShieldCheck, LineChart, ArrowRight, Banknote, Landmark, PiggyBank,
 } from "lucide-react";
 
 const TOOLS = [
   { to: "/tools/age-calculator", icon: Cake, title: "Age Calculator", desc: "Exact age in years, months, and days from a date of birth.", accent: "blue" },
   { to: "/tools/sip-calculator", icon: TrendingUp, title: "SIP Calculator", desc: "Project the future value of your monthly mutual fund investments.", accent: "violet" },
+  { to: "/tools/lumpsum-calculator", icon: Banknote, title: "Lumpsum Calculator", desc: "See what a one-time investment could grow to over the years.", accent: "indigo" },
+  { to: "/tools/rd-calculator", icon: PiggyBank, title: "RD Calculator", desc: "Maturity value and interest on a monthly recurring deposit.", accent: "orange" },
+  { to: "/tools/fd-calculator", icon: Landmark, title: "FD Calculator", desc: "Maturity value and interest on a fixed deposit, with your choice of compounding.", accent: "green" },
   { to: "/tools/income-tax-calculator", icon: Receipt, title: "Income Tax Calculator", desc: "Estimate your tax under the old and new regimes.", accent: "amber" },
   { to: "/tools/home-loan-emi-calculator", icon: Home, title: "Home Loan EMI Calculator", desc: "Monthly EMI, total interest, and total payment on a home loan.", accent: "emerald" },
   { to: "/tools/term-insurance-calculator", icon: ShieldCheck, title: "Term Insurance Calculator", desc: "Estimate how much life cover you actually need.", accent: "rose" },
@@ -20,7 +23,7 @@ const ToolsHub = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
         title="Free Financial Calculators"
-        description="Free calculators for age, SIP returns, income tax, home loan EMI, term insurance cover, and inflation — quick tools for agents and clients alike."
+        description="Free calculators for age, SIP, lumpsum, FD and RD returns, income tax, home loan EMI, term insurance cover and inflation — quick tools for agents and clients alike."
         path="/tools"
       />
       <Navigation />

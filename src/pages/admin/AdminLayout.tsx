@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "@/utils/auth";
 import ThemeToggle from "@/components/ThemeToggle";
 import NotificationBell from "@/components/NotificationBell";
+import PrivacyToggleButton from "@/components/PrivacyToggleButton";
 import { getMyPermissions, getPendingCounts } from "../../../services/adminService";
 import { logoutCurrentUser } from "../../../services/userService";
 import {
@@ -203,6 +204,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
         {/* Notifications + Root/Home */}
         <div className="flex items-center">
+          <PrivacyToggleButton variant="icon" />
           <NotificationBell align="end" />
           <button
             type="button"
@@ -265,6 +267,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             </p>
           </div>
           <div className="flex items-center gap-1">
+            <PrivacyToggleButton variant="icon" />
             <NotificationBell align="start" />
             <ThemeToggle type="icon" />
           </div>

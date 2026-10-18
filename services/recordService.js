@@ -104,6 +104,27 @@ export const updateRecord = async (formData, recordId) => {
   return res.data;
 };
 
+// ── Payment ledger for a record's current policy (backend: policyPaymentsController) ──
+export const getRecordPayments = async (recordId) => {
+  const res = await apiClient.get('/user/payments', { params: { recordId } });
+  return res.data.data; // { record, payments, schedule, summary, legacyLastPaymentDate }
+};
+
+export const addRecordPayment = async (recordId, payment) => {
+  const res = await apiClient.post('/user/payments', payment, { params: { recordId } });
+  return res.data;
+};
+
+export const updateRecordPayment = async (recordId, paymentId, payment) => {
+  const res = await apiClient.put(`/user/payments/${paymentId}`, payment, { params: { recordId } });
+  return res.data;
+};
+
+export const deleteRecordPayment = async (recordId, paymentId) => {
+  const res = await apiClient.delete(`/user/payments/${paymentId}`, { params: { recordId } });
+  return res.data;
+};
+
 export const deleteRecord = async (id) => {
   // Currently not in use 
   // const res = await apiClient.delete(`/user/deletePolicyRecord`, { data: { recordId: id } });

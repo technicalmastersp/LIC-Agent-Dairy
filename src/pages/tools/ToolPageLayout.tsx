@@ -12,7 +12,7 @@ const ToolPageLayout = ({ icon: Icon, title, description, children, accent }: To
 
   // Every calculator tool page is a free, browser-based WebApplication —
   // this is the schema.org type Google's rich-results docs recommend for
-  // that shape of page. One JSON-LD block here covers all six calculators
+  // that shape of page. One JSON-LD block here covers all nine calculators
   // without duplicating it per page.
   const jsonLd = {
     "@context": "https://schema.org",

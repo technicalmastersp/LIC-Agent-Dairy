@@ -13,6 +13,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { dueNextMonth } from "../../services/recordService";
 import { convertDateToIndianFormat } from "@/utils/tools";
 import type { Record } from "@/types/pages/UpcomingDuePolicies.types";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 // NOTE: copy CurrentMonthDue.tsx's Record interface, search/sort state,
 // SortableHeader, table body, and RecordDetailsModal/PaymentUpdateModal/
@@ -264,11 +265,11 @@ const UpcomingDuePolicies = () => {
                               </div>
                               </TableCell>
                               <TableCell className="border border-table-border text-muted-foreground">
-                              {record.aadhaarLinkedMobileNumber}
+                              <SensitiveValue field="mobileNumber" value={record.aadhaarLinkedMobileNumber} placeholder="" />
                               </TableCell>
                               <TableCell className="border border-table-border">
                               <Badge variant="outline" className="font-mono text-xs">
-                                  {record.currentPolicy.policyNumber || "N/A"}
+                                  <SensitiveValue field="policyNumber" value={record.currentPolicy.policyNumber} placeholder="N/A" />
                               </Badge>
                               </TableCell>
                               <TableCell className="border border-table-border text-muted-foreground">
@@ -329,11 +330,13 @@ const UpcomingDuePolicies = () => {
         record={selectedRecord}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onPaymentsChanged={fetchRecords}
       />
 
       <ContactActionModal
         phone={contactingRecord?.aadhaarLinkedMobileNumber}
         name={contactingRecord?.name}
+        email={contactingRecord?.email}
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
       />

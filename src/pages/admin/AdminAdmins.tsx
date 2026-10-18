@@ -16,6 +16,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { AdminItem, SuperAdminItem, ModalTarget } from "@/types/pages/admin/AdminAdmins.types";
 import { formatISTDate as fmt } from "@/utils/dateFormat";
 import { PERMISSION_DEFS, PERMISSION_RISK_COLOR } from "@/config/adminPermissions";
+import { SensitiveValue } from "@/components/SensitiveValue";
 
 // (date formatting now imported from dateFormat.ts as `fmt`)
 const AdminAdmins = () => {
@@ -267,7 +268,7 @@ const AdminAdmins = () => {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground">{s.email} · {s.easyId}</p>
+                        <p className="text-xs text-muted-foreground"><SensitiveValue field="email" value={s.email} /> · {s.easyId}</p>
                         {isTemp && s.tempSuperadmin?.reason && (
                           <p className="text-xs text-muted-foreground mt-0.5">
                             Reason: {s.tempSuperadmin.reason}
@@ -313,7 +314,7 @@ const AdminAdmins = () => {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">{a.name}</p>
-                      <p className="text-xs text-muted-foreground">{a.email} · {a.easyId}</p>
+                      <p className="text-xs text-muted-foreground"><SensitiveValue field="email" value={a.email} /> · {a.easyId}</p>
                       {!a.isActive && (
                         <p className="text-xs text-red-600 mt-0.5">
                           Deactivated {fmt(a.deactivatedAt)}

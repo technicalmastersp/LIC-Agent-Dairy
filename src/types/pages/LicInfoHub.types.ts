@@ -4,9 +4,9 @@ export type AbbreviationItem = {
   full_form: string;
   description: string;
 };
-export type LICAbbreviationsData = {
-  LIC_Abbreviations: AbbreviationItem[];
-  LIC_Internal_Codes: AbbreviationItem[];
+export type InsuranceAbbreviationsData = {
+  Insurance_Abbreviations: AbbreviationItem[];
+  Insurance_Internal_Codes: AbbreviationItem[];
   Private_Insurers: AbbreviationItem[];
   Common_Policy_Terms: AbbreviationItem[];
 };

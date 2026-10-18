@@ -4,6 +4,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
+import { SITE_STATS, SOCIAL_PROOF_STATS } from "@/config/siteStats";
 import {
   ShieldCheck,
   FileText,
@@ -35,6 +36,8 @@ import {
   BookOpenText,
   Moon,
   Compass,
+  FileSpreadsheet,
+  Layers,
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
 import { BUSINESS_HOURS_LABELS } from "@/config/businessHours";
@@ -50,7 +53,9 @@ const About = () => {
     { label: "All", icon: HomeIcon, rotate: "rotate-6", offset: "-translate-y-1", bg: "bg-violet-50 dark:bg-violet-950/40", accent: "text-violet-600 dark:text-violet-400", chip: "Renewed" },
   ];
 
+  // The first two come from src/config/siteStats.ts (single source of truth — also used on the home page).
   const trustStats = [
+    ...SOCIAL_PROOF_STATS.map(({ value, label }) => ({ value, label })),
     { value: "Daily", label: "Data backups" },
     { value: "< few hrs", label: "Support response" },
     { value: "0", label: "Queries pending overnight" },
@@ -68,7 +73,7 @@ const About = () => {
       icon: BellRing,
       title: "Due and lapse tracking",
       description:
-        "Automatically surfaces policies with payments due this month and flags anyone who missed their last payment, so follow-ups happen before a policy lapses — whatever kind of policy it is.",
+        "Automatically surfaces policies with payments due this month, coming up next, or missed, so follow-ups happen before a policy lapses — whatever kind of policy it is. Reminders reach you through the in-app bell, phone or desktop push notifications, and email, and you choose which ones to receive. Update a payment date in a couple of taps, or call, WhatsApp, SMS, or email the policyholder straight from the list.",
     },
     ...(REFERRAL_PROGRAM_ENABLED
       ? [
@@ -96,6 +101,18 @@ const About = () => {
         "Admins get dedicated tools to manage user accounts, handle support requests, and keep the platform running smoothly — without touching agents' day-to-day workspace.",
     },
     {
+      icon: Layers,
+      title: "Every kind of policy",
+      description:
+        "Life, term life, health, family health, vehicle, and travel policies each come with the fields that matter for that product — and an Other (Custom) type lets you name a policy type and design your own fields when none of them fit.",
+    },
+    {
+      icon: FileSpreadsheet,
+      title: "Import and export",
+      description:
+        "Moving from spreadsheets? Import an Excel or CSV file with a preview that highlights every cell to fix before saving. When you need a copy, export your records — with any search or type filter applied — to PDF or CSV.",
+    },
+    {
       icon: Search,
       title: "Fast, precise search",
       description:
@@ -105,18 +122,21 @@ const About = () => {
       icon: Languages,
       title: "Built for Indian agents",
       description:
-        "Full English and Hindi support, Indian date formatting, and terminology that matches how policies are actually discussed in the field.",
+        "Full English and Hindi language support, Indian date formats, and terminology tailored to the way insurance policies are discussed, understood, and handled in real-world field operations across India.",
     },
   ];
 
   const freeTools = [
     { to: "/tools/age-calculator", icon: Calculator, title: "Age Calculator", accent: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-950/40" },
     { to: "/tools/sip-calculator", icon: Calculator, title: "SIP Calculator", accent: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-950/40" },
+    { to: "/tools/lumpsum-calculator", icon: Calculator, title: "Lumpsum Calculator", accent: "text-indigo-600 dark:text-indigo-400", bg: "bg-indigo-50 dark:bg-indigo-950/40" },
+    { to: "/tools/rd-calculator", icon: Calculator, title: "RD Calculator", accent: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-950/40" },
+    { to: "/tools/fd-calculator", icon: Calculator, title: "FD Calculator", accent: "text-green-600 dark:text-green-400", bg: "bg-green-50 dark:bg-green-950/40" },
     { to: "/tools/income-tax-calculator", icon: Calculator, title: "Income Tax Calculator", accent: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/40" },
     { to: "/tools/home-loan-emi-calculator", icon: Calculator, title: "Home Loan EMI Calculator", accent: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/40" },
     { to: "/tools/term-insurance-calculator", icon: Calculator, title: "Term Insurance Calculator", accent: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-950/40" },
     { to: "/tools/inflation-calculator", icon: Calculator, title: "Inflation Calculator", accent: "text-cyan-600 dark:text-cyan-400", bg: "bg-cyan-50 dark:bg-cyan-950/40" },
-    { to: "/lic-info-hub", icon: BookOpenText, title: "LIC Info Hub", accent: "text-primary", bg: "bg-primary/10" },
+    { to: "/policy-niketan-info-hub", icon: BookOpenText, title: "Policy Niketan Info Hub", accent: "text-primary", bg: "bg-primary/10" },
   ];
 
   return (
@@ -214,7 +234,7 @@ const About = () => {
         {/* ══════════ TRUST STRIP — full width stat bar ══════════ */}
         <section className="bg-form-subheader text-primary-foreground">
           <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-primary-foreground/15">
+            <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-primary-foreground/15">
               {trustStats.map(({ value, label }) => (
                 <div key={label} className="px-4 py-6 text-center">
                   <p className="text-2xl md:text-3xl font-bold">{value}</p>
@@ -225,7 +245,7 @@ const About = () => {
           </div>
         </section>
 
-        {/* ══════════ NOT JUST FOR LIC — split, icon panel right ══════════ */}
+        {/* ══════════ NOT JUST FOR One Insurance Type — split, icon panel right ══════════ */}
         <section className="bg-background py-16 md:py-20">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -289,7 +309,7 @@ const About = () => {
           </div>
         </section>
 
-        {/* ══════════ FREE TOOLS — calculators + LIC Info Hub grid ══════════ */}
+        {/* ══════════ FREE TOOLS — calculators + Policy Niketan Info Hub grid ══════════ */}
         <section className="bg-background py-16 md:py-20">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
@@ -297,8 +317,8 @@ const About = () => {
                 <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Beyond record-keeping</p>
                 <h2 className="text-3xl font-bold text-form-header">Free tools, built right in</h2>
                 <p className="text-muted-foreground mt-3 leading-relaxed">
-                  Six financial calculators agents actually need day to day, plus a searchable glossary
-                  of LIC terms — no separate app, no sign-up wall.
+                  {SITE_STATS.freeTools} financial calculators agents actually need day to day, plus a searchable glossary
+                  of Insurance & Policy terms — no separate app, no sign-up wall.
                 </p>
               </div>
 
@@ -347,7 +367,7 @@ const About = () => {
                     icon: Lock,
                     title: "Locked down by default",
                     description:
-                      "Every account is authenticated before it can see a single record. Sensitive fields like Aadhaar, PAN, and bank details are only ever visible to the agent who owns them, or an admin acting within their role. You can also review your own activity log and sign out any active session yourself, any time.",
+                      "Every account is authenticated before it can see a single record. Sensitive fields like Aadhaar, PAN, and bank details are encrypted before they are stored, and are only ever visible to the agent who owns them, or an admin acting within their role. A Hide button masks them on screen whenever you need privacy. You can also review your own activity log and sign out any active session yourself, any time.",
                   },
                   {
                     icon: CloudCog,
