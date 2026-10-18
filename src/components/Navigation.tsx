@@ -232,6 +232,7 @@ const Navigation = () => {
   };
 
   const publicLinks = [
+    { href: "/",     label: "Home"          },
     { href: "/tools",     label: "Tools"          },
     { href: "/our-plans",     label: "Plans"          },
     { href: "/policy-niketan-info-hub",  label: "Best Info Hub"  },

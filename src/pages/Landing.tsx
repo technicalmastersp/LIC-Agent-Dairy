@@ -353,7 +353,7 @@ const Landing = () => {
 
               <div className="space-y-5 order-2 lg:order-1">
                 <Badge className="bg-primary/10 text-primary border border-primary/20 w-fit">
-                  <Sparkles className="w-3 h-3 mr-1" /> New
+                  <Sparkles className="w-3 h-3 mr-1" /> Get Free Business Card
                 </Badge>
                 <h2 className="text-3xl font-bold text-form-header leading-tight">
                   Your own digital business card, generated for free
@@ -370,6 +370,7 @@ const Landing = () => {
                     "Your name, mobile number, email, and Agent ID laid out automatically",
                     "Unlocks the moment your profile hits 100% completion",
                     "Download as a high-resolution PNG, ready to share or print",
+                    "Add your Image & custom note to your business card (max. 150 characters)",
                   ].map((point) => (
                     <div key={point} className="flex items-start gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />

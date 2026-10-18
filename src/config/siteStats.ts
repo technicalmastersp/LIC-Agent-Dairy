@@ -11,7 +11,7 @@ export const SITE_STATS = {
   /** Agent accounts registered. Shown as "200+". */
   agentsJoined: 200,
   /** Policy records stored across all agents. Shown as "2,200+". */
-  recordsManaged: 2200,
+  recordsManaged: 2700,
   /**
    * Free calculators on /tools. Must equal the number of /tools/* routes — enforced by
    * src/test/siteStats.test.ts, so adding a tool without updating this fails the build.
@@ -42,5 +42,5 @@ export const SOCIAL_PROOF_STATS: SiteStat[] = [
 export const HOME_STATS: SiteStat[] = [
   ...SOCIAL_PROOF_STATS,
   { key: "tools", value: String(SITE_STATS.freeTools), label: "Free calculators" },
-  { key: "trial", value: `${SITE_STATS.freeTrialDays} days`, label: "Free trial, no card" },
+  { key: "trial", value: `${SITE_STATS.freeTrialDays} days`, label: "Free trial, no credit card" },
 ];

@@ -108,7 +108,7 @@ const About = () => {
       icon: Languages,
       title: "Built for Indian agents",
       description:
-        "Full English and Hindi support, Indian date formatting, and terminology that matches how policies are actually discussed in the field.",
+        "Full English and Hindi language support, Indian date formats, and terminology tailored to the way insurance policies are discussed, understood, and handled in real-world field operations across India.",
     },
   ];
 

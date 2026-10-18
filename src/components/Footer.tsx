@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, MapPin, Globe, Compass, Link2, Sparkles, Building2, Calculator, Phone } from "lucide-react";
+import { Mail, MapPin, Globe, Compass, Link2, Sparkles, Building2, Calculator, Phone, Linkedin } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { isAuthenticated } from "@/utils/auth";
 import siteConfig from "@/config/siteConfig";
@@ -122,6 +122,10 @@ const Footer = () => {
               <div className="flex items-start gap-2">
                 <Globe className="w-3.5 h-3.5 mt-0.5 shrink-0" />
                 <span className="break-all">{siteConfig.productionUrl}</span>
+              </div>
+              <div className="flex items-start gap-2 hover:text-accent transition-colors">
+                <Linkedin className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                <span className="break-all"><a href={siteConfig.linkedInUrl} target="_blank">LinkedIn Page</a></span>
               </div>
             </div>
           </FooterSection>
