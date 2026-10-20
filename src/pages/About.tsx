@@ -36,6 +36,8 @@ import {
   BookOpenText,
   Moon,
   Compass,
+  FileSpreadsheet,
+  Layers,
 } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
 import { BUSINESS_HOURS_LABELS } from "@/config/businessHours";
@@ -71,7 +73,7 @@ const About = () => {
       icon: BellRing,
       title: "Due and lapse tracking",
       description:
-        "Automatically surfaces policies with payments due this month and flags anyone who missed their last payment, so follow-ups happen before a policy lapses — whatever kind of policy it is.",
+        "Automatically surfaces policies with payments due this month, coming up next, or missed, so follow-ups happen before a policy lapses — whatever kind of policy it is. Reminders reach you through the in-app bell, phone or desktop push notifications, and email, and you choose which ones to receive. Update a payment date in a couple of taps, or call, WhatsApp, SMS, or email the policyholder straight from the list.",
     },
     ...(REFERRAL_PROGRAM_ENABLED
       ? [
@@ -99,6 +101,18 @@ const About = () => {
         "Admins get dedicated tools to manage user accounts, handle support requests, and keep the platform running smoothly — without touching agents' day-to-day workspace.",
     },
     {
+      icon: Layers,
+      title: "Every kind of policy",
+      description:
+        "Life, term life, health, family health, vehicle, and travel policies each come with the fields that matter for that product — and an Other (Custom) type lets you name a policy type and design your own fields when none of them fit.",
+    },
+    {
+      icon: FileSpreadsheet,
+      title: "Import and export",
+      description:
+        "Moving from spreadsheets? Import an Excel or CSV file with a preview that highlights every cell to fix before saving. When you need a copy, export your records — with any search or type filter applied — to PDF or CSV.",
+    },
+    {
       icon: Search,
       title: "Fast, precise search",
       description:
@@ -108,7 +122,7 @@ const About = () => {
       icon: Languages,
       title: "Built for Indian agents",
       description:
-        "Full English and Hindi support, Indian date formatting, and terminology that matches how policies are actually discussed in the field.",
+        "Full English and Hindi language support, Indian date formats, and terminology tailored to the way insurance policies are discussed, understood, and handled in real-world field operations across India.",
     },
   ];
 
@@ -353,7 +367,7 @@ const About = () => {
                     icon: Lock,
                     title: "Locked down by default",
                     description:
-                      "Every account is authenticated before it can see a single record. Sensitive fields like Aadhaar, PAN, and bank details are only ever visible to the agent who owns them, or an admin acting within their role. You can also review your own activity log and sign out any active session yourself, any time.",
+                      "Every account is authenticated before it can see a single record. Sensitive fields like Aadhaar, PAN, and bank details are encrypted before they are stored, and are only ever visible to the agent who owns them, or an admin acting within their role. A Hide button masks them on screen whenever you need privacy. You can also review your own activity log and sign out any active session yourself, any time.",
                   },
                   {
                     icon: CloudCog,

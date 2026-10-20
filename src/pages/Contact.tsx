@@ -12,7 +12,7 @@ import siteConfig from "@/config/siteConfig";
 // below only renders when its value has been filled in, so the page never
 // shows a placeholder or an empty row.
 const Contact = () => {
-  const { supportEmail, phone, address, legalEntityName } = siteConfig;
+  const { supportEmail, phone, address, legalEntityName, linkedInUrl } = siteConfig;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -154,6 +154,11 @@ const Contact = () => {
                         {siteConfig.productionUrl}
                       </a>
                     </p>
+                    {linkedInUrl && (
+                      <p className="py-2">
+                        <strong className="text-foreground">Company LinkedIn Page:</strong> <a href={linkedInUrl} target="_blank" className="text-primary hover:underline">LinkedIn Page URL</a>
+                      </p>
+                    )}
                     {legalEntityName && (
                       <p>
                         <strong className="text-foreground">Operated by:</strong> {legalEntityName}

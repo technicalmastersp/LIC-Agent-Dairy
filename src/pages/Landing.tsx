@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,10 +11,12 @@ import {
   DatabaseBackup, Lock, Timer, CheckCircle2, LifeBuoy,
   Sparkles, ArrowRight, UserPlus, LogIn, ClipboardList, ListChecks,
   TrendingUp, CircleDot, Bell, Languages, IdCard,
+  Upload, FileDown, Layers, EyeOff, Phone, Calculator, FileSpreadsheet,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
 import { signupPathForPlan } from "@/config/plans";
-import { HOME_STATS } from "@/config/siteStats";
+import { HOME_STATS, SITE_STATS } from "@/config/siteStats";
 import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import SEO from "@/components/SEO";
 import BusinessCard, { BUSINESS_CARD_TEMPLATES } from "@/components/BusinessCard";
@@ -28,6 +30,163 @@ const plans = [
   { id: "6months", name: "6 Months", price: "Most popular", tag: "Recommended", color: "bg-blue-50 border-blue-300 ring-2 ring-blue-200 dark:bg-blue-950/40 dark:border-blue-800 dark:ring-blue-900", accent: "text-blue-700 dark:text-blue-400" },
   { id: "12months", name: "12 Months", price: "Best value", tag: "", color: "bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900", accent: "text-amber-700 dark:text-amber-400" },
 ];
+
+// Hero copy — the three headline promises, then every major capability as a compact chip.
+// Every chip maps to a feature that exists in the app today (see the FEATURES grid below).
+const HERO_POINTS = [
+  "All your client and policy records in one place",
+  "Stay ahead of renewals and payment due dates",
+  "Daily backups to help protect your records",
+];
+
+const HERO_CHIPS = [
+  { icon: Upload, text: "Import from Excel / CSV" },
+  { icon: FileDown, text: "Export to PDF & CSV" },
+  { icon: Layers, text: "All policy types + custom" },
+  { icon: BellRing, text: "Bell, push & email reminders" },
+  { icon: Phone, text: "Call, WhatsApp & SMS" },
+  { icon: EyeOff, text: "Encrypted · hide mode" },
+  { icon: Languages, text: "English & Hindi" },
+  { icon: Calculator, text: `${SITE_STATS.freeTools} free calculators` },
+];
+
+// ── FEATURES — "What you get" tiles ─────────────────────────────────────────
+// Each tile = a mini visual + icon + title + one-line description, all verified against the app.
+// Grid rule: the list length must be a multiple of 3 (lg = 3 columns). 9 tiles today. If the
+// referral program is switched on, its tile is added and the list is trimmed back to 9 — the
+// LAST tiles drop first, so keep them in priority order (most important first).
+const FEATURES: { key: string; icon: LucideIcon; title: string; description: string; visual: ReactNode }[] = [
+  {
+    key: "records", icon: FileText, title: "Complete policy records",
+    description: "Policyholder details, nominee info, and current & previous policy terms — all in one place.",
+    visual: (
+      <div className="flex items-center gap-3 mb-4 bg-blue-50 dark:bg-blue-950/40 rounded-xl p-3">
+        <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-700 dark:text-blue-300 text-xs font-semibold shrink-0">RS</div>
+        <div className="space-y-1 flex-1">
+          <div className="h-2 w-20 rounded bg-blue-200/70 dark:bg-blue-800/50" />
+          <div className="h-1.5 w-14 rounded bg-blue-200/40 dark:bg-blue-800/30" />
+        </div>
+      </div>
+    ),
+  },
+  {
+    key: "due", icon: BellRing, title: "Due and lapse tracking",
+    description: "See what's due this month, what's coming up, and who missed a payment — before it lapses.",
+    visual: (
+      <div className="mb-4 bg-amber-50 dark:bg-amber-950/40 rounded-xl p-3 space-y-1.5">
+        {["Due 3 Aug", "Due 9 Aug"].map((d) => (
+          <div key={d} className="flex items-center justify-between bg-white dark:bg-background rounded-md px-2.5 py-1.5">
+            <span className="text-[10px] text-form-header font-medium">{d}</span>
+            <BellRing className="w-3 h-3 text-amber-500" />
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  // REFERRAL-PROGRAM — only while the program is enabled
+  ...(REFERRAL_PROGRAM_ENABLED ? [{
+    key: "referral", icon: Wallet, title: "Referral wallet",
+    description: "Earn and track referral rewards, and use your wallet balance toward plan renewals and upgrades.",
+    visual: (
+      <div className="mb-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl p-4">
+        <p className="text-[10px] text-emerald-700 dark:text-emerald-400 mb-1">Available balance</p>
+        <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400">₹4,250</p>
+      </div>
+    ),
+  }] : []),
+  {
+    key: "search", icon: Search, title: "Instant search & sort",
+    description: "Find any record by name, policy number, or occupation — and filter by insurance type — in seconds.",
+    visual: (
+      <div className="mb-4 bg-violet-50 dark:bg-violet-950/40 rounded-xl p-3">
+        <div className="flex items-center gap-2 bg-white dark:bg-background rounded-md px-2.5 py-1.5 mb-2">
+          <Search className="w-3 h-3 text-muted-foreground" />
+          <span className="text-[10px] text-muted-foreground">Sharma...</span>
+        </div>
+        <div className="h-1.5 w-3/4 rounded bg-violet-200/60 dark:bg-violet-800/40 mb-1.5" />
+        <div className="h-1.5 w-1/2 rounded bg-violet-200/40 dark:bg-violet-800/25" />
+      </div>
+    ),
+  },
+  {
+    key: "import-export", icon: FileSpreadsheet, title: "Import & export",
+    description: "Bring your book in from Excel or CSV (up to 100 records at a time), and export your records to PDF or CSV whenever you need them.",
+    visual: (
+      <div className="mb-4 bg-teal-50 dark:bg-teal-950/40 rounded-xl p-3 flex items-center justify-center gap-2">
+        {[".xlsx", ".csv"].map((t) => (
+          <span key={t} className="text-[11px] font-medium bg-white dark:bg-background text-form-header rounded-md px-2.5 py-1 shadow-sm">{t}</span>
+        ))}
+        <ArrowRight className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+        <span className="text-[11px] font-medium bg-teal-200/60 dark:bg-teal-800/40 text-teal-800 dark:text-teal-300 rounded-md px-2.5 py-1">PDF</span>
+      </div>
+    ),
+  },
+  {
+    key: "types", icon: Layers, title: "Every kind of policy",
+    description: "Life, term, health, family health, vehicle and travel — each with its own fields — plus a custom type you can design yourself.",
+    visual: (
+      <div className="mb-4 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl p-3 flex flex-wrap gap-1.5">
+        {["Life", "Health", "Vehicle", "Travel", "+ Custom"].map((t) => (
+          <span key={t} className="text-[10px] font-medium bg-white dark:bg-background text-form-header rounded-full px-2.5 py-1 shadow-sm">{t}</span>
+        ))}
+      </div>
+    ),
+  },
+  {
+    key: "reminders", icon: Bell, title: "Reminders that reach you",
+    description: "In-app bell, phone or desktop push, and email reminders ahead of every due date — you choose which ones to receive.",
+    visual: (
+      <div className="mb-4 bg-orange-50 dark:bg-orange-950/40 rounded-xl p-3 space-y-1.5">
+        <div className="flex items-center gap-2 bg-white dark:bg-background rounded-md px-2.5 py-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
+          <span className="text-[10px] text-form-header font-medium">3 policies due in 3 days</span>
+        </div>
+        <div className="flex gap-1.5">
+          {["In-app", "Push", "Email"].map((c) => (
+            <span key={c} className="text-[9px] font-medium bg-orange-200/60 dark:bg-orange-800/40 text-orange-800 dark:text-orange-300 rounded-full px-2 py-0.5">{c}</span>
+          ))}
+        </div>
+      </div>
+    ),
+  },
+  {
+    key: "privacy", icon: Lock, title: "Private by design",
+    description: "Aadhaar, PAN and bank details are encrypted at rest, and a Hide switch masks them on screen when a client is looking.",
+    visual: (
+      <div className="mb-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 flex items-center justify-between">
+        <div>
+          <p className="text-[9px] text-muted-foreground mb-0.5">Aadhaar</p>
+          <p className="text-xs font-mono text-form-header tracking-wider">XXXX XXXX 2291</p>
+        </div>
+        <span className="w-7 h-7 rounded-full bg-white dark:bg-background shadow-sm flex items-center justify-center">
+          <EyeOff className="w-3.5 h-3.5 text-slate-500" />
+        </span>
+      </div>
+    ),
+  },
+  {
+    key: "language", icon: Languages, title: "English & Hindi",
+    description: "Use the platform in the language you're comfortable with, with Indian date formats throughout.",
+    visual: (
+      <div className="mb-4 bg-rose-50 dark:bg-rose-950/40 rounded-xl p-3 flex items-center gap-2">
+        <span className="text-[11px] font-medium bg-white dark:bg-background text-form-header rounded-full px-3 py-1 shadow-sm">English</span>
+        <span className="text-[11px] font-medium bg-rose-200/60 dark:bg-rose-800/40 text-rose-700 dark:text-rose-300 rounded-full px-3 py-1">हिंदी</span>
+      </div>
+    ),
+  },
+  {
+    key: "mobile", icon: Smartphone, title: "Works on your phone",
+    description: "Update a record between client visits — smooth on mobile, installable as an app, same as desktop.",
+    visual: (
+      <div className="mb-4 bg-cyan-50 dark:bg-cyan-950/40 rounded-xl p-3 flex justify-center">
+        <div className="w-14 h-24 rounded-xl border-2 border-cyan-300 dark:border-cyan-800 bg-white dark:bg-background p-1.5 flex flex-col gap-1">
+          <div className="h-1.5 w-6 mx-auto rounded-full bg-cyan-200 dark:bg-cyan-800" />
+          <div className="flex-1 rounded-md bg-cyan-50 dark:bg-cyan-950/40 mt-1" />
+        </div>
+      </div>
+    ),
+  },
+].slice(0, 9);
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -44,7 +203,7 @@ const Landing = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
         title="Insurance Policy Record Management for Agents"
-        description="Track every client's policy, due date, and payment status in one place. Add records in seconds, search instantly, and never miss a renewal — built for all types of insurance agents."
+        description="Manage every policy and never miss a renewal. Track due dates and payments, import from Excel, export to PDF, get reminders by push and email — built for all types of insurance agents."
         path="/"
         jsonLd={{
           "@context": "https://schema.org",
@@ -79,23 +238,43 @@ const Landing = () => {
           <div className="absolute top-20 -left-32 w-72 h-72 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="container mx-auto px-4 relative">
-            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center pt-[2rem] pb-16 md:py-24">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center pt-8 pb-12 md:py-16">
 
-              {/* Left: message */}
-              <div className="space-y-6">
-                <div className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider bg-primary/10 text-primary px-3 py-1.5 rounded-full">
-                  <Sparkles className="w-3.5 h-3.5" />
+              {/* Left: message — matches the approved reference (pill, headline, intro, 3 checks), then the full feature set */}
+              <div className="space-y-5">
+                <span className="inline-flex items-center text-xs font-semibold uppercase tracking-wide bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 px-3 py-1 rounded-full">
                   Free for your first month
-                </div>
-                <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight text-form-header">
-                  Stop Chasing Policies Across Spreadsheets.
+                </span>
+                <h1 className="text-3xl sm:text-4xl lg:text-[2.6rem] font-bold leading-[1.15] tracking-tight text-form-header">
+                  Manage Every Policy. Never Miss a Renewal.
                 </h1>
-                <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
-                  {siteConfig.title} is where policy agents — life, health, motor, or all
-                  insurance — keep every record, every due date, and every client organized,
-                  backed up daily, and a search away.
+                <p className="text-base text-muted-foreground leading-relaxed max-w-xl">
+                  The smarter way for insurance agents to manage clients, track policy renewals,
+                  monitor due dates, and keep every record organized — all in one place, with daily backups.
                 </p>
-                <div className="flex flex-wrap gap-3 pt-2">
+
+                <ul className="space-y-2">
+                  {HERO_POINTS.map((point) => (
+                    <li key={point} className="flex items-center gap-3 text-form-header">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" aria-hidden="true" />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Everything inside</p>
+                  <ul className="flex flex-wrap gap-2">
+                    {HERO_CHIPS.map(({ icon: Icon, text }) => (
+                      <li key={text} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-3 py-1.5 text-xs sm:text-[13px] text-form-header">
+                        <Icon className="w-3.5 h-3.5 text-primary shrink-0" aria-hidden="true" />
+                        {text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-1">
                   <Link to="/signup">
                     <Button size="lg" className="bg-primary hover:bg-primary-light font-medium">
                       <UserPlus className="w-4 h-4 mr-2" />
@@ -109,53 +288,55 @@ const Landing = () => {
                     </Button>
                   </Link>
                 </div>
-                <p className="text-xs text-muted-foreground pt-1">No credit card required for your first month.</p>
+                <p className="text-xs text-muted-foreground">No credit card required for your first month.</p>
               </div>
 
               {/* Right: single contained dashboard mockup — badges anchored to its own box, can't drift into text */}
               <div className="relative mx-auto w-full max-w-md py-6">
                 <div className="relative rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
-                  {/* window chrome */}
-                  <div className="flex items-center gap-1.5 px-4 py-3 border-b border-border bg-muted/40">
-                    <span className="w-2.5 h-2.5 rounded-full bg-red-300" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-300" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-300" />
-                    <span className="ml-3 text-xs text-muted-foreground font-medium">Policy Dashboard</span>
-                  </div>
-
-                  <div className="p-5 space-y-4">
-                    {/* mini stat row */}
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { label: "Records", val: "128", bg: "bg-blue-50 dark:bg-blue-950/40", color: "text-blue-700 dark:text-blue-400" },
-                        { label: "Due", val: "12", bg: "bg-amber-50 dark:bg-amber-950/40", color: "text-amber-700 dark:text-amber-400" },
-                        { label: "Backed up", val: "Today", bg: "bg-emerald-50 dark:bg-emerald-950/40", color: "text-emerald-700 dark:text-emerald-400" },
-                      ].map(({ label, val, bg, color }) => (
-                        <div key={label} className={`${bg} rounded-lg p-2.5 text-center`}>
-                          <p className={`text-sm font-semibold ${color}`}>{val}</p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">{label}</p>
-                        </div>
-                      ))}
+                  <div className="overflow-hidden rounded-2xl">
+                    {/* window chrome */}
+                    <div className="flex items-center gap-1.5 px-4 py-3 border-b border-border bg-muted/40">
+                      <span className="w-2.5 h-2.5 rounded-full bg-red-300" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-300" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-300" />
+                      <span className="ml-3 text-xs text-muted-foreground font-medium">Policy Dashboard</span>
                     </div>
 
-                    {/* mini table */}
-                    <div className="rounded-lg border border-border overflow-hidden">
-                      <div className="grid grid-cols-3 bg-muted/50 text-[10px] font-medium text-muted-foreground uppercase px-3 py-2">
-                        <span>Name</span><span>Policy</span><span className="text-right">Status</span>
+                    <div className="p-5 space-y-4">
+                      {/* mini stat row */}
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { label: "Records", val: "128", bg: "bg-blue-50 dark:bg-blue-950/40", color: "text-blue-700 dark:text-blue-400" },
+                          { label: "Due", val: "12", bg: "bg-amber-50 dark:bg-amber-950/40", color: "text-amber-700 dark:text-amber-400" },
+                          { label: "Backed up", val: "Today", bg: "bg-emerald-50 dark:bg-emerald-950/40", color: "text-emerald-700 dark:text-emerald-400" },
+                        ].map(({ label, val, bg, color }) => (
+                          <div key={label} className={`${bg} rounded-lg p-2.5 text-center`}>
+                            <p className={`text-sm font-semibold ${color}`}>{val}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{label}</p>
+                          </div>
+                        ))}
                       </div>
-                      {[
-                        { name: "S. Sharma", policy: "XXX-2291", status: "Active", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
-                        { name: "S. Verma", policy: "XXXX-8823", status: "Due", color: "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400" },
-                        { name: "P. Kumar", policy: "XXXXX-4410", status: "Active", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
-                      ].map((row) => (
-                        <div key={row.name} className="grid grid-cols-3 items-center px-3 py-2 text-xs border-t border-border">
-                          <span className="text-form-header font-medium">{row.name}</span>
-                          <span className="text-muted-foreground font-mono text-[11px]">{row.policy}</span>
-                          <span className="flex justify-end">
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${row.color}`}>{row.status}</span>
-                          </span>
+
+                      {/* mini table */}
+                      <div className="rounded-lg border border-border overflow-hidden">
+                        <div className="grid grid-cols-3 bg-muted/50 text-[10px] font-medium text-muted-foreground uppercase px-3 py-2">
+                          <span>Name</span><span>Policy</span><span className="text-right">Status</span>
                         </div>
-                      ))}
+                        {[
+                          { name: "S. Sharma", policy: "XXX-2291", status: "Active", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
+                          { name: "S. Verma", policy: "XXXX-8823", status: "Due", color: "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400" },
+                          { name: "P. Kumar", policy: "XXXXX-4410", status: "Active", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
+                        ].map((row) => (
+                          <div key={row.name} className="grid grid-cols-3 items-center px-3 py-2 text-xs border-t border-border">
+                            <span className="text-form-header font-medium">{row.name}</span>
+                            <span className="text-muted-foreground font-mono text-[11px]">{row.policy}</span>
+                            <span className="flex justify-end">
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${row.color}`}>{row.status}</span>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -258,89 +439,16 @@ const Landing = () => {
                 <h2 className="text-3xl font-bold text-form-header">Everything to run your policy book</h2>
               </div>
 
+              {/* Always a multiple of 3 so the lg grid has no orphan row (see FEATURES). */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-
-                {/* Complete records */}
-                <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
-                  <div className="flex items-center gap-3 mb-4 bg-blue-50 rounded-xl p-3">
-                    <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-semibold shrink-0">RS</div>
-                    <div className="space-y-1 flex-1">
-                      <div className="h-2 w-20 rounded bg-blue-200/70" />
-                      <div className="h-1.5 w-14 rounded bg-blue-200/40" />
-                    </div>
+                {FEATURES.map(({ key, icon: Icon, title, description, visual }) => (
+                  <div key={key} className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
+                    {visual}
+                    <Icon className="w-5 h-5 text-primary mb-2" />
+                    <h3 className="font-semibold text-form-header mb-1.5">{title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
                   </div>
-                  <FileText className="w-5 h-5 text-primary mb-2" />
-                  <h3 className="font-semibold text-form-header mb-1.5">Complete policy records</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Policyholder details, nominee info, and current & previous policy terms — all in one place.</p>
-                </div>
-
-                {/* Due tracking */}
-                <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
-                  <div className="mb-4 bg-amber-50 dark:bg-amber-950/40 rounded-xl p-3 space-y-1.5">
-                    {["Due 3 Aug", "Due 9 Aug"].map((d) => (
-                      <div key={d} className="flex items-center justify-between bg-white dark:bg-background rounded-md px-2.5 py-1.5">
-                        <span className="text-[10px] text-form-header font-medium">{d}</span>
-                        <BellRing className="w-3 h-3 text-amber-500" />
-                      </div>
-                    ))}
-                  </div>
-                  <BellRing className="w-5 h-5 text-primary mb-2" />
-                  <h3 className="font-semibold text-form-header mb-1.5">Due and lapse tracking</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">See what's due this month and who missed a payment — before it lapses.</p>
-                </div>
-
-                {/* REFERRAL-PROGRAM — only while the program is enabled */}
-                {REFERRAL_PROGRAM_ENABLED && (
-                <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
-                  <div className="mb-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl p-4">
-                    <p className="text-[10px] text-emerald-700 dark:text-emerald-400 mb-1">Available balance</p>
-                    <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400">₹4,250</p>
-                  </div>
-                  <Wallet className="w-5 h-5 text-primary mb-2" />
-                  <h3 className="font-semibold text-form-header mb-1.5">Referral wallet</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Earn and track referral rewards, and use your wallet balance toward plan renewals and upgrades.</p>
-                </div>
-                )}
-
-                {/* Search */}
-                <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
-                  <div className="mb-4 bg-violet-50 dark:bg-violet-950/40 rounded-xl p-3">
-                    <div className="flex items-center gap-2 bg-white dark:bg-background rounded-md px-2.5 py-1.5 mb-2">
-                      <Search className="w-3 h-3 text-muted-foreground" />
-                      <span className="text-[10px] text-muted-foreground">Sharma...</span>
-                    </div>
-                    <div className="h-1.5 w-3/4 rounded bg-violet-200/60 dark:bg-violet-800/40 mb-1.5" />
-                    <div className="h-1.5 w-1/2 rounded bg-violet-200/40 dark:bg-violet-800/25" />
-                  </div>
-                  <Search className="w-5 h-5 text-primary mb-2" />
-                  <h3 className="font-semibold text-form-header mb-1.5">Instant search & sort</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Find any record by name, policy number, or occupation, in seconds.</p>
-                </div>
-
-                {/* Multi-language */}
-                <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
-                  <div className="mb-4 bg-rose-50 dark:bg-rose-950/40 rounded-xl p-3 flex items-center gap-2">
-                    <span className="text-[11px] font-medium bg-white dark:bg-background text-form-header rounded-full px-3 py-1 shadow-sm">English</span>
-                    <span className="text-[11px] font-medium bg-rose-200/60 dark:bg-rose-800/40 text-rose-700 dark:text-rose-300 rounded-full px-3 py-1">हिंदी</span>
-                  </div>
-                  <Languages className="w-5 h-5 text-primary mb-2" />
-                  <h3 className="font-semibold text-form-header mb-1.5">English & Hindi</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Use the platform in the language you're comfortable with, with Indian date formats throughout.</p>
-                </div>
-
-                {/* Mobile */}
-                <div className="bg-background rounded-2xl border border-border p-6 hover:shadow-md hover:border-primary/30 transition-all">
-                  <div className="mb-4 bg-cyan-50 dark:bg-cyan-950/40 rounded-xl p-3 flex justify-center">
-                    <div className="w-14 h-24 rounded-xl border-2 border-cyan-300 dark:border-cyan-800 bg-white dark:bg-background p-1.5 flex flex-col gap-1">
-                      <div className="h-1.5 w-6 mx-auto rounded-full bg-cyan-200 dark:bg-cyan-800" />
-                      <div className="flex-1 rounded-md bg-cyan-50 dark:bg-cyan-950/40 mt-1" />
-                    </div>
-                  </div>
-                  <Smartphone className="w-5 h-5 text-primary mb-2" />
-                  <h3 className="font-semibold text-form-header mb-1.5">Works on your phone</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Update a record between client visits — smooth on mobile, same as desktop.</p>
-                </div>
-
+                ))}
               </div>
             </div>
           </div>
@@ -353,7 +461,7 @@ const Landing = () => {
 
               <div className="space-y-5 order-2 lg:order-1">
                 <Badge className="bg-primary/10 text-primary border border-primary/20 w-fit">
-                  <Sparkles className="w-3 h-3 mr-1" /> New
+                  <Sparkles className="w-3 h-3 mr-1" /> Get Free Business Card
                 </Badge>
                 <h2 className="text-3xl font-bold text-form-header leading-tight">
                   Your own digital business card, generated for free
@@ -370,6 +478,7 @@ const Landing = () => {
                     "Your name, mobile number, email, and Agent ID laid out automatically",
                     "Unlocks the moment your profile hits 100% completion",
                     "Download as a high-resolution PNG, ready to share or print",
+                    "Add your Image & custom note to your business card (max. 150 characters)",
                   ].map((point) => (
                     <div key={point} className="flex items-start gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />

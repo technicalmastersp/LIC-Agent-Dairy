@@ -355,6 +355,7 @@ const CurrentMonthDue = () => {
       <ContactActionModal
         phone={contactingRecord?.aadhaarLinkedMobileNumber}
         name={contactingRecord?.name}
+        email={contactingRecord?.email}
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
       />
