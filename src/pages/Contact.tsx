@@ -6,19 +6,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Mail, LifeBuoy, Clock, Phone, MapPin, Building2, ArrowRight } from "lucide-react";
 import { BUSINESS_HOURS_LABELS } from "@/config/businessHours";
 import siteConfig from "@/config/siteConfig";
+import { useLanguage } from "@/hooks/useLanguage";
+import Trans from "@/components/Trans";
 
 // Callers use the "Request a call" flow (Help & Support) instead of a public
 // number. Phone, address and legal entity name are OPTIONAL in siteConfig — each card
 // below only renders when its value has been filled in, so the page never
 // shows a placeholder or an empty row.
 const Contact = () => {
+  const { t } = useLanguage();
   const { supportEmail, phone, address, legalEntityName, linkedInUrl } = siteConfig;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
-        title="Contact Us"
-        description={`Contact ${siteConfig.companyName}: email our support team, raise a support ticket, request a call back, or find our business details.`}
+        title={t('contact.contactUs')}
+        description={t('contact.contactEmailOurSupportTeam', { companyName: siteConfig.companyName })}
         path="/contact"
       />
       <Navigation />
@@ -30,9 +33,9 @@ const Contact = () => {
               <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-5">
                 <Mail className="w-7 h-7" />
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-3">Contact Us</h1>
+              <h1 className="text-3xl md:text-4xl font-bold mb-3">{t('contact.contactUs')}</h1>
               <p className="text-primary-foreground/75">
-                Questions about your account, payments, or the product? We're here to help.
+                {t('contact.questionsAboutYourAccountPayments')}
               </p>
             </div>
           </div>
@@ -49,10 +52,10 @@ const Contact = () => {
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                         <Mail className="w-4 h-4 text-primary" />
                       </div>
-                      Email support
+                      {t('contact.emailSupport')}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      For account, billing, refund and general questions.
+                      {t('contact.forAccountBillingRefund')}
                     </p>
                     <a
                       href={`mailto:${supportEmail}`}
@@ -69,16 +72,16 @@ const Contact = () => {
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                         <LifeBuoy className="w-4 h-4 text-primary" />
                       </div>
-                      Raise a support ticket
+                      {t('contact.raiseASupportTicket')}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Send us a message from the app and track it with a ticket ID.
+                      {t('contact.sendUsAMessageFrom')}
                     </p>
                     <Link
                       to="/help-support"
                       className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                     >
-                      Go to Help &amp; Support <ArrowRight className="w-3.5 h-3.5" />
+                      {t('contact.goToHelpSupport')}{" "} <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </CardContent>
                 </Card>
@@ -89,16 +92,16 @@ const Contact = () => {
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                         <Phone className="w-4 h-4 text-primary" />
                       </div>
-                      Request a call
+                      {t('common.requestACall')}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Share your mobile number and a short reason — our team calls you back. We call only during business hours.
+                      {t('contact.shareYourMobileNumber')}
                     </p>
                     <Link
                       to="/help-support#request-call"
                       className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                     >
-                      Request a call <ArrowRight className="w-3.5 h-3.5" />
+                      {t('common.requestACall')}{" "} <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </CardContent>
                 </Card>
@@ -109,13 +112,13 @@ const Contact = () => {
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                         <Clock className="w-4 h-4 text-primary" />
                       </div>
-                      Business hours &amp; response time
+                      {t('contact.businessHoursResponseTime')}
                     </div>
                     <div className="text-sm text-muted-foreground space-y-0.5">
                       {BUSINESS_HOURS_LABELS.map((l) => (
-                        <p key={l.days}>{l.days}: {l.hours} <span className="text-xs">(IST)</span></p>
+                        <p key={l.days}>{t(l.days)}: {t(l.hours)} <span className="text-xs">{t('contact.ist')}</span></p>
                       ))}
-                      <p className="pt-1">Most email queries are answered within a few hours.</p>
+                      <p className="pt-1">{t('contact.mostEmailQueriesAreAnswered')}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -127,7 +130,7 @@ const Contact = () => {
                         <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                           <Phone className="w-4 h-4 text-primary" />
                         </div>
-                        Phone
+                        {t('contact.phone')}
                       </div>
                       <a href={`tel:${phone.replace(/\s+/g, "")}`} className="text-sm font-medium text-primary hover:underline">
                         {phone}
@@ -143,25 +146,19 @@ const Contact = () => {
                     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                       <Building2 className="w-4 h-4 text-primary" />
                     </div>
-                    About the business
+                    {t('contact.aboutTheBusiness')}
                   </div>
                   <div className="text-sm text-muted-foreground space-y-1">
                     <p>
-                      <strong className="text-foreground">{siteConfig.companyName}</strong> is a software
-                      subscription tool that helps insurance agents manage their own client records,
-                      reminders, and follow-ups. Website:{" "}
-                      <a href={siteConfig.productionUrl} className="text-primary hover:underline">
-                        {siteConfig.productionUrl}
-                      </a>
-                    </p>
+                      <Trans i18nKey="contact.isASoftwareSubscriptionTool" params={{ companyName: siteConfig.companyName, productionUrl: siteConfig.productionUrl }} components={{ strong: <strong className="text-foreground" />, link: <a href={siteConfig.productionUrl} className="text-primary hover:underline" /> }} /></p>
                     {linkedInUrl && (
                       <p className="py-2">
-                        <strong className="text-foreground">Company LinkedIn Page:</strong> <a href={linkedInUrl} target="_blank" className="text-primary hover:underline">LinkedIn Page URL</a>
+                        <strong className="text-foreground">{t('contact.companyLinkedinPage')}</strong> <a href={linkedInUrl} target="_blank" className="text-primary hover:underline">{t('contact.linkedinPageUrl')}</a>
                       </p>
                     )}
                     {legalEntityName && (
                       <p>
-                        <strong className="text-foreground">Operated by:</strong> {legalEntityName}
+                        <strong className="text-foreground">{t('contact.operated')}</strong> {legalEntityName}
                       </p>
                     )}
                     {address && (
@@ -175,10 +172,7 @@ const Contact = () => {
               </Card>
 
               <p className="text-xs text-muted-foreground text-center">
-                See also our{" "}
-                <Link to="/refund-policy" className="text-primary hover:underline">Cancellation &amp; Refund Policy</Link>,{" "}
-                <Link to="/terms-of-service" className="text-primary hover:underline">Terms of Service</Link> and{" "}
-                <Link to="/privacy-policy" className="text-primary hover:underline">Privacy Policy</Link>.
+                <Trans i18nKey="contact.seeAlsoOurCancellationRefund" components={{ link: <Link to="/refund-policy" className="text-primary hover:underline" />, link2: <Link to="/terms-of-service" className="text-primary hover:underline" />, link3: <Link to="/privacy-policy" className="text-primary hover:underline" /> }} />
               </p>
             </div>
           </div>

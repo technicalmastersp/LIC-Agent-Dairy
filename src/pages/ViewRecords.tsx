@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { makeInsuranceText } from "@/i18n/insuranceText";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { Link, useNavigate } from "react-router-dom";
@@ -30,6 +31,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { Record } from "@/types/Record";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import Trans from "@/components/Trans";
 
 // Deterministic soft color for an avatar chip, derived from the name itself
 const avatarPalette = [
@@ -49,15 +51,16 @@ const initials = (name: string) =>
 
 // A pre-existing record with no insuranceType predates this feature and is
 // treated as Life Insurance, matching the backend's default.
-const recordTypeLabel = (record: Record) => {
+const recordTypeLabel = (record: Record, ins: ReturnType<typeof makeInsuranceText>) => {
   const type = record.insuranceType || "Life Insurance";
-  if (type === "Other") return record.customInsuranceTypeName || "Custom";
-  return getInsuranceTypeDef(type)?.shortLabel || type;
+  if (type === "Other") return record.customInsuranceTypeName || ins.typeShortNameById("Other", "Custom");
+  return ins.typeShortNameById(type, getInsuranceTypeDef(type)?.shortLabel || type);
 };
 
 const ViewRecords = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, tOr } = useLanguage();
+  const ins = makeInsuranceText(tOr);
   const { toast } = useToast();
   const currentUser = getCurrentUser();
 
@@ -106,7 +109,7 @@ const ViewRecords = () => {
       record.currentPolicy.policyNumber.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
       record.currentPolicy.modeOfPayment.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
       record.currentPolicy.branch.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-      recordTypeLabel(record).toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+      recordTypeLabel(record, ins).toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
 
     if (typeFilter !== "all") {
@@ -163,13 +166,13 @@ const ViewRecords = () => {
 
   const handleExportCsv = () => {
     const headers = [
-      "Name", "Type", "Father's Name", "Age", "Policy Number",
-      "Sum Assured", "Branch", "Created Date",
+      t('common.name'), t('records.type'), "Father's Name", "Age", "Policy Number",
+      "Sum Assured", t('common.branch'), "Created Date",
     ];
 
     const rows = filteredAndSortedRecords.map((record) => [
       record.name,
-      recordTypeLabel(record),
+      recordTypeLabel(record, ins),
       record.fatherName,
       record.age,
       record.currentPolicy?.policyNumber,
@@ -196,8 +199,8 @@ const ViewRecords = () => {
     URL.revokeObjectURL(url);
 
     toast({
-      title: "Export complete",
-      description: `${filteredAndSortedRecords.length} record${filteredAndSortedRecords.length !== 1 ? "s" : ""} exported to CSV.`,
+      title: t('records.exportComplete'),
+      description: t('records.recordExportedToCsv', { count: filteredAndSortedRecords.length }),
     });
   };
 
@@ -223,7 +226,7 @@ const ViewRecords = () => {
       head: [["Name", "Type", "Father's Name", "Age", "Policy Number", "Sum Assured", "Branch", "Created Date"]],
       body: filteredAndSortedRecords.map((record) => [
         record.name ?? "—",
-        recordTypeLabel(record),
+        recordTypeLabel(record, ins),
         record.fatherName ?? "—",
         record.age ?? "—",
         record.currentPolicy?.policyNumber ?? "—",
@@ -239,8 +242,8 @@ const ViewRecords = () => {
     doc.save(`policy-records-${dateStamp}.pdf`);
 
     toast({
-      title: "Export complete",
-      description: `${filteredAndSortedRecords.length} record${filteredAndSortedRecords.length !== 1 ? "s" : ""} exported to PDF.`,
+      title: t('records.exportComplete'),
+      description: t('records.recordExportedToPdf', { count: filteredAndSortedRecords.length }),
     });
   };
 
@@ -254,8 +257,8 @@ const ViewRecords = () => {
     if (success) {
       queryClient.invalidateQueries({ queryKey: ["records"] });
       toast({
-        title: "Success",
-        description: "Record deleted successfully",
+        title: t('records.success'),
+        description: t('records.recordDeletedSuccessfully'),
       });
     }
   };
@@ -263,8 +266,8 @@ const ViewRecords = () => {
   const handleEditRecord = (record: Record) => {
     if (isReadOnly) {
       toast({
-        title: "Subscription expired",
-        description: "Renew your plan to edit records. You can still view everything below.",
+        title: t('records.subscriptionExpired'),
+        description: t('records.renewYourPlanToEdit'),
         variant: "destructive",
       });
       return;
@@ -306,14 +309,9 @@ const ViewRecords = () => {
             <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
               <Lock className="w-4.5 h-4.5 text-amber-600 mt-0.5 shrink-0" />
               <div className="text-sm">
-                <p className="text-amber-900 font-medium">Your subscription has expired</p>
+                <p className="text-amber-900 font-medium">{t('records.yourSubscriptionHasExpired')}</p>
                 <p className="text-amber-800/90 mt-0.5">
-                  You can still view all your saved records here, but adding new policies or editing
-                  existing ones is paused until you renew.{" "}
-                  <Link to="/our-plans" className="text-amber-900 font-medium underline underline-offset-2">
-                    Renew your plan
-                  </Link>
-                </p>
+                  <Trans i18nKey="records.youCanStillViewAll" components={{ link: <Link to="/our-plans" className="text-amber-900 font-medium underline underline-offset-2" /> }} /></p>
               </div>
             </div>
           )}
@@ -325,9 +323,9 @@ const ViewRecords = () => {
                 <ShieldCheck className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold text-form-header">Policy Records</h1>
+                <h1 className="text-2xl font-semibold text-form-header">{t('records.policyRecords')}</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">
-                  Manage and view all insurance policy records
+                  {t('records.manageAndViewAllInsurance')}
                 </p>
               </div>
             </div>
@@ -338,13 +336,13 @@ const ViewRecords = () => {
                 onClick={() => navigate("/our-plans")}
               >
                 <Lock className="w-4 h-4 mr-2" />
-                Renew to add records
+                {t('records.renewToAddRecords')}
               </Button>
             ) : (
               <Link to="/add-record">
                 <Button className="bg-primary hover:bg-primary-light shadow-sm">
                   <Plus className="w-4 h-4 mr-2" />
-                  {t("addNewRecord")}
+                  {t("records.addNewRecord")}
                 </Button>
               </Link>
             )}
@@ -354,34 +352,34 @@ const ViewRecords = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             {[
               {
-                label: "Total records",
+                label: t('records.totalRecords2'),
                 val: records.length,
                 icon: <FileText className="w-4 h-4" />,
-                sub: "All policy records",
+                sub: t('records.allPolicyRecords'),
                 bg: "bg-blue-50",
                 color: "text-form-header",
               },
               {
-                label: "Total sum assured",
+                label: t('records.totalSumAssured'),
                 val: <SensitiveValue field="sumAssured" value={summaryStats.totalSumAssured} render={(v) => `₹${Number(v).toLocaleString("en-IN")}`} />,
                 icon: <IndianRupee className="w-4 h-4" />,
-                sub: "Across all policies",
+                sub: t('records.acrossAllPolicies'),
                 bg: "bg-emerald-50",
                 color: "text-emerald-700",
               },
               {
-                label: "Added this month",
+                label: t('records.addedThisMonth'),
                 val: summaryStats.addedThisMonth,
                 icon: <CalendarPlus className="w-4 h-4" />,
-                sub: "New records",
+                sub: t('records.newRecords'),
                 bg: "bg-amber-50",
                 color: "text-amber-700",
               },
               {
-                label: "Branches",
+                label: t('records.branches'),
                 val: summaryStats.branches,
                 icon: <FolderOpen className="w-4 h-4" />,
-                sub: "Distinct branches",
+                sub: t('records.distinctBranches'),
                 bg: "bg-violet-50",
                 color: "text-violet-700",
               },
@@ -406,7 +404,7 @@ const ViewRecords = () => {
                   <div className="relative w-full sm:flex-1 sm:min-w-[200px] sm:max-w-md">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
-                      placeholder="Search by name, policy number, occupation..."
+                      placeholder={t('common.searchByNamePolicyNumber')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10 focus-visible:ring-primary/40"
@@ -414,14 +412,14 @@ const ViewRecords = () => {
                   </div>
                   <Select value={typeFilter} onValueChange={setTypeFilter}>
                     <SelectTrigger className="w-full sm:w-56 shrink-0">
-                      <SelectValue placeholder="All insurance types" />
+                      <SelectValue placeholder={t('records.allInsuranceTypes')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All insurance types</SelectItem>
-                      {INSURANCE_TYPES.filter(t => t.id !== "Other").map((t) => (
-                        <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                      <SelectItem value="all">{t('records.allInsuranceTypes')}</SelectItem>
+                      {INSURANCE_TYPES.filter(tk => tk.id !== "Other").map((tk) => (
+                        <SelectItem key={tk.id} value={tk.id}>{ins.typeLabel(tk)}</SelectItem>
                       ))}
-                      <SelectItem value="Other">Other (Custom)</SelectItem>
+                      <SelectItem value="Other">{t('records.otherCustom')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button
@@ -430,7 +428,7 @@ const ViewRecords = () => {
                     className="w-full sm:w-auto shrink-0"
                   >
                     <FileUp className="w-4 h-4 mr-2" />
-                    Import Records
+                    {t('records.importRecords')}
                   </Button>
                   <Button
                     variant="outline"
@@ -439,7 +437,7 @@ const ViewRecords = () => {
                     className="w-full sm:w-auto shrink-0"
                   >
                     <Download className="w-4 h-4 mr-2" />
-                    Export CSV
+                    {t('records.exportCsv')}
                   </Button>
                   <Button
                     variant="outline"
@@ -448,12 +446,12 @@ const ViewRecords = () => {
                     className="w-full sm:w-auto shrink-0"
                   >
                     <FileDown className="w-4 h-4 mr-2" />
-                    Export PDF
+                    {t('records.exportPdf')}
                   </Button>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
-                  <span>{t("totalRecords")}: <Badge variant="secondary">{records.length}</Badge></span>
-                  <span>{t("filteredRecords")}: <Badge variant="outline">{filteredAndSortedRecords.length}</Badge></span>
+                  <span>{t("records.totalRecords")}: <Badge variant="secondary">{records.length}</Badge></span>
+                  <span>{t("records.filteredRecords")}: <Badge variant="outline">{filteredAndSortedRecords.length}</Badge></span>
                 </div>
               </div>
             </CardContent>
@@ -462,7 +460,7 @@ const ViewRecords = () => {
           {/* Records Table */}
           <Card className="overflow-hidden">
             <CardHeader className="border-b border-table-border bg-table-header/40">
-              <CardTitle className="text-form-header text-base">{t("allRecord")}</CardTitle>
+              <CardTitle className="text-form-header text-base">{t("records.allRecord")}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {filteredAndSortedRecords.length === 0 ? (
@@ -474,24 +472,24 @@ const ViewRecords = () => {
                   </div>
                   <div className="text-muted-foreground text-base mb-4">
                     {isLoading ? (
-                      <span>{t("loadingRecords")}</span>
+                      <span>{t("records.loadingRecords")}</span>
                     ) : records.length === 0 ? (
-                      <span>No records yet</span>
+                      <span>{t('records.noRecordsYet')}</span>
                     ) : (
-                      <span>No records match your search</span>
+                      <span>{t('common.noRecordsMatchYourSearch')}</span>
                     )}
                   </div>
                   {records.length === 0 && !isLoading && (
                     isReadOnly ? (
                       <Button variant="outline" className="border-amber-300 text-amber-800 hover:bg-amber-50" onClick={() => navigate("/our-plans")}>
                         <Lock className="w-4 h-4 mr-2" />
-                        Renew to add records
+                        {t('records.renewToAddRecords')}
                       </Button>
                     ) : (
                       <Link to="/add-record">
                         <Button>
                           <Plus className="w-4 h-4 mr-2" />
-                          Add First Record
+                          {t('records.addFirstRecord')}
                         </Button>
                       </Link>
                     )
@@ -516,7 +514,7 @@ const ViewRecords = () => {
                               <p className="font-semibold text-form-header truncate leading-tight">{record.name}</p>
                               <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                                 <Badge variant="outline" className="text-[11px] font-normal">
-                                  {recordTypeLabel(record)}
+                                  {recordTypeLabel(record, ins)}
                                 </Badge>
                                 <Badge variant="outline" className="font-mono text-[11px]">
                                   <SensitiveValue field="policyNumber" value={record.currentPolicy.policyNumber} placeholder="N/A" />
@@ -533,7 +531,7 @@ const ViewRecords = () => {
                         <div className="flex items-center justify-between rounded-lg bg-emerald-50 dark:bg-emerald-950/30 px-3 py-2">
                           <span className="text-xs font-medium text-emerald-800 dark:text-emerald-400/90 flex items-center gap-1.5">
                             <IndianRupee className="w-3.5 h-3.5" />
-                            Sum Assured
+                            {t('common.sumAssured')}
                           </span>
                           <span className="text-base font-semibold text-emerald-700 dark:text-emerald-400">
                             <SensitiveValue field="sumAssured" value={record.currentPolicy.sumAssured} placeholder="₹0" render={(v) => `₹${formatIndianNumber(v) || "0"}`} />
@@ -543,19 +541,19 @@ const ViewRecords = () => {
                         {/* Details grid */}
                         <div className="grid grid-cols-2 gap-x-3 gap-y-3 text-sm border-t border-border/60 pt-4">
                           <div>
-                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Father's Name</p>
+                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">{t('records.fatherSName')}</p>
                             <p className="mt-0.5 truncate text-form-header">{record.fatherName || "-"}</p>
                           </div>
                           <div>
-                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Age</p>
+                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">{t('common.age')}</p>
                             <p className="mt-0.5 text-form-header">{record.age || "-"}</p>
                           </div>
                           <div>
-                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Branch</p>
+                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">{t('common.branch')}</p>
                             <p className="mt-0.5 truncate text-form-header">{record.currentPolicy.branch || "-"}</p>
                           </div>
                           <div>
-                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Created</p>
+                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">{t('records.created')}</p>
                             <p className="mt-0.5 text-form-header">{convertDateToIndianFormat(record.createdAt)}</p>
                           </div>
                         </div>
@@ -567,7 +565,7 @@ const ViewRecords = () => {
                             variant="outline"
                             onClick={() => handleViewRecord(record)}
                             className="h-9 w-9 p-0"
-                            title="View Record"
+                            title={t('common.viewRecord')}
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -576,7 +574,7 @@ const ViewRecords = () => {
                             variant="outline"
                             onClick={() => handleEditRecord(record)}
                             className={`h-9 w-9 p-0 ${isReadOnly ? "opacity-50 cursor-not-allowed" : ""}`}
-                            title={isReadOnly ? "Edit disabled — subscription expired" : "Edit Record"}
+                            title={isReadOnly ? t('records.editDisabledSubscriptionExpired') : t('records.editRecord')}
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -585,7 +583,7 @@ const ViewRecords = () => {
                             variant="outline"
                             onClick={() => handleContactRecord(record)}
                             className="h-9 w-9 p-0"
-                            title="Contact"
+                            title={t('common.contact')}
                           >
                             <MessageSquare className="w-4 h-4" />
                           </Button>
@@ -595,7 +593,7 @@ const ViewRecords = () => {
                             onClick={() => handleDeleteRecord(record.recordId ?? record._id ?? record.id)}
                             disabled
                             className="h-9 w-9 p-0 opacity-50 cursor-not-allowed"
-                            title="Delete Record (Disabled)"
+                            title={t('records.deleteRecordDisabled')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -610,17 +608,17 @@ const ViewRecords = () => {
                     <TableHeader>
                       <TableRow className="bg-table-header">
                         <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground w-12">
-                          No.
+                          {t('records.no')}
                         </TableHead>
-                        <SortableHeader field="name">Name</SortableHeader>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Type</TableHead>
-                        <SortableHeader field="fatherName">Father's Name</SortableHeader>
-                        <SortableHeader field="age">Age</SortableHeader>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Policy Number</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Sum Assured</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Branch</TableHead>
-                        <SortableHeader field="createdAt">Created</SortableHeader>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Actions</TableHead>
+                        <SortableHeader field="name">{t('common.name')}</SortableHeader>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('records.type')}</TableHead>
+                        <SortableHeader field="fatherName">{t('records.fatherSName')}</SortableHeader>
+                        <SortableHeader field="age">{t('common.age')}</SortableHeader>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.policyNumber')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.sumAssured')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.branch')}</TableHead>
+                        <SortableHeader field="createdAt">{t('records.created')}</SortableHeader>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -641,7 +639,7 @@ const ViewRecords = () => {
                           </TableCell>
                           <TableCell className="border border-table-border">
                             <Badge variant="outline" className="text-xs font-normal whitespace-nowrap">
-                              {recordTypeLabel(record)}
+                              {recordTypeLabel(record, ins)}
                             </Badge>
                           </TableCell>
                           <TableCell className="border border-table-border text-muted-foreground">
@@ -671,7 +669,7 @@ const ViewRecords = () => {
                                 variant="outline"
                                 onClick={() => handleViewRecord(record)}
                                 className="h-8 w-8 p-0"
-                                title="View Record"
+                                title={t('common.viewRecord')}
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
@@ -680,7 +678,7 @@ const ViewRecords = () => {
                                 variant="outline"
                                 onClick={() => handleEditRecord(record)}
                                 className={`h-8 w-8 p-0 ${isReadOnly ? "opacity-50 cursor-not-allowed" : ""}`}
-                                title={isReadOnly ? "Edit disabled — subscription expired" : "Edit Record"}
+                                title={isReadOnly ? t('records.editDisabledSubscriptionExpired') : t('records.editRecord')}
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
@@ -689,7 +687,7 @@ const ViewRecords = () => {
                                 variant="outline"
                                 onClick={() => handleContactRecord(record)}
                                 className="h-8 w-8 p-0"
-                                title="Contact"
+                                title={t('common.contact')}
                               >
                                 <MessageSquare className="w-4 h-4" />
                               </Button>
@@ -699,7 +697,7 @@ const ViewRecords = () => {
                                 onClick={() => handleDeleteRecord(record.recordId ?? record._id ?? record.id)}
                                 disabled
                                 className="h-8 w-8 p-0 opacity-50 cursor-not-allowed"
-                                title="Delete Record (Disabled)"
+                                title={t('records.deleteRecordDisabled')}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>

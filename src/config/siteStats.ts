@@ -26,21 +26,29 @@ export const SITE_STATS = {
 // "2,200+" — Indian digit grouping, always with the trailing plus (these are floors, not exact counts).
 export const formatStat = (n: number): string => `${new Intl.NumberFormat("en-IN").format(n)}+`;
 
+import type { TranslationKey } from "@/types/i18n.types";
+
 export interface SiteStat {
   key: string;
+  /** English display value / fallback (also what tests assert). */
   value: string;
+  /** English label / fallback. */
   label: string;
+  /** i18n keys — config is module-scope, so the UI translates these at render. */
+  labelKey: TranslationKey;
+  valueKey?: TranslationKey;
+  valueParams?: Record<string, number>;
 }
 
 /** The two customer-base proof points, in display order. */
 export const SOCIAL_PROOF_STATS: SiteStat[] = [
-  { key: "agents", value: formatStat(SITE_STATS.agentsJoined), label: "Agents joined" },
-  { key: "records", value: formatStat(SITE_STATS.recordsManaged), label: "Records managed" },
+  { key: "agents", value: formatStat(SITE_STATS.agentsJoined), label: "Agents joined", labelKey: "common.statAgentsJoined" },
+  { key: "records", value: formatStat(SITE_STATS.recordsManaged), label: "Records managed", labelKey: "common.statRecordsManaged" },
 ];
 
 /** Everything the home page stats band shows. */
 export const HOME_STATS: SiteStat[] = [
   ...SOCIAL_PROOF_STATS,
-  { key: "tools", value: String(SITE_STATS.freeTools), label: "Free calculators" },
-  { key: "trial", value: `${SITE_STATS.freeTrialDays} days`, label: "Free trial, no credit card" },
+  { key: "tools", value: String(SITE_STATS.freeTools), label: "Free calculators", labelKey: "common.statFreeCalculators" },
+  { key: "trial", value: `${SITE_STATS.freeTrialDays} days`, label: "Free trial, no credit card", labelKey: "common.statTrialNoCard", valueKey: "common.statDays", valueParams: { days: SITE_STATS.freeTrialDays } },
 ];

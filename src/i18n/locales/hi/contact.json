@@ -1,0 +1,21 @@
+{
+  "contactUs": "संपर्क करें",
+  "contactEmailOurSupportTeam": "{{companyName}} से संपर्क करें: हमारी सपोर्ट टीम को ईमेल करें, सपोर्ट टिकट बनाएँ, कॉल बैक का अनुरोध करें या हमारे व्यवसाय की जानकारी देखें।",
+  "questionsAboutYourAccountPayments": "अपने खाते, भुगतान या प्रोडक्ट के बारे में सवाल हैं? हम मदद के लिए यहाँ हैं।",
+  "emailSupport": "सपोर्ट को ईमेल करें",
+  "forAccountBillingRefund": "खाते, बिलिंग, रिफ़ंड और आम सवालों के लिए।",
+  "raiseASupportTicket": "सपोर्ट टिकट बनाएँ",
+  "sendUsAMessageFrom": "ऐप से हमें संदेश भेजें और टिकट ID से उसे ट्रैक करें।",
+  "goToHelpSupport": "सहायता और सपोर्ट पर जाएँ",
+  "shareYourMobileNumber": "अपना मोबाइल नंबर और संक्षिप्त कारण बताएँ — हमारी टीम आपको वापस कॉल करेगी। हम केवल कार्य समय में कॉल करते हैं।",
+  "businessHoursResponseTime": "कार्य समय और जवाब का समय",
+  "ist": "(IST)",
+  "mostEmailQueriesAreAnswered": "ज़्यादातर ईमेल के जवाब कुछ घंटों में दे दिए जाते हैं।",
+  "phone": "फ़ोन",
+  "aboutTheBusiness": "व्यवसाय के बारे में",
+  "isASoftwareSubscriptionTool": "<strong>{{companyName}}</strong> एक सॉफ़्टवेयर सब्सक्रिप्शन टूल है जो बीमा एजेंटों को अपने ग्राहकों के रिकॉर्ड, रिमाइंडर और फ़ॉलो-अप संभालने में मदद करता है। वेबसाइट: <link>{{productionUrl}}</link>",
+  "companyLinkedinPage": "कंपनी का लिंक्डइन पेज:",
+  "linkedinPageUrl": "लिंक्डइन पेज URL",
+  "operated": "संचालक:",
+  "seeAlsoOurCancellationRefund": "हमारी <link>रद्दीकरण और रिफ़ंड नीति</link>, <link2>सेवा की शर्तें</link2> और <link3>गोपनीयता नीति</link3> भी देखें।"
+}

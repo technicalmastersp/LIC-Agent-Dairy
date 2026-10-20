@@ -1,6 +1,7 @@
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSensitiveMask } from "@/hooks/useSensitiveMask";
+import { useLanguage } from "@/hooks/useLanguage";
 
 /**
  * The Hide/Show sensitive-data button (Home page + Admin panel).
@@ -13,10 +14,11 @@ import { useSensitiveMask } from "@/hooks/useSensitiveMask";
  *  variant "icon"     — compact icon-only button (admin mobile header)
  */
 const PrivacyToggleButton = ({ variant = "labelled", className = "" }: { variant?: "labelled" | "icon"; className?: string }) => {
+  const { t } = useLanguage();
   const { enabled, hidden, saving, toggle } = useSensitiveMask();
   if (!enabled) return null;
 
-  const action = hidden ? "Show sensitive data" : "Hide sensitive data";
+  const action = hidden ? t('records.showSensitiveData') : t('records.hideSensitiveData');
   const Icon = hidden ? EyeOff : Eye;
 
   if (variant === "icon") {
@@ -40,7 +42,7 @@ const PrivacyToggleButton = ({ variant = "labelled", className = "" }: { variant
       className={`gap-2 shrink-0 ${className}`}
     >
       <Icon className="w-4 h-4" aria-hidden="true" />
-      <span className="text-xs">{hidden ? "Show data" : "Hide data"}</span>
+      <span className="text-xs">{hidden ? t('records.showData') : t('records.hideData')}</span>
     </Button>
   );
 };

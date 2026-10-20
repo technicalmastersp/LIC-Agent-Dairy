@@ -1,8 +1,10 @@
+import type { TranslationKey } from "@/types/i18n.types";
 export type BusinessCardTheme = "classic" | "teal" | "gold" | "gradient";
 
 export interface BusinessCardTemplate {
   id: BusinessCardTheme;
-  label: string;
+  /** i18n key (module-scope config, translated at render). */
+  label: TranslationKey;
   swatch: string; // small CSS gradient/color used for the theme-picker chip
 }
 

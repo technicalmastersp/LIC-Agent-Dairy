@@ -1,3 +1,6 @@
+import { translate } from "@/i18n/translate";
+import { getActiveLanguage } from "@/i18n/format";
+import type { TranslationKey, TranslateParams } from "@/types/i18n.types";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import * as Sentry from "@sentry/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +37,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   render() {
     if (this.state.hasError) {
+      // Class component, mounted ABOVE LanguageProvider: no hooks available, so read the
+      // active language from the i18n module (falls back to English if its pack isn't loaded).
+      const tr = (key: TranslationKey, params?: TranslateParams) => translate(getActiveLanguage(), key, params);
       return (
         <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4 py-12">
           <div className="w-full max-w-md text-center">
@@ -42,11 +48,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-bold text-form-header leading-tight tracking-tight">
-              Something went wrong
+              {tr('nav.errorTitle')}
             </h1>
             <p className="mt-2 text-sm sm:text-base text-muted-foreground">
-              An unexpected error occurred on {siteConfig.title}. Reloading the
-              page usually fixes it.
+              {tr('nav.errorBody', { site: siteConfig.title })}
             </p>
 
             <div className="mt-8">
@@ -55,7 +60,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                 className="bg-primary hover:bg-primary-light w-full sm:w-auto"
               >
                 <RotateCw className="w-4 h-4 mr-2" />
-                Reload page
+                {tr('nav.errorReload')}
               </Button>
             </div>
 
@@ -63,7 +68,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               <Card className="mt-8 text-left">
                 <CardHeader>
                   <CardTitle className="text-sm text-destructive">
-                    Error details (visible in development only)
+                    {tr('nav.errorDevDetails')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

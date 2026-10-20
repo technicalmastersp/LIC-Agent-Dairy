@@ -5,6 +5,8 @@
 // All times are Indian Standard Time (IST, UTC+05:30, no daylight saving).
 // Days: 0 = Sunday … 6 = Saturday. open/close are minutes after IST midnight.
 
+import type { TranslationKey } from "@/types/i18n.types";
+
 interface DayWindow { open: number; close: number }
 
 export const BUSINESS_HOURS = {
@@ -23,9 +25,11 @@ export const BUSINESS_HOURS = {
 };
 
 // Shown on Help & Support, Contact, About and in the request-a-call dialog.
-export const BUSINESS_HOURS_LABELS: { days: string; hours: string }[] = [
-  { days: "Monday – Friday",   hours: "9:00 AM – 9:00 PM" },
-  { days: "Saturday – Sunday", hours: "10:00 AM – 8:00 PM" },
+// Values are i18n KEYS (translate at the call site with t()): this config lives at module scope,
+// where hooks can't run. Keep them in sync with BUSINESS_HOURS.schedule above.
+export const BUSINESS_HOURS_LABELS: { days: TranslationKey; hours: TranslationKey }[] = [
+  { days: "common.hoursWeekdays", hours: "common.hoursWeekdaysTime" },
+  { days: "common.hoursWeekend",  hours: "common.hoursWeekendTime" },
 ];
 
 export const BUSINESS_HOURS_SUMMARY = "Mon–Fri 9 AM – 9 PM · Sat–Sun 10 AM – 8 PM (IST)";

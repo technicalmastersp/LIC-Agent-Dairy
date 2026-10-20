@@ -6,7 +6,9 @@ import { ChevronRight } from "lucide-react";
 import SEO from "@/components/SEO";
 import siteConfig from "@/config/siteConfig";
 import type { ToolPageLayoutProps } from "@/types/pages/tools/ToolPageLayout.types";
+import { useLanguage } from "@/hooks/useLanguage";
 const ToolPageLayout = ({ icon: Icon, title, description, children, accent }: ToolPageLayoutProps) => {
+  const { t } = useLanguage();
   const iconBg = accent ? `bg-${accent}-100 text-${accent}-700` : "bg-primary/10 text-primary";
   const { pathname } = useLocation();
 
@@ -41,7 +43,7 @@ const ToolPageLayout = ({ icon: Icon, title, description, children, accent }: To
           <div className="container mx-auto px-4 relative py-10 md:py-14">
             <div className="max-w-3xl mx-auto text-center">
               <nav className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground mb-6">
-                <Link to="/tools" className="hover:text-form-header transition-colors">Tools</Link>
+                <Link to="/tools" className="hover:text-form-header transition-colors">{t('common.tools')}</Link>
                 <ChevronRight className="w-3 h-3" />
                 <span className="text-form-header font-medium">{title}</span>
               </nav>

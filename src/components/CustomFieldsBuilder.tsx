@@ -7,13 +7,16 @@ import { Plus, Trash2, GripVertical } from "lucide-react";
 import { CUSTOM_FIELD_TYPES, MAX_CUSTOM_FIELDS, MAX_CUSTOM_LABEL_LENGTH, MAX_CUSTOM_TYPE_NAME_LENGTH } from "@/config/insuranceTypes";
 import type { CustomFieldValue, InsuranceFieldType } from "@/types/config/insuranceTypes.types";
 import type { CustomFieldsBuilderProps } from "@/types/components/CustomFieldsBuilder.types";
-const FIELD_TYPE_LABELS: Record<InsuranceFieldType, string> = {
-  text: "Short text",
+import { useLanguage } from "@/hooks/useLanguage";
+import type { TFunction } from "@/types/i18n.types";
+import { useMemo } from "react";
+const buildFieldTypeLabels = (t: TFunction): Record<InsuranceFieldType, string> => ({
+  text: t('records.shortText'),
   number: "Number",
   date: "Date",
   textarea: "Long text",
   select: "Dropdown",
-};
+});
 
 const makeKey = (label: string, index: number) =>
   (label.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || `field_${index}`);
@@ -24,6 +27,8 @@ const makeKey = (label: string, index: number) =>
 // customFields sub-schema and validateInsuranceTypeFields() limits exactly,
 // so nothing here should exceed what the server will accept.
 const CustomFieldsBuilder = ({ customTypeName, onCustomTypeNameChange, fields, onFieldsChange }: CustomFieldsBuilderProps) => {
+  const { t } = useLanguage();
+  const FIELD_TYPE_LABELS = useMemo(() => buildFieldTypeLabels(t), [t]);
   const addField = () => {
     if (fields.length >= MAX_CUSTOM_FIELDS) return;
     const index = fields.length;
@@ -77,28 +82,28 @@ const CustomFieldsBuilder = ({ customTypeName, onCustomTypeNameChange, fields, o
   return (
     <div className="space-y-5">
       <div>
-        <Label htmlFor="customInsuranceTypeName">Custom Insurance Type Name</Label>
+        <Label htmlFor="customInsuranceTypeName">{t('records.customInsuranceTypeName')}</Label>
         <Input
           id="customInsuranceTypeName"
           value={customTypeName}
           onChange={(e) => onCustomTypeNameChange(e.target.value.slice(0, MAX_CUSTOM_TYPE_NAME_LENGTH))}
-          placeholder="e.g. Pet Insurance, Crop Insurance, Marine Cargo Insurance"
+          placeholder={t('records.eGPetInsuranceCrop')}
           className="mt-1"
         />
         <p className="text-xs text-muted-foreground mt-1">
-          {customTypeName.length}/{MAX_CUSTOM_TYPE_NAME_LENGTH} characters
+          {customTypeName.length}/{MAX_CUSTOM_TYPE_NAME_LENGTH} {" "}{t('records.characters')}
         </p>
       </div>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="text-sm">Custom Fields</Label>
-          <span className="text-xs text-muted-foreground">{fields.length}/{MAX_CUSTOM_FIELDS} fields</span>
+          <Label className="text-sm">{t('records.customFields')}</Label>
+          <span className="text-xs text-muted-foreground">{fields.length}/{MAX_CUSTOM_FIELDS} {" "}{t('records.fields')}</span>
         </div>
 
         {fields.length === 0 && (
           <p className="text-sm text-muted-foreground bg-muted/40 rounded-lg p-4 text-center">
-            No custom fields yet — add the details this insurance type needs (coverage, dates, limits, anything).
+            {t('records.noCustomFieldsYetAdd')}
           </p>
         )}
 
@@ -112,7 +117,7 @@ const CustomFieldsBuilder = ({ customTypeName, onCustomTypeNameChange, fields, o
                     <Input
                       value={field.label}
                       onChange={(e) => updateField(index, { label: e.target.value.slice(0, MAX_CUSTOM_LABEL_LENGTH) })}
-                      placeholder="Field name, e.g. Coverage Region"
+                      placeholder={t('records.fieldNameEGCoverage')}
                     />
                   </div>
                   <Select value={field.fieldType} onValueChange={(v) => updateField(index, { fieldType: v as InsuranceFieldType })}>
@@ -120,8 +125,8 @@ const CustomFieldsBuilder = ({ customTypeName, onCustomTypeNameChange, fields, o
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {CUSTOM_FIELD_TYPES.map((t) => (
-                        <SelectItem key={t} value={t}>{FIELD_TYPE_LABELS[t]}</SelectItem>
+                      {CUSTOM_FIELD_TYPES.map((tk) => (
+                        <SelectItem key={tk} value={tk}>{FIELD_TYPE_LABELS[tk]}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -133,13 +138,13 @@ const CustomFieldsBuilder = ({ customTypeName, onCustomTypeNameChange, fields, o
 
               {field.fieldType === "select" && (
                 <div className="pl-6 space-y-1.5">
-                  <p className="text-xs text-muted-foreground">Dropdown options</p>
+                  <p className="text-xs text-muted-foreground">{t('records.dropdownOptions')}</p>
                   {(field.options || []).map((opt, optIndex) => (
                     <div key={optIndex} className="flex items-center gap-1.5">
                       <Input
                         value={opt}
                         onChange={(e) => updateOption(index, optIndex, e.target.value)}
-                        placeholder={`Option ${optIndex + 1}`}
+                        placeholder={t('records.option', { value: optIndex + 1 })}
                         className="h-8 text-sm"
                         maxLength={100}
                       />
@@ -151,19 +156,19 @@ const CustomFieldsBuilder = ({ customTypeName, onCustomTypeNameChange, fields, o
                     </div>
                   ))}
                   <Button type="button" size="sm" variant="outline" onClick={() => addOption(index)} className="h-7 text-xs">
-                    <Plus className="w-3 h-3 mr-1" /> Add option
+                    <Plus className="w-3 h-3 mr-1" /> {" "}{t('records.addOption')}
                   </Button>
                 </div>
               )}
 
               <div className="pl-6">
-                <Label className="text-xs text-muted-foreground">Value</Label>
+                <Label className="text-xs text-muted-foreground">{t('records.value')}</Label>
                 {field.fieldType === "textarea" ? (
                   <Textarea value={field.value} onChange={(e) => updateField(index, { value: e.target.value })} rows={2} maxLength={200} className="mt-1 resize-none text-sm" />
                 ) : field.fieldType === "select" ? (
                   <Select value={field.value} onValueChange={(v) => updateField(index, { value: v })}>
                     <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select a value" />
+                      <SelectValue placeholder={t('records.selectAValue')} />
                     </SelectTrigger>
                     <SelectContent>
                       {(field.options || []).filter(Boolean).map((opt) => (
@@ -186,7 +191,7 @@ const CustomFieldsBuilder = ({ customTypeName, onCustomTypeNameChange, fields, o
         </div>
 
         <Button type="button" variant="outline" size="sm" onClick={addField} disabled={fields.length >= MAX_CUSTOM_FIELDS}>
-          <Plus className="w-3.5 h-3.5 mr-1.5" /> Add field
+          <Plus className="w-3.5 h-3.5 mr-1.5" /> {" "}{t('records.addField')}
         </Button>
       </div>
     </div>

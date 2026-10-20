@@ -4,6 +4,7 @@ import { USER_UPDATED_EVENT } from "@/utils/userEvents";
 import { getPrivacySettings, updatePrivacySettings } from "../../services/userService";
 import { toast } from "@/hooks/use-toast";
 import type { SensitiveFieldKey } from "@/config/sensitiveDataRegistry";
+import { useLanguage } from "@/hooks/useLanguage";
 
 // App-wide state of the Hide/Show sensitive-data button.
 //   enabled — the backend master switch (SENSITIVE_MASKING_ENABLED) is on
@@ -39,6 +40,7 @@ const readFromCache = () => {
 };
 
 export function SensitiveMaskProvider({ children }: { children: ReactNode }) {
+  const { t } = useLanguage();
   const [state, setState] = useState(readFromCache);
   const [saving, setSaving] = useState(false);
   const savingRef = useRef(false);
@@ -103,10 +105,10 @@ export function SensitiveMaskProvider({ children }: { children: ReactNode }) {
         });
       }
       toast({
-        title: code === "FEATURE_DISABLED" ? "Feature unavailable" : "Couldn't save your choice",
+        title: code === "FEATURE_DISABLED" ? t('records.featureUnavailable') : t('records.couldnTSaveYourChoice'),
         description: code === "FEATURE_DISABLED"
-          ? "Hiding sensitive data is currently turned off."
-          : "Please check your connection and try again.",
+          ? t('records.hidingSensitiveDataIsCurrently')
+          : t('records.pleaseCheckYourConnection'),
         variant: "destructive",
       });
     } finally {

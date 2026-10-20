@@ -160,9 +160,9 @@ const MissedPayments = () => {
                 <ReceiptText className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold text-form-header">Missed Last Payment</h1>
+                <h1 className="text-2xl font-semibold text-form-header">{t('dues.missedLastPayment')}</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">
-                  Records that missed their last payment. Stay on top of your policies and follow up on time.
+                  {t('dues.recordsThatMissedTheirLast')}
                 </p>
               </div>
             </div>
@@ -174,10 +174,10 @@ const MissedPayments = () => {
           {/* Stat row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: "Total missed", val: records.length, icon: <AlertTriangle className="w-4 h-4" />, sub: "Need follow-up", bg: "bg-red-50", color: "text-red-600" },
-              { label: "Never paid", val: summaryStats.neverPaid, icon: <Ban className="w-4 h-4" />, sub: "No payment on record", bg: "bg-rose-50", color: "text-rose-700" },
-              { label: "At-risk value", val: <SensitiveValue field="sumAssured" value={summaryStats.totalSumAssured} render={(v) => `₹${Number(v).toLocaleString("en-IN")}`} />, icon: <ReceiptText className="w-4 h-4" />, sub: "Sum assured", bg: "bg-amber-50", color: "text-amber-700" },
-              { label: "Branches", val: summaryStats.branches, icon: <FolderOpen className="w-4 h-4" />, sub: "Affected branches", bg: "bg-violet-50", color: "text-violet-700" },
+              { label: t('dues.totalMissed'), val: records.length, icon: <AlertTriangle className="w-4 h-4" />, sub: t('dues.needFollowUp'), bg: "bg-red-50", color: "text-red-600" },
+              { label: t('dues.neverPaid'), val: summaryStats.neverPaid, icon: <Ban className="w-4 h-4" />, sub: t('dues.noPaymentOnRecord'), bg: "bg-rose-50", color: "text-rose-700" },
+              { label: t('dues.atRiskValue'), val: <SensitiveValue field="sumAssured" value={summaryStats.totalSumAssured} render={(v) => `₹${Number(v).toLocaleString("en-IN")}`} />, icon: <ReceiptText className="w-4 h-4" />, sub: t('dues.sumAssured'), bg: "bg-amber-50", color: "text-amber-700" },
+              { label: t('dues.branches'), val: summaryStats.branches, icon: <FolderOpen className="w-4 h-4" />, sub: t('dues.affectedBranches'), bg: "bg-violet-50", color: "text-violet-700" },
             ].map(({ label, val, icon, sub, bg, color }) => (
               <Card key={label} className={`${bg} border-transparent hover:shadow-sm transition-shadow`}>
                 <CardContent className="p-4">
@@ -198,15 +198,15 @@ const MissedPayments = () => {
                 <div className="relative flex-1 max-w-md">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
-                    placeholder="Search by name, policy number, occupation..."
+                    placeholder={t('common.searchByNamePolicyNumber')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 focus-visible:ring-primary/40"
                   />
                 </div>
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  <span>{t("totalRecords")}: <Badge variant="secondary">{records.length}</Badge></span>
-                  <span>{t("filteredRecords")}: <Badge variant="outline">{filteredAndSortedRecords.length}</Badge></span>
+                  <span>{t("records.totalRecords")}: <Badge variant="secondary">{records.length}</Badge></span>
+                  <span>{t("records.filteredRecords")}: <Badge variant="outline">{filteredAndSortedRecords.length}</Badge></span>
                 </div>
               </div>
             </CardContent>
@@ -215,7 +215,7 @@ const MissedPayments = () => {
           {/* Records Table */}
           <Card className="overflow-hidden">
             <CardHeader className="border-b border-table-border bg-table-header/40">
-              <CardTitle className="text-form-header text-base">All Unpaid Records</CardTitle>
+              <CardTitle className="text-form-header text-base">{t('dues.allUnpaidRecords')}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {filteredAndSortedRecords.length === 0 ? (
@@ -227,11 +227,11 @@ const MissedPayments = () => {
                   </div>
                   <div className="text-muted-foreground text-base mb-4">
                     {isLoading ? (
-                      <span>{t("loadingRecords")}</span>
+                      <span>{t("records.loadingRecords")}</span>
                     ) : records.length === 0 ? (
-                      <span>{t("missedPaymentNoRecordNote")}</span>
+                      <span>{t("records.missedPaymentNoRecordNote")}</span>
                     ) : (
-                      <span>No records match your search</span>
+                      <span>{t('common.noRecordsMatchYourSearch')}</span>
                     )}
                   </div>
                 </div>
@@ -240,14 +240,14 @@ const MissedPayments = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
-                        <SortableHeader field="name">Name</SortableHeader>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Mobile Number</TableHead>
-                        <SortableHeader field="age">Age</SortableHeader>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Policy Number</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Mode Of Payment</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Branch</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground min-w-32">Last Payment Date</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Actions</TableHead>
+                        <SortableHeader field="name">{t('common.name')}</SortableHeader>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.mobileNumber')}</TableHead>
+                        <SortableHeader field="age">{t('common.age')}</SortableHeader>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.policyNumber')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.modeOfPayment')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.branch')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground min-w-32">{t('common.lastPaymentDate')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -281,7 +281,7 @@ const MissedPayments = () => {
                           <TableCell className="border border-table-border text-sm">
                             {record.currentPolicy.lastPaymentDate
                               ? <span className="text-muted-foreground">{record.currentPolicy.lastPaymentDate}</span>
-                              : <Badge className="bg-red-100 text-red-700 border border-red-200 text-xs">No payments</Badge>}
+                              : <Badge className="bg-red-100 text-red-700 border border-red-200 text-xs">{t('dues.noPayments')}</Badge>}
                           </TableCell>
                           <TableCell className="border border-table-border">
                             <div className="flex items-center space-x-2">
@@ -290,7 +290,7 @@ const MissedPayments = () => {
                                 variant="outline"
                                 onClick={() => handleViewRecord(record)}
                                 className="h-8 w-8 p-0"
-                                title="View Record"
+                                title={t('common.viewRecord')}
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
@@ -299,7 +299,7 @@ const MissedPayments = () => {
                                 variant="outline"
                                 onClick={() => handleContactRecord(record)}
                                 className="h-8 w-8 p-0"
-                                title="Contact"
+                                title={t('common.contact')}
                               >
                                 <MessageSquare className="w-4 h-4" />
                               </Button>
@@ -307,10 +307,10 @@ const MissedPayments = () => {
                               <Badge
                                 variant="destructive"
                                 className="ml-2 cursor-pointer"
-                                title="Update Last Payment Date"
+                                title={t('dues.updateLastPaymentDate')}
                                 onClick={() => handlePayRecord(record)}
                               >
-                                Pay
+                                {t('dues.pay')}
                               </Badge>
                             </div>
                           </TableCell>

@@ -8,7 +8,9 @@ import { verifyEmail, resendVerification, logoutCurrentUser } from "../../servic
 import { getCurrentUser } from "@/utils/auth";
 import type { VerifyStatus } from "@/types/pages/VerifyEmail.types";
 import SEO from "@/components/SEO";
+import { useLanguage } from "@/hooks/useLanguage";
 const VerifyEmail = () => {
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const navigate       = useNavigate();
 
@@ -66,38 +68,38 @@ const VerifyEmail = () => {
     verifying: {
       icon:  <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />,
       bg:    "bg-blue-100",
-      title: "Verifying your email…",
-      desc:  "Please wait while we verify your email address.",
+      title: t('auth.verifyingYourEmail'),
+      desc:  t('auth.pleaseWaitWhileWeVerify'),
     },
     success: {
       icon:  <CheckCircle2 className="w-8 h-8 text-green-600" />,
       bg:    "bg-green-100",
-      title: "Email verified! 🎉",
-      desc:  "Your email has been verified successfully. You can now login.",
+      title: t('auth.emailVerified'),
+      desc:  t('auth.yourEmailHasBeenVerified'),
     },
     already: {
       icon:  <MailCheck className="w-8 h-8 text-blue-600" />,
       bg:    "bg-blue-100",
-      title: "Already verified",
-      desc:  "This email is already verified. Please login.",
+      title: t('auth.alreadyVerified'),
+      desc:  t('auth.thisEmailIsAlreadyVerified'),
     },
     expired: {
       icon:  <XCircle className="w-8 h-8 text-amber-600" />,
       bg:    "bg-amber-100",
-      title: "Link expired",
-      desc:  "This verification link has expired. Request a new one below.",
+      title: t('auth.linkExpired'),
+      desc:  t('auth.thisVerificationLinkHasExpired'),
     },
     invalid: {
       icon:  <XCircle className="w-8 h-8 text-red-600" />,
       bg:    "bg-red-100",
-      title: "Invalid link",
-      desc:  "This verification link is invalid or has already been used.",
+      title: t('auth.invalidLink'),
+      desc:  t('auth.thisVerificationLinkIsInvalid'),
     },
     resendedMail: {
       icon:  <CheckCircle2 className="w-8 h-8 text-green-600" />,
       bg:    "bg-green-100",
-        title: "Verification email sent!",
-        desc:  "A new verification link has been sent to your email.",
+        title: t('auth.verificationEmailSent'),
+        desc:  t('auth.aNewVerificationLinkHas'),
     },
   };
 
@@ -105,7 +107,7 @@ const VerifyEmail = () => {
 
   return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
-      <SEO title="Verify Email" description="Verify your Policy Niketan account email address." path="/verify-email" noindex />
+      <SEO title={t('auth.verifyEmail')} description={t('auth.verifyYourPolicyNiketanAccount')} path="/verify-email" noindex />
       <div className="w-full max-w-md">
         <Card>
           <CardHeader className="text-center">
@@ -119,7 +121,7 @@ const VerifyEmail = () => {
           <CardContent className="space-y-4">
             {(verifyStatus === "success" || verifyStatus === "already" || verifyStatus === "resendedMail") && (
               <Button className="w-full" onClick={() => navigate("/login")}>
-                Go to login
+                {t('auth.goToLogin')}
               </Button>
             )}
 
@@ -127,19 +129,19 @@ const VerifyEmail = () => {
               <div className="space-y-3">
                 <Input
                   type="email"
-                  placeholder="Enter your registered email"
+                  placeholder={t('auth.enterYourRegisteredEmail2')}
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                 />
                 <Button className="w-full" onClick={handleResend} disabled={resending || !email}>
-                  {resending ? "Sending…" : "Resend verification link"}
+                  {resending ? t('auth.sending') : t('auth.resendVerificationLink')}
                 </Button>
                 {resendMsg && (
                   <p className="text-sm text-center text-muted-foreground">{resendMsg}</p>
                 )}
                 <div className="text-center">
                   <Link to="/login" className="text-sm text-primary hover:underline">
-                    Back to login
+                    {t('auth.backToLogin')}
                   </Link>
                 </div>
               </div>

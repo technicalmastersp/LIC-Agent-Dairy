@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { WifiOff, X } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 /**
  * Proactively tells the user they've lost their network connection, instead
@@ -11,6 +12,7 @@ import { WifiOff, X } from "lucide-react";
  * actually drops again — dismissing it doesn't silence future outages.
  */
 const OfflineBanner = () => {
+  const { t } = useLanguage();
   const [isOffline, setIsOffline] = useState(
     typeof navigator !== "undefined" ? !navigator.onLine : false
   );
@@ -44,12 +46,12 @@ const OfflineBanner = () => {
     >
       <WifiOff className="w-4 h-4 shrink-0" />
       <span className="font-medium">
-        You're offline — check your internet connection.
+        {t('nav.youReOfflineCheck')}
       </span>
       <button
         type="button"
         onClick={() => setDismissed(true)}
-        aria-label="Dismiss offline notice"
+        aria-label={t('nav.dismissOfflineNotice')}
         className="ml-1 shrink-0 rounded-full p-0.5 hover:bg-destructive-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive-foreground/60"
       >
         <X className="w-3.5 h-3.5" />

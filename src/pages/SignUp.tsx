@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { i18nZodResolver as zodResolver } from "@/i18n/zodResolver";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { UserPlus, EyeOff, Eye, Check, Home, CheckCircle2, Circle, ShieldCheck, BellRing, Wallet } from "lucide-react";
 import type { SignUpRequest } from "@/types/pages/SignUp.types";
+import Trans from "@/components/Trans";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -94,11 +95,11 @@ const SignUp = () => {
   const strengthWidth = ["0%", "33%", "66%", "100%"][passwordStrength.score];
 
   const plans = [
-    { id: '1month-free', planType: "Free", name: '1 Month Free Plan', price: 0, originalPrice: 299 },
-    { id: "1month", planType: "Starter", name: "1 Month Plan", price: 249, originalPrice: 299 },
-    { id: '3months', planType: "Basic", name: '3 Months Plan', price: 599, originalPrice: 899 },
-    { id: '6months', planType: "Standard", name: '6 Months Plan', price: 1099, originalPrice: 1599 },
-    { id: '12months', planType: "Premium", name: '12 Months Plan', price: 2099, originalPrice: 2999 }
+    { id: '1month-free', planType: t('auth.free'), name: t('auth.n1MonthFreePlan'), price: 0, originalPrice: 299 },
+    { id: "1month", planType: t('auth.starter'), name: t('auth.n1MonthPlan'), price: 249, originalPrice: 299 },
+    { id: '3months', planType: t('auth.basic'), name: t('auth.n3MonthsPlan'), price: 599, originalPrice: 899 },
+    { id: '6months', planType: t('auth.standard'), name: t('auth.n6MonthsPlan'), price: 1099, originalPrice: 1599 },
+    { id: '12months', planType: t('auth.premium'), name: t('auth.n12MonthsPlan'), price: 2099, originalPrice: 2999 }
   ];
 
   useEffect(() => {
@@ -131,7 +132,7 @@ const SignUp = () => {
     // backend check tied to the separate "Validate" button, not
     // something a sync schema can express.
     if (REFERRAL_PROGRAM_ENABLED && formData.referralCode && !isValidReferralCode) {
-      setError("Invalid Referral Code, Please Re-Validate and Try Again");
+      setError(t('auth.invalidReferralCodePleaseRe'));
       setIsLoading(false);
       return;
     }
@@ -189,35 +190,35 @@ const SignUp = () => {
             const freshProfile = await getProfile();
             setCurrentUser(freshProfile);
 
-            toast({ title: "Payment Successful", description: "Your account and plan are ready." });
+            toast({ title: t('auth.paymentSuccessful'), description: t('auth.yourAccountAndPlan') });
             navigate("/");
           } catch (err: unknown) {
             // Account exists but payment wasn't completed — send them to login;
             // they can finish payment from Our Plans afterwards.
             if (err instanceof Error && err.message === "PAYMENT_CANCELLED") {
               toast({
-                title: "Payment Cancelled",
-                description: "Your account was created. You can complete payment anytime from Our Plans.",
+                title: t('auth.paymentCancelled'),
+                description: t('auth.yourAccountWasCreated'),
               });
             } else {
               toast({
-                title: "Payment Failed",
-                description: "Your account was created but payment didn't go through. Please complete it from Our Plans.",
+                title: t('auth.paymentFailed'),
+                description: t('auth.yourAccountWasCreatedBut'),
                 variant: "destructive",
               });
             }
             navigate("/login");
           }
         } else {
-          toast({ title: t('signupSuccess') });
+          toast({ title: t('auth.signupSuccess') });
           navigate("/login");
         }
       } else {
-        setError(t('userExists'));
+        setError(t('auth.userExists'));
       }
     } catch (err: unknown) {
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
-      setError(message || "Failed to create account. Please try again.");
+      setError(message || t('auth.failedToCreateAccountPlease'));
     } finally {
       setIsLoading(false);
     }
@@ -226,15 +227,15 @@ const SignUp = () => {
   return (
     <main className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
       <SEO
-        title="Sign Up"
-        description="Create your free Policy Niketan account and start tracking client policy records, premium due dates, and payments today."
+        title={t('auth.signUp')}
+        description={t('auth.createYourFreePolicyNiketan')}
         path="/signup"
       />
-      <h1 className="sr-only">{t('signupTitle')}</h1>
+      <h1 className="sr-only">{t('auth.signupTitle')}</h1>
       <div className="w-full max-w-2xl space-y-6">
         <div className="flex w-full items-center justify-between">
           <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate("/")}>
-            <Home className="w-4 h-4" />Back to Home
+            <Home className="w-4 h-4" />{t('auth.backToHome')}
           </Button>
           <div className="flex">
             <LanguageSwitcher />
@@ -246,15 +247,14 @@ const SignUp = () => {
             <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
               <UserPlus className="w-8 h-8 text-primary-foreground" />
             </div>
-            <CardTitle className="text-2xl text-form-header">{t('signupTitle')}</CardTitle>
+            <CardTitle className="text-2xl text-form-header">{t('auth.signupTitle')}</CardTitle>
             <CardDescription>
-              {t('welcome')} Sir - {t('createAccount')}
-            </CardDescription>
+              {t('auth.signupSubtitle')}</CardDescription>
             <div className="flex flex-wrap justify-center gap-2 pt-1">
               {[
-                { icon: ShieldCheck, label: "Secure & backed up daily" },
-                { icon: BellRing, label: "Due-date reminders" },
-                ...(REFERRAL_PROGRAM_ENABLED ? [{ icon: Wallet, label: "Referral rewards" }] : []),
+                { icon: ShieldCheck, label: t('auth.secureBackedUpDaily') },
+                { icon: BellRing, label: t('auth.dueDateReminders') },
+                ...(REFERRAL_PROGRAM_ENABLED ? [{ icon: Wallet, label: t('auth.referralRewards') }] : []),
               ].map(({ icon: Icon, label }) => (
                 <span
                   key={label}
@@ -270,11 +270,11 @@ const SignUp = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  {/* <Label htmlFor="name">{t('name')}</Label> */}
+                  {/* <Label htmlFor="name">{t('common.name')}</Label> */}
                   <Input
                     id="name"
                     type="text"
-                    placeholder={t('name')}
+                    placeholder={t('common.name')}
                     {...register("name")}
                   />
                   {errors.name && (
@@ -283,11 +283,11 @@ const SignUp = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  {/* <Label htmlFor="mobileNumber">{t('mobileNumber')}</Label> */}
+                  {/* <Label htmlFor="mobileNumber">{t('auth.mobileNumber')}</Label> */}
                   <Input
                     id="mobileNumber"
                     type="tel"
-                    placeholder="10-digit mobile number"
+                    placeholder={t('auth.n10DigitMobileNumber')}
                     pattern="[0-9]{10}"
                     maxLength={10}
                     {...register("mobileNumber")}
@@ -299,11 +299,11 @@ const SignUp = () => {
               </div>
 
               <div className="space-y-2">
-                {/* <Label htmlFor="fullAddress">{t('fullAddress')}</Label> */}
+                {/* <Label htmlFor="fullAddress">{t('auth.fullAddress')}</Label> */}
                 <Input
                   id="fullAddress"
                   type="text"
-                  placeholder={t('fullAddress')}
+                  placeholder={t('auth.fullAddress')}
                   maxLength={100}
                   {...register("fullAddress")}
                 />
@@ -313,11 +313,11 @@ const SignUp = () => {
               </div>
 
               <div className="space-y-2">
-                {/* <Label htmlFor="email">{t('email')}</Label> */}
+                {/* <Label htmlFor="email">{t('common.email')}</Label> */}
                 <Input
                   id="email"
                   type="email"
-                  placeholder={t('email')}
+                  placeholder={t('common.email')}
                   {...register("email")}
                 />
                 {errors.email && (
@@ -327,16 +327,16 @@ const SignUp = () => {
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  {/* <Label htmlFor="password">{t('password')}</Label> */}
+                  {/* <Label htmlFor="password">{t('common.password')}</Label> */}
                   <div className="relative">
                     <Input
                       id="password"
                       type={showNew ? "text" : "password"}
-                      placeholder={t('password')}
+                      placeholder={t('common.password')}
                       {...register("password")}
                     />
                     <button type="button" onClick={() => setShowNew(!showNew)}
-                      aria-label={showNew ? "Hide password" : "Show password"}
+                      aria-label={showNew ? t('auth.hidePassword') : t('auth.showPassword')}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -352,9 +352,9 @@ const SignUp = () => {
                   {/* Requirements */}
                   <div className="space-y-1">
                     {[
-                      { ok: passwordStrength.hasLen,   label: "At least 6 characters" },
-                      { ok: passwordStrength.hasUpper, label: "One uppercase letter"  },
-                      { ok: passwordStrength.hasNum,   label: "One number"            },
+                      { ok: passwordStrength.hasLen,   label: t('auth.atLeast6Characters') },
+                      { ok: passwordStrength.hasUpper, label: t('auth.oneUppercaseLetter')  },
+                      { ok: passwordStrength.hasNum,   label: t('auth.oneNumber')            },
                     ].map(({ ok, label }) => (
                       <div key={label}
                         className={`flex items-center gap-1.5 text-xs transition-colors ${ok ? "text-green-600" : "text-muted-foreground"}`}>
@@ -368,16 +368,16 @@ const SignUp = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  {/* <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label> */}
+                  {/* <Label htmlFor="confirmPassword">{t('common.confirmPassword')}</Label> */}
                   <div className="relative">
                     <Input
                       id="confirmPassword"
                       type={showConfirm ? "text" : "password"}
-                      placeholder={t('confirmPassword')}
+                      placeholder={t('common.confirmPassword')}
                       {...register("confirmPassword")}
                     />
                     <button type="button" onClick={() => setShowConfirm(!showConfirm)}
-                      aria-label={showConfirm ? "Hide password" : "Show password"}
+                      aria-label={showConfirm ? t('auth.hidePassword') : t('auth.showPassword')}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -390,14 +390,14 @@ const SignUp = () => {
 
               <div className="grid gap-4">
                 <div className="space-y-2">
-                  {/* <Label htmlFor="selectedPlan">{t('SelectSubscriptionPlan')}</Label> */}
+                  {/* <Label htmlFor="selectedPlan">{t('common.selectSubscriptionPlan')}</Label> */}
                   <Controller
                     name="selectedPlan"
                     control={control}
                     render={({ field }) => (
                       <Select value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger id="selectedPlan">
-                          <SelectValue placeholder={t('SelectSubscriptionPlan')} />
+                          <SelectValue placeholder={t('common.selectSubscriptionPlan')} />
                         </SelectTrigger>
                         <SelectContent>
                           {plans.map((plan) => (
@@ -425,12 +425,12 @@ const SignUp = () => {
                 {/* REFERRAL-PROGRAM — hidden unless the program is enabled */}
                 {REFERRAL_PROGRAM_ENABLED && (
                 <div className="space-y-2">
-                  {/* <Label htmlFor="referralCode">{t('ReferralCode')+' ('+t('Optional')+')'}</Label> */}
+                  {/* <Label htmlFor="referralCode">{t('common.referralCode')+' ('+t('common.optional')+')'}</Label> */}
                   <div className="flex gap-2">
                     <Input
                       id="referralCode"
                       type="text"
-                      placeholder={t('ReferralCode') + ' (' + t('Optional') + ')'}
+                      placeholder={t('common.referralCode') + ' (' + t('common.optional') + ')'}
                       className="flex-1"
                       maxLength={7}
                       disabled={isValidReferralCode}
@@ -456,13 +456,13 @@ const SignUp = () => {
                           );
 
                           toast({
-                            title: "Referral Code Validated!",
-                            description: `Valid referral from ${pendingReferral.referrerName}. You'll receive ₹100 discount!`,
+                            title: t('auth.referralCodeValidated'),
+                            description: t('auth.validReferralFromYouLl', { referrerName: pendingReferral.referrerName }),
                           });
                         } else {
                           toast({
-                            title: "Invalid Referral Code",
-                            description: "Please check your referral code and try again.",
+                            title: t('auth.invalidReferralCode'),
+                            description: t('auth.pleaseCheckYourReferralCode'),
                             variant: "destructive",
                           });
                         }
@@ -476,11 +476,11 @@ const SignUp = () => {
                     >
                       {isValidReferralCode ? (
                         <span className="flex items-center gap-1">
-                          Validated
+                          {t('auth.validated')}
                           <Check className="h-4 w-4" />
                         </span>
                       ) : (
-                        t("validate")
+                        t("common.validate")
                       )}
                     </Button>
                   </div>
@@ -489,7 +489,7 @@ const SignUp = () => {
                   )}
                   {referralCodeValue && !isValidReferralCode && (
                     <p className="text-xs text-muted-foreground">
-                      Click 'Validate' to check your referral code
+                      {t('auth.clickValidateToCheck')}
                     </p>
                   )}
                 </div>
@@ -502,23 +502,22 @@ const SignUp = () => {
                     <Card className="bg-gradient-to-br from-primary/5 to-accent/10 border-primary/20 shadow-lg">
                       <CardHeader className="pb-3">
                         <CardTitle className="text-lg text-primary flex items-center gap-2">
-                          💳 Payment Summary
+                          {t('auth.paymentSummary')}
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="flex justify-between items-center py-2 border-b border-border/50">
-                          <span className="text-sm font-medium">Selected Plan:</span>
+                          <span className="text-sm font-medium">{t('auth.selectedPlan')}</span>
                           <span className="font-semibold">{getSelectedPlan()?.name}</span>
                         </div>
                         
                         <div className="flex justify-between items-center py-2 border-b border-border/50">
-                          <span className="text-sm font-medium">Plan Price:</span>
+                          <span className="text-sm font-medium">{t('auth.planPrice')}</span>
                           <div className="text-right">
                             <span className="font-semibold">₹{getSelectedPlan()?.price}</span>
                             {getSelectedPlan()?.originalPrice && (
                               <div className="text-xs text-muted-foreground line-through">
-                                MRP: ₹{getSelectedPlan()?.originalPrice}
-                              </div>
+                                {t('auth.mrp', { value: getSelectedPlan()?.originalPrice })}</div>
                             )}
                           </div>
                         </div>
@@ -526,7 +525,7 @@ const SignUp = () => {
                         {REFERRAL_PROGRAM_ENABLED && !isValidReferralCode && !referralCodeValue && (
                           <div className="bg-accent/90 border border-accent/60 rounded-lg p-3">
                             <p className="text-sm text-foreground/80 flex items-center gap-2">
-                              💡 <span><strong>Pro Tip:</strong> Enter a valid referral code to get an instant ₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} discount!</span>
+                              💡 <span><Trans i18nKey="auth.proTipEnterAValid" params={{ SIGNUP_DISCOUNT_AMOUNT: referralConfig.SIGNUP_DISCOUNT_AMOUNT }} /></span>
                             </p>
                           </div>
                         )}
@@ -534,18 +533,17 @@ const SignUp = () => {
                         {isValidReferralCode && referralCodeValue && (
                           <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
                             <div className="flex justify-between items-center mb-2">
-                              <span className="text-sm font-medium text-green-800 dark:text-green-300">Referral Discount:</span>
+                              <span className="text-sm font-medium text-green-800 dark:text-green-300">{t('auth.referralDiscount')}</span>
                               <span className="font-semibold text-green-800 dark:text-green-300">-₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT}</span>
                             </div>
                             <p className="text-xs text-green-700 dark:text-green-400 flex items-center gap-1">
-                              🎉 <span>Congratulations! You've received ₹100 discount with referral code: <strong>{referralCodeValue}</strong></span>
+                              🎉 <span><Trans i18nKey="auth.congratulationsYouVeReceived100" params={{ referralCodeValue }} /></span>
                             </p>
                             {(() => {
                               const pendingReferral = JSON.parse(localStorage.getItem('pendingReferral') || '{}');
                               return pendingReferral.referrerName && (
                                 <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                                  Referred by: <strong>{pendingReferral.referrerName}</strong>
-                                </p>
+                                  <Trans i18nKey="auth.referred" params={{ referrerName: pendingReferral.referrerName }} /></p>
                               );
                             })()}
                           </div>
@@ -553,12 +551,12 @@ const SignUp = () => {
 
                         <div className="border-t-2 border-primary/20 pt-4 bg-primary/5 -mx-6 -mb-6 px-6 pb-6 rounded-b-lg">
                           <div className="flex justify-between items-center">
-                            <span className="text-lg font-semibold">Total Amount:</span>
+                            <span className="text-lg font-semibold">{t('auth.totalAmount')}</span>
                             <span className="text-2xl font-bold text-primary">₹{calculateFinalPrice()}</span>
                           </div>
                           {isValidReferralCode && referralCodeValue && (
                             <div className="text-xs text-muted-foreground mt-1 text-right">
-                              You saved ₹100!
+                              {t('auth.youSaved100')}
                             </div>
                           )}
                         </div>
@@ -576,18 +574,12 @@ const SignUp = () => {
                     : "border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400"
                 }`}
               >
-                {isValidReferralCode ? (
-                  <p>
-                    🎉 <strong>Congratulations!</strong> You got a{" "}
-                    <strong>₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} discount</strong>. Pick any paid subscription plan to
-                    receive your discount.
-                  </p>
-                ) : (
-                  <p>
-                    {t("referralDiscountNote1")} <strong>{t("referralDiscountNote2")}</strong> {t("referralDiscountNote3")}{" "}
-                    <strong>₹{referralConfig.SIGNUP_DISCOUNT_AMOUNT} {t("referralDiscountNote5")}</strong> {t("referralDiscountNote6")}
-                  </p>
-                )}
+                <p>
+                  <Trans
+                    i18nKey={isValidReferralCode ? "auth.referralApplied" : "auth.referralDiscountNote"}
+                    params={{ amount: referralConfig.SIGNUP_DISCOUNT_AMOUNT }}
+                  />
+                </p>
               </div>
               )}
 
@@ -603,16 +595,7 @@ const SignUp = () => {
                       className="mt-0.5"
                     />
                     <Label htmlFor="acceptTerms" className="text-sm font-normal leading-snug cursor-pointer">
-                      I have read and agree to the{" "}
-                      <Link to="/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80">
-                        Terms & Conditions
-                      </Link>{" "}
-                      and{" "}
-                      <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80">
-                        Privacy Policy
-                      </Link>.
-                      {/* <span className="text-[#ff0000]"> *</span> */}
-                    </Label>
+                      <Trans i18nKey="auth.iHaveReadAndAgree" components={{ link: <Link to="/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80" />, link2: <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80" /> }} /></Label>
                   </div>
                 )}
               />
@@ -627,23 +610,19 @@ const SignUp = () => {
               )}
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? t('loading') : selectedPlanId !== '1month-free' && selectedPlanId?.trim() !== ''  ? t('makePaymentCreateAccount') : t('createAccount')}
+                {isLoading ? t('common.loading') : selectedPlanId !== '1month-free' && selectedPlanId?.trim() !== ''  ? t('auth.makePaymentCreateAccount') : t('auth.createAccount')}
               </Button>
             </form>
 
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                {t('alreadyHaveAccount')}{" "}
+                {t('auth.alreadyHaveAccount')}{" "}
                 <Link to="/login" className="text-primary underline underline-offset-2 hover:text-primary/80">
-                  {t('login')}
+                  {t('nav.login')}
                 </Link>
               </p>
               <p className="text-sm text-muted-foreground">
-                Explore &nbsp;  
-                <Link to="/our-plans" className="text-primary underline underline-offset-2 hover:text-primary/80">
-                  Our Plans
-                </Link>
-              </p>
+                <Trans i18nKey="auth.exploreOurPlans" components={{ link: <Link to="/our-plans" className="text-primary underline underline-offset-2 hover:text-primary/80" /> }} /></p>
             </div>
           </CardContent>
         </Card>

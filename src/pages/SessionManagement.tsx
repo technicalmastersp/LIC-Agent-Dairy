@@ -9,9 +9,12 @@ import { getMySessions, revokeSession, revokeOtherSessions } from "../../service
 import { Monitor, MapPin, LogOut, ShieldAlert } from "lucide-react";
 import type { Session } from "@/types/pages/SessionManagement.types";
 import { formatISTDateTime as fmt } from "@/utils/dateFormat";
+import { useLanguage } from "@/hooks/useLanguage";
+import Trans from "@/components/Trans";
 // (date formatting now imported from dateFormat.ts as `fmt`)
 
 const SessionManagement = () => {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [sessions,   setSessions]   = useState<Session[]>([]);
   const [loading,    setLoading]    = useState(true);
@@ -25,7 +28,7 @@ const SessionManagement = () => {
       setSessions(data);
     } catch (err) {
       console.error(err);
-      toast({ title: "Error", description: "Couldn't load your sessions.", variant: "destructive" });
+      toast({ title: t('auth.error'), description: t('auth.couldnTLoadYourSessions'), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -38,11 +41,11 @@ const SessionManagement = () => {
       setRevokingId(sessionId);
       await revokeSession(sessionId);
       setSessions(prev => prev.filter(s => s.sessionId !== sessionId));
-      toast({ title: "Device signed out" });
+      toast({ title: t('auth.deviceSignedOut') });
     } catch (error) {
       toast({
-        title: "Error",
-        description: error?.response?.data?.message || "Couldn't sign out that device.",
+        title: t('auth.error'),
+        description: error?.response?.data?.message || t('auth.couldnTSignOut'),
         variant: "destructive",
       });
     } finally {
@@ -55,11 +58,11 @@ const SessionManagement = () => {
       setRevokingAll(true);
       const res = await revokeOtherSessions();
       setSessions(prev => prev.filter(s => s.isCurrent));
-      toast({ title: "Signed out everywhere else", description: res.message });
+      toast({ title: t('auth.signedOutEverywhereElse'), description: res.message });
     } catch (error) {
       toast({
-        title: "Error",
-        description: error?.response?.data?.message || "Couldn't sign out other devices.",
+        title: t('auth.error'),
+        description: error?.response?.data?.message || t('auth.couldnTSignOutOther'),
         variant: "destructive",
       });
     } finally {
@@ -77,9 +80,9 @@ const SessionManagement = () => {
         <div className="max-w-2xl mx-auto space-y-5">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
-              <h1 className="text-xl font-medium">Sessions & devices</h1>
+              <h1 className="text-xl font-medium">{t('auth.sessionsDevices')}</h1>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Where you're currently signed in.
+                {t('auth.whereYouReCurrentlySigned')}
               </p>
             </div>
             {otherSessionsCount > 0 && (
@@ -87,7 +90,7 @@ const SessionManagement = () => {
                 className="bg-red-50 hover:bg-red-100 border-red-200 text-red-700"
                 onClick={handleRevokeOthers} disabled={revokingAll}>
                 <ShieldAlert className="w-3.5 h-3.5 mr-1.5" />
-                {revokingAll ? "Signing out…" : `Sign out ${otherSessionsCount} other device${otherSessionsCount === 1 ? "" : "s"}`}
+                {revokingAll ? t('auth.signingOut') : t('auth.signOutOtherDevices', { count: otherSessionsCount })}
               </Button>
             )}
           </div>
@@ -95,9 +98,9 @@ const SessionManagement = () => {
           <Card>
             <CardContent className="p-0">
               {loading ? (
-                <p className="text-center text-sm text-muted-foreground py-10">Loading…</p>
+                <p className="text-center text-sm text-muted-foreground py-10">{t('common.loading2')}</p>
               ) : !sessions.length ? (
-                <p className="text-center text-sm text-muted-foreground py-10">No active sessions found.</p>
+                <p className="text-center text-sm text-muted-foreground py-10">{t('auth.noActiveSessionsFound')}</p>
               ) : (
                 <div>
                   {sessions.map((s) => (
@@ -110,16 +113,16 @@ const SessionManagement = () => {
                           <span className="text-sm font-medium">{s.device}</span>
                           {s.isCurrent && (
                             <Badge className="text-[10px] bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400">
-                              This device
+                              {t('auth.thisDevice')}
                             </Badge>
                           )}
                         </div>
                         <div className="flex items-center gap-3 flex-wrap mt-0.5">
-                          <p className="text-xs text-muted-foreground">Signed in {fmt(s.createdAt)}</p>
+                          <p className="text-xs text-muted-foreground">{t('auth.signed', { value: fmt(s.createdAt) })}</p>
                           {(s.location || s.ip) && (
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
                               <MapPin className="w-3 h-3" />
-                              {s.location || "Unknown location"}
+                              {s.location || t('auth.unknownLocation')}
                               {s.ip && <span className="text-muted-foreground/60">· {s.ip}</span>}
                             </p>
                           )}
@@ -131,7 +134,7 @@ const SessionManagement = () => {
                           onClick={() => handleRevoke(s.sessionId)}
                           disabled={revokingId === s.sessionId}>
                           <LogOut className="w-3.5 h-3.5 mr-1.5" />
-                          {revokingId === s.sessionId ? "Signing out…" : "Sign out"}
+                          {revokingId === s.sessionId ? t('auth.signingOut') : t('auth.signOut')}
                         </Button>
                       )}
                     </div>
@@ -142,8 +145,7 @@ const SessionManagement = () => {
           </Card>
 
           <p className="text-xs text-muted-foreground">
-            Don't recognize a device? Sign it out here, then change your password from your{" "}
-            <a href="/profile" className="text-primary hover:underline">profile</a>.
+            <Trans i18nKey="auth.donTRecognizeADevice" components={{ link: <a href="/profile" className="text-primary hover:underline" /> }} />
           </p>
         </div>
       </main>

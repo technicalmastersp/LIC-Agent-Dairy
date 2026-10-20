@@ -162,9 +162,9 @@ const CurrentMonthDue = () => {
                 <FileClock className="w-5 h-5 text-amber-700" />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold text-form-header">Current Month Due</h1>
+                <h1 className="text-2xl font-semibold text-form-header">{t('dues.currentMonthDue')}</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">
-                  View all policies that have payments due this month and take necessary actions
+                  {t('dues.viewAllPoliciesThatHave')}
                 </p>
               </div>
             </div>
@@ -176,10 +176,10 @@ const CurrentMonthDue = () => {
           {/* Stat row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: "Total due", val: records.length, icon: <FileClock className="w-4 h-4" />, sub: "This month", bg: "bg-blue-50", color: "text-form-header" },
-              { label: "Overdue", val: summaryStats.overdue, icon: <AlertCircle className="w-4 h-4" />, sub: "Past due date", bg: "bg-red-50", color: "text-red-600" },
-              { label: "Upcoming", val: summaryStats.upcoming, icon: <CalendarClock className="w-4 h-4" />, sub: "Due date ahead", bg: "bg-emerald-50", color: "text-emerald-700" },
-              { label: "Branches", val: summaryStats.branches, icon: <FolderOpen className="w-4 h-4" />, sub: "Affected branches", bg: "bg-violet-50", color: "text-violet-700" },
+              { label: t('dues.totalDue'), val: records.length, icon: <FileClock className="w-4 h-4" />, sub: t('dues.thisMonth'), bg: "bg-blue-50", color: "text-form-header" },
+              { label: t('dues.overdue'), val: summaryStats.overdue, icon: <AlertCircle className="w-4 h-4" />, sub: t('dues.pastDueDate'), bg: "bg-red-50", color: "text-red-600" },
+              { label: t('dues.upcoming'), val: summaryStats.upcoming, icon: <CalendarClock className="w-4 h-4" />, sub: t('dues.dueDateAhead'), bg: "bg-emerald-50", color: "text-emerald-700" },
+              { label: t('dues.branches'), val: summaryStats.branches, icon: <FolderOpen className="w-4 h-4" />, sub: t('dues.affectedBranches'), bg: "bg-violet-50", color: "text-violet-700" },
             ].map(({ label, val, icon, sub, bg, color }) => (
               <Card key={label} className={`${bg} border-transparent hover:shadow-sm transition-shadow`}>
                 <CardContent className="p-4">
@@ -200,15 +200,15 @@ const CurrentMonthDue = () => {
                 <div className="relative flex-1 max-w-md">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
-                    placeholder="Search by name, policy number, occupation..."
+                    placeholder={t('common.searchByNamePolicyNumber')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 focus-visible:ring-primary/40"
                   />
                 </div>
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  <span>{t("totalRecords")}: <Badge variant="secondary">{records.length}</Badge></span>
-                  <span>{t("filteredRecords")}: <Badge variant="outline">{filteredAndSortedRecords.length}</Badge></span>
+                  <span>{t("records.totalRecords")}: <Badge variant="secondary">{records.length}</Badge></span>
+                  <span>{t("records.filteredRecords")}: <Badge variant="outline">{filteredAndSortedRecords.length}</Badge></span>
                 </div>
               </div>
             </CardContent>
@@ -217,7 +217,7 @@ const CurrentMonthDue = () => {
           {/* Records Table */}
           <Card className="overflow-hidden">
             <CardHeader className="border-b border-table-border bg-table-header/40">
-              <CardTitle className="text-form-header text-base">All Due Records</CardTitle>
+              <CardTitle className="text-form-header text-base">{t('dues.allDueRecords')}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {filteredAndSortedRecords.length === 0 ? (
@@ -229,11 +229,11 @@ const CurrentMonthDue = () => {
                   </div>
                   <div className="text-muted-foreground text-base mb-4">
                     {isLoading ? (
-                      <span>{t("loadingRecords")}</span>
+                      <span>{t("records.loadingRecords")}</span>
                     ) : records.length === 0 ? (
-                        <span>{t("duePaymentNoRecordNote")}</span>
+                        <span>{t("records.duePaymentNoRecordNote")}</span>
                     ) : (
-                      <span>No records match your search</span>
+                      <span>{t('common.noRecordsMatchYourSearch')}</span>
                     )}
                   </div>
                 </div>
@@ -242,14 +242,14 @@ const CurrentMonthDue = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
-                        <SortableHeader field="name">Name</SortableHeader>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Mobile Number</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Policy Number</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Mode Of Payment</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Branch</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground min-w-32">Last Payment Date</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground min-w-32">Due Date</TableHead>
-                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">Actions</TableHead>
+                        <SortableHeader field="name">{t('common.name')}</SortableHeader>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.mobileNumber')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.policyNumber')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.modeOfPayment')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.branch')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground min-w-32">{t('common.lastPaymentDate')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground min-w-32">{t('dues.dueDate')}</TableHead>
+                        <TableHead className="border border-table-border text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('common.actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -293,7 +293,7 @@ const CurrentMonthDue = () => {
                                   {convertDateToIndianFormat(record.currentPolicy.nextDueDate)}
                                 </Badge>
                               ) : (
-                                <span className="italic text-red-400 text-xs">No due date</span>
+                                <span className="italic text-red-400 text-xs">{t('dues.noDueDate')}</span>
                               )}
                             </TableCell>
                             <TableCell className="border border-table-border">
@@ -303,7 +303,7 @@ const CurrentMonthDue = () => {
                                   variant="outline"
                                   onClick={() => handleViewRecord(record)}
                                   className="h-8 w-8 p-0"
-                                  title="View Record"
+                                  title={t('common.viewRecord')}
                                 >
                                   <Eye className="w-4 h-4" />
                                 </Button>
@@ -312,17 +312,17 @@ const CurrentMonthDue = () => {
                                   variant="outline"
                                   onClick={() => handleContactRecord(record)}
                                   className="h-8 w-8 p-0"
-                                  title="Contact"
+                                  title={t('common.contact')}
                                 >
                                   <MessageSquare className="w-4 h-4" />
                                 </Button>
                                 <Badge
                                   variant="destructive"
                                   className="ml-2 cursor-pointer"
-                                  title="Update Last Payment Date"
+                                  title={t('dues.updateLastPaymentDate')}
                                   onClick={() => handlePayRecord(record)}
                                 >
-                                  Pay
+                                  {t('dues.pay')}
                                 </Badge>
                               </div>
                             </TableCell>

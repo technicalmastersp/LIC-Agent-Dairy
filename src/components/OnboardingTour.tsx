@@ -14,6 +14,7 @@ import { getCurrentUser, setCurrentUser } from "@/utils/auth";
 import { completeOnboarding } from "../../services/userService";
 import type { TourStep, Rect } from "@/types/components/OnboardingTour.types";
 import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
+import { useLanguage } from "@/hooks/useLanguage";
 
 // ── Step config ──────────────────────────────────────────────────────────
 // `target` matches a `data-tour="..."` attribute already placed on the real
@@ -24,43 +25,43 @@ import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 const ALL_STEPS: TourStep[] = [
   {
     target: "tour-add-record",
-    title: "Add a policy record",
-    body: "Start here to create a new policy record — holder details, nominee, bank info, and policy terms all in one form.",
+    title: "nav.tourAddAPolicyTitle",
+    body: "nav.tourAddAPolicyBody",
   },
   {
     target: "tour-view-records",
-    title: "View all your records",
-    body: "Browse, search, and edit every record you've added. This is your main working list.",
+    title: "nav.tourViewAllYourTitle",
+    body: "nav.tourViewAllYourBody",
   },
   {
     target: "tour-due-this-month",
-    title: "Track this month's dues",
-    body: "See every policy with a payment due this month, along with mode of payment and last payment date.",
+    title: "nav.tourTrackThisMonthTitle",
+    body: "nav.tourTrackThisMonthBody",
   },
   {
     target: "tour-missed-payments",
-    title: "Catch missed payments early",
-    body: "Policies that missed last month's payment show up here — act before a lapse notice goes out.",
+    title: "nav.tourCatchMissedPaymentsTitle",
+    body: "nav.tourCatchMissedPaymentsBody",
   },
   {
     target: "tour-upcoming-due",
-    title: "Plan ahead for next month",
-    body: "This card shows what's coming due next month, so you can follow up with clients before it's urgent.",
+    title: "nav.tourPlanAheadForTitle",
+    body: "nav.tourPlanAheadForBody",
   },
   {
     target: "tour-your-plan",
-    title: "Your subscription",
-    body: "Check your current plan, when it expires, and upgrade any time from here.",
+    title: "nav.tourYourSubscriptionTitle",
+    body: "nav.tourYourSubscriptionBody",
   },
   {
     target: "tour-language-switcher",
-    title: "Switch language",
-    body: "Prefer a different language? Change it any time from here — it applies across the whole app.",
+    title: "nav.tourSwitchLanguageTitle",
+    body: "nav.tourSwitchLanguageBody",
   },
   {
     target: "tour-referral-wallet",
-    title: "Referral wallet",
-    body: "Refer other agents and earn commission here. Track your balance and use it to renew or upgrade your plan.",
+    title: "nav.tourReferralWalletTitle",
+    body: "nav.tourReferralWalletBody",
   },
 ];
 
@@ -80,6 +81,7 @@ const getTargetRect = (target: string): Rect | null => {
 };
 
 const OnboardingTour = () => {
+  const { t } = useLanguage();
   const currentUser = getCurrentUser();
 
   // Two phases: an intro dialog offering to start, then the step-by-step
@@ -171,14 +173,14 @@ const OnboardingTour = () => {
             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mb-2">
               <Sparkles className="w-5 h-5 text-blue-600" />
             </div>
-            <DialogTitle>Welcome to Policy Niketan</DialogTitle>
+            <DialogTitle>{t('nav.welcomeToPolicyNiketan')}</DialogTitle>
             <DialogDescription>
-              Want a 60-second tour of where everything lives on your dashboard? You can skip any time.
+              {t('nav.wantA60SecondTour')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-2">
-            <Button variant="outline" onClick={handleSkip}>Skip for now</Button>
-            <Button onClick={handleStart}>Take the tour</Button>
+            <Button variant="outline" onClick={handleSkip}>{t('nav.skipForNow')}</Button>
+            <Button onClick={handleStart}>{t('nav.takeTheTour')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -221,7 +223,7 @@ const OnboardingTour = () => {
   })();
 
   return createPortal(
-    <div className="fixed inset-0 z-[100]" role="dialog" aria-modal="true" aria-label="Product tour">
+    <div className="fixed inset-0 z-[100]" role="dialog" aria-modal="true" aria-label={t('nav.productTour')}>
       {/* Backdrop with a spotlight cutout around the current target.
           pointer-events: auto so clicks outside the tooltip are blocked —
           keeps the tour from being derailed by an accidental click-through
@@ -251,19 +253,18 @@ const OnboardingTour = () => {
       >
         <div className="flex items-start justify-between gap-2 mb-1">
           <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
-            Step {stepIndex + 1} of {STEPS.length}
-          </span>
+            {t('nav.step', { current: stepIndex + 1, total: STEPS.length })}</span>
           <button
             type="button"
             onClick={handleSkip}
-            aria-label="Skip tour"
+            aria-label={t('nav.skipTour')}
             className="text-muted-foreground hover:text-foreground transition-colors -mt-0.5"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
-        <h3 className="text-sm font-semibold mb-1">{step.title}</h3>
-        <p className="text-xs text-muted-foreground leading-relaxed mb-3">{step.body}</p>
+        <h3 className="text-sm font-semibold mb-1">{t(step.title)}</h3>
+        <p className="text-xs text-muted-foreground leading-relaxed mb-3">{t(step.body)}</p>
 
         {/* Progress dots */}
         <div className="flex items-center gap-1 mb-3">
@@ -285,10 +286,10 @@ const OnboardingTour = () => {
             onClick={handleBack}
             disabled={stepIndex === 0}
           >
-            <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back
+            <ArrowLeft className="w-3.5 h-3.5 mr-1" /> {" "}{t('nav.back')}
           </Button>
           <Button size="sm" className="text-xs" onClick={handleNext}>
-            {stepIndex === STEPS.length - 1 ? "Finish" : "Next"}
+            {stepIndex === STEPS.length - 1 ? t('nav.finish') : t('nav.next')}
             {stepIndex !== STEPS.length - 1 && <ArrowRight className="w-3.5 h-3.5 ml-1" />}
           </Button>
         </div>

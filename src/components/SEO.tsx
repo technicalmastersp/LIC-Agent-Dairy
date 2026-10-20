@@ -1,5 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import siteConfig from "@/config/siteConfig";
+import { useOptionalLanguage } from "@/hooks/useLanguage";
+import { DEFAULT_LANGUAGE, LANGUAGES, getLanguageConfig } from "@/i18n/languages";
 import type { SEOProps } from "@/types/components/SEO.types";
 // Social/crawler images need a real raster size (not the 128px UI icon), and
 // the large-image cards want a 1.91:1 shape, so this points at the dedicated
@@ -13,6 +15,9 @@ const DEFAULT_IMAGE = `${siteConfig.productionUrl}${siteConfig.og_image}`;
  * for every public page — see SEO.types.ts for what each prop controls.
  */
 const SEO = ({ title, description, image, jsonLd, path, noindex, ogType = "website" }: SEOProps) => {
+  const language = useOptionalLanguage()?.language ?? DEFAULT_LANGUAGE;
+  const ogLocale = getLanguageConfig(language).ogLocale;
+  const alternateLocales = LANGUAGES.filter((l) => l.code !== language).map((l) => l.ogLocale);
   const fullTitle = `${title} | ${siteConfig.title}`;
   const resolvedImage = image ?? DEFAULT_IMAGE;
   const canonicalUrl = `${siteConfig.productionUrl}${path}`;
@@ -25,6 +30,13 @@ const SEO = ({ title, description, image, jsonLd, path, noindex, ogType = "websi
       <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
 
       <meta property="og:type" content={ogType} />
+      {/* One URL serves every language (chosen client-side), so hreflang — which needs a distinct
+          URL per language — is intentionally not emitted. og:locale tells social crawlers which
+          language this render is in. See docs/I18N.md ("SEO") for the /hi/ URL upgrade path. */}
+      <meta property="og:locale" content={ogLocale} />
+      {alternateLocales.map((l) => (
+        <meta key={l} property="og:locale:alternate" content={l} />
+      ))}
       <meta property="og:site_name" content={siteConfig.companyName} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:title" content={fullTitle} />

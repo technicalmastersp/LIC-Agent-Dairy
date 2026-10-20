@@ -5,25 +5,30 @@ import SEO from "@/components/SEO";
 import {
   Cake, TrendingUp, Receipt, Home, ShieldCheck, LineChart, ArrowRight, Banknote, Landmark, PiggyBank,
 } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
+import type { TFunction } from "@/types/i18n.types";
+import { useMemo } from "react";
 
-const TOOLS = [
-  { to: "/tools/age-calculator", icon: Cake, title: "Age Calculator", desc: "Exact age in years, months, and days from a date of birth.", accent: "blue" },
-  { to: "/tools/sip-calculator", icon: TrendingUp, title: "SIP Calculator", desc: "Project the future value of your monthly mutual fund investments.", accent: "violet" },
-  { to: "/tools/lumpsum-calculator", icon: Banknote, title: "Lumpsum Calculator", desc: "See what a one-time investment could grow to over the years.", accent: "indigo" },
-  { to: "/tools/rd-calculator", icon: PiggyBank, title: "RD Calculator", desc: "Maturity value and interest on a monthly recurring deposit.", accent: "orange" },
-  { to: "/tools/fd-calculator", icon: Landmark, title: "FD Calculator", desc: "Maturity value and interest on a fixed deposit, with your choice of compounding.", accent: "green" },
-  { to: "/tools/income-tax-calculator", icon: Receipt, title: "Income Tax Calculator", desc: "Estimate your tax under the old and new regimes.", accent: "amber" },
-  { to: "/tools/home-loan-emi-calculator", icon: Home, title: "Home Loan EMI Calculator", desc: "Monthly EMI, total interest, and total payment on a home loan.", accent: "emerald" },
-  { to: "/tools/term-insurance-calculator", icon: ShieldCheck, title: "Term Insurance Calculator", desc: "Estimate how much life cover you actually need.", accent: "rose" },
-  { to: "/tools/inflation-calculator", icon: LineChart, title: "Inflation Calculator", desc: "See how inflation affects the value of money over time.", accent: "cyan" },
+const buildTools = (t: TFunction) => [
+  { to: "/tools/age-calculator", icon: Cake, title: t('tools.ageCalculator'), desc: t('tools.exactAgeInYearsMonths'), accent: "blue" },
+  { to: "/tools/sip-calculator", icon: TrendingUp, title: t('tools.sipCalculator'), desc: t('tools.projectTheFutureValue'), accent: "violet" },
+  { to: "/tools/lumpsum-calculator", icon: Banknote, title: t('tools.lumpsumCalculator'), desc: t('tools.seeWhatAOneTime'), accent: "indigo" },
+  { to: "/tools/rd-calculator", icon: PiggyBank, title: t('tools.rdCalculator'), desc: t('tools.maturityValueAndInterest'), accent: "orange" },
+  { to: "/tools/fd-calculator", icon: Landmark, title: t('tools.fdCalculator'), desc: t('tools.maturityValueAndInterest2'), accent: "green" },
+  { to: "/tools/income-tax-calculator", icon: Receipt, title: t('tools.incomeTaxCalculator'), desc: t('tools.estimateYourTaxUnder'), accent: "amber" },
+  { to: "/tools/home-loan-emi-calculator", icon: Home, title: t('tools.homeLoanEmiCalculator'), desc: t('tools.monthlyEmiTotalInterest'), accent: "emerald" },
+  { to: "/tools/term-insurance-calculator", icon: ShieldCheck, title: t('tools.termInsuranceCalculator'), desc: t('tools.estimateHowMuchLifeCover2'), accent: "rose" },
+  { to: "/tools/inflation-calculator", icon: LineChart, title: t('tools.inflationCalculator'), desc: t('tools.seeHowInflationAffects'), accent: "cyan" },
 ];
 
 const ToolsHub = () => {
+  const { t } = useLanguage();
+  const TOOLS = useMemo(() => buildTools(t), [t]);
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
-        title="Free Financial Calculators"
-        description="Free calculators for age, SIP, lumpsum, FD and RD returns, income tax, home loan EMI, term insurance cover and inflation — quick tools for agents and clients alike."
+        title={t('tools.freeFinancialCalculators')}
+        description={t('tools.freeCalculatorsForAgeSip')}
         path="/tools"
       />
       <Navigation />
@@ -32,10 +37,10 @@ const ToolsHub = () => {
           <div className="absolute top-10 -left-24 w-72 h-72 rounded-full bg-primary/5 blur-3xl" />
           <div className="container mx-auto px-4 relative py-14 md:py-20">
             <div className="max-w-2xl mx-auto text-center">
-              <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Free tools</p>
-              <h1 className="text-3xl md:text-4xl font-bold text-form-header mb-3">Financial calculators for everyone</h1>
+              <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('tools.freeTools')}</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-form-header mb-3">{t('tools.financialCalculatorsForEveryone')}</h1>
               <p className="text-muted-foreground leading-relaxed">
-                Quick, free calculators to plan your finances — no account needed.
+                {t('tools.quickFreeCalculatorsToPlan')}
               </p>
             </div>
           </div>

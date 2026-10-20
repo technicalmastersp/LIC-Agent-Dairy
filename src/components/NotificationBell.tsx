@@ -17,6 +17,7 @@ import type {
   NotificationBellProps,
   NotificationListResponse,
 } from "@/types/components/NotificationBell.types";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const POLL_MS = 60_000;
 const COUNT_KEY = ["notifications", "unread-count"] as const;
@@ -27,6 +28,7 @@ const LIST_KEY = ["notifications", "list"] as const;
 const isInternalPath = (p: string | null): p is string => !!p && p.startsWith("/") && !p.startsWith("//");
 
 const NotificationBell = ({ variant = "default", align = "end" }: NotificationBellProps) => {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -71,7 +73,7 @@ const NotificationBell = ({ variant = "default", align = "end" }: NotificationBe
       <PopoverTrigger asChild>
         <button
           type="button"
-          aria-label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}
+          aria-label={unread > 0 ? t('nav.notificationsUnread', { unread }) : t('nav.notifications')}
           className={cn(
             "relative inline-flex items-center justify-center w-9 h-9 rounded-md transition-colors shrink-0",
             variant === "onPrimary"
@@ -90,7 +92,7 @@ const NotificationBell = ({ variant = "default", align = "end" }: NotificationBe
 
       <PopoverContent align={align} className="p-0 w-[min(22rem,calc(100vw-1.5rem))]">
         <div className="flex items-center justify-between px-3 py-2.5 border-b border-border">
-          <p className="text-sm font-semibold">Notifications</p>
+          <p className="text-sm font-semibold">{t('nav.notifications')}</p>
           <Button
             variant="ghost"
             size="sm"
@@ -98,7 +100,7 @@ const NotificationBell = ({ variant = "default", align = "end" }: NotificationBe
             disabled={unread === 0 || readAll.isPending}
             onClick={() => readAll.mutate()}
           >
-            <CheckCheck className="w-3.5 h-3.5 mr-1" /> Mark all read
+            <CheckCheck className="w-3.5 h-3.5 mr-1" /> {" "}{t('nav.markAllRead')}
           </Button>
         </div>
 
@@ -108,7 +110,7 @@ const NotificationBell = ({ variant = "default", align = "end" }: NotificationBe
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
             </div>
           ) : items.length === 0 ? (
-            <p className="px-4 py-8 text-center text-sm text-muted-foreground">You're all caught up.</p>
+            <p className="px-4 py-8 text-center text-sm text-muted-foreground">{t('nav.youReAllCaughtUp')}</p>
           ) : (
             <ul>
               {items.map((n) => (
@@ -152,7 +154,7 @@ const NotificationBell = ({ variant = "default", align = "end" }: NotificationBe
             onClick={() => { setOpen(false); navigate("/notification-preferences"); }}
             className="text-xs text-primary hover:underline"
           >
-            Notification settings
+            {t('nav.notificationSettings')}
           </button>
         </div>
       </PopoverContent>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import {
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { getCurrentUser, isAuthenticated } from "@/utils/auth";
 import { useLanguage }   from "@/hooks/useLanguage";
-import type { Translations } from "@/types/utils/translations.types";
+import type { TFunction } from "@/types/i18n.types";
 import LanguageSwitcher  from "./LanguageSwitcher";
 import ThemeToggle        from "./ThemeToggle";
 import NotificationBell   from "./NotificationBell";
@@ -33,32 +33,32 @@ import { logoutCurrentUser } from "../../services/userService";
    NAV CONFIG
 ───────────────────────────────────────────── */
 
-const getNavItems = (t: (key: keyof Translations) => string) => [
-  { to: "/",             label: t("home"),        icon: Home        },
-  { to: "/add-record",   label: t("addRecord"),   icon: Plus        },
-  { to: "/view-records", label: t("viewRecords"), icon: Table       },
+const getNavItems = (t: TFunction) => [
+  { to: "/",             label: t("nav.home"),        icon: Home        },
+  { to: "/add-record",   label: t("nav.addRecord"),   icon: Plus        },
+  { to: "/view-records", label: t("nav.viewRecords"), icon: Table       },
 ];
 
-const getNavItemsMobile = (t: (key: keyof Translations) => string) => [
-  { to: "/",             label: t("home"),        icon: Home        },
-  { to: "/add-record",   label: t("addRecord"),   icon: Plus        },
-  { to: "/view-records", label: t("viewRecords"), icon: Table       },
+const getNavItemsMobile = (t: TFunction) => [
+  { to: "/",             label: t("nav.home"),        icon: Home        },
+  { to: "/add-record",   label: t("nav.addRecord"),   icon: Plus        },
+  { to: "/view-records", label: t("nav.viewRecords"), icon: Table       },
 ];
 
-const getAdminNavItems = (t: (key: keyof Translations) => string) => [
-  { to: "/admin", label: "Admin Panel", icon: UserRoundCog },
+const getAdminNavItems = (t: TFunction) => [
+  { to: "/admin", label: t('nav.adminPanel'), icon: UserRoundCog },
 ];
 
-const TOOLS = [
-  { to: "/tools/age-calculator", icon: Cake, label: "Age Calculator" },
-  { to: "/tools/sip-calculator", icon: TrendingUp, label: "SIP Calculator" },
-  { to: "/tools/lumpsum-calculator", icon: Banknote, label: "Lumpsum Calculator" },
-  { to: "/tools/rd-calculator", icon: PiggyBank, label: "RD Calculator" },
-  { to: "/tools/fd-calculator", icon: Landmark, label: "FD Calculator" },
-  { to: "/tools/income-tax-calculator", icon: Receipt, label: "Income Tax Calculator" },
-  { to: "/tools/home-loan-emi-calculator", icon: Home, label: "Home Loan EMI Calculator" },
-  { to: "/tools/term-insurance-calculator", icon: ShieldCheck, label: "Term Insurance Calculator" },
-  { to: "/tools/inflation-calculator", icon: LineChart, label: "Inflation Calculator" },
+const buildTools = (t: TFunction) => [
+  { to: "/tools/age-calculator", icon: Cake, label: t('nav.ageCalculator') },
+  { to: "/tools/sip-calculator", icon: TrendingUp, label: t('nav.sipCalculator') },
+  { to: "/tools/lumpsum-calculator", icon: Banknote, label: t('nav.lumpsumCalculator') },
+  { to: "/tools/rd-calculator", icon: PiggyBank, label: t('nav.rdCalculator') },
+  { to: "/tools/fd-calculator", icon: Landmark, label: t('nav.fdCalculator') },
+  { to: "/tools/income-tax-calculator", icon: Receipt, label: t('nav.incomeTaxCalculator') },
+  { to: "/tools/home-loan-emi-calculator", icon: Home, label: t('nav.homeLoanEmiCalculator') },
+  { to: "/tools/term-insurance-calculator", icon: ShieldCheck, label: t('nav.termInsuranceCalculator') },
+  { to: "/tools/inflation-calculator", icon: LineChart, label: t('nav.inflationCalculator') },
 ];
 
 /* ─────────────────────────────────────────────
@@ -155,7 +155,10 @@ const PublicMobileLink = ({
 // landing on /tools. With asChild, Radix merges its hover/focus/state
 // props onto the anchor instead of rendering its own button, so the click
 // goes through the normal DOM anchor path and nothing is left half-updated.
-const ToolsDropdown = ({ dark }: { dark?: boolean }) => (
+const ToolsDropdown = ({ dark }: { dark?: boolean }) => {
+  const { t } = useLanguage();
+  const TOOLS = useMemo(() => buildTools(t), [t]);
+  return (
   <NavigationMenu>
     <NavigationMenuList>
       <NavigationMenuItem>
@@ -170,7 +173,7 @@ const ToolsDropdown = ({ dark }: { dark?: boolean }) => (
             )}
           >
             <Wrench className="w-4 h-4 mr-1.5" />
-            Tools
+            {t('common.tools')}
             <ChevronDown
               className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180"
               aria-hidden="true"
@@ -194,7 +197,7 @@ const ToolsDropdown = ({ dark }: { dark?: boolean }) => (
                 to="/tools"
                 className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-primary hover:bg-muted transition-colors"
               >
-                View all tools
+                {t('nav.viewAllTools')}
               </Link>
             </div>
           </div>
@@ -203,6 +206,7 @@ const ToolsDropdown = ({ dark }: { dark?: boolean }) => (
     </NavigationMenuList>
   </NavigationMenu>
 );
+};
 
 /* ─────────────────────────────────────────────
    MAIN COMPONENT
@@ -232,13 +236,13 @@ const Navigation = () => {
   };
 
   const publicLinks = [
-    { href: "/",     label: "Home"          },
-    { href: "/tools",     label: "Tools"          },
-    { href: "/our-plans",     label: "Plans"          },
-    { href: "/policy-niketan-info-hub",  label: "Best Info Hub"  },
+    { href: "/",     label: t('nav.home')          },
+    { href: "/tools",     label: t('common.tools')          },
+    { href: "/our-plans",     label: t('nav.plans')          },
+    { href: "/policy-niketan-info-hub",  label: t('nav.bestInfoHub')  },
     // { href: "#Career",  label: "Career"   },
-    { href: "/help-support",  label: "Help & Support" },
-    { href: "/about",         label: "About"          },
+    { href: "/help-support",  label: t('common.helpSupport') },
+    { href: "/about",         label: t('nav.about')          },
   ];
 
   /* ═══════════════════════════════════════════
@@ -253,7 +257,7 @@ const Navigation = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <img src={siteConfig.logo_icon} alt="logo" className="w-5 h-5" />
+                <img src={siteConfig.logo_icon} alt={t('nav.logo')} className="w-5 h-5" />
               </div>
               <span className="font-semibold text-form-header">{siteConfig.title}</span>
             </Link>
@@ -285,7 +289,7 @@ const Navigation = () => {
                 type="button"
                 className="md:hidden p-1.5 rounded-md hover:bg-muted transition-colors"
                 onClick={toggleMobileMenu}
-                aria-label="Toggle menu"
+                aria-label={t('nav.toggleMenu')}
                 aria-expanded={isMobileMenuOpen}
               >
                 {isMobileMenuOpen
@@ -300,11 +304,11 @@ const Navigation = () => {
               </div>
 
               <Link to="/login">
-                <Button variant="ghost" size="sm">Log in</Button>
+                <Button variant="ghost" size="sm">{t('nav.log')}</Button>
               </Link>
               <Link to="/signup">
                 <Button size="sm" className="bg-primary hover:bg-primary-light">
-                  Sign up free
+                  {t('nav.signUpFree')}
                 </Button>
               </Link>
             </div>
@@ -320,7 +324,7 @@ const Navigation = () => {
               {TOOLS.map(({ to, label }) => (
                 <PublicMobileLink key={to} href={to} label={label} onClick={closeMobileMenu} />
               ))} */}
-              <p className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Menu</p>
+              <p className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('nav.menu')}</p>
               {publicLinks.map(({ href, label }) => (
                 <PublicMobileLink
                   key={label}
@@ -369,7 +373,7 @@ const Navigation = () => {
             className="flex items-center space-x-2 shrink-0 min-w-0"
           >
             <div className="w-8 h-8 bg-primary-foreground rounded-full flex items-center justify-center overflow-hidden shrink-0">
-              <img src={siteConfig.logo_icon} alt="logo" />
+              <img src={siteConfig.logo_icon} alt={t('nav.logo')} />
             </div>
             <span className="text-primary-foreground font-semibold text-lg sm:max-w-none">
               {siteConfig.title}
@@ -386,7 +390,7 @@ const Navigation = () => {
             type="button"
             className="lg:hidden text-primary-foreground p-1.5 -mr-1.5 rounded-md hover:bg-primary-light/50 transition-colors shrink-0"
             onClick={toggleMobileMenu}
-            aria-label="Toggle menu"
+            aria-label={t('nav.toggleMenu')}
             aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen
@@ -442,28 +446,28 @@ const Navigation = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem onClick={() => navigate("/profile")}>
-                    <User className="w-4 h-4 mr-2" /> Profile
+                    <User className="w-4 h-4 mr-2" /> {" "}{t('nav.profile')}
                   </DropdownMenuItem>
                   {REFERRAL_PROGRAM_ENABLED && (
                   <DropdownMenuItem onClick={() => navigate("/referral-program")}>
-                    <User className="w-4 h-4 mr-2" /> Referral Program
+                    <User className="w-4 h-4 mr-2" /> {" "}{t('nav.referralProgram')}
                   </DropdownMenuItem>
                   )}
                   <DropdownMenuItem onClick={() => navigate("/about")}>
-                    <MapPinnedIcon className="w-4 h-4 mr-2" /> About
+                    <MapPinnedIcon className="w-4 h-4 mr-2" /> {" "}{t('nav.about')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/help-support")}>
-                    <CircleHelp className="w-4 h-4 mr-2" /> Help & Support
+                    <CircleHelp className="w-4 h-4 mr-2" /> {" "}{t('common.helpSupport')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/contact")}>
-                    <Phone className="w-4 h-4 mr-2" /> Contact Us
+                    <Phone className="w-4 h-4 mr-2" /> {" "}{t('nav.contactUs')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={handleLogout}
                     className="text-red-600 focus:text-red-600"
                   >
-                    <LogOut className="w-4 h-4 mr-2" /> Logout
+                    <LogOut className="w-4 h-4 mr-2" /> {" "}{t('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -497,7 +501,7 @@ const Navigation = () => {
             {/* Tools */}
             <MobileNavItem
               to="/tools"
-              label="Tools"
+              label={t('common.tools')}
               icon={Wrench}
               onClick={closeMobileMenu}
             />
@@ -505,7 +509,7 @@ const Navigation = () => {
             {/* About */}
             <MobileNavItem
               to="/about"
-              label="About"
+              label={t('nav.about')}
               icon={MapPinnedIcon}
               onClick={closeMobileMenu}
             />
@@ -513,7 +517,7 @@ const Navigation = () => {
             {/* Help & support */}
             <MobileNavItem
               to="/help-support"
-              label="Help & Support"
+              label={t('common.helpSupport')}
               icon={CircleHelp}
               onClick={closeMobileMenu}
             />
@@ -552,7 +556,7 @@ const Navigation = () => {
                 className="w-full bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-red-600 hover:border-red-600 hover:text-primary-foreground"
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                {t("logout")}
+                {t("nav.logout")}
               </Button>
             </div>
 

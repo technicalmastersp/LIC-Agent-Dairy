@@ -24,8 +24,20 @@ const apiClient = axios.create({
   withCredentials: true,
 });
 
-// No request interceptor needed anymore — the browser attaches the auth
-// cookie automatically on every request to the API's origin.
+// Auth is a cookie the browser attaches itself, so no auth interceptor is needed.
+// The only request interceptor tells the backend which language the UI is in.
+// Accept-Language is a CORS-safelisted header (no preflight / no backend CORS change), and
+// today's backend simply ignores it — but it lets server-generated text (error messages,
+// notification copy, emails) be localized later without another frontend release.
+apiClient.interceptors.request.use((config) => {
+  try {
+    const lang = localStorage.getItem("language");
+    if (lang) config.headers["Accept-Language"] = lang;
+  } catch {
+    /* storage unavailable — send no preference */
+  }
+  return config;
+});
 
 // Auth now lives in an httpOnly cookie the browser controls — client JS
 // can no longer read or clear it directly (that's the whole point of

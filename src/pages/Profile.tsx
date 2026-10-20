@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import type { TranslationKey } from "@/types/i18n.types";
 import axios from "axios";
 import { useNavigate, Link }            from "react-router-dom";
 import Navigation                        from "@/components/Navigation";
@@ -39,14 +40,16 @@ import type { ReferralDashboardData } from "@/types/pages/Profile.types";
 import type { Session }               from "@/types/pages/SessionManagement.types";
 import type { Preferences }           from "@/types/pages/NotificationPreferences.types";
 import type { ActivityLog, Pagination } from "@/types/pages/MyActivity.types";
+import Trans from "@/components/Trans";
 
 const initials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() || "?";
 
-const roleLabel: Record<string, string> = {
-  superadmin: "Super admin",
-  admin:      "Admin",
-  user:       "Policy agent",
+// Values are i18n keys (module scope can't call hooks); translated where displayed.
+const roleLabel: Record<string, TranslationKey> = {
+  superadmin: "profile.roleSuperAdmin",
+  admin:      "profile.roleAdmin",
+  user:       "profile.policyAgent",
 };
 
 const DEFAULT_PREFS: Preferences = {
@@ -73,19 +76,19 @@ const ACTION_COLORS: Record<string, string> = {
 
 // Human-readable labels for the permission keys the backend tracks — only
 // the ones worth surfacing on a self-view profile card.
-const PERMISSION_LABELS: Record<string, string> = {
-  can_view_users:             "View users",
-  can_deactivate_users:       "Deactivate users",
-  can_view_withdrawals:       "View withdrawals",
-  can_approve_withdrawals:    "Approve withdrawals",
-  can_reject_withdrawals:     "Reject withdrawals",
-  can_verify_payment_details: "Verify payment details",
-  can_manage_support:         "Manage support",
-  can_view_revenue:           "View revenue",
-  can_manage_expenses:        "Manage expenses",
-  can_view_logs:              "View logs",
-  can_change_subscription:    "Change subscriptions",
-  can_delete_users:           "Delete users",
+const PERMISSION_LABELS: Record<string, TranslationKey> = {
+  can_view_users: "profile.permViewUsers",
+  can_deactivate_users: "profile.permDeactivateUsers",
+  can_view_withdrawals: "profile.permViewWithdrawals",
+  can_approve_withdrawals: "profile.permApproveWithdrawals",
+  can_reject_withdrawals: "profile.permRejectWithdrawals",
+  can_verify_payment_details: "profile.permVerifyPaymentDetails",
+  can_manage_support: "profile.permManageSupport",
+  can_view_revenue: "profile.permViewRevenue",
+  can_manage_expenses: "profile.permManageExpenses",
+  can_view_logs: "profile.permViewLogs",
+  can_change_subscription: "profile.permChangeSubscription",
+  can_delete_users: "profile.permDeleteUsers",
 };
 
 const Profile = () => {
@@ -181,18 +184,18 @@ const Profile = () => {
 
       if (res.emailChanged) {
         toast({
-          title: "Verify your new email",
-          description: "We've sent a verification link to your new email address.",
+          title: t('profile.verifyYourNewEmail'),
+          description: t('profile.weVeSentAVerification'),
         });
       }
 
       setCurrentUser(updated);
       setUser(updated);
       setIsEditing(false);
-      toast({ title: "Profile updated", description: "Your changes have been saved." });
+      toast({ title: t('profile.profileUpdated'), description: t('profile.yourChangesHaveBeenSaved') });
     } catch (error: unknown) {
       const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
-      toast({ title: "Error", description: message || "Failed to update profile.", variant: "destructive" });
+      toast({ title: t('profile.error'), description: message || t('profile.failedToUpdateProfile'), variant: "destructive" });
     } finally { setSaving(false); }
   };
 
@@ -214,14 +217,14 @@ const Profile = () => {
       const resized = await resizeImageToSquare(file, 256, 0.6);
       setAvatar(resized);
       await updateProfileImage(resized);
-      toast({ title: "Photo updated", description: "Profile photo saved." });
+      toast({ title: t('profile.photoUpdated'), description: t('profile.profilePhotoSaved') });
     } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response?.data?.code === "EMAIL_ALREADY_IN_USE") {
-        toast({ title: "Email already in use", description: "That email belongs to another account. Try a different one.", variant: "destructive" });
+        toast({ title: t('profile.emailAlreadyInUse'), description: t('profile.thatEmailBelongsToAnother'), variant: "destructive" });
         return;
       }
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
-      toast({ title: "Error", description: message || "Something went wrong.", variant: "destructive" });
+      toast({ title: t('profile.error'), description: message || t('profile.somethingWentWrong'), variant: "destructive" });
     }
   };
 
@@ -231,7 +234,7 @@ const Profile = () => {
       setCopied(key);
       setTimeout(() => setCopied(c => (c === key ? null : c)), 1500);
     } catch {
-      toast({ title: "Couldn't copy", description: "Copy it manually instead.", variant: "destructive" });
+      toast({ title: t('profile.couldnTCopy'), description: t('profile.copyItManuallyInstead'), variant: "destructive" });
     }
   };
 
@@ -244,7 +247,7 @@ const Profile = () => {
     } catch (error: unknown) {
       setPrefs(p => ({ ...p, [key]: previous })); // roll back
       const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
-      toast({ title: "Error", description: message || "Couldn't save that change.", variant: "destructive" });
+      toast({ title: t('profile.error'), description: message || t('profile.couldnTSaveThatChange'), variant: "destructive" });
     } finally {
       setPrefSaving(null);
     }
@@ -256,10 +259,10 @@ const Profile = () => {
       await revokeOtherSessions();
       const sess = await getMySessions().catch(() => null);
       setSessions(sess);
-      toast({ title: "Other devices signed out" });
+      toast({ title: t('profile.otherDevicesSignedOut') });
     } catch (error: unknown) {
       const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
-      toast({ title: "Error", description: message || "Couldn't sign out other devices.", variant: "destructive" });
+      toast({ title: t('profile.error'), description: message || t('profile.couldnTSignOutOther'), variant: "destructive" });
     } finally {
       setSigningOutOthers(false);
     }
@@ -296,12 +299,12 @@ const Profile = () => {
   const withdrawalsEnabled = referral?.withdrawalsEnabled === true;
 
   const completionItems = [
-    { label: "Name",            done: !!user.name           },
-    { label: "Email verified",  done: !!user.isEmailVerified },
-    { label: "Mobile number",   done: !!user.mobileNumber   },
-    { label: "Full address",    done: !!user.fullAddress     },
-    { label: "Profile photo",   done: !!avatar              },
-    ...(withdrawalsEnabled ? [{ label: "Payout details", done: hasPayout }] : []),
+    { label: t('common.name'),            done: !!user.name           },
+    { label: t('profile.emailVerified'),  done: !!user.isEmailVerified },
+    { label: t('profile.mobileNumber'),   done: !!user.mobileNumber   },
+    { label: t('profile.fullAddress'),    done: !!user.fullAddress     },
+    { label: t('profile.profilePhoto'),   done: !!avatar              },
+    ...(withdrawalsEnabled ? [{ label: t('profile.payoutDetails'), done: hasPayout }] : []),
   ];
   const completionPct  = Math.round((completionItems.filter(i => i.done).length / completionItems.length) * 100);
   const completionColor = completionPct === 100 ? "bg-green-500"
@@ -309,18 +312,18 @@ const Profile = () => {
                         : "bg-red-500";
 
   const quickActions = [
-    { icon: FileText,   label: "View records",      to: "/view-records" },
-    { icon: PlusCircle, label: "Add record",         to: "/add-record" },
-    { icon: BellRing,   label: "Due this month",     to: "/view-due-policies" },
-    { icon: Crown,      label: "Plans & billing",    to: "/our-plans" },
-    { icon: History,    label: "My activity",        to: "/my-activity" },
-    { icon: Monitor,    label: "Sessions & devices",  to: "/sessions" },
-    { icon: Bell,       label: "Notifications",       to: "/notification-preferences" },
+    { icon: FileText,   label: t('profile.viewRecords'),      to: "/view-records" },
+    { icon: PlusCircle, label: t('profile.addRecord'),         to: "/add-record" },
+    { icon: BellRing,   label: t('profile.dueThisMonth'),     to: "/view-due-policies" },
+    { icon: Crown,      label: t('profile.plansBilling'),    to: "/our-plans" },
+    { icon: History,    label: t('profile.myActivity'),        to: "/my-activity" },
+    { icon: Monitor,    label: t('profile.sessionsDevices'),  to: "/sessions" },
+    { icon: Bell,       label: t('profile.notifications'),       to: "/notification-preferences" },
   ];
 
   const grantedPermissions = Object.entries(user.permissions ?? {})
     .filter(([, v]) => v === true)
-    .map(([k]) => PERMISSION_LABELS[k] ?? k);
+    .map(([k]) => (PERMISSION_LABELS[k] ? t(PERMISSION_LABELS[k]) : k));
 
   const isAccountDeactivated = user.isActive === false;
 
@@ -336,9 +339,9 @@ const Profile = () => {
             <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-start gap-2.5">
               <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm font-medium text-red-700">Your account is deactivated</p>
+                <p className="text-sm font-medium text-red-700">{t('profile.yourAccountIsDeactivated')}</p>
                 <p className="text-xs text-red-600 mt-0.5">
-                  {user.deactivationNote || "Contact support if you believe this is a mistake."}
+                  {user.deactivationNote || t('profile.contactSupportIfYouBelieve')}
                 </p>
               </div>
             </div>
@@ -351,7 +354,7 @@ const Profile = () => {
                 <div className="relative shrink-0 cursor-pointer" onClick={() => fileRef.current?.click()}>
                   <div className="w-[102px] h-[102px] rounded-full ring-4 ring-white overflow-hidden bg-blue-100 flex items-center justify-center text-blue-700 text-xl font-medium select-none shadow-md">
                     {avatar
-                      ? <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+                      ? <img src={avatar} alt={t('profile.profile')} className="w-full h-full object-cover" />
                       : <span>{initials(form.name)}</span>
                     }
                   </div>
@@ -364,7 +367,7 @@ const Profile = () => {
               </div>
               {sub?.status === "active" && (
                 <Badge className="absolute top-3 right-3 bg-primary-foreground/15 text-primary-foreground border border-primary-foreground/25 text-[10px] backdrop-blur-sm">
-                  <ShieldCheck className="w-3 h-3 mr-1" /> Active member
+                  <ShieldCheck className="w-3 h-3 mr-1" /> {" "}{t('profile.activeMember')}
                 </Badge>
               )}
             </div>
@@ -374,35 +377,34 @@ const Profile = () => {
                 <div>
                   <h1 className="text-xl font-medium leading-tight">{form.name || "—"}</h1>
                   <div className="flex items-center gap-2 flex-wrap mt-1 text-sm text-muted-foreground">
-                    <span>{roleLabel[user.role ?? "user"] ?? "Policy agent"}</span>
+                    <span>{t(roleLabel[user.role ?? "user"] ?? 'profile.policyAgent')}</span>
                     <button
                       onClick={() => user.easyId && handleCopy(user.easyId, "easyId")}
                       className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 flex items-center gap-1 hover:border-primary/40 transition-colors"
-                      title="Copy User ID"
+                      title={t('profile.copyUserId')}
                     >
-                      User ID: {' '}
-                      {user.easyId}
+                      {t('profile.userIdLabel', { id: user.easyId })}
                       {copied === "easyId"
                         ? <Check className="w-2.5 h-2.5 text-green-600" />
                         : <Copy className="w-2.5 h-2.5 text-muted-foreground/70" />}
                     </button>
                     {user.isEmailVerified
                       ? <span className="flex items-center gap-1 text-xs text-green-700 bg-green-50 border border-green-200 rounded px-1.5 py-0.5">
-                          <CheckCircle2 className="w-3 h-3" /> Email verified
+                          <CheckCircle2 className="w-3 h-3" /> {" "}{t('profile.emailVerified')}
                         </span>
                       : <button onClick={() => navigate("/verify-email")}
                           className="flex items-center gap-1 text-xs text-red-700 bg-red-50 border border-red-200 rounded px-1.5 py-0.5 hover:bg-red-100 transition-colors">
-                          <XCircle className="w-3 h-3" /> Not verified — click to verify
+                          <XCircle className="w-3 h-3" /> {" "}{t('profile.notVerifiedClickToVerify')}
                         </button>
                     }
                   </div>
                   {user.referredBy && (
-                    <p className="text-xs text-muted-foreground mt-1.5">Referred by <span className="font-medium text-form-header">{user.referredBy}</span></p>
+                    <p className="text-xs text-muted-foreground mt-1.5"><Trans i18nKey="profile.referred" params={{ referredBy: user.referredBy }} components={{ span: <span className="font-medium text-form-header" /> }} /></p>
                   )}
                 </div>
 
                 <div className="text-right hidden sm:block">
-                  <p className="text-[11px] text-muted-foreground">Member since</p>
+                  <p className="text-[11px] text-muted-foreground">{t('profile.memberSince')}</p>
                   <p className="text-sm font-medium text-form-header">{convertDateToIndianFormat(user.createdAt) || "—"}</p>
                 </div>
               </div>
@@ -410,30 +412,30 @@ const Profile = () => {
               <div className="flex flex-wrap gap-2 mt-3">
                 {!isEditing ? (
                   <Button size="sm" onClick={() => setIsEditing(true)}>
-                    <Edit className="w-3.5 h-3.5 mr-1.5" /> Edit profile
+                    <Edit className="w-3.5 h-3.5 mr-1.5" /> {" "}{t('profile.editProfile')}
                   </Button>
                 ) : (
                   <>
                     <Button size="sm" onClick={handleSave} disabled={saving}>
                       <Save className="w-3.5 h-3.5 mr-1.5" />
-                      {saving ? "Saving…" : "Save changes"}
+                      {saving ? t('profile.saving') : t('profile.saveChanges')}
                     </Button>
                     <Button size="sm" variant="outline" onClick={handleCancel}>
-                      <X className="w-3.5 h-3.5 mr-1.5" /> Cancel
+                      <X className="w-3.5 h-3.5 mr-1.5" /> {" "}{t('common.cancel')}
                     </Button>
                   </>
                 )}
                 {REFERRAL_PROGRAM_ENABLED && (
                 <Button size="sm" variant="outline" asChild>
                   <Link to="/referral-program">
-                    <Users className="w-3.5 h-3.5 mr-1.5" /> Referral program
+                    <Users className="w-3.5 h-3.5 mr-1.5" /> {" "}{t('profile.referralProgram')}
                   </Link>
                 </Button>
                 )}
                 <Button size="sm" variant="outline"
                   className="bg-red-50 hover:bg-red-100 border-red-200 text-red-700"
                   onClick={() => navigate("/change-password")}>
-                  <KeyRound className="w-3.5 h-3.5 mr-1.5" /> Change password
+                  <KeyRound className="w-3.5 h-3.5 mr-1.5" /> {" "}{t('profile.changePassword')}
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => load(true)} disabled={refreshing}>
                   <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
@@ -462,7 +464,7 @@ const Profile = () => {
           <div className="bg-card border border-border rounded-xl px-4 py-3.5">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium flex items-center gap-1.5">
-                <Gauge className="w-4 h-4 text-primary" /> Profile Completion
+                <Gauge className="w-4 h-4 text-primary" /> {" "}{t('profile.profileCompletion')}
               </p>
               <p className={`text-sm font-medium ${
                 completionPct === 100 ? "text-green-600"
@@ -490,15 +492,15 @@ const Profile = () => {
           <div className="bg-card border border-border rounded-xl p-4">
             <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
               <p className="text-sm font-medium flex items-center gap-1.5">
-                <IdCard className="w-4 h-4 text-primary" /> Your digital business card
+                <IdCard className="w-4 h-4 text-primary" /> {" "}{t('profile.yourDigitalBusinessCard')}
               </p>
               {completionPct === 100 ? (
                 <Button size="sm" onClick={handleDownloadCard}>
-                  <Download className="w-3.5 h-3.5 mr-1.5" /> Download Your Card
+                  <Download className="w-3.5 h-3.5 mr-1.5" /> {" "}{t('profile.downloadYourCard')}
                 </Button>
               ) : (
                 <Badge variant="secondary" className="text-xs">
-                  {completionPct}% complete — unlocks at 100%
+                  {t('profile.completeUnlocksAt100', { completionPct })}
                 </Badge>
               )}
             </div>
@@ -507,7 +509,7 @@ const Profile = () => {
               <BusinessCard
                 ref={cardRef}
                 name={form.name}
-                roleLabel={roleLabel[user.role?.toLocaleUpperCase() ?? "user"] ?? "Policy Agent"}
+                roleLabel={t(roleLabel[user.role?.toLocaleUpperCase() ?? "user"] ?? 'profile.policyAgent2')}
                 mobileNumber={form.mobileNumber}
                 email={form.email}
                 easyId={user.easyId}
@@ -518,18 +520,18 @@ const Profile = () => {
                 className="max-w-xl"
               />
               <div className="flex md:flex-col gap-2 flex-wrap md:w-40">
-                {BUSINESS_CARD_TEMPLATES.map((t) => (
+                {BUSINESS_CARD_TEMPLATES.map((tk) => (
                   <button
-                    key={t.id}
-                    onClick={() => setCardTheme(t.id)}
+                    key={tk.id}
+                    onClick={() => setCardTheme(tk.id)}
                     className={`flex items-center gap-2 rounded-lg border px-2.5 py-2 text-xs font-medium transition-colors ${
-                      cardTheme === t.id
+                      cardTheme === tk.id
                         ? "border-primary ring-1 ring-primary"
                         : "border-border hover:border-primary/40"
                     }`}
                   >
-                    <span className="w-6 h-6 rounded-full border border-border shrink-0" style={{ background: t.swatch }} />
-                    {t.label}
+                    <span className="w-6 h-6 rounded-full border border-border shrink-0" style={{ background: tk.swatch }} />
+                    {t(tk.label)}
                   </button>
                 ))}
               </div>
@@ -537,7 +539,7 @@ const Profile = () => {
 
             {completionPct < 100 && (
               <p className="text-xs text-muted-foreground mt-3">
-                Finish your profile — {completionItems.filter(i => !i.done).map(i => i.label).join(", ")} — to unlock downloading your card.
+                {t('profile.finishYourProfileToUnlock', { completionItems: completionItems.filter(i => !i.done).map(i => i.label).join(", ") })}
               </p>
             )}
           </div>
@@ -551,26 +553,26 @@ const Profile = () => {
               {/* Account & subscription */}
               <div className="bg-card border border-border rounded-xl p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                  <Crown className="w-3.5 h-3.5 text-primary" /> Account
+                  <Crown className="w-3.5 h-3.5 text-primary" /> {" "}{t('profile.account')}
                 </p>
 
                 {[
-                  { label: "Status",
+                  { label: t('common.status'),
                     val: sub?.status === "active"
-                      ? <Badge className="text-xs bg-green-100 text-green-700 border border-green-200">Active</Badge>
-                      : <Badge variant="destructive" className="text-xs">{sub?.status ?? "Expired"}</Badge>
+                      ? <Badge className="text-xs bg-green-100 text-green-700 border border-green-200">{t('common.active')}</Badge>
+                      : <Badge variant="destructive" className="text-xs">{sub?.status ?? t('common.expired')}</Badge>
                   },
-                  { label: "Plan",     val: `${sub?.planType ?? "—"} · ₹${sub?.price ?? 0}` },
-                  { label: "Duration", val: sub?.duration || "—"                      },
-                  { label: "Expires",  val: convertDateToIndianFormat(sub?.endDate)    },
-                  { label: "Days left",
+                  { label: t('profile.plan'),     val: `${sub?.planType ?? "—"} · ₹${sub?.price ?? 0}` },
+                  { label: t('profile.duration'), val: sub?.duration || "—"                      },
+                  { label: t('profile.expires'),  val: convertDateToIndianFormat(sub?.endDate)    },
+                  { label: t('profile.daysLeft'),
                     val: <Badge className="text-xs bg-blue-100 text-blue-700 border border-blue-200">
                       {daysLeft}d
                     </Badge>
                   },
-                  { label: "Records",      val: <span className="text-blue-600 font-medium text-xs">{user.totalRecords ?? 0}</span> },
+                  { label: t('profile.records'),      val: <span className="text-blue-600 font-medium text-xs">{user.totalRecords ?? 0}</span> },
                   ...(REFERRAL_PROGRAM_ENABLED ? [
-                  { label: "Referral code",
+                  { label: t('profile.referralCode'),
                     val: <button
                       onClick={() => user.referralCode && handleCopy(user.referralCode, "referral")}
                       className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 flex items-center gap-1 hover:border-primary/40 transition-colors"
@@ -591,7 +593,7 @@ const Profile = () => {
 
                 <div className="mt-3">
                   <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                    <span>Time left</span><span>{daysLeft}/{totalDays}d</span>
+                    <span>{t('profile.timeLeft')}</span><span>{daysLeft}/{totalDays}d</span>
                   </div>
                   <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                     <div className={`h-full rounded-full ${planColor}`} style={{ width: `${planPct}%` }} />
@@ -602,7 +604,7 @@ const Profile = () => {
                   onClick={() => navigate("/our-plans")}
                   className="mt-3 w-full flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 hover:bg-blue-100 transition-colors">
                   <span className="text-xs font-medium text-blue-700 flex items-center gap-1">
-                    <Crown className="w-3 h-3" /> Upgrade plan
+                    <Crown className="w-3 h-3" /> {" "}{t('profile.upgradePlan')}
                   </span>
                   <ArrowRight className="w-3.5 h-3.5 text-blue-600" />
                 </button>
@@ -613,12 +615,12 @@ const Profile = () => {
               <div className="bg-card border border-border rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                    <Landmark className="w-3.5 h-3.5 text-primary" /> Payout details
+                    <Landmark className="w-3.5 h-3.5 text-primary" /> {" "}{t('profile.payoutDetails')}
                   </p>
                   {hasPayout && (
                     payoutVerified
-                      ? <span className="flex items-center gap-1 text-[11px] text-green-700"><CheckCircle2 className="w-3 h-3" /> Verified</span>
-                      : <span className="flex items-center gap-1 text-[11px] text-yellow-700"><AlertTriangle className="w-3 h-3" /> Pending</span>
+                      ? <span className="flex items-center gap-1 text-[11px] text-green-700"><CheckCircle2 className="w-3 h-3" /> {" "}{t('common.verified')}</span>
+                      : <span className="flex items-center gap-1 text-[11px] text-yellow-700"><AlertTriangle className="w-3 h-3" /> {" "}{t('common.pending')}</span>
                   )}
                 </div>
 
@@ -627,7 +629,7 @@ const Profile = () => {
                     onClick={() => navigate("/referral-program")}
                     className="w-full flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2 hover:bg-yellow-100 transition-colors">
                     <span className="text-xs font-medium text-yellow-700 text-left">
-                      Add payout details to withdraw referral earnings
+                      {t('profile.addPayoutDetailsToWithdraw')}
                     </span>
                     <ChevronRight className="w-3.5 h-3.5 text-yellow-600 shrink-0" />
                   </button>
@@ -644,7 +646,7 @@ const Profile = () => {
                     {payment?.accountNumber && (
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground flex items-center gap-1.5">
-                          <Landmark className="w-3.5 h-3.5" /> {payment.bankName || "Bank"}
+                          <Landmark className="w-3.5 h-3.5" /> {payment.bankName || t('profile.bank')}
                         </span>
                         <SensitiveValue field="bankAccountNumber" value={payment.accountNumber} render={(v) => `••••${v.slice(-4)}`} className="font-mono" />
                       </div>
@@ -658,7 +660,7 @@ const Profile = () => {
                       onClick={() => navigate("/referral-program")}
                       className="w-full flex items-center justify-between text-xs text-primary hover:underline pt-1"
                     >
-                      Manage payout details <ChevronRight className="w-3 h-3" />
+                      {t('profile.managePayoutDetails')}{" "} <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>
                 )}
@@ -668,11 +670,11 @@ const Profile = () => {
               {/* Security & sessions */}
               <div className="bg-card border border-border rounded-xl p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                  <Fingerprint className="w-3.5 h-3.5 text-primary" /> Security
+                  <Fingerprint className="w-3.5 h-3.5 text-primary" /> {" "}{t('profile.security')}
                 </p>
                 <div className="flex items-center justify-between py-1.5 border-b border-border">
                   <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <Monitor className="w-3.5 h-3.5" /> Active sessions
+                    <Monitor className="w-3.5 h-3.5" /> {" "}{t('profile.activeSessions')}
                   </span>
                   <Badge variant="secondary" className="text-xs">
                     {sessions === null ? "…" : sessions.length}
@@ -680,17 +682,17 @@ const Profile = () => {
                 </div>
                 <div className="flex items-center justify-between py-1.5 border-b border-border last:border-0">
                   <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5" /> Password
+                    <Lock className="w-3.5 h-3.5" /> {" "}{t('common.password')}
                   </span>
                   <button onClick={() => navigate("/change-password")} className="text-xs text-primary hover:underline">
-                    Change
+                    {t('profile.change')}
                   </button>
                 </div>
 
                 <div className="flex flex-col gap-2 mt-3">
                   <Button size="sm" variant="outline" className="w-full justify-center text-xs h-8" asChild>
                     <Link to="/sessions">
-                      <Monitor className="w-3.5 h-3.5 mr-1.5" /> Manage devices
+                      <Monitor className="w-3.5 h-3.5 mr-1.5" /> {" "}{t('profile.manageDevices')}
                     </Link>
                   </Button>
                   {sessions && sessions.length > 1 && (
@@ -700,7 +702,7 @@ const Profile = () => {
                       onClick={handleSignOutOthers} disabled={signingOutOthers}
                     >
                       <LogOut className="w-3.5 h-3.5 mr-1.5" />
-                      {signingOutOthers ? "Signing out…" : "Sign out other devices"}
+                      {signingOutOthers ? t('profile.signingOut') : t('profile.signOutOtherDevices')}
                     </Button>
                   )}
                 </div>
@@ -709,12 +711,12 @@ const Profile = () => {
               {/* Notification preferences — inline quick toggles */}
               <div className="bg-card border border-border rounded-xl p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                  <BellRing className="w-3.5 h-3.5 text-primary" /> Notifications
+                  <BellRing className="w-3.5 h-3.5 text-primary" /> {" "}{t('profile.notifications')}
                 </p>
                 <div className="flex items-center justify-between py-2 border-b border-border last:border-0">
                   <div className="flex items-start gap-2 pr-2">
                     <CalendarClock className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
-                    <span className="text-xs">Payment due reminders</span>
+                    <span className="text-xs">{t('profile.paymentDueReminders')}</span>
                   </div>
                   <Switch
                     checked={prefs.policyDueReminders}
@@ -725,7 +727,7 @@ const Profile = () => {
                 <div className="flex items-center justify-between py-2">
                   <div className="flex items-start gap-2 pr-2">
                     <CreditCard className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
-                    <span className="text-xs">Subscription reminders</span>
+                    <span className="text-xs">{t('profile.subscriptionReminders')}</span>
                   </div>
                   <Switch
                     checked={prefs.subscriptionReminders}
@@ -734,7 +736,7 @@ const Profile = () => {
                   />
                 </div>
                 <Link to="/notification-preferences" className="text-xs text-primary hover:underline flex items-center gap-1 mt-1">
-                  All notification settings <ChevronRight className="w-3 h-3" />
+                  {t('profile.allNotificationSettings')}{" "} <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
 
@@ -742,7 +744,7 @@ const Profile = () => {
               {user.role !== "user" && grantedPermissions.length > 0 && (
                 <div className="bg-card border border-border rounded-xl p-4">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                    <ShieldAlert className="w-3.5 h-3.5 text-primary" /> Permissions
+                    <ShieldAlert className="w-3.5 h-3.5 text-primary" /> {" "}{t('common.permissions')}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {grantedPermissions.map((p) => (
@@ -775,20 +777,19 @@ const Profile = () => {
                   )}
                 </div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                  <UserCircle2 className="w-3.5 h-3.5 text-primary" /> Profile information
+                  <UserCircle2 className="w-3.5 h-3.5 text-primary" /> {" "}{t('profile.profileInformation2')}
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                   <div className="space-y-1.5">
                     <Label className="text-xs text-muted-foreground">
-                      Name <span className="text-muted-foreground/60">(cannot change)</span>
-                    </Label>
+                      <Trans i18nKey="profile.nameCannotChange" components={{ span: <span className="text-muted-foreground/60" /> }} /></Label>
                     <Input value={form.name} disabled
                       className="bg-muted text-muted-foreground text-sm h-9" />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs text-muted-foreground">Mobile number</Label>
+                    <Label className="text-xs text-muted-foreground">{t('profile.mobileNumber')}</Label>
                     <Input name="mobileNumber" value={form.mobileNumber}
                       onChange={handleChange} disabled={!isEditing}
                       autoComplete="off"
@@ -797,13 +798,13 @@ const Profile = () => {
 
                   <div className="space-y-1.5 md:col-span-2">
                     <div className="flex items-center gap-2">
-                      <Label className="text-xs text-muted-foreground">Email address</Label>
+                      <Label className="text-xs text-muted-foreground">{t('profile.emailAddress')}</Label>
                       {user.isEmailVerified
                         ? <span className="text-xs text-green-700 flex items-center gap-0.5">
-                            <CheckCircle2 className="w-3 h-3" /> Verified
+                            <CheckCircle2 className="w-3 h-3" /> {" "}{t('common.verified')}
                           </span>
                         : <span className="text-xs text-red-600 flex items-center gap-0.5">
-                            <XCircle className="w-3 h-3" /> Not verified
+                            <XCircle className="w-3 h-3" /> {" "}{t('profile.notVerified')}
                           </span>}
                     </div>
                     <div className="relative">
@@ -814,7 +815,7 @@ const Profile = () => {
                         <Button size="sm" variant="outline"
                           className="absolute right-1.5 top-1/2 -translate-y-1/2 h-7 text-xs bg-red-50 hover:bg-red-100 border-red-200 text-red-700 px-2"
                           onClick={() => navigate("/verify-email")}>
-                          Verify now
+                          {t('profile.verifyNow')}
                         </Button>
                       )}
                     </div>
@@ -822,7 +823,7 @@ const Profile = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Full address</Label>
+                  <Label className="text-xs text-muted-foreground">{t('profile.fullAddress')}</Label>
                   <Textarea name="fullAddress" value={form.fullAddress}
                     onChange={handleChange} disabled={!isEditing} rows={3} autoComplete="off"
                     className={`text-sm resize-none ${!isEditing ? "bg-muted text-muted-foreground" : ""} ${addressMask}`} />
@@ -831,22 +832,21 @@ const Profile = () => {
                 <div className="space-y-1.5 mt-3">
                   <div className="flex items-center justify-between">
                     <Label className="text-xs text-muted-foreground">
-                      Business card note <span className="text-muted-foreground/60">(optional)</span>
-                    </Label>
+                      <Trans i18nKey="profile.businessCardNoteOptional" components={{ span: <span className="text-muted-foreground/60" /> }} /></Label>
                     <span hidden={!isEditing} className={`text-[11px] ${noteCharCount >= MAX_NOTE_CHARS ? "text-red-600 font-medium" : "text-muted-foreground"}`}>
-                      {noteCharCount}/{MAX_NOTE_CHARS} characters
+                      {noteCharCount}/{MAX_NOTE_CHARS} {" "}{t('profile.characters')}
                     </span>
                   </div>
                   <Textarea name="businessCardNote" value={form.businessCardNote}
                     onChange={handleNoteChange} disabled={!isEditing} rows={4}
                     maxLength={MAX_NOTE_CHARS}
-                    placeholder="A short line about yourself, your specialty, or your motto — shown on your downloadable business card."
+                    placeholder={t('profile.aShortLineAboutYourself')}
                     className={`text-sm resize-none ${!isEditing ? "bg-muted text-muted-foreground" : ""}`} />
                 </div>
 
                 {isEditing && (
                   <p className="text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mt-3">
-                    Name and Easy ID are permanently assigned and cannot be changed.
+                    {t('profile.nameAndEasyId')}
                   </p>
                 )}
               </div>
@@ -855,15 +855,15 @@ const Profile = () => {
               <div className="bg-card border border-border rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                    <History className="w-3.5 h-3.5 text-primary" /> Recent activity
+                    <History className="w-3.5 h-3.5 text-primary" /> {" "}{t('profile.recentActivity')}
                   </p>
                   <Link to="/my-activity" className="text-xs text-primary hover:underline">
-                    View all{activityTotal ? ` (${activityTotal.total})` : ""} →
+                    {activityTotal ? t('profile.viewAllCount', { total: activityTotal.total }) : t('profile.viewAll')}
                   </Link>
                 </div>
 
                 {activity.length === 0 ? (
-                  <p className="text-xs text-muted-foreground py-4 text-center">No activity yet.</p>
+                  <p className="text-xs text-muted-foreground py-4 text-center">{t('common.noActivityYet')}</p>
                 ) : (
                   <div className="space-y-0">
                     {activity.map((log) => (
@@ -885,19 +885,19 @@ const Profile = () => {
                 <div className="bg-card border border-border rounded-xl p-4">
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                      <Wallet2 className="w-3.5 h-3.5 text-primary" /> Referral summary
+                      <Wallet2 className="w-3.5 h-3.5 text-primary" /> {" "}{t('profile.referralSummary')}
                     </p>
                     <Link to="/referral-program" className="text-xs text-blue-600 hover:underline">
-                      View full dashboard →
+                      {t('profile.viewFullDashboard')}
                     </Link>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                     {[
-                      { label: "Direct (L1)",   val: referral.totalL1 ?? 0,               color: "text-blue-600"   },
-                      { label: "Indirect (L2)", val: referral.totalL2 ?? 0,               color: "text-purple-600" },
-                      { label: "Total earned",  val: <SensitiveValue field="walletAmount" value={referral.totalEarned ?? 0} render={(v) => `₹${v}`} />, color: "text-green-600"  },
-                      { label: "Wallet",        val: <SensitiveValue field="walletAmount" value={referral.availableBalance ?? 0} render={(v) => `₹${v}`} />, color: "text-green-600"  },
-                      { label: "Pending",       val: <SensitiveValue field="walletAmount" value={referral.pendingEarnings ?? 0} render={(v) => `₹${v}`} />, color: "text-yellow-600" },
+                      { label: t('profile.directL1'),   val: referral.totalL1 ?? 0,               color: "text-blue-600"   },
+                      { label: t('profile.indirectL2'), val: referral.totalL2 ?? 0,               color: "text-purple-600" },
+                      { label: t('profile.totalEarned'),  val: <SensitiveValue field="walletAmount" value={referral.totalEarned ?? 0} render={(v) => `₹${v}`} />, color: "text-green-600"  },
+                      { label: t('profile.wallet'),        val: <SensitiveValue field="walletAmount" value={referral.availableBalance ?? 0} render={(v) => `₹${v}`} />, color: "text-green-600"  },
+                      { label: t('common.pending'),       val: <SensitiveValue field="walletAmount" value={referral.pendingEarnings ?? 0} render={(v) => `₹${v}`} />, color: "text-yellow-600" },
                     ].map(({ label, val, color }) => (
                       <div key={label} className="text-center bg-muted rounded-lg p-3">
                         <p className={`text-lg font-medium ${color}`}>{val}</p>

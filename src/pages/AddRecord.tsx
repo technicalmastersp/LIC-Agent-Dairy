@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import { makeInsuranceText } from "@/i18n/insuranceText";
 import axios from "axios";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { i18nZodResolver as zodResolver } from "@/i18n/zodResolver";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,7 +50,8 @@ const SectionTitle = ({ icon: Icon, step, children }: { icon: LucideIcon; step?:
 const AddRecord = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, tOr } = useLanguage();
+  const { typeNameById } = makeInsuranceText(tOr);
   // Hide/Show sensitive data: obscure these inputs (CSS only — value untouched) while hidden
   const aadhaarMask = useSensitiveInputClass("aadhaarNumber");
   const panMask     = useSensitiveInputClass("panNumber");
@@ -229,8 +231,8 @@ const AddRecord = () => {
   const onInvalid = () => {
     if (errors.name) {
       toast({
-        title: "Error",
-        description: "Please enter the applicant's name",
+        title: t('records.error'),
+        description: t('records.pleaseEnterTheApplicantS'),
         variant: "destructive",
       });
       nameInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -243,8 +245,8 @@ const AddRecord = () => {
 
     if (isOtherInsuranceType(insuranceType) && !customInsuranceTypeName.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a name for this custom insurance type",
+        title: t('records.error'),
+        description: t('records.pleaseEnterAName'),
         variant: "destructive",
       });
       return;
@@ -253,11 +255,11 @@ const AddRecord = () => {
     // currentPolicy/previousPolicy are plain state, not part of the zod
     // schema above — validate their date fields the same way.
     if (currentPolicy.lastPaymentDate && !isValidCalendarDate(currentPolicy.lastPaymentDate)) {
-      toast({ title: "Error", description: "Current policy's last payment date is not a valid date", variant: "destructive" });
+      toast({ title: t('records.error'), description: t('records.currentPolicySLastPayment'), variant: "destructive" });
       return;
     }
     if (previousPolicy.lastPaymentDate && !isValidCalendarDate(previousPolicy.lastPaymentDate)) {
-      toast({ title: "Error", description: "Previous policy's last payment date is not a valid date", variant: "destructive" });
+      toast({ title: t('records.error'), description: t('records.previousPolicySLastPayment'), variant: "destructive" });
       return;
     }
 
@@ -276,15 +278,15 @@ const AddRecord = () => {
     try {
       await createRecord(record);
       toast({
-        title: "Success",
-        description: "Record saved successfully",
+        title: t('records.success'),
+        description: t('records.recordSavedSuccessfully'),
       });
       navigate("/view-records");
     } catch (error) {
       const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
       toast({
-        title: "Error",
-        description: message || "Failed to save record",
+        title: t('records.error'),
+        description: message || t('records.failedToSaveRecord'),
         variant: "destructive",
       });
     } finally {
@@ -309,15 +311,15 @@ const AddRecord = () => {
               <CardTitle className="text-2xl font-bold">
                 {siteConfig.title}
               </CardTitle>
-              <p className="text-primary-foreground/90">{t("addRecord")}</p>
-              <p className="text-primary-foreground/60 text-xs mt-1">Fill in the sections below to create a new policy record</p>
+              <p className="text-primary-foreground/90">{t("nav.addRecord")}</p>
+              <p className="text-primary-foreground/60 text-xs mt-1">{t('records.fillInTheSectionsBelow')}</p>
             </CardHeader>
           </Card>
 
           {/* Insurance Type Selection */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={ListChecks} step="Step 1">Select Insurance Type</SectionTitle>
+              <SectionTitle icon={ListChecks} step={t('common.step', { n: 1 })}>{t('records.selectInsuranceType')}</SectionTitle>
             </CardHeader>
             <CardContent>
               <InsuranceTypeSelector value={insuranceType} onChange={handleInsuranceTypeChange} />
@@ -329,7 +331,7 @@ const AddRecord = () => {
           {isOtherInsuranceType(insuranceType) ? (
             <Card>
               <CardHeader>
-                <SectionTitle icon={ShieldCheck} step="Step 2">Custom Insurance Details</SectionTitle>
+                <SectionTitle icon={ShieldCheck} step={t('common.step', { n: 2 })}>{t('records.customInsuranceDetails')}</SectionTitle>
               </CardHeader>
               <CardContent>
                 <CustomFieldsBuilder
@@ -343,7 +345,7 @@ const AddRecord = () => {
           ) : (
             <Card>
               <CardHeader>
-                <SectionTitle icon={ShieldCheck} step="Step 2">{insuranceType} Details</SectionTitle>
+                <SectionTitle icon={ShieldCheck} step={t('common.step', { n: 2 })}>{t('records.details', { insuranceType: typeNameById(insuranceType) })}</SectionTitle>
               </CardHeader>
               <CardContent>
                 <TypeSpecificFieldsForm
@@ -358,12 +360,12 @@ const AddRecord = () => {
           {/* Basic Information Form */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={IdCard} step="Step 3">Basic Details</SectionTitle>
+              <SectionTitle icon={IdCard} step={t('common.step', { n: 3 })}>{t('common.basicDetails')}</SectionTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="date">1. Date</Label>
+                  <Label htmlFor="date">{t('records.n1Date')}</Label>
                   <Input 
                     id="date"
                     type="date"
@@ -372,10 +374,10 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="aadhaarNumber">2. Aadhaar Number</Label>
+                  <Label htmlFor="aadhaarNumber">{t('records.n2AadhaarNumber')}</Label>
                   <Input 
                     id="aadhaarNumber" 
-                    placeholder="12-digit Aadhaar number"
+                    placeholder={t('records.n12DigitAadhaarNumber')}
                     value={formatAadhaar(watch("aadhaarNumber"))}
                     onChange={(e) => setValue("aadhaarNumber", unformatAadhaar(e.target.value), { shouldValidate: true })}
                     onBlur={register("aadhaarNumber").onBlur}
@@ -389,10 +391,10 @@ const AddRecord = () => {
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="panNumber">3. Pan Number</Label>
+                  <Label htmlFor="panNumber">{t('records.n3PanNumber')}</Label>
                   <Input 
                     id="panNumber" 
-                    placeholder="e.g. ABCDE1234F"
+                    placeholder={t('records.eGAbcde1234f')}
                     {...register("panNumber")}
                     autoComplete="off"
                     className={`mt-1 uppercase ${panMask}`}
@@ -403,7 +405,7 @@ const AddRecord = () => {
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="email">4. Email ID</Label>
+                  <Label htmlFor="email">{t('records.n4EmailId')}</Label>
                   <Input 
                     id="email" 
                     type="email" 
@@ -422,15 +424,15 @@ const AddRecord = () => {
           {/* Personal Information Form */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={User} step="Step 4">Personal Information</SectionTitle>
+              <SectionTitle icon={User} step={t('common.step', { n: 4 })}>{t('records.personalInformation')}</SectionTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <Label htmlFor="name">1. Name</Label>
+                  <Label htmlFor="name">{t('records.n1Name')}</Label>
                   <Input 
                     id="name" 
-                    placeholder="Enter applicant's full name"
+                    placeholder={t('records.enterApplicantSFullName')}
                     {...nameField}
                     ref={(el) => { nameFieldRef(el); nameInputRef.current = el; }}
                     className={`mt-1 ${errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}`}
@@ -441,7 +443,7 @@ const AddRecord = () => {
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="birthPlace">2. Birth Place</Label>
+                  <Label htmlFor="birthPlace">{t('records.n2BirthPlace')}</Label>
                   <Input 
                     id="birthPlace" 
                     {...register("birthPlace")}
@@ -450,7 +452,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="fatherName">3. Father's Name</Label>
+                  <Label htmlFor="fatherName">{t('records.n3FatherSName')}</Label>
                   <Input 
                     id="fatherName" 
                     {...register("fatherName")}
@@ -459,7 +461,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="motherName">4. Mother's Name</Label>
+                  <Label htmlFor="motherName">{t('records.n4MotherSName')}</Label>
                   <Input 
                     id="motherName" 
                     {...register("motherName")}
@@ -468,7 +470,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="spouseName">5. Spouse's Name</Label>
+                  <Label htmlFor="spouseName">{t('records.n5SpouseSName')}</Label>
                   <Input 
                     id="spouseName" 
                     {...register("spouseName")}
@@ -477,7 +479,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="address">6. Address</Label>
+                  <Label htmlFor="address">{t('records.n6Address')}</Label>
                   <Input 
                     id="address" 
                     {...register("address")}
@@ -486,7 +488,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="dateOfBirth">7. Date of Birth</Label>
+                  <Label htmlFor="dateOfBirth">{t('records.n7DateOfBirth')}</Label>
                   <Input 
                     id="dateOfBirth" 
                     type="date"
@@ -495,7 +497,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="age">8. Age</Label>
+                  <Label htmlFor="age">{t('records.n8Age')}</Label>
                   <Input 
                     id="age" 
                     value={digitsOnly(watch("age"))}
@@ -507,7 +509,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="education">9. Educational Qualification</Label>
+                  <Label htmlFor="education">{t('records.n9EducationalQualification')}</Label>
                   <Input 
                     id="education" 
                     {...register("educationalQualification")}
@@ -516,7 +518,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="occupation">10. Occupation</Label>
+                  <Label htmlFor="occupation">{t('records.n10Occupation')}</Label>
                   <Input 
                     id="occupation" 
                     {...register("occupation")}
@@ -525,7 +527,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="DesignationName">11. Designation</Label>
+                  <Label htmlFor="DesignationName">{t('records.n11Designation')}</Label>
                   <Input 
                     id="DesignationName" 
                     {...register("designationOfPolicyHolder")}
@@ -534,7 +536,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="income">12. Annual Income</Label>
+                  <Label htmlFor="income">{t('records.n12AnnualIncome')}</Label>
                   <Input 
                     id="income" 
                     {...register("annualIncome")}
@@ -543,7 +545,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="servicePeriod">13. Period Of Service</Label>
+                  <Label htmlFor="servicePeriod">{t('records.n13PeriodOfService')}</Label>
                   <Input 
                     id="servicePeriod" 
                     value={digitsOnly(watch("periodOfService"))}
@@ -555,7 +557,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="employer">14. Employer's Name</Label>
+                  <Label htmlFor="employer">{t('records.n14EmployerSName')}</Label>
                   <Input 
                     id="employer" 
                     {...register("employerName")}
@@ -564,7 +566,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="mobileNumberLinkedAadhaar">15. Aadhaar Linked Mobile Number </Label>
+                  <Label htmlFor="mobileNumberLinkedAadhaar">{t('records.n15AadhaarLinkedMobileNumber')}{" "} </Label>
                   <Input 
                     id="mobileNumberLinkedAadhaar" 
                     value={formatMobileNumber(watch("aadhaarLinkedMobileNumber"))}
@@ -576,7 +578,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="nominee">16. Name of Nominee</Label>
+                  <Label htmlFor="nominee">{t('records.n16NameOfNominee')}</Label>
                   <Input 
                     id="nominee" 
                     {...register("nameOfNominee")}
@@ -585,7 +587,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="nomineeAge">17. Age of Nominee</Label>
+                  <Label htmlFor="nomineeAge">{t('records.n17AgeOfNominee')}</Label>
                   <Input 
                     id="nomineeAge" 
                     value={digitsOnly(watch("ageOfNominee"))}
@@ -597,7 +599,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="relation">18. Relation</Label>
+                  <Label htmlFor="relation">{t('records.n18Relation')}</Label>
                   <Input 
                     id="relation" 
                     {...register("relationName")}
@@ -613,10 +615,10 @@ const AddRecord = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <SectionTitle icon={Users} step="Step 5">Family Information</SectionTitle>
+                <SectionTitle icon={Users} step={t('common.step', { n: 5 })}>{t('records.familyInformation')}</SectionTitle>
                 <Button type="button" onClick={addFamilyMember} size="sm" variant="outline">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Member
+                  {t('records.addMember')}
                 </Button>
               </div>
             </CardHeader>
@@ -625,12 +627,12 @@ const AddRecord = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-table-header">
-                      <TableHead className="border border-table-border font-semibold">1. Relationship</TableHead>
-                      <TableHead className="border border-table-border font-semibold">2. Current Age</TableHead>
-                      <TableHead className="border border-table-border font-semibold">3. Health</TableHead>
-                      <TableHead className="border border-table-border font-semibold">4. Age at Death/Year</TableHead>
-                      <TableHead className="border border-table-border font-semibold">5. Reason</TableHead>
-                      <TableHead className="border border-table-border font-semibold">Delete</TableHead>
+                      <TableHead className="border border-table-border font-semibold">{t('records.n1Relationship')}</TableHead>
+                      <TableHead className="border border-table-border font-semibold">{t('records.n2CurrentAge')}</TableHead>
+                      <TableHead className="border border-table-border font-semibold">{t('records.n3Health')}</TableHead>
+                      <TableHead className="border border-table-border font-semibold">{t('records.n4AgeAtDeathYear')}</TableHead>
+                      <TableHead className="border border-table-border font-semibold">{t('records.n5Reason')}</TableHead>
+                      <TableHead className="border border-table-border font-semibold">{t('common.delete')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -638,8 +640,8 @@ const AddRecord = () => {
                       <TableRow key={index} className="hover:bg-muted/40">
                         <TableCell className="border border-table-border font-medium">
                           <Select value={member.relationship || ""} onValueChange={(value) => handleFamilyMemberChange(index, 'relationship', value)}>
-                            <SelectTrigger aria-label={`Relationship for family member ${index + 1}`}>
-                              <SelectValue placeholder="Select relationship" />
+                            <SelectTrigger aria-label={t('records.relationshipForFamilyMember', { value: index + 1 })}>
+                              <SelectValue placeholder={t('records.selectRelationship')} />
                             </SelectTrigger>
                             <SelectContent>
                               {relationOptions.map((relationship) => (
@@ -654,19 +656,19 @@ const AddRecord = () => {
                           <Input 
                             value={digitsOnly(member.currentAge)}
                             onChange={(e) => handleFamilyMemberChange(index, "currentAge", e.target.value)}
-                            aria-label={`Current age for family member ${index + 1}`}
+                            aria-label={t('records.currentAgeForFamilyMember', { value: index + 1 })}
                             className="w-full border border-input bg-background focus-visible:border-primary"
                             maxLength={3}
                           />
                         </TableCell>
                         <TableCell className="border border-table-border">
                           <Select value={member.health} onValueChange={(value) => handleFamilyMemberChange(index, 'health', value)}>
-                            <SelectTrigger aria-label={`Health status for family member ${index + 1}`}>
-                              <SelectValue placeholder="Select Health" />
+                            <SelectTrigger aria-label={t('records.healthStatusForFamilyMember', { value: index + 1 })}>
+                              <SelectValue placeholder={t('records.selectHealth')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem key="Good" value="Good">Good</SelectItem>
-                                <SelectItem key="Not Good" value="Not Good">Not Good</SelectItem>
+                                <SelectItem key="Good" value="Good">{t('common.good')}</SelectItem>
+                                <SelectItem key="Not Good" value="Not Good">{t('common.notGood')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>
@@ -674,7 +676,7 @@ const AddRecord = () => {
                           <Input 
                             value={digitsOnly(member.deathAge)}
                             onChange={(e) => handleFamilyMemberChange(index, "deathAge", e.target.value)}
-                            aria-label={`Age at death or year for family member ${index + 1}`}
+                            aria-label={t('records.ageAtDeathOrYear', { value: index + 1 })}
                             className="w-full border border-input bg-background focus-visible:border-primary"
                             maxLength={4}
                           />
@@ -683,7 +685,7 @@ const AddRecord = () => {
                           <Input 
                             value={member.reason}
                             onChange={(e) => handleFamilyMemberChange(index, "reason", e.target.value)}
-                            aria-label={`Reason for family member ${index + 1}`}
+                            aria-label={t('records.reasonForFamilyMember', { value: index + 1 })}
                             className="w-full border border-input bg-background focus-visible:border-primary"
                             maxLength={100}
                           />
@@ -696,7 +698,7 @@ const AddRecord = () => {
                               variant="destructive" 
                               size="sm"
                               disabled={familyMembers.length <= 1}
-                              aria-label={`Remove family member ${index + 1}`}
+                              aria-label={t('records.removeFamilyMember', { value: index + 1 })}
                               className={familyMembers.length <= 1 ? "opacity-50" : ""}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -714,15 +716,15 @@ const AddRecord = () => {
           {/* Additional Fields */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={HeartPulse} step="Step 6">Physical & Banking Details</SectionTitle>
+              <SectionTitle icon={HeartPulse} step={t('common.step', { n: 6 })}>{t('records.physicalBankingDetails')}</SectionTitle>
             </CardHeader>
             <CardContent className="pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <Label htmlFor="height">1. Height : cm</Label>
+                  <Label htmlFor="height">{t('records.n1HeightCm')}</Label>
                   <Input 
                     id="height" 
-                    placeholder="Height in cm"
+                    placeholder={t('records.heightInCm')}
                     value={digitsOnly(watch("height"))}
                     onChange={(e) => setValue("height", digitsOnly(e.target.value), { shouldValidate: true })}
                     onBlur={register("height").onBlur}
@@ -732,10 +734,10 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="weight">2. Weight : kg</Label>
+                  <Label htmlFor="weight">{t('records.n2WeightKg')}</Label>
                   <Input 
                     id="weight" 
-                    placeholder="Weight in kg"
+                    placeholder={t('records.weightInKg')}
                     value={digitsOnly(watch("weight"))}
                     onChange={(e) => setValue("weight", digitsOnly(e.target.value), { shouldValidate: true })}
                     onBlur={register("weight").onBlur}
@@ -745,7 +747,7 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="childrenDate">3. Children's Birth Date &#40;Only for Women&#41;</Label>
+                  <Label htmlFor="childrenDate">{t('records.n3ChildrenSBirthDate')}</Label>
                   <Input 
                     id="childrenDate" 
                     type="date"
@@ -754,10 +756,10 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="bankAccount">4. Bank Account Number</Label>
+                  <Label htmlFor="bankAccount">{t('records.n4BankAccountNumber')}</Label>
                   <Input 
                     id="bankAccount" 
-                    placeholder="Enter bank account number"
+                    placeholder={t('records.enterBankAccountNumber')}
                     {...register("bankAccountNumber")}
                     autoComplete="off"
                     className={`mt-1 ${accountMask}`}
@@ -765,10 +767,10 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="ifsc">5. IFSC Code</Label>
+                  <Label htmlFor="ifsc">{t('records.n5IfscCode')}</Label>
                   <Input 
                     id="ifsc" 
-                    placeholder="e.g. SBIN0001234"
+                    placeholder={t('records.eGSbin0001234')}
                     {...register("ifscCode", {
                       onChange: () => setIfscLookupState({ status: "idle" }),
                     })}
@@ -779,40 +781,40 @@ const AddRecord = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="bankName">6. Bank Name</Label>
+                  <Label htmlFor="bankName">{t('records.n6BankName')}</Label>
                   <Input 
                     id="bankName" 
                     {...register("bankName")}
                     className="mt-1"
                     maxLength={100}
                     disabled
-                    placeholder="Auto-filled from IFSC"
+                    placeholder={t('records.autoFilledFromIfsc')}
                   />
                   {ifscLookupState.status === "loading" && (
                     <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                      <Loader2 className="w-3 h-3 animate-spin" /> Looking up bank…
+                      <Loader2 className="w-3 h-3 animate-spin" /> {" "}{t('common.lookingUpBank')}
                     </p>
                   )}
                   {ifscLookupState.status === "not_found" && (
                     <p className="text-xs text-destructive mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" /> IFSC not found — check the code
+                      <AlertCircle className="w-3 h-3" /> {" "}{t('common.ifscNotFoundCheck')}
                     </p>
                   )}
                   {ifscLookupState.status === "found" && (
                     <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" /> Verified
+                      <CheckCircle2 className="w-3 h-3" /> {" "}{t('common.verified')}
                     </p>
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="branchName">7. Branch Name</Label>
+                  <Label htmlFor="branchName">{t('records.n7BranchName')}</Label>
                   <Input 
                     id="branchName" 
                     {...register("branchName")}
                     className="mt-1"
                     maxLength={100}
                     disabled
-                    placeholder="Auto-filled from IFSC"
+                    placeholder={t('records.autoFilledFromIfsc')}
                   />
                 </div>
               </div>
@@ -822,19 +824,19 @@ const AddRecord = () => {
           {/* Current Policy Details */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={ShieldCheck} step="Step 7">Current Policy Details</SectionTitle>
+              <SectionTitle icon={ShieldCheck} step={t('common.step', { n: 7 })}>{t('records.currentPolicyDetails')}</SectionTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto rounded-lg border border-table-border">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-table-header">
-                      <TableHead className="border border-table-border">1. Policy Number</TableHead>
-                      <TableHead className="border border-table-border">2. Plan & Term</TableHead>
-                      <TableHead className="border border-table-border">3. Sum Assured</TableHead>
-                      <TableHead className="border border-table-border">4. Mode of Payment</TableHead>
-                      <TableHead className="border border-table-border">5. Branch</TableHead>
-                      <TableHead className="border border-table-border">6. Last Payment Date</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n1PolicyNumber')}</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n2PlanTerm')}</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n3SumAssured')}</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n4ModeOfPayment')}</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n5Branch')}</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n6LastPaymentDate')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -843,7 +845,7 @@ const AddRecord = () => {
                         <Input 
                           value={currentPolicy.policyNumber}
                           onChange={(e) => handlePolicyChange("current", "policyNumber", e.target.value)}
-                          aria-label="Policy Number"
+                          aria-label={t('common.policyNumber')}
                           className="border border-input bg-background focus-visible:border-primary"
                           maxLength={30}
                         />
@@ -852,7 +854,7 @@ const AddRecord = () => {
                         <Input 
                           value={currentPolicy.planAndTerm}
                           onChange={(e) => handlePolicyChange("current", "planAndTerm", e.target.value)}
-                          aria-label="Plan and Term"
+                          aria-label={t('records.planAndTerm')}
                           className="border border-input bg-background focus-visible:border-primary"
                           maxLength={100}
                         />
@@ -861,7 +863,7 @@ const AddRecord = () => {
                         <Input 
                           value={formatIndianNumber(currentPolicy.sumAssured)}
                           onChange={(e) => handlePolicyChange("current", "sumAssured", unformatIndianNumber(e.target.value))}
-                          aria-label="Sum Assured"
+                          aria-label={t('common.sumAssured')}
                           className="border border-input bg-background focus-visible:border-primary"
                           inputMode="numeric"
                         />
@@ -871,14 +873,14 @@ const AddRecord = () => {
                           value={currentPolicy.modeOfPayment}
                           onValueChange={(value) => handlePolicyChange("current","modeOfPayment", value)}
                         >
-                          <SelectTrigger aria-label="Mode of Payment">
-                            <SelectValue placeholder="Select Payment Mode" />
+                          <SelectTrigger aria-label={t('records.modeOfPayment')}>
+                            <SelectValue placeholder={t('records.selectPaymentMode')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Monthly">Monthly or e-NACH</SelectItem>
-                            <SelectItem value="Quarterly">Quarterly</SelectItem>
-                            <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
-                            <SelectItem value="Yearly">Yearly</SelectItem>
+                            <SelectItem value="Monthly">{t('records.monthlyOrENach')}</SelectItem>
+                            <SelectItem value="Quarterly">{t('records.quarterly')}</SelectItem>
+                            <SelectItem value="Half-Yearly">{t('records.halfYearly')}</SelectItem>
+                            <SelectItem value="Yearly">{t('records.yearly')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </TableCell>
@@ -886,7 +888,7 @@ const AddRecord = () => {
                         <Input 
                           value={currentPolicy.branch}
                           onChange={(e) => handlePolicyChange("current", "branch", e.target.value)}
-                          aria-label="Branch"
+                          aria-label={t('common.branch')}
                           className="border border-input bg-background focus-visible:border-primary"
                           maxLength={100}
                         />
@@ -896,7 +898,7 @@ const AddRecord = () => {
                           type="date"
                           value={currentPolicy.lastPaymentDate}
                           onChange={(e) => handlePolicyChange("current", "lastPaymentDate", e.target.value)}
-                          aria-label="Last Payment Date"
+                          aria-label={t('common.lastPaymentDate')}
                           className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
@@ -910,19 +912,19 @@ const AddRecord = () => {
           {/* Previous Policy Details */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={History} step="Step 8">Previous Policy Details</SectionTitle>
+              <SectionTitle icon={History} step={t('common.step', { n: 8 })}>{t('records.previousPolicyDetails')}</SectionTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto rounded-lg border border-table-border">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-table-header">
-                      <TableHead className="border border-table-border">1. Policy Number</TableHead>
-                      <TableHead className="border border-table-border">2. Plan & Term</TableHead>
-                      <TableHead className="border border-table-border">3. Sum Assured</TableHead>
-                      <TableHead className="border border-table-border">4. Mode of Payment</TableHead>
-                      <TableHead className="border border-table-border">5. Branch</TableHead>
-                      <TableHead className="border border-table-border">6. Last Payment Date</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n1PolicyNumber')}</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n2PlanTerm')}</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n3SumAssured')}</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n4ModeOfPayment')}</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n5Branch')}</TableHead>
+                      <TableHead className="border border-table-border">{t('records.n6LastPaymentDate')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -931,7 +933,7 @@ const AddRecord = () => {
                         <Input 
                           value={previousPolicy.policyNumber}
                           onChange={(e) => handlePolicyChange("previous", "policyNumber", e.target.value)}
-                          aria-label="Previous Policy Number"
+                          aria-label={t('records.previousPolicyNumber')}
                           className="border border-input bg-background focus-visible:border-primary"
                           maxLength={30}
                         />
@@ -940,7 +942,7 @@ const AddRecord = () => {
                         <Input 
                           value={previousPolicy.planAndTerm}
                           onChange={(e) => handlePolicyChange("previous", "planAndTerm", e.target.value)}
-                          aria-label="Previous Plan and Term"
+                          aria-label={t('records.previousPlanAndTerm')}
                           className="border border-input bg-background focus-visible:border-primary"
                           maxLength={100}
                         />
@@ -949,7 +951,7 @@ const AddRecord = () => {
                         <Input 
                           value={formatIndianNumber(previousPolicy.sumAssured)}
                           onChange={(e) => handlePolicyChange("previous", "sumAssured", unformatIndianNumber(e.target.value))}
-                          aria-label="Previous Sum Assured"
+                          aria-label={t('records.previousSumAssured')}
                           className="border border-input bg-background focus-visible:border-primary"
                           inputMode="numeric"
                         />
@@ -959,14 +961,14 @@ const AddRecord = () => {
                           value={previousPolicy.modeOfPayment}
                           onValueChange={(value) => handlePolicyChange("previous","modeOfPayment", value)}
                         >
-                          <SelectTrigger aria-label="Previous Mode of Payment">
-                            <SelectValue placeholder="Select Payment Mode" />
+                          <SelectTrigger aria-label={t('records.previousModeOfPayment')}>
+                            <SelectValue placeholder={t('records.selectPaymentMode')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Monthly">Monthly or e-NACH</SelectItem>
-                            <SelectItem value="Quarterly">Quarterly</SelectItem>
-                            <SelectItem value="Half-Yearly">Half-Yearly</SelectItem>
-                            <SelectItem value="Yearly">Yearly</SelectItem>
+                            <SelectItem value="Monthly">{t('records.monthlyOrENach')}</SelectItem>
+                            <SelectItem value="Quarterly">{t('records.quarterly')}</SelectItem>
+                            <SelectItem value="Half-Yearly">{t('records.halfYearly')}</SelectItem>
+                            <SelectItem value="Yearly">{t('records.yearly')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </TableCell>
@@ -974,7 +976,7 @@ const AddRecord = () => {
                         <Input 
                           value={previousPolicy.branch}
                           onChange={(e) => handlePolicyChange("previous", "branch", e.target.value)}
-                          aria-label="Previous Branch"
+                          aria-label={t('records.previousBranch')}
                           className="border border-input bg-background focus-visible:border-primary"
                           maxLength={100}
                         />
@@ -984,7 +986,7 @@ const AddRecord = () => {
                           type="date"
                           value={previousPolicy.lastPaymentDate}
                           onChange={(e) => handlePolicyChange("previous", "lastPaymentDate", e.target.value)}
-                          aria-label="Previous Last Payment Date"
+                          aria-label={t('records.previousLastPaymentDate')}
                           className="border border-input bg-background focus-visible:border-primary"
                         />
                       </TableCell>
@@ -999,7 +1001,7 @@ const AddRecord = () => {
           <div className="flex justify-center space-x-4 pt-2 pb-8">
             <Button onClick={rhfHandleSubmit(onValid, onInvalid)} className="bg-primary hover:bg-primary-light text-primary-foreground shadow-sm" disabled={isSubmitting}>
               <Save className="w-4 h-4 mr-2" />
-              {isSubmitting ? "Saving…" : "Save Record"}
+              {isSubmitting ? t('records.saving') : t('records.saveRecord')}
             </Button>
             <Button 
               variant="outline" 
@@ -1007,7 +1009,7 @@ const AddRecord = () => {
               className="border-primary text-primary hover:bg-primary/5"
               disabled={isSubmitting}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </div>
         </div>

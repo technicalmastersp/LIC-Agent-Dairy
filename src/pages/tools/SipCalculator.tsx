@@ -4,10 +4,12 @@ import NumberField from "@/components/tools/NumberField";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const inr = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
 const SipCalculator = () => {
+  const { t } = useLanguage();
   const [monthly, setMonthly] = useState(5000);
   const [rate, setRate] = useState(12);
   const [years, setYears] = useState(10);
@@ -28,17 +30,17 @@ const SipCalculator = () => {
   return (
     <ToolPageLayout
       icon={TrendingUp}
-      title="SIP Calculator"
-      description="Estimate the future value of a Systematic Investment Plan (SIP) based on your monthly contribution, expected return, and tenure."
+      title={t('tools.sipCalculator')}
+      description={t('tools.estimateTheFutureValue')}
       accent="violet"
     >
       <Card className="rounded-2xl mt-3">
         <CardContent className="p-6 md:p-8">
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-7">
-              <NumberField label="Monthly investment" value={monthly} onChange={setMonthly} min={500} max={200000} step={500} prefix="₹" />
-              <NumberField label="Expected annual return" value={rate} onChange={setRate} min={1} max={30} step={0.5} suffix="%" />
-              <NumberField label="Investment period" value={years} onChange={setYears} min={1} max={40} step={1} suffix="yrs" />
+              <NumberField label={t('tools.monthlyInvestment')} value={monthly} onChange={setMonthly} min={500} max={200000} step={500} prefix="₹" />
+              <NumberField label={t('tools.expectedAnnualReturn')} value={rate} onChange={setRate} min={1} max={30} step={0.5} suffix="%" />
+              <NumberField label={t('tools.investmentPeriod')} value={years} onChange={setYears} min={1} max={40} step={1} suffix={t('tools.yrs')} />
             </div>
 
             <div className="flex flex-col items-center justify-center">
@@ -53,29 +55,29 @@ const SipCalculator = () => {
                 </ResponsiveContainer>
               </div>
               <div className="flex gap-4 text-xs mt-1">
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-violet-500" />Invested</span>
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-violet-200" />Est. gains</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-violet-500" />{t('tools.invested')}</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-violet-200" />{t('tools.estGains')}</span>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-border">
             <div className="text-center">
-              <p className="text-xs text-muted-foreground mb-1">Invested amount</p>
+              <p className="text-xs text-muted-foreground mb-1">{t('tools.investedAmount')}</p>
               <p className="text-lg font-semibold text-form-header">{inr(invested)}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-muted-foreground mb-1">Total interest</p>
+              <p className="text-xs text-muted-foreground mb-1">{t('tools.totalInterest')}</p>
               <p className="text-lg font-semibold text-green-600">{inr(gains)}</p>
             </div>
             <div className="text-center bg-violet-50 rounded-xl py-2">
-              <p className="text-xs text-violet-600 mb-1">Est. total returns</p>
+              <p className="text-xs text-violet-600 mb-1">{t('tools.estTotalReturns')}</p>
               <p className="text-xl font-bold text-violet-700">{inr(futureValue)}</p>
             </div>
           </div>
 
           <p className="text-xs text-muted-foreground mt-6">
-            This is an estimate assuming a constant annual return, compounded monthly. Actual mutual fund returns fluctuate and aren't guaranteed.
+            {t('tools.thisIsAnEstimateAssuming2')}
           </p>
         </CardContent>
       </Card>

@@ -19,6 +19,7 @@ import { formatISTDate } from "@/utils/dateFormat";
 import { formatMonthKey, formatRupees, STATUS_CHIP, STATUS_LABEL } from "@/utils/paymentMonths";
 import type { PaymentEntry, PaymentsPayload } from "@/types/components/PaymentHistory.types";
 import type { PaymentUpdateRecord } from "@/types/components/PaymentUpdateModal.types";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const CHIPS_COLLAPSED = 12;
 
@@ -39,6 +40,7 @@ const Money = ({ value }: { value: number | null | undefined }) => (
 // amount, additional charge and notes. From here the agent can record, correct
 // or delete a payment.
 const PaymentHistoryModal = ({ record, isOpen, onClose, onChanged }: Props) => {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [data, setData] = useState<PaymentsPayload | null>(null);
   const [loading, setLoading] = useState(false);
@@ -59,7 +61,7 @@ const PaymentHistoryModal = ({ record, isOpen, onClose, onChanged }: Props) => {
       setData(await getRecordPayments(recordId));
     } catch (e) {
       setData(null);
-      setError(axios.isAxiosError(e) ? e.response?.data?.message || "Couldn't load payment history." : "Couldn't load payment history.");
+      setError(axios.isAxiosError(e) ? e.response?.data?.message || t('records.couldnTLoadPaymentHistory') : t('records.couldnTLoadPaymentHistory'));
     } finally {
       setLoading(false);
     }
@@ -78,13 +80,13 @@ const PaymentHistoryModal = ({ record, isOpen, onClose, onChanged }: Props) => {
     setDeleting(true);
     try {
       await deleteRecordPayment(record.recordId, toDelete.id);
-      toast({ title: "Payment deleted", description: "Its months are shown as unpaid again." });
+      toast({ title: t('records.paymentDeleted'), description: t('records.itsMonthsAreShown') });
       setToDelete(null);
       await afterChange();
     } catch (e) {
       toast({
-        title: "Couldn't delete payment",
-        description: (axios.isAxiosError(e) && e.response?.data?.message) || "Please try again.",
+        title: t('records.couldnTDeletePayment'),
+        description: (axios.isAxiosError(e) && e.response?.data?.message) || t('records.pleaseTryAgain'),
         variant: "destructive",
       });
     } finally {
@@ -103,29 +105,29 @@ const PaymentHistoryModal = ({ record, isOpen, onClose, onChanged }: Props) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-form-header">
               <Receipt className="w-5 h-5" />
-              <span>Payment History{record.name ? ` — ${record.name}` : ""}</span>
+              <span>{record.name ? t('records.paymentHistoryNamed', { name: record.name }) : t('records.paymentHistory2')}</span>
             </DialogTitle>
             <DialogDescription>
-              Every premium payment for the current policy{data?.record.modeOfPayment ? ` (${data.record.modeOfPayment})` : ""}.
+              {data?.record.modeOfPayment ? t('records.everyPremiumPaymentMode', { mode: data.record.modeOfPayment }) : t('records.everyPremiumPayment')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex justify-end">
             <Button size="sm" onClick={() => { setEditing(null); setFormOpen(true); }} disabled={!data}>
-              <Plus className="w-4 h-4 mr-1.5" /> Record payment
+              <Plus className="w-4 h-4 mr-1.5" /> {" "}{t('records.recordPayment')}
             </Button>
           </div>
 
           {loading && (
             <div role="status" aria-live="polite" className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" /> Loading payment history…
+              <Loader2 className="w-4 h-4 animate-spin" /> {" "}{t('records.loadingPaymentHistory')}
             </div>
           )}
 
           {!loading && error && (
             <div className="flex items-start justify-between gap-3 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
               <span className="flex items-start gap-2"><AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />{error}</span>
-              <Button variant="outline" size="sm" onClick={load}><RefreshCw className="w-3.5 h-3.5 mr-1.5" />Retry</Button>
+              <Button variant="outline" size="sm" onClick={load}><RefreshCw className="w-3.5 h-3.5 mr-1.5" />{t('records.retry')}</Button>
             </div>
           )}
 
@@ -134,10 +136,10 @@ const PaymentHistoryModal = ({ record, isOpen, onClose, onChanged }: Props) => {
               {/* Totals */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {[
-                  { label: "Total paid", val: <Money value={s.totalPaid} /> },
-                  { label: "Additional charges", val: <Money value={s.totalAdditionalCharges} /> },
-                  { label: "Payments recorded", val: s.paymentsCount },
-                  { label: "Missed months", val: s.missedCount, warn: s.missedCount > 0 },
+                  { label: t('records.totalPaid'), val: <Money value={s.totalPaid} /> },
+                  { label: t('records.additionalCharges'), val: <Money value={s.totalAdditionalCharges} /> },
+                  { label: t('records.paymentsRecorded'), val: s.paymentsCount },
+                  { label: t('records.missedMonths'), val: s.missedCount, warn: s.missedCount > 0 },
                 ].map((c) => (
                   <div key={c.label} className="rounded-lg border border-table-border bg-muted/20 p-3">
                     <p className="text-xs text-muted-foreground">{c.label}</p>
@@ -148,12 +150,12 @@ const PaymentHistoryModal = ({ record, isOpen, onClose, onChanged }: Props) => {
 
               {/* Month strip */}
               {schedule.length > 0 && (
-                <section aria-label="Due months">
+                <section aria-label={t('records.dueMonths')}>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-form-header">Due months</h3>
+                    <h3 className="text-sm font-medium text-form-header">{t('records.dueMonths')}</h3>
                     {schedule.length > CHIPS_COLLAPSED && (
                       <button type="button" className="text-xs text-primary hover:underline" onClick={() => setShowAllMonths((v) => !v)}>
-                        {showAllMonths ? "Show recent only" : `Show all ${schedule.length}`}
+                        {showAllMonths ? t('records.showRecentOnly') : t('records.showAll', { length: schedule.length })}
                       </button>
                     )}
                   </div>
@@ -166,30 +168,30 @@ const PaymentHistoryModal = ({ record, isOpen, onClose, onChanged }: Props) => {
                     ))}
                   </ul>
                   <p className="text-xs text-muted-foreground mt-2">
-                    The current month counts as "due" until it ends. Months before the earliest recorded payment aren't judged.
+                    {t('records.theCurrentMonthCounts')}
                   </p>
                 </section>
               )}
 
               {/* Payments */}
-              <section aria-label="Payments">
-                <h3 className="text-sm font-medium text-form-header mb-2">Payments</h3>
+              <section aria-label={t('records.payments')}>
+                <h3 className="text-sm font-medium text-form-header mb-2">{t('records.payments')}</h3>
                 {data.payments.length === 0 && !data.legacyLastPaymentDate ? (
                   <div className="rounded-lg border border-dashed border-table-border py-8 text-center text-sm text-muted-foreground">
-                    No payments recorded yet. Use “Record payment” to add the first one.
+                    {t('records.noPaymentsRecordedYetUse')}
                   </div>
                 ) : (
                   <div className="overflow-x-auto rounded-lg border border-table-border">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="whitespace-nowrap">Paid on</TableHead>
-                          <TableHead>Covers</TableHead>
-                          <TableHead className="text-right">Amount</TableHead>
-                          <TableHead className="text-right">Additional</TableHead>
-                          <TableHead className="text-right">Total</TableHead>
-                          <TableHead>Notes</TableHead>
-                          <TableHead className="w-[1%]"><span className="sr-only">Actions</span></TableHead>
+                          <TableHead className="whitespace-nowrap">{t('records.paid')}</TableHead>
+                          <TableHead>{t('records.covers')}</TableHead>
+                          <TableHead className="text-right">{t('common.amount')}</TableHead>
+                          <TableHead className="text-right">{t('records.additional')}</TableHead>
+                          <TableHead className="text-right">{t('records.total')}</TableHead>
+                          <TableHead>{t('records.notes')}</TableHead>
+                          <TableHead className="w-[1%]"><span className="sr-only">{t('common.actions')}</span></TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -197,13 +199,13 @@ const PaymentHistoryModal = ({ record, isOpen, onClose, onChanged }: Props) => {
                           <TableRow key={p.id}>
                             <TableCell className="whitespace-nowrap">
                               {formatISTDate(p.paidOn)}
-                              {p.source === "legacy" && p.amount == null && <Badge variant="outline" className="ml-1.5 text-[10px]">Earlier date</Badge>}
+                              {p.source === "legacy" && p.amount == null && <Badge variant="outline" className="ml-1.5 text-[10px]">{t('records.earlierDate')}</Badge>}
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-wrap gap-1">
                                 {p.coversMonths.map((m) => <Badge key={m} variant="secondary" className="text-[10px] font-normal">{formatMonthKey(m)}</Badge>)}
                               </div>
-                              {p.coversMonths.length > 1 && <p className="text-[10px] text-muted-foreground mt-0.5">Paid together</p>}
+                              {p.coversMonths.length > 1 && <p className="text-[10px] text-muted-foreground mt-0.5">{t('records.paidTogether')}</p>}
                             </TableCell>
                             <TableCell className="text-right"><Money value={p.amount} /></TableCell>
                             <TableCell className="text-right">
@@ -213,9 +215,9 @@ const PaymentHistoryModal = ({ record, isOpen, onClose, onChanged }: Props) => {
                             <TableCell className="max-w-[220px] whitespace-pre-wrap break-words text-xs text-muted-foreground">{p.notes || "—"}</TableCell>
                             <TableCell>
                               <div className="flex gap-1 justify-end">
-                                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Edit payment of ${formatISTDate(p.paidOn)}`}
+                                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t('records.editPayment', { value: formatISTDate(p.paidOn) })}
                                   onClick={() => { setEditing(p); setFormOpen(true); }}><Pencil className="w-3.5 h-3.5" /></Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" aria-label={`Delete payment of ${formatISTDate(p.paidOn)}`}
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" aria-label={t('records.deletePayment', { value: formatISTDate(p.paidOn) })}
                                   onClick={() => setToDelete(p)}><Trash2 className="w-3.5 h-3.5" /></Button>
                               </div>
                             </TableCell>
@@ -225,7 +227,7 @@ const PaymentHistoryModal = ({ record, isOpen, onClose, onChanged }: Props) => {
                           <TableRow className="bg-muted/20">
                             <TableCell className="whitespace-nowrap">{formatISTDate(data.legacyLastPaymentDate)}</TableCell>
                             <TableCell colSpan={6} className="text-xs text-muted-foreground">
-                              Last payment date on this record — no amount or notes were saved for it.
+                              {t('records.lastPaymentDate')}
                             </TableCell>
                           </TableRow>
                         )}
@@ -250,16 +252,15 @@ const PaymentHistoryModal = ({ record, isOpen, onClose, onChanged }: Props) => {
       <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && !deleting && setToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this payment?</AlertDialogTitle>
+            <AlertDialogTitle>{t('records.deleteThisPayment')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {toDelete ? `${toDelete.coversMonths.map(formatMonthKey).join(", ")} will show as unpaid again. ` : ""}
-              The record's last payment date will be recalculated. This can't be undone.
+              {toDelete ? `${t('records.willShowUnpaidAgain', { months: toDelete.coversMonths.map(formatMonthKey).join(", ") })} ` : ""}{t('records.theRecordSLastPayment')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={(e) => { e.preventDefault(); confirmDelete(); }} disabled={deleting}>
-              {deleting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Deleting…</> : "Delete"}
+              {deleting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('records.deleting')}</> : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

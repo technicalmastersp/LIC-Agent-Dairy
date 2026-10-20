@@ -1,3 +1,5 @@
+import { getActiveIntlLocale } from "@/i18n/format";
+
 // Single source of truth for date display, date-input handling, and
 // calendar-date validation across the whole app.
 //
@@ -17,6 +19,11 @@
 // is always, consistently IST, and that date-only fields (dateOfBirth,
 // lastPaymentDate) are parsed/validated the same way everywhere so the
 // calendar day itself never silently shifts.
+//
+// LANGUAGE: the locale passed to Intl follows the user's selected UI language
+// (getActiveIntlLocale(): "en-IN" for English, "hi-IN" for Hindi, …) so month
+// names and ordering are localized. Digits stay Latin and the timezone stays IST
+// in every language — only the wording changes.
 const IST_TIMEZONE = "Asia/Kolkata";
 
 function toDate(input: string | Date | undefined | null): Date | null {
@@ -30,7 +37,7 @@ function toDate(input: string | Date | undefined | null): Date | null {
 export function formatISTDate(input: string | Date | undefined | null): string {
   const d = toDate(input);
   if (!d) return "";
-  return new Intl.DateTimeFormat("en-IN", {
+  return new Intl.DateTimeFormat(getActiveIntlLocale(), {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -43,7 +50,7 @@ export function formatISTDate(input: string | Date | undefined | null): string {
 export function formatISTDateTime(input: string | Date | undefined | null): string {
   const d = toDate(input);
   if (!d) return "";
-  return new Intl.DateTimeFormat("en-IN", {
+  return new Intl.DateTimeFormat(getActiveIntlLocale(), {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -58,7 +65,7 @@ export function formatISTDateTime(input: string | Date | undefined | null): stri
 export function formatISTFullDate(input: string | Date | undefined | null = new Date()): string {
   const d = toDate(input);
   if (!d) return "";
-  return new Intl.DateTimeFormat("en-IN", {
+  return new Intl.DateTimeFormat(getActiveIntlLocale(), {
     weekday: "long",
     day: "2-digit",
     month: "long",
@@ -71,7 +78,7 @@ export function formatISTFullDate(input: string | Date | undefined | null = new 
 export function formatISTMonthYear(input: string | Date | undefined | null = new Date()): string {
   const d = toDate(input);
   if (!d) return "";
-  return new Intl.DateTimeFormat("en-IN", {
+  return new Intl.DateTimeFormat(getActiveIntlLocale(), {
     month: "long",
     year: "numeric",
     timeZone: IST_TIMEZONE,

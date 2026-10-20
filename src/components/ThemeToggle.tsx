@@ -5,19 +5,21 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import type { ThemeToggleProps } from "@/types/components/ThemeToggle.types";
+import { useLanguage } from "@/hooks/useLanguage";
 const ThemeToggle = ({ type }: ThemeToggleProps) => {
+  const { t } = useLanguage();
   const { setTheme } = useTheme();
 
   const items = (
     <>
       <DropdownMenuItem onClick={() => setTheme("light")}>
-        <Sun className="w-4 h-4 mr-2" /> Light
+        <Sun className="w-4 h-4 mr-2" /> {" "}{t('nav.light')}
       </DropdownMenuItem>
       <DropdownMenuItem onClick={() => setTheme("dark")}>
-        <Moon className="w-4 h-4 mr-2" /> Dark
+        <Moon className="w-4 h-4 mr-2" /> {" "}{t('nav.dark')}
       </DropdownMenuItem>
       <DropdownMenuItem onClick={() => setTheme("system")}>
-        <Monitor className="w-4 h-4 mr-2" /> System
+        <Monitor className="w-4 h-4 mr-2" /> {" "}{t('nav.system')}
       </DropdownMenuItem>
     </>
   );
@@ -29,7 +31,7 @@ const ThemeToggle = ({ type }: ThemeToggleProps) => {
           <Button variant="outline" size="sm" className="w-full flex items-center gap-2">
             <Sun className="w-4 h-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute w-4 h-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span>Theme</span>
+            <span>{t('nav.theme')}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">{items}</DropdownMenuContent>
@@ -47,7 +49,7 @@ const ThemeToggle = ({ type }: ThemeToggleProps) => {
           variant="outline"
           size="sm"
           className="relative flex items-center justify-center"
-          aria-label="Toggle theme"
+          aria-label={t('nav.toggleTheme')}
         >
           <Sun className="w-4 h-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute w-4 h-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />

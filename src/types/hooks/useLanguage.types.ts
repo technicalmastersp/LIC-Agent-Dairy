@@ -1,7 +1,2 @@
-import type { Language, Translations } from "@/types/utils/translations.types";
-
-export interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  t: (key: keyof Translations) => string;
-}
+// Kept for backward-compatible imports; the source of truth is types/i18n.types.ts.
+export type { LanguageContextType } from "@/types/i18n.types";

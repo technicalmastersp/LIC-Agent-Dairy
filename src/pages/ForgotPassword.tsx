@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { i18nZodResolver as zodResolver } from "@/i18n/zodResolver";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,10 @@ import { forgotPasswordEmailSchema, resetPasswordSchema } from "@/schemas/forgot
 import type { ForgotPasswordEmailValues, ResetPasswordValues } from "@/types/schemas/forgotPasswordSchema.types";
 import SEO from "@/components/SEO";
 import type { Step } from "@/types/pages/ForgotPassword.types";
+import { useLanguage } from "@/hooks/useLanguage";
+import Trans from "@/components/Trans";
 const ForgotPassword = () => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -47,9 +50,9 @@ const ForgotPassword = () => {
     if (step !== "otp") return;
     setTimer(30); setCanResend(false);
     const interval = setInterval(() => {
-      setTimer(t => {
-        if (t <= 1) { clearInterval(interval); setCanResend(true); return 0; }
-        return t - 1;
+      setTimer(sec => {
+        if (sec <= 1) { clearInterval(interval); setCanResend(true); return 0; }
+        return sec - 1;
       });
     }, 1000);
     return () => clearInterval(interval);
@@ -85,7 +88,7 @@ const ForgotPassword = () => {
       setStep("otp");
       setTimeout(() => otpRefs.current[0]?.focus(), 100);
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t('auth.somethingWentWrongPleaseTry'));
     } finally { setLoading(false); }
   };
 
@@ -98,14 +101,14 @@ const ForgotPassword = () => {
       setOtp(["", "", "", "", "", ""]);
       setTimeout(() => otpRefs.current[0]?.focus(), 100);
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t('auth.somethingWentWrongPleaseTry'));
     } finally { setLoading(false); }
   };
 
   const handleVerifyOTP = async () => {
     const otpValue = otp.join("");
     if (otpValue.length < 6) {
-      setError("Please enter the complete 6-digit OTP.");
+      setError(t('auth.pleaseEnterTheComplete6'));
       return;
     }
 
@@ -123,12 +126,12 @@ const ForgotPassword = () => {
       if (code === "OTP_EXPIRED") {
       // Clear boxes and tell user to resend
       setOtp(["", "", "", "", "", ""]);
-      setError("OTP has expired. Please request a new one.");
+      setError(t('auth.otpHasExpiredPleaseRequest'));
       setCanResend(true);
       } else if (code === "OTP_ATTEMPTS_EXCEEDED" || code === "NO_OTP") {
       // Too many wrong guesses: the server destroyed this OTP. A fresh one is required.
       setOtp(["", "", "", "", "", ""]);
-      setError(message || "Too many incorrect attempts. Please request a new OTP.");
+      setError(message || t('auth.tooManyIncorrectAttemptsPlease'));
       setCanResend(true);
       } else if (code === "OTP_INVALID") {
       // Clear boxes, focus first box, let user retry
@@ -137,11 +140,11 @@ const ForgotPassword = () => {
       const left = axios.isAxiosError(err) ? err.response?.data?.attemptsLeft : undefined;
       setError(
         typeof left === "number" && left > 0 && left <= 2
-          ? `Invalid OTP. ${left} attempt${left === 1 ? "" : "s"} left.`
-          : "Invalid OTP. Please check and try again."
+          ? t('auth.invalidOtpAttemptsLeft', { count: left })
+          : t('auth.invalidOtpPleaseCheck')
       );
       } else {
-      setError(message || "Something went wrong. Please try again.");
+      setError(message || t('auth.somethingWentWrongPleaseTry'));
       }
     } finally {
       setLoading(false);
@@ -162,13 +165,13 @@ const ForgotPassword = () => {
         setStep("otp");
         setCanResend(true);
       }
-      setError(message || "Invalid OTP or request expired.");
+      setError(message || t('auth.invalidOtpOrRequestExpired'));
     } finally { setLoading(false); }
   };
 
   return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
-      <SEO title="Forgot Password" description="Reset your Policy Niketan account password." path="/forgot-password" noindex />
+      <SEO title={t('auth.forgotPassword2')} description={t('auth.resetYourPolicyNiketanAccount')} path="/forgot-password" noindex />
       <div className="w-full max-w-md">
         <Card>
 
@@ -179,14 +182,14 @@ const ForgotPassword = () => {
                 <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Lock className="w-7 h-7 text-blue-600" />
                 </div>
-                <CardTitle className="text-2xl text-form-header">Forgot password?</CardTitle>
-                <CardDescription>Enter your registered email and we'll send you a 6-digit OTP.</CardDescription>
+                <CardTitle className="text-2xl text-form-header">{t('auth.forgotPassword')}</CardTitle>
+                <CardDescription>{t('auth.enterYourRegisteredEmail')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
                 <form onSubmit={emailForm.handleSubmit(handleSendOTP)} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email address</Label>
+                    <Label htmlFor="email">{t('auth.emailAddress')}</Label>
                     <Input id="email" type="email" placeholder="you@example.com"
                       {...emailForm.register("email")} />
                     {emailForm.formState.errors.email && (
@@ -194,11 +197,11 @@ const ForgotPassword = () => {
                     )}
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Sending…" : "Send OTP"}
+                    {loading ? t('auth.sending') : t('auth.sendOtp')}
                   </Button>
                 </form>
                 <div className="text-center">
-                  <Link to="/login" className="text-sm text-primary hover:underline">Back to login</Link>
+                  <Link to="/login" className="text-sm text-primary hover:underline">{t('auth.backToLogin')}</Link>
                 </div>
               </CardContent>
             </>
@@ -211,10 +214,9 @@ const ForgotPassword = () => {
                 <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Mail className="w-7 h-7 text-blue-600" />
                 </div>
-                <CardTitle className="text-2xl text-form-header">Check your email</CardTitle>
+                <CardTitle className="text-2xl text-form-header">{t('auth.checkYourEmail')}</CardTitle>
                 <CardDescription>
-                  We sent a 6-digit OTP to <strong className="text-foreground">{email}</strong>
-                </CardDescription>
+                  <Trans i18nKey="auth.weSentA6Digit" params={{ email }} components={{ strong: <strong className="text-foreground" /> }} /></CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
@@ -230,18 +232,18 @@ const ForgotPassword = () => {
                   ))}
                 </div>
                 <p className="text-xs text-center text-muted-foreground">
-                  Didn't receive it?{" "}
+                  {t('auth.didntReceiveIt')}{" "}
                   {canResend
-                    ? <button onClick={handleResendOTP} className="text-primary hover:underline">Resend OTP</button>
-                    : <span>Resend in {timer}s</span>
+                    ? <button onClick={handleResendOTP} className="text-primary hover:underline">{t('auth.resendOtp')}</button>
+                    : <span>{t('auth.resendInS', { timer })}</span>
                   }
                 </p>
                 <Button className="w-full" onClick={handleVerifyOTP} disabled={loading}>
-                  {loading ? "Verifying…" : "Verify OTP"}
+                  {loading ? t('auth.verifying') : t('auth.verifyOtp')}
                 </Button>
                 <button onClick={() => setStep("email")}
                   className="w-full text-sm text-muted-foreground hover:text-foreground text-center">
-                  ← Change email
+                  {t('auth.changeEmail')}
                 </button>
               </CardContent>
             </>
@@ -254,17 +256,17 @@ const ForgotPassword = () => {
                 <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <ShieldCheck className="w-7 h-7 text-blue-600" />
                 </div>
-                <CardTitle className="text-2xl text-form-header">Set new password</CardTitle>
-                <CardDescription>Choose a strong password for your account.</CardDescription>
+                <CardTitle className="text-2xl text-form-header">{t('auth.setNewPassword')}</CardTitle>
+                <CardDescription>{t('auth.chooseAStrongPassword')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
 
                 <form onSubmit={passwordForm.handleSubmit(handleResetPassword)} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="np">New password</Label>
+                    <Label htmlFor="np">{t('auth.newPassword')}</Label>
                     <div className="relative">
-                      <Input id="np" type={showNew ? "text" : "password"} placeholder="Min. 6 characters"
+                      <Input id="np" type={showNew ? "text" : "password"} placeholder={t('auth.min6Characters')}
                         className="pr-10" {...passwordForm.register("newPassword")} />
                       <button type="button" onClick={() => setShowNew(!showNew)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -282,9 +284,9 @@ const ForgotPassword = () => {
                     {/* Requirements */}
                     <div className="space-y-1 text-xs">
                       {[
-                        { ok: strength.hasLen,   label: "At least 6 characters" },
-                        { ok: strength.hasUpper, label: "One uppercase letter"  },
-                        { ok: strength.hasNum,   label: "One number"            },
+                        { ok: strength.hasLen,   label: t('auth.atLeast6Characters') },
+                        { ok: strength.hasUpper, label: t('auth.oneUppercaseLetter')  },
+                        { ok: strength.hasNum,   label: t('auth.oneNumber')            },
                       ].map(({ ok, label }) => (
                         <div key={label} className={`flex items-center gap-1.5 ${ok ? "text-green-600" : "text-muted-foreground"}`}>
                           {ok ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
@@ -295,9 +297,9 @@ const ForgotPassword = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="cp">Confirm password</Label>
+                    <Label htmlFor="cp">{t('auth.confirmPassword')}</Label>
                     <div className="relative">
-                      <Input id="cp" type={showConfirm ? "text" : "password"} placeholder="Re-enter password"
+                      <Input id="cp" type={showConfirm ? "text" : "password"} placeholder={t('auth.reEnterPassword')}
                         className="pr-10" {...passwordForm.register("confirmPassword")} />
                       <button type="button" onClick={() => setShowConfirm(!showConfirm)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -308,13 +310,13 @@ const ForgotPassword = () => {
                       <p className="text-xs text-destructive">{passwordForm.formState.errors.confirmPassword.message}</p>
                     ) : confirmPass && (
                       <p className={`text-xs ${newPassword === confirmPass ? "text-green-600" : "text-red-500"}`}>
-                        {newPassword === confirmPass ? "✓ Passwords match" : "✗ Passwords do not match"}
+                        {newPassword === confirmPass ? t('auth.passwordsMatch') : t('auth.passwordsDoNotMatch')}
                       </p>
                     )}
                   </div>
 
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Resetting…" : "Reset password"}
+                    {loading ? t('auth.resetting') : t('auth.resetPassword')}
                   </Button>
                 </form>
               </CardContent>
@@ -328,14 +330,13 @@ const ForgotPassword = () => {
                 <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle2 className="w-7 h-7 text-green-600" />
                 </div>
-                <CardTitle className="text-2xl text-form-header">Password reset!</CardTitle>
+                <CardTitle className="text-2xl text-form-header">{t('auth.passwordReset')}</CardTitle>
                 <CardDescription>
-                  Your password has been updated successfully.<br />
-                  You can now login with your new password.
+                  <Trans i18nKey="auth.yourPasswordHasBeenUpdated" />
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full" onClick={() => navigate("/login")}>Go to login</Button>
+                <Button className="w-full" onClick={() => navigate("/login")}>{t('auth.goToLogin')}</Button>
               </CardContent>
             </>
           )}

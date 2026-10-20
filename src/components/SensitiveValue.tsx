@@ -3,6 +3,7 @@ import { isEncryptedValue } from "@/utils/inputValueFormats";
 import { maskValue } from "@/utils/maskSensitive";
 import { useSensitiveMask } from "@/hooks/useSensitiveMask";
 import type { SensitiveFieldKey } from "@/config/sensitiveDataRegistry";
+import { useLanguage } from "@/hooks/useLanguage";
 
 type SensitiveValueProps = {
   /** The raw value from the API — either the real (decrypted) value, or our
@@ -45,6 +46,7 @@ export function SensitiveValue({
   placeholder = "—",
   className,
 }: SensitiveValueProps) {
+  const { t } = useLanguage();
   const { hidden } = useSensitiveMask();
   const text = value === null || value === undefined ? "" : String(value);
 
@@ -53,7 +55,7 @@ export function SensitiveValue({
   if (!isEncryptedValue(text)) {
     if (field && hidden) {
       return (
-        <span className={className} data-sensitive-hidden="true" title="Hidden — use the eye button to show">
+        <span className={className} data-sensitive-hidden="true" title={t('records.hiddenUseTheEyeButton')}>
           {maskValue(field, text)}
         </span>
       );

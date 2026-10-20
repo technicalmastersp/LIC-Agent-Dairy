@@ -8,12 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 import { getNotificationPreferences, updateNotificationPreferences } from "../../services/userService";
 import { Bell, CalendarClock, CreditCard } from "lucide-react";
 import type { Preferences } from "@/types/pages/NotificationPreferences.types";
+import { useLanguage } from "@/hooks/useLanguage";
 const DEFAULT_PREFS: Preferences = {
   policyDueReminders: true,
   subscriptionReminders: true,
 };
 
 const NotificationPreferences = () => {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [prefs,    setPrefs]    = useState<Preferences>(DEFAULT_PREFS);
   const [loading,  setLoading]  = useState(true);
@@ -28,7 +30,7 @@ const NotificationPreferences = () => {
       setPrefs({ ...DEFAULT_PREFS, ...data });
     } catch (err) {
       console.error(err);
-      toast({ title: "Error", description: "Couldn't load your notification preferences.", variant: "destructive" });
+      toast({ title: t('profile.error'), description: t('profile.couldnTLoadYourNotification'), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -45,8 +47,8 @@ const NotificationPreferences = () => {
     } catch (error) {
       setPrefs(p => ({ ...p, [key]: previous })); // roll back on failure
       toast({
-        title: "Error",
-        description: error?.response?.data?.message || "Couldn't save that change.",
+        title: t('profile.error'),
+        description: error?.response?.data?.message || t('profile.couldnTSaveThatChange'),
         variant: "destructive",
       });
     } finally {
@@ -63,14 +65,14 @@ const NotificationPreferences = () => {
     {
       key: "policyDueReminders",
       icon: CalendarClock,
-      title: "Payment due reminders",
-      desc: "Email me when a policy's payment is due next month, or when last month's payment was missed.",
+      title: t('profile.paymentDueReminders'),
+      desc: t('profile.emailMeWhenAPolicy'),
     },
     {
       key: "subscriptionReminders",
       icon: CreditCard,
-      title: "Subscription reminders",
-      desc: "Email me before my plan expires, and again if it has expired.",
+      title: t('profile.subscriptionReminders'),
+      desc: t('profile.emailMeBeforeMyPlan'),
     },
   ];
 
@@ -83,9 +85,9 @@ const NotificationPreferences = () => {
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-primary" />
             <div>
-              <h1 className="text-xl font-medium">Notification preferences</h1>
+              <h1 className="text-xl font-medium">{t('profile.notificationPreferences')}</h1>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Choose which reminder emails you'd like to receive.
+                {t('profile.chooseWhichReminderEmails')}
               </p>
             </div>
           </div>
@@ -96,7 +98,7 @@ const NotificationPreferences = () => {
           <Card>
             <CardContent className="p-0">
               {loading ? (
-                <p className="text-center text-sm text-muted-foreground py-10">Loading…</p>
+                <p className="text-center text-sm text-muted-foreground py-10">{t('common.loading2')}</p>
               ) : (
                 <div>
                   {options.map(({ key, icon: Icon, title, desc }) => (
@@ -122,8 +124,7 @@ const NotificationPreferences = () => {
           </Card>
 
           <p className="text-xs text-muted-foreground">
-            This only controls reminder emails — you'll still see due dates and missed payments
-            inside the app on your dashboard regardless of these settings.
+            {t('profile.thisOnlyControlsReminderEmails')}
           </p>
         </div>
       </main>

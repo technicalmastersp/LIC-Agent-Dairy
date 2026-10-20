@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { i18nZodResolver as zodResolver } from "@/i18n/zodResolver";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,8 +15,11 @@ import Footer from "@/components/Footer";
 import { changePassword } from "../../services/userService";
 import { changePasswordSchema } from "@/schemas/changePasswordSchema";
 import type { ChangePasswordFormValues } from "@/types/schemas/changePasswordSchema.types";
+import { useLanguage } from "@/hooks/useLanguage";
+import Trans from "@/components/Trans";
 
 const ChangePassword = () => {
+  const { t } = useLanguage();
   const navigate   = useNavigate();
   const { toast }  = useToast();
 
@@ -58,8 +61,8 @@ const ChangePassword = () => {
       setStep("success");
     } catch (err: unknown) {
       const message = axios.isAxiosError(err)
-        ? err.response?.data?.message || "Something went wrong. Please try again."
-        : "Something went wrong. Please try again.";
+        ? err.response?.data?.message || t('auth.somethingWentWrongPleaseTry')
+        : t('auth.somethingWentWrongPleaseTry');
       setError(message);
     } finally {
       setLoading(false);
@@ -87,8 +90,8 @@ const ChangePassword = () => {
                   <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Lock className="w-7 h-7 text-blue-600" />
                   </div>
-                  <CardTitle className="text-2xl text-form-header">Change password</CardTitle>
-                  <CardDescription>Enter your current password, then choose a new one.</CardDescription>
+                  <CardTitle className="text-2xl text-form-header">{t('auth.changePassword')}</CardTitle>
+                  <CardDescription>{t('auth.enterYourCurrentPasswordThen')}</CardDescription>
                 </CardHeader>
 
                 <CardContent className="space-y-4">
@@ -101,10 +104,10 @@ const ChangePassword = () => {
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     {/* Current password */}
                     <div className="space-y-2">
-                      <Label htmlFor="cur">Current password</Label>
+                      <Label htmlFor="cur">{t('auth.currentPassword')}</Label>
                       <div className="relative">
                         <Input id="cur" type={showCur ? "text" : "password"}
-                          placeholder="Your current password" className="pr-10"
+                          placeholder={t('auth.yourCurrentPassword')} className="pr-10"
                           {...register("currentPassword")} />
                         <EyeToggle show={showCur} onToggle={() => setShowCur(!showCur)} />
                       </div>
@@ -115,10 +118,10 @@ const ChangePassword = () => {
 
                     {/* New password */}
                     <div className="space-y-2">
-                      <Label htmlFor="np">New password</Label>
+                      <Label htmlFor="np">{t('auth.newPassword')}</Label>
                       <div className="relative">
                         <Input id="np" type={showNew ? "text" : "password"}
-                          placeholder="Min. 6 characters" className="pr-10"
+                          placeholder={t('auth.min6Characters')} className="pr-10"
                           {...register("newPassword")} />
                         <EyeToggle show={showNew} onToggle={() => setShowNew(!showNew)} />
                       </div>
@@ -133,9 +136,9 @@ const ChangePassword = () => {
                       {/* Requirements */}
                       <div className="space-y-1">
                         {[
-                          { ok: strength.hasLen,   label: "At least 6 characters" },
-                          { ok: strength.hasUpper, label: "One uppercase letter"  },
-                          { ok: strength.hasNum,   label: "One number"            },
+                          { ok: strength.hasLen,   label: t('auth.atLeast6Characters') },
+                          { ok: strength.hasUpper, label: t('auth.oneUppercaseLetter')  },
+                          { ok: strength.hasNum,   label: t('auth.oneNumber')            },
                         ].map(({ ok, label }) => (
                           <div key={label}
                             className={`flex items-center gap-1.5 text-xs transition-colors ${ok ? "text-green-600" : "text-muted-foreground"}`}>
@@ -150,10 +153,10 @@ const ChangePassword = () => {
 
                     {/* Confirm password */}
                     <div className="space-y-2">
-                      <Label htmlFor="cp">Confirm new password</Label>
+                      <Label htmlFor="cp">{t('auth.confirmNewPassword')}</Label>
                       <div className="relative">
                         <Input id="cp" type={showCon ? "text" : "password"}
-                          placeholder="Re-enter new password" className="pr-10"
+                          placeholder={t('auth.reEnterNewPassword')} className="pr-10"
                           {...register("confirmPassword")} />
                         <EyeToggle show={showCon} onToggle={() => setShowCon(!showCon)} />
                       </div>
@@ -161,16 +164,16 @@ const ChangePassword = () => {
                         <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
                       ) : confirmPass && (
                         <p className={`text-xs ${newPass === confirmPass ? "text-green-600" : "text-red-500"}`}>
-                          {newPass === confirmPass ? "✓ Passwords match" : "✗ Passwords do not match"}
+                          {newPass === confirmPass ? t('auth.passwordsMatch') : t('auth.passwordsDoNotMatch')}
                         </p>
                       )}
                     </div>
 
                     <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? "Updating…" : "Update password"}
+                      {loading ? t('auth.updating') : t('auth.updatePassword')}
                     </Button>
                     <Button type="button" variant="outline" className="w-full" onClick={() => navigate("/profile")}>
-                      Cancel
+                      {t('common.cancel')}
                     </Button>
                   </form>
                 </CardContent>
@@ -184,15 +187,14 @@ const ChangePassword = () => {
                   <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Check className="w-7 h-7 text-green-600" />
                   </div>
-                  <CardTitle className="text-2xl text-form-header">Password updated!</CardTitle>
+                  <CardTitle className="text-2xl text-form-header">{t('auth.passwordUpdated')}</CardTitle>
                   <CardDescription>
-                    Your password has been changed successfully.<br />
-                    Use your new password next time you log in.
+                    <Trans i18nKey="auth.yourPasswordHasBeenChanged" />
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button className="w-full" onClick={() => navigate("/profile")}>
-                    Back to profile
+                    {t('auth.backToProfile')}
                   </Button>
                 </CardContent>
               </>

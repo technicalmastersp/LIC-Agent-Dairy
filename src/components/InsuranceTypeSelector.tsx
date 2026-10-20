@@ -1,4 +1,6 @@
 import { INSURANCE_TYPES } from "@/config/insuranceTypes";
+import { useLanguage } from "@/hooks/useLanguage";
+import { makeInsuranceText } from "@/i18n/insuranceText";
 import { Check } from "lucide-react";
 import type { InsuranceTypeSelectorProps } from "@/types/components/InsuranceTypeSelector.types";
 // Card grid used on Add Record (and available for Edit) to pick which of
@@ -6,6 +8,8 @@ import type { InsuranceTypeSelectorProps } from "@/types/components/InsuranceTyp
 // to. Selecting a card is what drives which type-specific fields render
 // underneath it.
 const InsuranceTypeSelector = ({ value, onChange, disabled }: InsuranceTypeSelectorProps) => {
+  const { tOr } = useLanguage();
+  const ins = makeInsuranceText(tOr);
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
       {INSURANCE_TYPES.map((type) => {
@@ -32,8 +36,8 @@ const InsuranceTypeSelector = ({ value, onChange, disabled }: InsuranceTypeSelec
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-2.5 ${isSelected ? "bg-primary/15" : "bg-muted"}`}>
               <Icon className={`w-4.5 h-4.5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
             </div>
-            <p className="text-sm font-medium text-form-header leading-tight pr-4">{type.label}</p>
-            <p className="text-xs text-muted-foreground mt-1 leading-snug">{type.description}</p>
+            <p className="text-sm font-medium text-form-header leading-tight pr-4">{ins.typeLabel(type)}</p>
+            <p className="text-xs text-muted-foreground mt-1 leading-snug">{ins.typeDescription(type)}</p>
           </button>
         );
       })}

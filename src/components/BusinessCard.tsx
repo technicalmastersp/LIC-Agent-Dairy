@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import siteConfig from "@/config/siteConfig";
 import type { BusinessCardHandle, BusinessCardProps, BusinessCardTemplate } from "@/types/components/BusinessCard.types";
+import { useLanguage } from "@/hooks/useLanguage";
 
 // Real-world business-card ratio (3.5in x 2in) rendered at high enough
 // resolution that the downloaded PNG still looks crisp when printed.
@@ -16,10 +17,10 @@ const NOTE_LINE_HEIGHT = 27;
 const NOTE_MAX_LINES = 3;
 
 export const BUSINESS_CARD_TEMPLATES: BusinessCardTemplate[] = [
-  { id: "classic",  label: "Classic Navy",  swatch: "linear-gradient(135deg, #0A2A43, #0A5B76)" },
-  { id: "teal",     label: "Clean Teal",    swatch: "linear-gradient(135deg, #ffffff, #e6f3f6)" },
-  { id: "gold",     label: "Elegant Gold",  swatch: "linear-gradient(135deg, #111111, #2b2b2b)" },
-  { id: "gradient", label: "Modern Gradient", swatch: "linear-gradient(135deg, #0A5B76, #6C3FAE)" },
+  { id: "classic",  label: "profile.cardClassicNavy",  swatch: "linear-gradient(135deg, #0A2A43, #0A5B76)" },
+  { id: "teal",     label: "profile.cardCleanTeal",    swatch: "linear-gradient(135deg, #ffffff, #e6f3f6)" },
+  { id: "gold",     label: "profile.cardElegantGold",  swatch: "linear-gradient(135deg, #111111, #2b2b2b)" },
+  { id: "gradient", label: "profile.cardModernGradient", swatch: "linear-gradient(135deg, #0A5B76, #6C3FAE)" },
 ];
 
 const initials = (name = "") =>
@@ -246,6 +247,7 @@ function draw(
 }
 
 const BusinessCard = forwardRef<BusinessCardHandle, BusinessCardProps>((props, ref) => {
+  const { t } = useLanguage();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useImperativeHandle(ref, () => ({
@@ -284,7 +286,7 @@ const BusinessCard = forwardRef<BusinessCardHandle, BusinessCardProps>((props, r
       {props.locked && (
         <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
           <span className="bg-white/95 text-form-header text-xs sm:text-sm font-medium px-3 py-1.5 rounded-full shadow">
-            🔒 Locked preview
+            {t('records.lockedPreview')}
           </span>
         </div>
       )}

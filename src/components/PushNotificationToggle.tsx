@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { TranslationKey } from "@/types/i18n.types";
 import { Smartphone, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -6,17 +7,18 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { getPushState, enablePush, disablePush, type PushState } from "@/utils/pushNotifications";
 import { sendTestPush } from "../../services/pushService";
+import { useLanguage } from "@/hooks/useLanguage";
 
-const MESSAGES: Partial<Record<PushState, string>> = {
-  unsupported: "This browser doesn't support device notifications. Try Chrome, Edge or Firefox.",
-  "ios-install":
-    "On iPhone/iPad, first add this app to your Home Screen (Share → Add to Home Screen), open it from there, then come back here.",
-  unavailable: "Device notifications aren't available right now. Please try again later.",
-  denied:
-    "Notifications are blocked for this site. Allow them in your browser's site settings, then reload this page.",
+// i18n keys (module scope can't call hooks); translated where displayed.
+const MESSAGES: Partial<Record<PushState, TranslationKey>> = {
+  unsupported: "nav.pushUnsupported",
+  "ios-install": "nav.pushIosInstall",
+  unavailable: "nav.pushUnavailable",
+  denied: "nav.pushDenied",
 };
 
 const PushNotificationToggle = () => {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [state, setState] = useState<PushState | "loading">("loading");
   const [busy, setBusy] = useState(false);
@@ -37,7 +39,7 @@ const PushNotificationToggle = () => {
         const next = await enablePush();
         setState(next);
         if (next === "denied") {
-          toast({ title: "Notifications blocked", description: MESSAGES.denied, variant: "destructive" });
+          toast({ title: t('nav.notificationsBlocked'), description: t(MESSAGES.denied!), variant: "destructive" });
         }
       } else {
         await disablePush();
@@ -45,8 +47,8 @@ const PushNotificationToggle = () => {
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: error?.response?.data?.message || "Couldn't change device notifications.",
+        title: t('nav.error'),
+        description: error?.response?.data?.message || t('nav.couldnTChangeDeviceNotifications'),
         variant: "destructive",
       });
     } finally {
@@ -66,7 +68,7 @@ const PushNotificationToggle = () => {
     }
   };
 
-  const message = state !== "loading" && state !== "on" && state !== "off" ? MESSAGES[state] : null;
+  const message = state !== "loading" && state !== "on" && state !== "off" ? (MESSAGES[state] ? t(MESSAGES[state]!) : null) : null;
 
   return (
     <Card>
@@ -76,15 +78,15 @@ const PushNotificationToggle = () => {
             <Smartphone className="w-4 h-4 text-muted-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium">Notifications on this device</p>
+            <p className="text-sm font-medium">{t('nav.notificationsOnThisDevice')}</p>
             <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
               {message ??
-                "Get due-date reminders and updates in your Windows or phone notification panel, even when this tab is closed. This applies to this device only."}
+                t('nav.getDueDateReminders')}
             </p>
             {state === "on" && (
               <Button variant="outline" size="sm" className="mt-3 h-8 text-xs" disabled={testing} onClick={handleTest}>
                 {testing && <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />}
-                Send me a test notification
+                {t('nav.sendMeATestNotification')}
               </Button>
             )}
           </div>
@@ -95,7 +97,7 @@ const PushNotificationToggle = () => {
               checked={state === "on"}
               disabled={busy}
               onCheckedChange={handleChange}
-              aria-label="Notifications on this device"
+              aria-label={t('nav.notificationsOnThisDevice')}
               className="mt-0.5 shrink-0"
             />
           ) : null}

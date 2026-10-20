@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Compass, ArrowLeft, Home } from "lucide-react";
 import siteConfig from "@/config/siteConfig";
 import SEO from "@/components/SEO";
+import { useLanguage } from "@/hooks/useLanguage";
+import Trans from "@/components/Trans";
 
 const REDIRECT_SECONDS = 5;
 
 const NotFound = () => {
+  const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const [count, setCount] = useState(REDIRECT_SECONDS);
@@ -36,7 +39,7 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4 py-12">
-      <SEO title="Page Not Found" description="The page you're looking for doesn't exist or may have been moved." path={location.pathname} noindex />
+      <SEO title={t('landing.pageNotFound')} description={t('landing.thePageYouReLooking')} path={location.pathname} noindex />
       <div className="w-full max-w-md text-center">
 
         {/* Icon badge */}
@@ -50,16 +53,16 @@ const NotFound = () => {
         </h1>
 
         <p className="mt-4 text-lg sm:text-xl font-medium text-form-header">
-          This page doesn't exist
+          {t('landing.thisPageDoesnTExist')}
         </p>
         <p className="mt-2 text-sm sm:text-base text-muted-foreground break-words px-2">
-          We couldn't find <span className="font-mono text-xs sm:text-sm bg-muted border border-border rounded px-1.5 py-0.5 break-all">{location.pathname}</span> on {siteConfig.title}.
+          <Trans i18nKey="landing.weCouldnTFind" params={{ pathname: location.pathname, title: siteConfig.title }} components={{ span: <span className="font-mono text-xs sm:text-sm bg-muted border border-border rounded px-1.5 py-0.5 break-all" /> }} />
         </p>
 
         {/* Countdown progress bar */}
         <div className="mt-8 max-w-xs mx-auto">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
-            <span>Redirecting to home</span>
+            <span>{t('landing.redirectingToHome')}</span>
             <span className="font-medium text-form-header tabular-nums">{count}s</span>
           </div>
           <div className="h-1.5 bg-muted rounded-full overflow-hidden">
@@ -77,7 +80,7 @@ const NotFound = () => {
             className="bg-primary hover:bg-primary-light w-full sm:w-auto"
           >
             <Home className="w-4 h-4 mr-2" />
-            Return to Home now
+            {t('landing.returnToHomeNow')}
           </Button>
           <Button
             onClick={() => navigate(-1)}
@@ -85,7 +88,7 @@ const NotFound = () => {
             className="bg-background w-full sm:w-auto"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Go back
+            {t('landing.goBack')}
           </Button>
         </div>
       </div>

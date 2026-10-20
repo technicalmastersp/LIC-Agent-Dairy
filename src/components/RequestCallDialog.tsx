@@ -1,3 +1,4 @@
+import type { TranslationKey } from "@/types/i18n.types";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -14,9 +15,20 @@ import {
   BUSINESS_HOURS_LABELS, isTeamAvailableNow,
 } from "@/config/businessHours";
 import type { RequestCallDialogProps, CallRequestResult } from "@/types/components/RequestCallDialog.types";
+import { useLanguage } from "@/hooks/useLanguage";
+import Trans from "@/components/Trans";
 
 // Same topics as the support ticket form, so both reach the team the same way.
-const TOPICS = ["Account & Billing", "Policies & Records", "Payments & Referrals", "Security & Data", "Technical", "Other"];
+// `value` is what is sent to the backend and shown to admins — it must stay English.
+// Only the label the agent sees is translated.
+const TOPICS: { value: string; labelKey: TranslationKey }[] = [
+  { value: "Account & Billing", labelKey: "help.topicAccountBilling" },
+  { value: "Policies & Records", labelKey: "help.topicPoliciesRecords" },
+  { value: "Payments & Referrals", labelKey: "help.topicPaymentsReferrals" },
+  { value: "Security & Data", labelKey: "help.topicSecurityData" },
+  { value: "Technical", labelKey: "help.topicTechnical" },
+  { value: "Other", labelKey: "help.topicOther" },
+];
 const REASON_MIN = 10;
 const REASON_MAX = 500;
 
@@ -32,6 +44,7 @@ const normalizeMobile = (raw: string): string | null => {
 };
 
 const RequestCallDialog = ({ trigger, open: openProp, onOpenChange, onSubmitted }: RequestCallDialogProps) => {
+  const { t } = useLanguage();
   const authenticated = isAuthenticated();
   const currentUser = getCurrentUser();
 
@@ -73,8 +86,8 @@ const RequestCallDialog = ({ trigger, open: openProp, onOpenChange, onSubmitted 
 
   const validate = () => {
     const next: typeof errors = {};
-    if (!authenticated && form.name.trim().length < 2) next.name = "Please enter your name.";
-    if (!normalizeMobile(form.phone)) next.phone = "Enter a valid 10-digit Indian mobile number.";
+    if (!authenticated && form.name.trim().length < 2) next.name = t('nav.pleaseEnterYourName');
+    if (!normalizeMobile(form.phone)) next.phone = t('nav.enterAValid10Digit');
     const reason = form.reason.trim();
     if (reason.length < REASON_MIN) next.reason = `Please give a reason (at least ${REASON_MIN} characters).`;
     setErrors(next);
@@ -104,8 +117,8 @@ const RequestCallDialog = ({ trigger, open: openProp, onOpenChange, onSubmitted 
       onSubmitted?.();
     } catch (err: unknown) {
       const message = axios.isAxiosError(err)
-        ? err.response?.data?.message || "Something went wrong. Please try again, or email us."
-        : "Something went wrong. Please try again, or email us.";
+        ? err.response?.data?.message || t('nav.somethingWentWrongPleaseTry')
+        : t('nav.somethingWentWrongPleaseTry');
       // Shown inline only — apiClient's global interceptor already raises a toast
       // for 409/429/5xx, so a second one here would just duplicate it.
       setServerError(message);
@@ -124,10 +137,10 @@ const RequestCallDialog = ({ trigger, open: openProp, onOpenChange, onSubmitted 
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-form-header">
-            <Phone className="w-4 h-4 text-primary" /> Request a call
+            <Phone className="w-4 h-4 text-primary" /> {" "}{t('common.requestACall')}
           </DialogTitle>
           <DialogDescription>
-            Leave your number and the reason — our team will call you back. We don't share a direct number.
+            {t('nav.leaveYourNumber')}
           </DialogDescription>
         </DialogHeader>
 
@@ -136,11 +149,11 @@ const RequestCallDialog = ({ trigger, open: openProp, onOpenChange, onSubmitted 
           <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
           <div className="space-y-0.5">
             <p className="font-medium text-form-header">
-              {openNow ? "We're taking calls now" : "We're outside call hours right now"}
-              <span className="font-normal text-muted-foreground"> — calls are placed only in business hours (IST)</span>
+              {openNow ? t('nav.weReTakingCallsNow') : t('nav.weReOutsideCallHours')}
+              <span className="font-normal text-muted-foreground"> {" "}{t('nav.callsArePlacedOnly')}</span>
             </p>
             {BUSINESS_HOURS_LABELS.map((l) => (
-              <p key={l.days} className="text-muted-foreground">{l.days}: {l.hours}</p>
+              <p key={l.days} className="text-muted-foreground">{t(l.days)}: {t(l.hours)}</p>
             ))}
           </div>
         </div>
@@ -155,18 +168,17 @@ const RequestCallDialog = ({ trigger, open: openProp, onOpenChange, onSubmitted 
 
             {authenticated ? (
               <p className="text-xs text-muted-foreground">
-                Requesting as <span className="font-medium text-form-header">{currentUser?.name}</span>
-              </p>
+                <Trans i18nKey="nav.requesting" params={{ name: currentUser?.name }} components={{ span: <span className="font-medium text-form-header" /> }} /></p>
             ) : (
               <div className="space-y-1.5">
-                <Label htmlFor="rc-name" className="text-xs text-muted-foreground">Your name</Label>
-                <Input id="rc-name" value={form.name} onChange={set("name")} maxLength={80} placeholder="Your name" autoComplete="name" />
+                <Label htmlFor="rc-name" className="text-xs text-muted-foreground">{t('nav.yourName')}</Label>
+                <Input id="rc-name" value={form.name} onChange={set("name")} maxLength={80} placeholder={t('nav.yourName')} autoComplete="name" />
                 {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
               </div>
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="rc-phone" className="text-xs text-muted-foreground">Mobile number to call</Label>
+              <Label htmlFor="rc-phone" className="text-xs text-muted-foreground">{t('nav.mobileNumberToCall')}</Label>
               <div className="flex">
                 <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-sm text-muted-foreground">+91</span>
                 <Input
@@ -179,20 +191,20 @@ const RequestCallDialog = ({ trigger, open: openProp, onOpenChange, onSubmitted 
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="rc-topic" className="text-xs text-muted-foreground">What's it about?</Label>
+              <Label htmlFor="rc-topic" className="text-xs text-muted-foreground">{t('nav.whatSItAbout')}</Label>
               <select
                 id="rc-topic" value={form.category} onChange={set("category")}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               >
-                {TOPICS.map((t) => <option key={t} value={t}>{t}</option>)}
+                {TOPICS.map((topic) => <option key={topic.value} value={topic.value}>{t(topic.labelKey)}</option>)}
               </select>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="rc-reason" className="text-xs text-muted-foreground">Reason for the call</Label>
+              <Label htmlFor="rc-reason" className="text-xs text-muted-foreground">{t('nav.reasonForTheCall')}</Label>
               <Textarea
                 id="rc-reason" rows={4} value={form.reason} onChange={set("reason")} maxLength={REASON_MAX}
-                placeholder="Briefly tell us what you need help with…" className="resize-none"
+                placeholder={t('nav.brieflyTellUsWhat')} className="resize-none"
               />
               <div className="flex justify-between text-xs">
                 <span className="text-destructive">{errors.reason}</span>
@@ -201,7 +213,7 @@ const RequestCallDialog = ({ trigger, open: openProp, onOpenChange, onSubmitted 
             </div>
 
             <Button type="submit" className="w-full bg-primary hover:bg-primary-light">
-              Continue
+              {t('nav.continue')}
             </Button>
           </form>
         )}
@@ -209,18 +221,18 @@ const RequestCallDialog = ({ trigger, open: openProp, onOpenChange, onSubmitted 
         {step === "confirm" && (
           <div className="space-y-4">
             <div className="rounded-lg border border-border bg-background px-4 py-3 text-sm space-y-1.5">
-              <p className="text-xs text-muted-foreground">We will call</p>
+              <p className="text-xs text-muted-foreground">{t('nav.weWillCall')}</p>
               <p className="text-lg font-semibold text-form-header tracking-wide">+91 {normalized}</p>
               <p className="text-xs text-muted-foreground">
-                Double-check the number — it's the only way we can reach you. A wrong number means a missed call.
+                {t('nav.doubleCheckTheNumber')}
               </p>
             </div>
             <div className="flex flex-col-reverse sm:flex-row gap-2">
               <Button type="button" variant="outline" className="sm:flex-1" onClick={() => setStep("form")} disabled={submitting}>
-                <ArrowLeft className="w-4 h-4 mr-1.5" /> Edit
+                <ArrowLeft className="w-4 h-4 mr-1.5" /> {" "}{t('common.edit')}
               </Button>
               <Button type="button" className="sm:flex-1 bg-primary hover:bg-primary-light" onClick={send} disabled={submitting}>
-                {submitting ? <><Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> Sending…</> : "Yes, request the call"}
+                {submitting ? <><Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> {" "}{t('nav.sending')}</> : t('nav.yesRequestTheCall')}
               </Button>
             </div>
           </div>
@@ -232,11 +244,11 @@ const RequestCallDialog = ({ trigger, open: openProp, onOpenChange, onSubmitted 
               <CheckCircle2 className="w-6 h-6 text-green-600" />
             </div>
             <div className="space-y-1.5">
-              <p className="font-semibold text-form-header">Request received</p>
+              <p className="font-semibold text-form-header">{t('nav.requestReceived')}</p>
               <p className="text-sm text-muted-foreground">{result.message}</p>
-              <p className="text-xs text-muted-foreground">Reference: <span className="font-mono">{result.requestId}</span></p>
+              <p className="text-xs text-muted-foreground"><Trans i18nKey="nav.reference" params={{ requestId: result.requestId }} components={{ span: <span className="font-mono" /> }} /></p>
             </div>
-            <Button className="w-full" variant="outline" onClick={() => setOpen(false)}>Close</Button>
+            <Button className="w-full" variant="outline" onClick={() => setOpen(false)}>{t('nav.close')}</Button>
           </div>
         )}
       </DialogContent>

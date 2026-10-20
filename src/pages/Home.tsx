@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { TFunction } from "@/types/i18n.types";
 import { Link, useNavigate } from "react-router-dom";
 import { Button }     from "@/components/ui/button";
 import { Badge }      from "@/components/ui/badge";
@@ -23,12 +24,13 @@ import { getReferralDashboard } from "../../services/referralService";
 import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import type { MonthlyTrendPoint, ReferralDashboardData } from "@/types/pages/Home.types";
 import { formatISTDate as fmt, formatISTFullDate } from "@/utils/dateFormat";
+import Trans from "@/components/Trans";
 
-const getGreeting = () => {
+const getGreeting = (t: TFunction) => {
   const h = new Date().getHours();
-  if (h < 12) return "Good Morning";
-  if (h < 17) return "Good Afternoon";
-  return "Good Evening";
+  if (h < 12) return t('dues.goodMorning');
+  if (h < 17) return t('dues.goodAfternoon');
+  return t('dues.goodEvening');
 };
 
 // (date formatting now imported from dateFormat.ts as `fmt`)
@@ -91,49 +93,49 @@ const Home = () => {
 
   const stats = [
     {
-      label: "Total records",
+      label: t('dues.totalRecords'),
       val:   currentUser.totalRecords ?? 0,
       icon:  <FileText  className="w-4 h-4" />,
       color: "text-foreground",
-      sub:   "All policy records",
+      sub:   t('dues.allPolicyRecords'),
       link:  "/view-records",
       bg: "bg-blue-50"
     },
     {
-      label: "Due this month",
+      label: t('dues.dueThisMonth'),
       val:   dueCount,
       icon:  <FileClock className="w-4 h-4" />,
       color: dueCount   > 0 ? "text-yellow-600" : "text-foreground",
-      sub:   currentMonth || "Payments pending",
+      sub:   currentMonth || t('dues.paymentsPending'),
       link:  "/view-due-policies",
       bg: "bg-green-50"
     },
     {
-      label: "Missed payments",
+      label: t('dues.missedPayments'),
       val:   missedCount,
       icon:  <ReceiptText className="w-4 h-4" />,
       color: missedCount > 0 ? "text-red-600" : "text-foreground",
-      sub:   "Last month unpaid",
+      sub:   t('dues.lastMonthUnpaid'),
       link:  "/view-missed-payments",
       bg: "bg-purple-50"
     },
     {
-      label: "Upcoming due",
+      label: t('dues.upcomingDue'),
       val:   upcomingDueCount,
       icon:  <FileClock className="w-4 h-4" />,
       color: upcomingDueCount > 0 ? "text-emerald-600" : "text-foreground",
-      sub:   "Due next month",
+      sub:   t('dues.dueNextMonth'),
       link:  "/view-upcoming-due",
       bg: "bg-emerald-50",
       tourId: "tour-upcoming-due",
     },
     ...(REFERRAL_PROGRAM_ENABLED ? [
     {
-      label: "Referrals",
+      label: t('dues.referrals'),
       val:   (referralData?.totalL1 ?? 0) + (referralData?.totalL2 ?? 0),
       icon:  <Users className="w-5 h-5" />,
       color: "text-green-600",
-      sub:   <><SensitiveValue field="walletAmount" value={referralData?.availableBalance ?? 0} render={(v) => `₹${v}`} /> in wallet</>,
+      sub:   <><SensitiveValue field="walletAmount" value={referralData?.availableBalance ?? 0} render={(v) => `₹${v}`} /> {" "}{t('dues.inWallet')}</>,
       link:  "/referral-program",
       bg: "bg-amber-50"
     },
@@ -142,51 +144,51 @@ const Home = () => {
 
   const actions = [
     {
-      title: "Add record",
+      title: t('dues.addRecord'),
       icon:  <Plus className="w-4 h-4" />,
-      desc:  "Create a new policy record with full details — holder info, nominee, bank, and policy terms.",
-      label: "Add new record",
+      desc:  t('dues.createANewPolicyRecord'),
+      label: t('dues.addNewRecord'),
       link:  "/add-record",
-      badge: <Badge className="text-xs bg-blue-100 text-blue-700 border border-blue-200">New</Badge>,
+      badge: <Badge className="text-xs bg-blue-100 text-blue-700 border border-blue-200">{t('dues.new')}</Badge>,
       tourId: "tour-add-record",
     },
     {
-      title: "All records",
+      title: t('dues.allRecords'),
       icon:  <Eye className="w-4 h-4" />,
-      desc:  "Browse, search, and manage all your existing policy records. Edit or view full details.",
-      label: "View all records",
+      desc:  t('dues.browseSearchAndManageAll'),
+      label: t('dues.viewAllRecords'),
       link:  "/view-records",
-      badge: <Badge variant="secondary" className="text-xs">{currentUser.totalRecords ?? 0} total</Badge>,
+      badge: <Badge variant="secondary" className="text-xs">{t('dues.total', { value: currentUser.totalRecords ?? 0 })}</Badge>,
       tourId: "tour-view-records",
     },
     {
-      title: "Due this month",
+      title: t('dues.dueThisMonth'),
       icon:  <FileClock className="w-4 h-4" />,
-      desc:  "See all policies with payment due this month. Track mode of payment and last payment date.",
-      label: "View due policies",
+      desc:  t('dues.seeAllPoliciesWithPayment'),
+      label: t('dues.viewDuePolicies'),
       link:  "/view-due-policies",
       badge: dueCount > 0
-        ? <Badge className="text-xs bg-yellow-100 text-yellow-700 border border-yellow-200">{dueCount} due</Badge>
+        ? <Badge className="text-xs bg-yellow-100 text-yellow-700 border border-yellow-200">{t('dues.due', { dueCount })}</Badge>
         : null,
       tourId: "tour-due-this-month",
     },
     {
-      title: "Missed payments",
+      title: t('dues.missedPayments'),
       icon:  <ReceiptText className="w-4 h-4" />,
-      desc:  "Policies that missed last month's payment. Take action before lapse notices are issued.",
-      label: "View missed payments",
+      desc:  t('dues.policiesThatMissedLastMonth'),
+      label: t('dues.viewMissedPayments'),
       link:  "/view-missed-payments",
       badge: missedCount > 0
-        ? <Badge variant="destructive" className="text-xs">{missedCount} missed</Badge>
+        ? <Badge variant="destructive" className="text-xs">{t('dues.missed', { missedCount })}</Badge>
         : null,
       tourId: "tour-missed-payments",
     },
   ];
 
   const quickLinks = [
-    { label: "Profile",         icon: <User       className="w-5 h-5" />, link: "/profile"          },
-    { label: "Change password", icon: <Lock       className="w-5 h-5" />, link: "/change-password"   },
-    { label: "Our plans",       icon: <BarChart3  className="w-5 h-5" />, link: "/our-plans"         },
+    { label: t('dues.profile'),         icon: <User       className="w-5 h-5" />, link: "/profile"          },
+    { label: t('dues.changePassword'), icon: <Lock       className="w-5 h-5" />, link: "/change-password"   },
+    { label: t('dues.ourPlans'),       icon: <BarChart3  className="w-5 h-5" />, link: "/our-plans"         },
   ];
 
   return (
@@ -201,11 +203,11 @@ const Home = () => {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h1 className="text-2xl font-medium text-form-header">
-                {getGreeting()}, {currentUser.name}
+                {getGreeting(t)}, {currentUser.name}
               </h1>
               <p className="text-sm text-muted-foreground mt-0.5">
                 {formatISTFullDate()}
-                {sub && ` · ${sub.planType} plan · ${daysLeft} days left`}
+                {sub && ` ${t('dues.planDaysLeft', { planType: sub.planType, count: daysLeft })}`}
               </p>
             </div>
             {/* Hide/Show sensitive data — renders nothing if the backend switch is off */}
@@ -216,16 +218,15 @@ const Home = () => {
           {isFirstTimeUser && (
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-gradient-to-r from-blue-50 to-form-header/5 border border-blue-200 rounded-lg px-5 py-5">
               <div className="flex-1">
-                <p className="text-base font-medium text-form-header">Welcome to your policy diary 👋</p>
+                <p className="text-base font-medium text-form-header">{t('dues.welcomeToYourPolicyDiary')}</p>
                 <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                  You haven't added any policy records yet. Add your first one to start tracking due dates,
-                  payments, and everything else on this dashboard.
+                  {t('dues.youHavenTAddedAny')}
                 </p>
               </div>
               <Link to="/add-record" className="shrink-0">
                 <Button data-tour="tour-add-record-banner">
                   <Plus className="w-4 h-4 mr-2" />
-                  Add your first record
+                  {t('dues.addYourFirstRecord')}
                 </Button>
               </Link>
             </div>
@@ -236,10 +237,7 @@ const Home = () => {
             <div className="flex items-start gap-3 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
               <AlertTriangle className="w-4 h-4 text-yellow-600 shrink-0 mt-0.5" />
               <p className="text-sm text-yellow-800">
-                <strong>{missedCount} {missedCount === 1 ? "policy" : "policies"}</strong> missed last month's payment.
-                Review them before lapse notices are issued.{" "}
-                <Link to="/view-missed-payments" className="underline font-medium">View now →</Link>
-              </p>
+                <Trans i18nKey="dues.missedLastMonth" params={{ count: missedCount }} components={{ link: <Link to="/view-missed-payments" className="underline font-medium" /> }} /></p>
             </div>
           )}
 
@@ -252,15 +250,12 @@ const Home = () => {
               : daysLeft <= 7
               ? { box: "bg-orange-50 border-orange-200", icon: "text-orange-600", text: "text-orange-800", link: "text-orange-700", pulse: false }
               : { box: "bg-yellow-50 border-yellow-200", icon: "text-yellow-600", text: "text-yellow-800", link: "text-yellow-700", pulse: false };
-            const whenText = daysLeft === 0 ? "today" : daysLeft === 1 ? "tomorrow" : `in ${daysLeft} days`;
+            const whenText = daysLeft === 0 ? t('dues.expiresToday') : daysLeft === 1 ? t('dues.expiresTomorrow') : t('dues.expiresInDays', { count: daysLeft });
             return (
               <div className={`flex items-start gap-3 border rounded-lg px-4 py-3 ${tier.box}`}>
                 <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${tier.icon} ${tier.pulse ? "animate-pulse" : ""}`} />
                 <p className={`text-sm ${tier.text}`}>
-                  <strong>Your {sub.planType} plan expires {whenText}</strong> ({fmt(sub.endDate)}).
-                  Renew now to avoid losing access to your records and adding new ones.{" "}
-                  <Link to="/our-plans" className={`underline font-medium ${tier.link}`}>Renew now →</Link>
-                </p>
+                  <Trans i18nKey="dues.yourPlanExpiresRenewNow" params={{ planType: sub.planType, whenText, date: fmt(sub.endDate) }} components={{ link: <Link to="/our-plans" className={`underline font-medium ${tier.link}`} /> }} /></p>
               </div>
             );
           })()}
@@ -285,20 +280,20 @@ const Home = () => {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">Last 6 months</CardTitle>
+              <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">{t('dues.last6Months')}</CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
                 // Shown while the dashboard data (incl. the trend) loads
                 <div role="status" aria-live="polite" className="flex flex-col items-center justify-center gap-2 text-muted-foreground" style={{ height: 260 }}>
                   <Loader2 className="w-6 h-6 animate-spin" aria-hidden="true" />
-                  <span className="text-sm">Loading your activity trend…</span>
+                  <span className="text-sm">{t('dues.loadingYourActivityTrend')}</span>
                 </div>
               ) : isFirstTimeUser ? (
                 <div className="flex flex-col items-center justify-center text-center py-14 px-4">
                   <TrendingUp className="w-8 h-8 text-muted-foreground/50 mb-3" />
                   <p className="text-sm text-muted-foreground">
-                    Your activity trend will show up here once you've added a few records.
+                    {t('dues.yourActivityTrendWillShow')}
                   </p>
                 </div>
               ) : (
@@ -317,7 +312,7 @@ const Home = () => {
               )}
               {!loading && !isFirstTimeUser && (
                 <p className="text-xs text-muted-foreground mt-2">
-                  Missed payments = due months still unpaid. The current month isn't counted until it ends.
+                  {t('dues.missedPaymentsDueMonthsStill')}
                 </p>
               )}
             </CardContent>
@@ -352,16 +347,16 @@ const Home = () => {
             <Card data-tour="tour-your-plan">
               <CardHeader className="pb-3">
                 <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2">
-                  <Crown className="w-4 h-4" /> Your plan
+                  <Crown className="w-4 h-4" /> {" "}{t('dues.yourPlan')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-0 pt-0">
                 {[
-                  { label: "Plan",    val: `${sub?.planType} · ${sub?.duration}` },
-                  { label: "Status",  val: sub?.status === "active"
-                      ? <Badge className="text-xs bg-green-100 text-green-700 border border-green-200">Active</Badge>
-                      : <Badge variant="destructive" className="text-xs">Expired</Badge> },
-                  { label: "Expires", val: fmt(sub?.endDate) },
+                  { label: t('dues.plan'),    val: `${sub?.planType} · ${sub?.duration}` },
+                  { label: t('common.status'),  val: sub?.status === "active"
+                      ? <Badge className="text-xs bg-green-100 text-green-700 border border-green-200">{t('common.active')}</Badge>
+                      : <Badge variant="destructive" className="text-xs">{t('common.expired')}</Badge> },
+                  { label: t('dues.expires'), val: fmt(sub?.endDate) },
                 ].map(({ label, val }) => (
                   <div key={label} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                     <span className="text-xs text-muted-foreground">{label}</span>
@@ -371,8 +366,8 @@ const Home = () => {
                 {/* Progress bar */}
                 <div className="pt-3">
                   <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
-                    <span>Time remaining</span>
-                    <span>{daysLeft} / {totalDays} days</span>
+                    <span>{t('dues.timeRemaining')}</span>
+                    <span>{daysLeft} / {totalDays} {" "}{t('dues.days')}</span>
                   </div>
                   <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                     <div className={`h-full rounded-full transition-all ${progressColor}`}
@@ -381,7 +376,7 @@ const Home = () => {
                 </div>
                 <div className="pt-3">
                   <Link to="/our-plans" className="text-xs font-medium text-blue-600 hover:underline">
-                    Upgrade plan →
+                    {t('dues.upgradePlan')}
                   </Link>
                 </div>
               </CardContent>
@@ -392,16 +387,16 @@ const Home = () => {
             <Card data-tour="tour-referral-wallet">
               <CardHeader className="pb-3">
                 <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2">
-                  <Wallet className="w-4 h-4" /> Referral wallet
+                  <Wallet className="w-4 h-4" /> {" "}{t('dues.referralWallet')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-0 pt-0">
                 {[
-                  { label: "Available balance", val: <SensitiveValue field="walletAmount" value={referralData?.availableBalance ?? 0} render={(v) => `₹${v}`} className="text-green-600 font-medium text-xs" /> },
-                  { label: "Pending rewards",   val: <SensitiveValue field="walletAmount" value={referralData?.pendingEarnings ?? 0} render={(v) => `₹${v}`} className="text-yellow-600 font-medium text-xs" /> },
-                  { label: "Total earned",      val: <SensitiveValue field="walletAmount" value={referralData?.totalEarned ?? 0} render={(v) => `₹${v}`} /> },
-                  { label: "Direct referrals",  val: referralData?.totalL1 ?? 0 },
-                  { label: "Level 2 referrals", val: referralData?.totalL2 ?? 0 },
+                  { label: t('dues.availableBalance'), val: <SensitiveValue field="walletAmount" value={referralData?.availableBalance ?? 0} render={(v) => `₹${v}`} className="text-green-600 font-medium text-xs" /> },
+                  { label: t('dues.pendingRewards'),   val: <SensitiveValue field="walletAmount" value={referralData?.pendingEarnings ?? 0} render={(v) => `₹${v}`} className="text-yellow-600 font-medium text-xs" /> },
+                  { label: t('dues.totalEarned'),      val: <SensitiveValue field="walletAmount" value={referralData?.totalEarned ?? 0} render={(v) => `₹${v}`} /> },
+                  { label: t('dues.directReferrals'),  val: referralData?.totalL1 ?? 0 },
+                  { label: t('dues.level2Referrals'), val: referralData?.totalL2 ?? 0 },
                 ].map(({ label, val }) => (
                   <div key={label} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                     <span className="text-xs text-muted-foreground">{label}</span>
@@ -410,14 +405,14 @@ const Home = () => {
                 ))}
                 <div className="pt-3 flex gap-4">
                   <Link to="/referral-program" className="text-xs font-medium text-blue-600 hover:underline">
-                    View referrals →
+                    {t('dues.viewReferrals')}
                   </Link>
                   {referralData?.withdrawalsEnabled === true ? (
                     (referralData?.availableBalance ?? 0) >= 100 && (
                       <>
                         <span className="text-muted-foreground text-xs">·</span>
                         <Link to="/referral-program" className="text-xs font-medium text-green-600 hover:underline">
-                          Withdraw →
+                          {t('dues.withdraw')}
                         </Link>
                       </>
                     )
@@ -427,7 +422,7 @@ const Home = () => {
                       <>
                         <span className="text-muted-foreground text-xs">·</span>
                         <Link to="/our-plans" className="text-xs font-medium text-green-600 hover:underline">
-                          Use on renewal →
+                          {t('dues.useOnRenewal')}
                         </Link>
                       </>
                     )

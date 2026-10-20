@@ -19,8 +19,11 @@ import { signupPathForPlan } from "@/config/plans";
 import { openRazorpayCheckout } from "@/utils/razorpayCheckout";
 import SEO from "@/components/SEO";
 import type { Plan } from "@/types/pages/OurPlans.types";
+import { useLanguage } from "@/hooks/useLanguage";
+import Trans from "@/components/Trans";
 
 const OurPlans = () => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<string>("");
@@ -49,11 +52,11 @@ const OurPlans = () => {
       price: 0,
       originalPrice: 299,
       features: [
-        "Only for new users",
-        "Access to all features",
-        "1 month validity",
-        "Email support",
-        "Regular updates"
+        t('plans.onlyForNewUsers'),
+        t('plans.accessToAllFeatures'),
+        t('plans.n1MonthValidity'),
+        t('plans.emailSupport'),
+        t('plans.regularUpdates')
       ]
     },
     {
@@ -63,10 +66,10 @@ const OurPlans = () => {
       price: 249,
       originalPrice: 299,
       features: [
-        "Access to all features",
-        "1 month validity",
-        "Email support",
-        "Regular updates"
+        t('plans.accessToAllFeatures'),
+        t('plans.n1MonthValidity'),
+        t('plans.emailSupport'),
+        t('plans.regularUpdates')
       ]
     },
     {
@@ -76,10 +79,10 @@ const OurPlans = () => {
       price: 599,
       originalPrice: 899,
       features: [
-        "Access to all features",
-        "3 months validity",
-        "Email support",
-        "Regular updates"
+        t('plans.accessToAllFeatures'),
+        t('plans.n3MonthsValidity'),
+        t('plans.emailSupport'),
+        t('plans.regularUpdates')
       ]
     },
     {
@@ -90,11 +93,11 @@ const OurPlans = () => {
       originalPrice: 1599,
       popular: true,
       features: [
-        "Access to all features",
-        "6 months validity",
-        "Priority email support",
-        "Regular updates",
-        "Extended storage"
+        t('plans.accessToAllFeatures'),
+        t('plans.n6MonthsValidity'),
+        t('plans.priorityEmailSupport'),
+        t('plans.regularUpdates'),
+        t('plans.extendedStorage')
       ]
     },
     {
@@ -104,12 +107,12 @@ const OurPlans = () => {
       price: 2099,
       originalPrice: 2999,
       features: [
-        "Access to all features",
-        "12 months validity",
-        "24/7 priority support",
-        "Regular updates",
-        "Unlimited storage",
-        "Advanced analytics"
+        t('plans.accessToAllFeatures'),
+        t('plans.n12MonthsValidity'),
+        t('plans.n247PrioritySupport'),
+        t('plans.regularUpdates'),
+        t('plans.unlimitedStorage'),
+        t('plans.advancedAnalytics')
       ]
     }
   ];
@@ -126,7 +129,7 @@ const OurPlans = () => {
     if (processingPlanId) return; // already checking out a plan — ignore extra clicks
     if (!currentUser) { navigate(signupPathForPlan(planId)); return; }
     if (currentUser.role === "admin" || currentUser.role === "superadmin") {
-      toast({ title: "Not applicable", description: "Admin accounts don't use subscription plans." });
+      toast({ title: t('plans.notApplicable'), description: t('plans.adminAccountsDonTUse') });
       return;
     }
 
@@ -137,7 +140,7 @@ const OurPlans = () => {
       if (!plan || plan.price === 0) {
         // Free plan — unchanged direct-activation path
         await changePlan(planId);
-        toast({ title: "Plan Activated", description: "Your plan has been updated successfully." });
+        toast({ title: t('plans.planActivated'), description: t('plans.yourPlanHasBeenUpdated') });
         navigate("/");
         return;
       }
@@ -152,7 +155,7 @@ const OurPlans = () => {
         const freshProfile = await getProfile();
         setCurrentUser(freshProfile);
         setLocalCurrentUser(freshProfile);
-        toast({ title: "Plan Activated", description: "Fully covered by your referral wallet." });
+        toast({ title: t('plans.planActivated'), description: t('plans.fullyCoveredByYourReferral') });
         navigate("/");
         return;
       }
@@ -164,8 +167,8 @@ const OurPlans = () => {
         userContact: currentUser?.mobileNumber,
         onFailure: () =>
           toast({
-            title: "Payment attempt failed",
-            description: "You can retry in the payment window, or close it and try again later.",
+            title: t('plans.paymentAttemptFailed'),
+            description: t('plans.youCanRetry'),
             variant: "destructive",
           }),
       });
@@ -177,21 +180,21 @@ const OurPlans = () => {
       setCurrentUser(freshProfile);
       setLocalCurrentUser(freshProfile);
 
-      toast({ title: "Payment Successful", description: "Your plan has been activated." });
+      toast({ title: t('plans.paymentSuccessful'), description: t('plans.yourPlanHasBeenActivated') });
       navigate("/");
     } catch (err: unknown) {
       if (err instanceof Error && err.message === "PAYMENT_CANCELLED") {
-        toast({ title: "Payment Cancelled", description: "You can try again anytime." });
+        toast({ title: t('plans.paymentCancelled'), description: t('plans.youCanTryAgainAnytime') });
         return;
       }
       if (err instanceof Error && err.message === "PAYMENT_FAILED") {
-        toast({ title: "Payment Failed", description: "Your payment could not be completed. Please try again.", variant: "destructive" });
+        toast({ title: t('plans.paymentFailed'), description: t('plans.yourPaymentCouldNot'), variant: "destructive" });
         return;
       }
       // Every axios error has already been toasted (or redirected) by apiClient's global
       // interceptor — toasting again here showed users the same message twice.
       if (axios.isAxiosError(err)) return;
-      toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
+      toast({ title: t('plans.error'), description: t('plans.somethingWentWrong'), variant: "destructive" });
     } finally {
       setProcessingPlanId(null);
     }
@@ -257,8 +260,8 @@ const OurPlans = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
-        title="Subscription Plans & Pricing"
-        description="Compare Policy Niketan subscription plans — from a free 1-month trial to 12-month options — and pick the right fit for how many client records you manage."
+        title={t('plans.subscriptionPlansPricing')}
+        description={t('plans.comparePolicyNiketanSubscriptionPlans')}
         path="/our-plans"
       />
       <Navigation />
@@ -267,13 +270,13 @@ const OurPlans = () => {
         {reason === "expired" && (
           <div className="flex items-start gap-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-400 text-sm rounded-xl p-4 mb-8 max-w-3xl mx-auto">
             <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
-            <p>Your subscription has expired. Please renew to continue managing your policy records.</p>
+            <p>{t('plans.yourSubscriptionHasExpiredPlease')}</p>
           </div>
         )}
         {reason === "no-plan" && (
           <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-amber-700 dark:text-amber-400 text-sm rounded-xl p-4 mb-8 max-w-3xl mx-auto">
             <Info className="w-5 h-5 shrink-0 mt-0.5" />
-            <p>Please choose a plan to get started with your workspace.</p>
+            <p>{t('plans.pleaseChooseAPlan')}</p>
           </div>
         )}
 
@@ -282,18 +285,17 @@ const OurPlans = () => {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-5">
             <Sparkles className="w-7 h-7 text-primary" />
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-form-header mb-3">Choose Your Plan</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-form-header mb-3">{t('plans.chooseYourPlan')}</h1>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            From a free trial to a full 12-month workspace — pick what fits how many client records
-            you manage today. Upgrade or renew any time as your book of business grows.
+            {t('plans.fromAFreeTrial')}
           </p>
 
           {/* Trust strip */}
           <div className="flex flex-wrap justify-center gap-2 mt-6">
             {[
-              { icon: ShieldCheck, label: "Secure Razorpay checkout" },
-              ...(REFERRAL_PROGRAM_ENABLED ? [{ icon: WalletIcon, label: "Use your referral wallet at checkout" }] : []),
-              { icon: RefreshCw, label: "Upgrade or renew any time" },
+              { icon: ShieldCheck, label: t('plans.secureRazorpayCheckout') },
+              ...(REFERRAL_PROGRAM_ENABLED ? [{ icon: WalletIcon, label: t('plans.useYourReferralWallet') }] : []),
+              { icon: RefreshCw, label: t('plans.upgradeOrRenewAnyTime') },
             ].map(({ icon: Icon, label }) => (
               <span
                 key={label}
@@ -316,7 +318,7 @@ const OurPlans = () => {
                 className="accent-primary"
               />
               <WalletIcon className="w-4 h-4 shrink-0" />
-              Use my referral wallet (₹{walletBalance} available)
+              {t('plans.useWalletBalance', { amount: walletBalance })}
             </label>
             {useWallet && (
               <input
@@ -326,12 +328,12 @@ const OurPlans = () => {
                 value={walletAmountInput}
                 onChange={(e) => setWalletAmountInput(e.target.value)}
                 className="mt-3 w-full border border-blue-200 dark:border-blue-900/50 bg-background rounded-lg px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                placeholder="Amount to apply"
+                placeholder={t('plans.amountToApply')}
               />
             )}
             {/* WALLET-TRANSFER-PAUSED */}
             <p className="mt-2 text-xs text-blue-800/80 dark:text-blue-300/80">
-              Wallet balance can only be used for plan renewals and upgrades.
+              {t('plans.walletBalanceCanOnly')}
             </p>
           </div>
         )}
@@ -341,9 +343,7 @@ const OurPlans = () => {
         <div className="flex items-center justify-center gap-2.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 rounded-xl p-4 text-center mb-10 max-w-3xl mx-auto">
           <Gift className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" />
           <p className="text-sm text-emerald-800 dark:text-emerald-400">
-            Have a referral code?{" "}
-            <strong>Get ₹{referralConfig?.SIGNUP_DISCOUNT_AMOUNT ?? 100} off</strong>{" "}
-            any paid plan when you sign up with a valid referral code.
+            <Trans i18nKey="plans.haveAReferralCodeGet" params={{ value: referralConfig?.SIGNUP_DISCOUNT_AMOUNT ?? 100 }} />
           </p>
         </div>
         )}
@@ -359,7 +359,7 @@ const OurPlans = () => {
               >
                 {plan.popular && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground shadow-sm">
-                    Most Popular
+                    {t('plans.mostPopular')}
                   </Badge>
                 )}
 
@@ -377,8 +377,7 @@ const OurPlans = () => {
                   </div>
                   {plan.originalPrice && (
                     <Badge variant="outline" className="mt-2 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50">
-                      Save ₹{plan.originalPrice - plan.price}
-                    </Badge>
+                      {t('plans.save', { value: plan.originalPrice - plan.price })}</Badge>
                   )}
                 </CardHeader>
 
@@ -401,7 +400,7 @@ const OurPlans = () => {
                       disabled
                     >
                       <Check className="h-4 w-4 mr-2" />
-                      Active Plan
+                      {t('plans.activePlan')}
                     </Button>
                   ) : currentUser?.subscription?.planId === plan.id && currentUser?.subscription?.status === 'pending_payment' ? (
                     <Button
@@ -410,7 +409,7 @@ const OurPlans = () => {
                       onClick={() => handleSelectPlan(plan.id)}
                       disabled={!!processingPlanId}
                     >
-                      {processingPlanId === plan.id ? "Processing…" : "Complete Payment"}
+                      {processingPlanId === plan.id ? t('plans.processing') : t('plans.completePayment')}
                     </Button>
                   ) : (
                     <Button
@@ -419,7 +418,7 @@ const OurPlans = () => {
                       onClick={() => handleSelectPlan(plan.id)}
                       disabled={!!processingPlanId}
                     >
-                      {processingPlanId === plan.id ? "Processing…" : "Select Plan"}
+                      {processingPlanId === plan.id ? t('plans.processing') : t('plans.selectPlan')}
                     </Button>
                   )}
                 </CardFooter>
@@ -432,10 +431,10 @@ const OurPlans = () => {
         <section className="max-w-4xl mx-auto mt-14" aria-labelledby="plan-value-heading">
           <div className="text-center mb-5">
             <h2 id="plan-value-heading" className="text-xl sm:text-2xl font-bold text-form-header">
-              Save more with longer plans
+              {t('plans.saveMoreWithLongerPlans')}
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              The longer you commit, the less each month costs you.
+              {t('plans.theLongerYouCommit')}
             </p>
           </div>
 
@@ -443,10 +442,10 @@ const OurPlans = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="whitespace-nowrap">Plan Duration</TableHead>
-                  <TableHead className="whitespace-nowrap">Current Price</TableHead>
-                  <TableHead className="whitespace-nowrap">Total Savings</TableHead>
-                  <TableHead className="whitespace-nowrap text-right">Effective Cost Per Month</TableHead>
+                  <TableHead className="whitespace-nowrap">{t('plans.planDuration')}</TableHead>
+                  <TableHead className="whitespace-nowrap">{t('plans.currentPrice')}</TableHead>
+                  <TableHead className="whitespace-nowrap">{t('plans.totalSavings')}</TableHead>
+                  <TableHead className="whitespace-nowrap text-right">{t('plans.effectiveCostPerMonth')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -455,18 +454,17 @@ const OurPlans = () => {
                     <TableCell className="font-medium text-form-header whitespace-nowrap">
                       {row.label}
                       {row.popular && (
-                        <Badge className="ml-2 bg-primary text-primary-foreground text-[10px] align-middle">Most Popular</Badge>
+                        <Badge className="ml-2 bg-primary text-primary-foreground text-[10px] align-middle">{t('plans.mostPopular')}</Badge>
                       )}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       <span className="font-semibold text-form-header">{inr(row.price)}</span>{" "}
-                      <span className="text-xs text-muted-foreground">(Originally {inr(row.original)})</span>
+                      <span className="text-xs text-muted-foreground">{t('plans.originally', { value: inr(row.original) })}</span>
                     </TableCell>
                     <TableCell className="whitespace-nowrap font-medium text-emerald-700 dark:text-emerald-400">
-                      Save {inr(row.saving)}
-                    </TableCell>
+                      {t('plans.save2', { value: inr(row.saving) })}</TableCell>
                     <TableCell className="whitespace-nowrap text-right font-semibold text-form-header">
-                      ~{inr(row.perMonth)} / month
+                      {t('plans.month', { value: inr(row.perMonth) })}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -477,11 +475,7 @@ const OurPlans = () => {
 
         <div className="text-center mt-10">
           <p className="text-sm text-muted-foreground">
-            All prices are in Indian Rupees (INR). Each plan is a one-time payment and does not renew automatically.{" "}
-            <Link to="/refund-policy" className="text-primary hover:underline">
-              Cancellation &amp; Refund Policy
-            </Link>
-          </p>
+            <Trans i18nKey="plans.allPricesAreInIndian" components={{ link: <Link to="/refund-policy" className="text-primary hover:underline" /> }} /></p>
         </div>
       </main>
 

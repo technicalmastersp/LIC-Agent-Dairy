@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode, useMemo } from "react";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,32 +21,33 @@ import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
 import SEO from "@/components/SEO";
 import BusinessCard, { BUSINESS_CARD_TEMPLATES } from "@/components/BusinessCard";
 import type { BusinessCardTheme } from "@/types/components/BusinessCard.types";
+import type { TFunction } from "@/types/i18n.types";
 
-const plans = [
-  { id: "1month-free", name: "1 Month Free", price: "Free", tag: "Try it out", color: "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border", accent: "text-gray-600 dark:text-muted-foreground" },
+const buildPlans = (t: TFunction) => [
+  { id: "1month-free", name: t('landing.n1MonthFree'), price: t('landing.free'), tag: t('landing.tryItOut'), color: "bg-gray-50 border-gray-200 dark:bg-muted dark:border-border", accent: "text-gray-600 dark:text-muted-foreground" },
   // The paid 1-month "Starter" plan (backend id "1month") — it was missing from this section.
-  { id: "1month", name: "1 Month", price: "Pay month to month", tag: "", color: "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-900", accent: "text-emerald-700 dark:text-emerald-400" },
-  { id: "3months", name: "3 Months", price: "For starting agents", tag: "", color: "bg-violet-50 border-violet-200 dark:bg-violet-950/40 dark:border-violet-900", accent: "text-violet-700 dark:text-violet-400" },
-  { id: "6months", name: "6 Months", price: "Most popular", tag: "Recommended", color: "bg-blue-50 border-blue-300 ring-2 ring-blue-200 dark:bg-blue-950/40 dark:border-blue-800 dark:ring-blue-900", accent: "text-blue-700 dark:text-blue-400" },
-  { id: "12months", name: "12 Months", price: "Best value", tag: "", color: "bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900", accent: "text-amber-700 dark:text-amber-400" },
+  { id: "1month", name: "1 Month", price: t('landing.payMonthToMonth'), tag: "", color: "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-900", accent: "text-emerald-700 dark:text-emerald-400" },
+  { id: "3months", name: "3 Months", price: t('landing.forStartingAgents'), tag: "", color: "bg-violet-50 border-violet-200 dark:bg-violet-950/40 dark:border-violet-900", accent: "text-violet-700 dark:text-violet-400" },
+  { id: "6months", name: "6 Months", price: t('landing.mostPopular'), tag: t('landing.recommended'), color: "bg-blue-50 border-blue-300 ring-2 ring-blue-200 dark:bg-blue-950/40 dark:border-blue-800 dark:ring-blue-900", accent: "text-blue-700 dark:text-blue-400" },
+  { id: "12months", name: "12 Months", price: t('landing.bestValue'), tag: "", color: "bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900", accent: "text-amber-700 dark:text-amber-400" },
 ];
 
 // Hero copy — the three headline promises, then every major capability as a compact chip.
 // Every chip maps to a feature that exists in the app today (see the FEATURES grid below).
-const HERO_POINTS = [
-  "All your client and policy records in one place",
-  "Stay ahead of renewals and payment due dates",
-  "Daily backups to help protect your records",
+const buildHeroPoints = (t: TFunction) => [
+  t('landing.allYourClientAndPolicy'),
+  t('landing.stayAheadOfRenewals'),
+  t('landing.dailyBackupsToHelpProtect'),
 ];
 
-const HERO_CHIPS = [
-  { icon: Upload, text: "Import from Excel / CSV" },
-  { icon: FileDown, text: "Export to PDF & CSV" },
-  { icon: Layers, text: "All policy types + custom" },
-  { icon: BellRing, text: "Bell, push & email reminders" },
-  { icon: Phone, text: "Call, WhatsApp & SMS" },
-  { icon: EyeOff, text: "Encrypted · hide mode" },
-  { icon: Languages, text: "English & Hindi" },
+const buildHeroChips = (t: TFunction) => [
+  { icon: Upload, text: t('landing.importFromExcelCsv') },
+  { icon: FileDown, text: t('landing.exportToPdfCsv') },
+  { icon: Layers, text: t('landing.allPolicyTypesCustom') },
+  { icon: BellRing, text: t('landing.bellPushEmailReminders') },
+  { icon: Phone, text: t('landing.callWhatsappSms') },
+  { icon: EyeOff, text: t('landing.encryptedHideMode') },
+  { icon: Languages, text: t('landing.englishHindi') },
   { icon: Calculator, text: `${SITE_STATS.freeTools} free calculators` },
 ];
 
@@ -55,10 +56,10 @@ const HERO_CHIPS = [
 // Grid rule: the list length must be a multiple of 3 (lg = 3 columns). 9 tiles today. If the
 // referral program is switched on, its tile is added and the list is trimmed back to 9 — the
 // LAST tiles drop first, so keep them in priority order (most important first).
-const FEATURES: { key: string; icon: LucideIcon; title: string; description: string; visual: ReactNode }[] = [
+const buildFeatures = (t: TFunction): { key: string; icon: LucideIcon; title: string; description: string; visual: ReactNode }[] => [
   {
-    key: "records", icon: FileText, title: "Complete policy records",
-    description: "Policyholder details, nominee info, and current & previous policy terms — all in one place.",
+    key: "records", icon: FileText, title: t('landing.completePolicyRecords'),
+    description: t('landing.policyholderDetailsNomineeInfo'),
     visual: (
       <div className="flex items-center gap-3 mb-4 bg-blue-50 dark:bg-blue-950/40 rounded-xl p-3">
         <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-700 dark:text-blue-300 text-xs font-semibold shrink-0">RS</div>
@@ -70,11 +71,11 @@ const FEATURES: { key: string; icon: LucideIcon; title: string; description: str
     ),
   },
   {
-    key: "due", icon: BellRing, title: "Due and lapse tracking",
-    description: "See what's due this month, what's coming up, and who missed a payment — before it lapses.",
+    key: "due", icon: BellRing, title: t('landing.dueAndLapseTracking'),
+    description: t('landing.seeWhatSDue'),
     visual: (
       <div className="mb-4 bg-amber-50 dark:bg-amber-950/40 rounded-xl p-3 space-y-1.5">
-        {["Due 3 Aug", "Due 9 Aug"].map((d) => (
+        {[t('landing.due3Aug'), t('landing.due9Aug')].map((d) => (
           <div key={d} className="flex items-center justify-between bg-white dark:bg-background rounded-md px-2.5 py-1.5">
             <span className="text-[10px] text-form-header font-medium">{d}</span>
             <BellRing className="w-3 h-3 text-amber-500" />
@@ -85,23 +86,23 @@ const FEATURES: { key: string; icon: LucideIcon; title: string; description: str
   },
   // REFERRAL-PROGRAM — only while the program is enabled
   ...(REFERRAL_PROGRAM_ENABLED ? [{
-    key: "referral", icon: Wallet, title: "Referral wallet",
-    description: "Earn and track referral rewards, and use your wallet balance toward plan renewals and upgrades.",
+    key: "referral", icon: Wallet, title: t('landing.referralWallet'),
+    description: t('landing.earnAndTrackReferralRewards'),
     visual: (
       <div className="mb-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl p-4">
-        <p className="text-[10px] text-emerald-700 dark:text-emerald-400 mb-1">Available balance</p>
+        <p className="text-[10px] text-emerald-700 dark:text-emerald-400 mb-1">{t('landing.availableBalance')}</p>
         <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400">₹4,250</p>
       </div>
     ),
   }] : []),
   {
-    key: "search", icon: Search, title: "Instant search & sort",
-    description: "Find any record by name, policy number, or occupation — and filter by insurance type — in seconds.",
+    key: "search", icon: Search, title: t('landing.instantSearchSort'),
+    description: t('landing.findAnyRecordByName'),
     visual: (
       <div className="mb-4 bg-violet-50 dark:bg-violet-950/40 rounded-xl p-3">
         <div className="flex items-center gap-2 bg-white dark:bg-background rounded-md px-2.5 py-1.5 mb-2">
           <Search className="w-3 h-3 text-muted-foreground" />
-          <span className="text-[10px] text-muted-foreground">Sharma...</span>
+          <span className="text-[10px] text-muted-foreground">{t('landing.sharma')}</span>
         </div>
         <div className="h-1.5 w-3/4 rounded bg-violet-200/60 dark:bg-violet-800/40 mb-1.5" />
         <div className="h-1.5 w-1/2 rounded bg-violet-200/40 dark:bg-violet-800/25" />
@@ -109,12 +110,12 @@ const FEATURES: { key: string; icon: LucideIcon; title: string; description: str
     ),
   },
   {
-    key: "import-export", icon: FileSpreadsheet, title: "Import & export",
-    description: "Bring your book in from Excel or CSV (up to 100 records at a time), and export your records to PDF or CSV whenever you need them.",
+    key: "import-export", icon: FileSpreadsheet, title: t('landing.importExport'),
+    description: t('landing.bringYourBookInFrom'),
     visual: (
       <div className="mb-4 bg-teal-50 dark:bg-teal-950/40 rounded-xl p-3 flex items-center justify-center gap-2">
-        {[".xlsx", ".csv"].map((t) => (
-          <span key={t} className="text-[11px] font-medium bg-white dark:bg-background text-form-header rounded-md px-2.5 py-1 shadow-sm">{t}</span>
+        {[".xlsx", ".csv"].map((tk) => (
+          <span key={tk} className="text-[11px] font-medium bg-white dark:bg-background text-form-header rounded-md px-2.5 py-1 shadow-sm">{tk}</span>
         ))}
         <ArrowRight className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
         <span className="text-[11px] font-medium bg-teal-200/60 dark:bg-teal-800/40 text-teal-800 dark:text-teal-300 rounded-md px-2.5 py-1">PDF</span>
@@ -122,27 +123,27 @@ const FEATURES: { key: string; icon: LucideIcon; title: string; description: str
     ),
   },
   {
-    key: "types", icon: Layers, title: "Every kind of policy",
-    description: "Life, term, health, family health, vehicle and travel — each with its own fields — plus a custom type you can design yourself.",
+    key: "types", icon: Layers, title: t('landing.everyKindOfPolicy'),
+    description: t('landing.lifeTermHealthFamilyHealth'),
     visual: (
       <div className="mb-4 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl p-3 flex flex-wrap gap-1.5">
-        {["Life", "Health", "Vehicle", "Travel", "+ Custom"].map((t) => (
-          <span key={t} className="text-[10px] font-medium bg-white dark:bg-background text-form-header rounded-full px-2.5 py-1 shadow-sm">{t}</span>
+        {[t('landing.life'), t('landing.health'), t('landing.vehicle'), t('landing.travel'), "+ Custom"].map((tk) => (
+          <span key={tk} className="text-[10px] font-medium bg-white dark:bg-background text-form-header rounded-full px-2.5 py-1 shadow-sm">{tk}</span>
         ))}
       </div>
     ),
   },
   {
-    key: "reminders", icon: Bell, title: "Reminders that reach you",
-    description: "In-app bell, phone or desktop push, and email reminders ahead of every due date — you choose which ones to receive.",
+    key: "reminders", icon: Bell, title: t('landing.remindersThatReach'),
+    description: t('landing.inAppBellPhone'),
     visual: (
       <div className="mb-4 bg-orange-50 dark:bg-orange-950/40 rounded-xl p-3 space-y-1.5">
         <div className="flex items-center gap-2 bg-white dark:bg-background rounded-md px-2.5 py-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
-          <span className="text-[10px] text-form-header font-medium">3 policies due in 3 days</span>
+          <span className="text-[10px] text-form-header font-medium">{t('landing.n3PoliciesDueIn3')}</span>
         </div>
         <div className="flex gap-1.5">
-          {["In-app", "Push", "Email"].map((c) => (
+          {["In-app", t('landing.push'), t('common.email2')].map((c) => (
             <span key={c} className="text-[9px] font-medium bg-orange-200/60 dark:bg-orange-800/40 text-orange-800 dark:text-orange-300 rounded-full px-2 py-0.5">{c}</span>
           ))}
         </div>
@@ -150,13 +151,13 @@ const FEATURES: { key: string; icon: LucideIcon; title: string; description: str
     ),
   },
   {
-    key: "privacy", icon: Lock, title: "Private by design",
-    description: "Aadhaar, PAN and bank details are encrypted at rest, and a Hide switch masks them on screen when a client is looking.",
+    key: "privacy", icon: Lock, title: t('landing.privateByDesign'),
+    description: t('landing.aadhaarPanAndBankDetails'),
     visual: (
       <div className="mb-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 flex items-center justify-between">
         <div>
-          <p className="text-[9px] text-muted-foreground mb-0.5">Aadhaar</p>
-          <p className="text-xs font-mono text-form-header tracking-wider">XXXX XXXX 2291</p>
+          <p className="text-[9px] text-muted-foreground mb-0.5">{t('landing.aadhaar')}</p>
+          <p className="text-xs font-mono text-form-header tracking-wider">{t('landing.xxxxXxxx2291')}</p>
         </div>
         <span className="w-7 h-7 rounded-full bg-white dark:bg-background shadow-sm flex items-center justify-center">
           <EyeOff className="w-3.5 h-3.5 text-slate-500" />
@@ -165,18 +166,18 @@ const FEATURES: { key: string; icon: LucideIcon; title: string; description: str
     ),
   },
   {
-    key: "language", icon: Languages, title: "English & Hindi",
-    description: "Use the platform in the language you're comfortable with, with Indian date formats throughout.",
+    key: "language", icon: Languages, title: t('landing.englishHindi'),
+    description: t('landing.useThePlatform'),
     visual: (
       <div className="mb-4 bg-rose-50 dark:bg-rose-950/40 rounded-xl p-3 flex items-center gap-2">
-        <span className="text-[11px] font-medium bg-white dark:bg-background text-form-header rounded-full px-3 py-1 shadow-sm">English</span>
+        <span className="text-[11px] font-medium bg-white dark:bg-background text-form-header rounded-full px-3 py-1 shadow-sm">{t('landing.english')}</span>
         <span className="text-[11px] font-medium bg-rose-200/60 dark:bg-rose-800/40 text-rose-700 dark:text-rose-300 rounded-full px-3 py-1">हिंदी</span>
       </div>
     ),
   },
   {
-    key: "mobile", icon: Smartphone, title: "Works on your phone",
-    description: "Update a record between client visits — smooth on mobile, installable as an app, same as desktop.",
+    key: "mobile", icon: Smartphone, title: t('landing.worksOnYourPhone'),
+    description: t('landing.updateARecordBetweenClient'),
     visual: (
       <div className="mb-4 bg-cyan-50 dark:bg-cyan-950/40 rounded-xl p-3 flex justify-center">
         <div className="w-14 h-24 rounded-xl border-2 border-cyan-300 dark:border-cyan-800 bg-white dark:bg-background p-1.5 flex flex-col gap-1">
@@ -191,6 +192,10 @@ const FEATURES: { key: string; icon: LucideIcon; title: string; description: str
 const Landing = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const HERO_CHIPS = useMemo(() => buildHeroChips(t), [t]);
+  const FEATURES = useMemo(() => buildFeatures(t), [t]);
+  const plans = useMemo(() => buildPlans(t), [t]);
+  const HERO_POINTS = useMemo(() => buildHeroPoints(t), [t]);
   const [demoTheme, setDemoTheme] = useState<BusinessCardTheme>("classic");
 
   useEffect(() => {
@@ -202,14 +207,14 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
-        title="Insurance Policy Record Management for Agents"
-        description="Manage every policy and never miss a renewal. Track due dates and payments, import from Excel, export to PDF, get reminders by push and email — built for all types of insurance agents."
+        title={t('landing.insurancePolicyRecordManagement')}
+        description={t('landing.manageEveryPolicyAndNever')}
         path="/"
         jsonLd={{
           "@context": "https://schema.org",
           "@graph": [
             {
-              "@type": "Organization",
+              "@type": t('landing.organization'),
               "@id": `${siteConfig.productionUrl}/#organization`,
               name: siteConfig.companyName,
               url: siteConfig.productionUrl,
@@ -243,14 +248,13 @@ const Landing = () => {
               {/* Left: message — matches the approved reference (pill, headline, intro, 3 checks), then the full feature set */}
               <div className="space-y-5">
                 <span className="inline-flex items-center text-xs font-semibold uppercase tracking-wide bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 px-3 py-1 rounded-full">
-                  Free for your first month
+                  {t('landing.freeForYourFirstMonth')}
                 </span>
                 <h1 className="text-3xl sm:text-4xl lg:text-[2.6rem] font-bold leading-[1.15] tracking-tight text-form-header">
-                  Manage Every Policy. Never Miss a Renewal.
+                  {t('landing.manageEveryPolicyNeverMiss')}
                 </h1>
                 <p className="text-base text-muted-foreground leading-relaxed max-w-xl">
-                  The smarter way for insurance agents to manage clients, track policy renewals,
-                  monitor due dates, and keep every record organized — all in one place, with daily backups.
+                  {t('landing.theSmarterWayForInsurance')}
                 </p>
 
                 <ul className="space-y-2">
@@ -263,7 +267,7 @@ const Landing = () => {
                 </ul>
 
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Everything inside</p>
+                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('landing.everythingInside')}</p>
                   <ul className="flex flex-wrap gap-2">
                     {HERO_CHIPS.map(({ icon: Icon, text }) => (
                       <li key={text} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-3 py-1.5 text-xs sm:text-[13px] text-form-header">
@@ -278,17 +282,17 @@ const Landing = () => {
                   <Link to="/signup">
                     <Button size="lg" className="bg-primary hover:bg-primary-light font-medium">
                       <UserPlus className="w-4 h-4 mr-2" />
-                      Create free account
+                      {t('landing.createFreeAccount')}
                     </Button>
                   </Link>
                   <Link to="/login">
                     <Button size="lg" variant="outline" className="bg-transparent border-primary/30 text-form-header hover:bg-primary/5">
                       <LogIn className="w-4 h-4 mr-2" />
-                      I already have an account
+                      {t('landing.iAlreadyHaveAnAccount')}
                     </Button>
                   </Link>
                 </div>
-                <p className="text-xs text-muted-foreground">No credit card required for your first month.</p>
+                <p className="text-xs text-muted-foreground">{t('landing.noCreditCardRequired')}</p>
               </div>
 
               {/* Right: single contained dashboard mockup — badges anchored to its own box, can't drift into text */}
@@ -300,16 +304,16 @@ const Landing = () => {
                       <span className="w-2.5 h-2.5 rounded-full bg-red-300" />
                       <span className="w-2.5 h-2.5 rounded-full bg-amber-300" />
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-300" />
-                      <span className="ml-3 text-xs text-muted-foreground font-medium">Policy Dashboard</span>
+                      <span className="ml-3 text-xs text-muted-foreground font-medium">{t('landing.policyDashboard')}</span>
                     </div>
 
                     <div className="p-5 space-y-4">
                       {/* mini stat row */}
                       <div className="grid grid-cols-3 gap-2">
                         {[
-                          { label: "Records", val: "128", bg: "bg-blue-50 dark:bg-blue-950/40", color: "text-blue-700 dark:text-blue-400" },
-                          { label: "Due", val: "12", bg: "bg-amber-50 dark:bg-amber-950/40", color: "text-amber-700 dark:text-amber-400" },
-                          { label: "Backed up", val: "Today", bg: "bg-emerald-50 dark:bg-emerald-950/40", color: "text-emerald-700 dark:text-emerald-400" },
+                          { label: t('landing.records'), val: "128", bg: "bg-blue-50 dark:bg-blue-950/40", color: "text-blue-700 dark:text-blue-400" },
+                          { label: t('landing.due'), val: "12", bg: "bg-amber-50 dark:bg-amber-950/40", color: "text-amber-700 dark:text-amber-400" },
+                          { label: t('landing.backedUp'), val: t('landing.today'), bg: "bg-emerald-50 dark:bg-emerald-950/40", color: "text-emerald-700 dark:text-emerald-400" },
                         ].map(({ label, val, bg, color }) => (
                           <div key={label} className={`${bg} rounded-lg p-2.5 text-center`}>
                             <p className={`text-sm font-semibold ${color}`}>{val}</p>
@@ -321,7 +325,7 @@ const Landing = () => {
                       {/* mini table */}
                       <div className="rounded-lg border border-border overflow-hidden">
                         <div className="grid grid-cols-3 bg-muted/50 text-[10px] font-medium text-muted-foreground uppercase px-3 py-2">
-                          <span>Name</span><span>Policy</span><span className="text-right">Status</span>
+                          <span>{t('common.name')}</span><span>{t('landing.policy')}</span><span className="text-right">{t('common.status')}</span>
                         </div>
                         {[
                           { name: "S. Sharma", policy: "XXX-2291", status: "Active", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
@@ -345,7 +349,7 @@ const Landing = () => {
                     <span className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
                       <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                     </span>
-                    <span className="text-[11px] font-medium text-form-header">Backed up 2m ago</span>
+                    <span className="text-[11px] font-medium text-form-header">{t('landing.backedUp2mAgo')}</span>
                   </div>
                 </div>
 
@@ -355,8 +359,8 @@ const Landing = () => {
                     <Bell className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                   </span>
                   <span className="text-xs text-form-header">
-                    <span className="font-semibold">3 payments</span>
-                    <span className="text-muted-foreground"> due this week</span>
+                    <span className="font-semibold">{t('landing.n3Payments')}</span>
+                    <span className="text-muted-foreground"> {" "}{t('landing.dueThisWeek')}</span>
                   </span>
                 </div>
               </div>
@@ -369,10 +373,10 @@ const Landing = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-3">
               {[
-                { icon: DatabaseBackup, text: "Daily backups" },
-                { icon: Timer, text: "Support in < few hrs" },
-                { icon: CheckCircle2, text: "Zero pending overnight" },
-                { icon: ShieldCheck, text: "Any policy type" },
+                { icon: DatabaseBackup, text: t('landing.dailyBackups') },
+                { icon: Timer, text: t('landing.supportInFewHrs') },
+                { icon: CheckCircle2, text: t('landing.zeroPendingOvernight') },
+                { icon: ShieldCheck, text: t('landing.anyPolicyType') },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-2 bg-background border border-border rounded-full px-4 py-2 text-sm text-form-header shadow-sm">
                   <Icon className="w-4 h-4 text-primary" />
@@ -384,14 +388,14 @@ const Landing = () => {
         </section>
 
         {/* ══════════ STATS BAND — numbers come from src/config/siteStats.ts (single source of truth) ══════════ */}
-        <section aria-label="Policy Niketan in numbers" className="bg-background py-12">
+        <section aria-label={t('landing.policyNiketanInNumbers')} className="bg-background py-12">
           <div className="container mx-auto px-4">
             <dl className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-y-8 md:gap-y-0 md:divide-x md:divide-border text-center">
-              {HOME_STATS.map(({ key, value, label }) => (
+              {HOME_STATS.map(({ key, value, labelKey, valueKey, valueParams }) => (
                 <div key={key} className="px-4" data-testid={`home-stat-${key}`}>
-                  <dt className="sr-only">{label}</dt>
-                  <dd className="text-3xl md:text-4xl font-bold text-primary tabular-nums">{value}</dd>
-                  <p className="mt-1 text-sm text-muted-foreground" aria-hidden="true">{label}</p>
+                  <dt className="sr-only">{t(labelKey)}</dt>
+                  <dd className="text-3xl md:text-4xl font-bold text-primary tabular-nums">{valueKey ? t(valueKey, valueParams) : value}</dd>
+                  <p className="mt-1 text-sm text-muted-foreground" aria-hidden="true">{t(labelKey)}</p>
                 </div>
               ))}
             </dl>
@@ -403,8 +407,8 @@ const Landing = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center max-w-xl mx-auto mb-16">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Getting started</p>
-                <h2 className="text-3xl font-bold text-form-header">Up and running in three steps</h2>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('landing.gettingStarted')}</p>
+                <h2 className="text-3xl font-bold text-form-header">{t('landing.upAndRunningInThree')}</h2>
               </div>
 
               <div className="relative grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6">
@@ -412,9 +416,9 @@ const Landing = () => {
                 <div className="hidden md:block absolute top-7 left-[16.6%] right-[16.6%] h-0.5 bg-border" />
 
                 {[
-                  { icon: UserPlus, title: "Create your account", description: "Sign up in minutes — no paperwork, no waiting for approval. Your first month is free." },
-                  { icon: ClipboardList, title: "Add your policies", description: "Bring in your existing book of clients, one record or many, with full policyholder and policy details." },
-                  { icon: ListChecks, title: "Never miss a due date", description: "The dashboard flags what's due this month and what's lapsed — so follow-ups happen on time." },
+                  { icon: UserPlus, title: t('landing.createYourAccount'), description: t('landing.signUpInMinutesNo') },
+                  { icon: ClipboardList, title: t('landing.addYourPolicies'), description: t('landing.bringInYourExistingBook') },
+                  { icon: ListChecks, title: t('landing.neverMissADueDate'), description: t('landing.theDashboardFlagsWhatS') },
                 ].map(({ icon: Icon, title, description }, i) => (
                   // <div key={title} className="relative text-center md:text-left">
                   <div key={title} className="relative text-center md:text-center md:flex md:flex-col md:items-center">
@@ -435,8 +439,8 @@ const Landing = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center max-w-xl mx-auto mb-14">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">What you get</p>
-                <h2 className="text-3xl font-bold text-form-header">Everything to run your policy book</h2>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('landing.whatYouGet')}</p>
+                <h2 className="text-3xl font-bold text-form-header">{t('landing.everythingToRunYourPolicy')}</h2>
               </div>
 
               {/* Always a multiple of 3 so the lg grid has no orphan row (see FEATURES). */}
@@ -461,24 +465,21 @@ const Landing = () => {
 
               <div className="space-y-5 order-2 lg:order-1">
                 <Badge className="bg-primary/10 text-primary border border-primary/20 w-fit">
-                  <Sparkles className="w-3 h-3 mr-1" /> Get Free Business Card
+                  <Sparkles className="w-3 h-3 mr-1" /> {" "}{t('landing.getFreeBusinessCard')}
                 </Badge>
                 <h2 className="text-3xl font-bold text-form-header leading-tight">
-                  Your own digital business card, generated for free
+                  {t('landing.yourOwnDigitalBusinessCard')}
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  Once your profile is 100% complete, {siteConfig.companyName} turns your name,
-                  role, and contact details into a shareable business card — pick from 4 designs,
-                  then download it as a PNG to share on WhatsApp, print, or add to your email
-                  signature.
+                  {t('landing.onceYourProfileIs100', { companyName: siteConfig.companyName })}
                 </p>
                 <div className="space-y-3">
                   {[
-                    "4 professionally designed themes to choose from",
-                    "Your name, mobile number, email, and Agent ID laid out automatically",
-                    "Unlocks the moment your profile hits 100% completion",
-                    "Download as a high-resolution PNG, ready to share or print",
-                    "Add your Image & custom note to your business card (max. 150 characters)",
+                    t('landing.n4ProfessionallyDesignedThemes'),
+                    t('landing.yourNameMobileNumberEmail'),
+                    t('landing.unlocksTheMomentYourProfile'),
+                    t('landing.downloadAsAHighResolution'),
+                    t('landing.addYourImageCustomNote'),
                   ].map((point) => (
                     <div key={point} className="flex items-start gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
@@ -498,19 +499,19 @@ const Landing = () => {
                       }`}
                     >
                       <span className="w-4 h-4 rounded-full border border-border shrink-0" style={{ background: tpl.swatch }} />
-                      {tpl.label}
+                      {t(tpl.label)}
                     </button>
                   ))}
                 </div>
                 <Button size="lg" className="mt-2" onClick={() => navigate("/signup")}>
-                  <UserPlus className="w-4 h-4 mr-2" /> Get started free
+                  <UserPlus className="w-4 h-4 mr-2" /> {" "}{t('landing.getStartedFree')}
                 </Button>
               </div>
 
               <div className="order-1 lg:order-2">
                 <BusinessCard
                   name="Rahul Sharma"
-                  roleLabel="Policy Agent"
+                  roleLabel={t('landing.policyAgent')}
                   mobileNumber="+91 98765 43210"
                   email="rahul.sharma@example.com"
                   easyId="PN-10482"
@@ -518,7 +519,7 @@ const Landing = () => {
                   className="w-full max-w-lg mx-auto"
                 />
                 <p className="text-xs text-muted-foreground text-center mt-3 flex items-center justify-center gap-1">
-                  <IdCard className="w-3.5 h-3.5" /> Live prototype — sample data shown, sign up to make your own
+                  <IdCard className="w-3.5 h-3.5" /> {" "}{t('landing.livePrototypeSampleDataShown')}
                 </p>
               </div>
 
@@ -533,9 +534,9 @@ const Landing = () => {
 
               <div className="space-y-6 order-2 lg:order-1">
                 {[
-                  { icon: DatabaseBackup, title: "Backed up daily", description: "Every record is backed up day by day, without exception — nothing rests on a single copy." },
-                  { icon: Lock, title: "Locked down access", description: "Sensitive fields like Aadhaar, PAN, and bank details are visible only to you and authorized admins." },
-                  { icon: LifeBuoy, title: "Fast, human support", description: "Real answers from a team that understands policy workflows — typically within a few hours, nothing left pending overnight." },
+                  { icon: DatabaseBackup, title: t('landing.backedUpDaily'), description: t('landing.everyRecordIsBackedUp') },
+                  { icon: Lock, title: t('landing.lockedDownAccess'), description: t('landing.sensitiveFieldsLikeAadhaarPan') },
+                  { icon: LifeBuoy, title: t('landing.fastHumanSupport'), description: t('landing.realAnswersFromATeam') },
                 ].map(({ icon: Icon, title, description }) => (
                   <div key={title} className="flex gap-4">
                     <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -550,19 +551,17 @@ const Landing = () => {
               </div>
 
               <div className="order-1 lg:order-2 space-y-4">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary">Why agents trust us</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary">{t('landing.whyAgentsTrustUs')}</p>
                 <h2 className="text-3xl font-bold text-form-header leading-tight">
-                  Secure, backed up, and always answered.
+                  {t('landing.secureBackedUpAndAlways')}
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  Your client data is sensitive, and it's treated that way from day one — backed up
-                  daily, access locked down by default, and support that closes out your questions
-                  the same day they're raised.
+                  {t('landing.yourClientDataIsSensitive')}
                 </p>
                 <div className="rounded-2xl bg-primary/5 border border-primary/10 p-5 flex items-center gap-4">
                   <ShieldCheck className="w-8 h-8 text-primary shrink-0" />
                   <p className="text-sm text-form-header font-medium">
-                    A platform built to be the last one you need for policy management.
+                    {t('landing.aPlatformBuilt')}
                   </p>
                 </div>
               </div>
@@ -576,10 +575,10 @@ const Landing = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center max-w-xl mx-auto mb-14">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Simple pricing</p>
-                <h2 className="text-3xl font-bold text-form-header">Start free, stay as long as you need</h2>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('landing.simplePricing')}</p>
+                <h2 className="text-3xl font-bold text-form-header">{t('landing.startFreeStayAsLong')}</h2>
                 <p className="text-muted-foreground mt-3">
-                  Every plan includes the full platform — no feature is locked behind a higher tier.
+                  {t('landing.everyPlanIncludesTheFull')}
                 </p>
               </div>
 
@@ -594,21 +593,21 @@ const Landing = () => {
                     <p className={`text-sm font-medium ${accent} mb-1`}>{name}</p>
                     <p className="text-form-header font-semibold text-lg mb-4">{price}</p>
                     <ul className="space-y-2 text-xs text-muted-foreground mb-6 flex-1">
-                      <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> Unlimited policy records</li>
-                      <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> Due & lapse tracking</li>
-                      <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> Daily backups</li>
+                      <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> {" "}{t('landing.unlimitedPolicyRecords')}</li>
+                      <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> {" "}{t('landing.dueLapseTracking')}</li>
+                      <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> {" "}{t('landing.dailyBackups')}</li>
                     </ul>
                     {/* ?plan=<id> → the signup page opens with this plan already selected */}
                     <Link to={signupPathForPlan(id)}>
                       <Button variant="outline" size="sm" className="w-full bg-background">
-                        Choose plan
+                        {t('landing.choosePlan')}
                       </Button>
                     </Link>
                   </div>
                 ))}
               </div>
               <p className="text-center text-xs text-muted-foreground mt-6">
-                <Link to="/our-plans" className="text-primary hover:underline font-medium">See full plan comparison →</Link>
+                <Link to="/our-plans" className="text-primary hover:underline font-medium">{t('landing.seeFullPlanComparison')}</Link>
               </p>
             </div>
           </div>
@@ -619,20 +618,20 @@ const Landing = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center space-y-6">
               <TrendingUp className="w-10 h-10 mx-auto text-primary-foreground/90" />
-              <h2 className="text-3xl md:text-4xl font-bold">Bring order to your policy book today.</h2>
+              <h2 className="text-3xl md:text-4xl font-bold">{t('landing.bringOrderToYourPolicy')}</h2>
               <p className="text-primary-foreground/90 text-lg">
-                Free for your first month. No setup fees, no long-term commitment required.
+                {t('landing.freeForYourFirstMonth2')}
               </p>
               <div className="flex flex-wrap justify-center gap-3 pt-2">
                 <Link to="/signup">
                   <Button size="lg" className="bg-white text-[hsl(195,85%,25%)] hover:bg-white/90 font-medium">
                     <UserPlus className="w-4 h-4 mr-2" />
-                    Create your free account
+                    {t('landing.createYourFreeAccount')}
                   </Button>
                 </Link>
                 <Link to="/about">
                   <Button size="lg" variant="outline" className="bg-transparent border-white/50 text-primary-foreground hover:bg-white/10">
-                    Learn more <ArrowRight className="w-4 h-4 ml-2" />
+                    {t('landing.learnMore')}{" "} <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
               </div>

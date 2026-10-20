@@ -12,6 +12,9 @@ const read = (rel: string) => fs.readFileSync(path.join(root, rel), "utf8");
 
 const toolPaths: string[] = (PUBLIC_ROUTES as { path: string }[]).map((r) => r.path).filter((p) => /^\/tools\/.+/.test(p));
 
+// English source strings for i18n keys ("tools.ageCalculator" -> locales/en/tools.json).
+const readEn = (ns: string) => JSON.parse(fs.readFileSync(path.join(process.cwd(), "src/i18n/locales/en", `${ns}.json`), "utf8"));
+
 describe("free tools — registered everywhere", () => {
   it("has the nine expected calculators, incl. the new lumpsum / RD / FD", () => {
     expect(toolPaths).toEqual(expect.arrayContaining([
@@ -40,8 +43,15 @@ describe("free tools — registered everywhere", () => {
       const imp = app.match(new RegExp(`const ${m![1]} = lazy\\(\\(\\) => import\\("\\./pages/tools/(\\w+)"\\)\\)`));
       expect(imp, `no lazy import for ${m![1]}`).toBeTruthy();
       const page = read(`src/pages/tools/${imp![1]}.tsx`);
-      const title = page.match(/title="([^"]+)"/)?.[1];
-      const desc = page.match(/description="([^"]+)"/)?.[1];
+      // Pages pass either a literal or an i18n key (title={t('tools.xyz')}); resolve keys to English.
+      const attr = (name: string) => {
+        const lit = page.match(new RegExp(`${name}="([^"]+)"`))?.[1];
+        if (lit) return lit;
+        const key = page.match(new RegExp(`${name}=\\{t\\('([\\w]+)\\.([\\w]+)'\\)\\}`));
+        return key ? (readEn(key[1]) as Record<string, string>)[key[2]] : undefined;
+      };
+      const title = attr("title");
+      const desc = attr("description");
       expect(title, `${p} title`).toBeTruthy();
       expect(desc!.length, `${p} description is ${desc!.length} chars`).toBeGreaterThanOrEqual(100);
       expect(desc!.length, `${p} description is ${desc!.length} chars`).toBeLessThanOrEqual(170);

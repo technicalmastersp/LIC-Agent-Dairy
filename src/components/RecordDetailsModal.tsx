@@ -4,6 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { makeInsuranceText } from "@/i18n/insuranceText";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import PaymentHistoryModal from "@/components/PaymentHistoryModal";
@@ -21,6 +22,7 @@ import { formatAadhaar, formatIndianNumber, formatMobileNumber } from "@/utils/i
 import { SensitiveValue } from "@/components/SensitiveValue";
 import { getInsuranceTypeDef, isOtherInsuranceType } from "@/config/insuranceTypes";
 import type { FamilyMember, CustomFieldValue, RecordDetailsModalProps, IconType } from "@/types/components/RecordDetailsModal.types";
+import { useLanguage } from "@/hooks/useLanguage";
 const SectionTitle = ({ icon: Icon, children }: { icon: IconType; children: React.ReactNode }) => (
   <CardTitle className="text-form-header flex items-center gap-2.5">
     <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -31,6 +33,8 @@ const SectionTitle = ({ icon: Icon, children }: { icon: IconType; children: Reac
 );
 
 const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = false, onPaymentsChanged }: RecordDetailsModalProps) => {
+  const { t, tOr } = useLanguage();
+  const ins = makeInsuranceText(tOr);
   const [paymentHistoryOpen, setPaymentHistoryOpen] = useState(false);
   if (!record) return null;
 
@@ -51,7 +55,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
         <DialogHeader>
           <DialogTitle className="flex flex-wrap items-center gap-2 text-form-header">
             <User className="w-5 h-5 shrink-0" />
-            <span className="break-words">Record Details - {record.name}</span>
+            <span className="break-words">{t('records.recordDetails2', { name: record.name })}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -68,17 +72,16 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                 <Badge variant="outline" className="bg-background/60 border-primary/30 text-form-header font-medium">
                   {isOtherInsuranceType(record.insuranceType)
-                    ? (record.customInsuranceTypeName || "Custom Insurance")
-                    : (getInsuranceTypeDef(record.insuranceType)?.label || record.insuranceType || "Life Insurance")}
+                    ? (record.customInsuranceTypeName || t('records.customInsurance'))
+                    : (ins.typeNameById(record.insuranceType ?? "", record.insuranceType ?? "") || t('records.lifeInsurance'))}
                 </Badge>
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5" />
-                  Created: {convertDateToIndianFormat(record.createdAt)}
+                  {t('records.createdOn', { date: convertDateToIndianFormat(record.createdAt) })}
                 </span>
                 {record.currentPolicy?.nextDueDate && (
                   <Badge className="bg-amber-100 text-amber-700 border border-amber-200">
-                    Payment Due: {convertDateToIndianFormat(record.currentPolicy?.nextDueDate)}
-                  </Badge>
+                    {t('records.paymentDue', { value: convertDateToIndianFormat(record.currentPolicy?.nextDueDate) })}</Badge>
                 )}
               </div>
             </CardHeader>
@@ -87,14 +90,14 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
           {/* Basic Details */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={IdCard}>Basic Details</SectionTitle>
+              <SectionTitle icon={IdCard}>{t('common.basicDetails')}</SectionTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <InfoItem icon={User} label="Date" value={convertDateToIndianFormat(record.date)} />
-                <InfoItem icon={Calendar} label="Aadhaar Number" value={<SensitiveValue field="aadhaarNumber" value={record.aadhaarNumber} render={formatAadhaar} />} />
-                <InfoItem icon={MapPin} label="Pan Number" value={<SensitiveValue field="panNumber" value={record.panNumber} />} />
-                <InfoItem icon={User} label="E Mail" value={<SensitiveValue field="email" value={record.email} />} />
+                <InfoItem icon={User} label={t('records.date')} value={convertDateToIndianFormat(record.date)} />
+                <InfoItem icon={Calendar} label={t('records.aadhaarNumber')} value={<SensitiveValue field="aadhaarNumber" value={record.aadhaarNumber} render={formatAadhaar} />} />
+                <InfoItem icon={MapPin} label={t('records.panNumber')} value={<SensitiveValue field="panNumber" value={record.panNumber} />} />
+                <InfoItem icon={User} label={t('records.eMail')} value={<SensitiveValue field="email" value={record.email} />} />
               </div>
             </CardContent>
           </Card>
@@ -105,7 +108,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
               <Card>
                 <CardHeader>
                   <SectionTitle icon={ShieldCheck}>
-                    {record.customInsuranceTypeName || "Custom"} Details
+                    {t('records.details2', { value: record.customInsuranceTypeName || "Custom" })}
                   </SectionTitle>
                 </CardHeader>
                 <CardContent>
@@ -122,7 +125,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
               <Card>
                 <CardHeader>
                   <SectionTitle icon={ShieldCheck}>
-                    {getInsuranceTypeDef(record.insuranceType)?.label || record.insuranceType} Details
+                    {t('records.details2', { value: getInsuranceTypeDef(record.insuranceType) ? ins.typeLabel(getInsuranceTypeDef(record.insuranceType)!) : record.insuranceType })}
                   </SectionTitle>
                 </CardHeader>
                 <CardContent>
@@ -131,8 +134,8 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
                       <InfoItem
                         key={field.key}
                         icon={IdCard}
-                        label={field.label}
-                        value={record.typeSpecificData?.[field.key] ? String(record.typeSpecificData[field.key]) : undefined}
+                        label={ins.fieldLabel(record.insuranceType ?? "", field)}
+                        value={record.typeSpecificData?.[field.key] ? (field.type === "select" ? ins.option(String(record.typeSpecificData[field.key])) : String(record.typeSpecificData[field.key])) : undefined}
                       />
                     ))}
                   </div>
@@ -144,22 +147,22 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
           {/* Personal Information */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={User}>Personal Information</SectionTitle>
+              <SectionTitle icon={User}>{t('records.personalInformation')}</SectionTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <InfoItem icon={User} label="Full Name" value={record.name || ""} />
-                <InfoItem icon={MapPin} label="Birth Place" value={record.birthPlace || ""} />
-                <InfoItem icon={User} label="Father's Name" value={record.fatherName || ""} />
-                <InfoItem icon={User} label="Mother's Name" value={record.motherName || ""} />
-                <InfoItem icon={User} label="Spouse's Name" value={record.spouseName || ""} />
-                <InfoItem icon={MapPin} label="Address" value={<SensitiveValue field="address" value={record.address} />} />
-                <InfoItem icon={Calendar} label="Date of Birth" value={<SensitiveValue field="dateOfBirth" value={convertDateToIndianFormat(record.dateOfBirth)} />} />
-                <InfoItem icon={User} label="Age" value={record.age || ""} />
-                <InfoItem icon={Phone} label="Aadhaar Linked Mobile Number" value={<SensitiveValue field="mobileNumber" value={record.aadhaarLinkedMobileNumber} render={formatMobileNumber} />} />
-                <InfoItem icon={User} label="Name of Nominee" value={record.nameOfNominee || ""} />
-                <InfoItem icon={User} label="Age of Nominee" value={record.ageOfNominee || ""} />
-                <InfoItem icon={User} label="Relation Name" value={record.relationName || ""} />
+                <InfoItem icon={User} label={t('records.fullName')} value={record.name || ""} />
+                <InfoItem icon={MapPin} label={t('records.birthPlace')} value={record.birthPlace || ""} />
+                <InfoItem icon={User} label={t('records.fatherSName')} value={record.fatherName || ""} />
+                <InfoItem icon={User} label={t('records.motherSName')} value={record.motherName || ""} />
+                <InfoItem icon={User} label={t('records.spouseSName')} value={record.spouseName || ""} />
+                <InfoItem icon={MapPin} label={t('records.address')} value={<SensitiveValue field="address" value={record.address} />} />
+                <InfoItem icon={Calendar} label={t('records.dateOfBirth')} value={<SensitiveValue field="dateOfBirth" value={convertDateToIndianFormat(record.dateOfBirth)} />} />
+                <InfoItem icon={User} label={t('common.age')} value={record.age || ""} />
+                <InfoItem icon={Phone} label={t('records.aadhaarLinkedMobileNumber')} value={<SensitiveValue field="mobileNumber" value={record.aadhaarLinkedMobileNumber} render={formatMobileNumber} />} />
+                <InfoItem icon={User} label={t('records.nameOfNominee')} value={record.nameOfNominee || ""} />
+                <InfoItem icon={User} label={t('records.ageOfNominee')} value={record.ageOfNominee || ""} />
+                <InfoItem icon={User} label={t('records.relationName')} value={record.relationName || ""} />
               </div>
             </CardContent>
           </Card>
@@ -167,16 +170,16 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
           {/* Education & Occupation */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={Briefcase}>Education & Occupation</SectionTitle>
+              <SectionTitle icon={Briefcase}>{t('records.educationOccupation')}</SectionTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <InfoItem icon={Briefcase} label="Educational Qualification" value={record.educationalQualification || ""} />
-                <InfoItem icon={Briefcase} label="Occupation" value={record.occupation || ""} />
-                <InfoItem icon={Briefcase} label="Designation" value={record.designationOfPolicyHolder || ""} />
-                <InfoItem icon={Briefcase} label="Annual Income" value={<SensitiveValue field="annualIncome" value={record.annualIncome} render={(v) => formatIndianNumber(v)} />} />
-                <InfoItem icon={Briefcase} label="Period of Service" value={record.periodOfService || ""} />
-                <InfoItem icon={Briefcase} label="Employer Name" value={record.employerName || ""} />
+                <InfoItem icon={Briefcase} label={t('records.educationalQualification')} value={record.educationalQualification || ""} />
+                <InfoItem icon={Briefcase} label={t('records.occupation')} value={record.occupation || ""} />
+                <InfoItem icon={Briefcase} label={t('records.designation')} value={record.designationOfPolicyHolder || ""} />
+                <InfoItem icon={Briefcase} label={t('records.annualIncome')} value={<SensitiveValue field="annualIncome" value={record.annualIncome} render={(v) => formatIndianNumber(v)} />} />
+                <InfoItem icon={Briefcase} label={t('records.periodOfService')} value={record.periodOfService || ""} />
+                <InfoItem icon={Briefcase} label={t('records.employerName')} value={record.employerName || ""} />
               </div>
             </CardContent>
           </Card>
@@ -184,13 +187,13 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
           {/* Physical Details */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={HeartPulse}>Physical Details</SectionTitle>
+              <SectionTitle icon={HeartPulse}>{t('records.physicalDetails')}</SectionTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <InfoItem icon={User} label="Height" value={record.height} />
-                <InfoItem icon={User} label="Weight" value={record.weight} />
-                <InfoItem icon={Calendar} label="Last Child Birth Date &#40;Only for Women&#41;" value={convertDateToIndianFormat(record.lastChildBirthDate) || ""} />
+                <InfoItem icon={User} label={t('records.height')} value={record.height} />
+                <InfoItem icon={User} label={t('records.weight')} value={record.weight} />
+                <InfoItem icon={Calendar} label={t('records.lastChildBirthDateOnly')} value={convertDateToIndianFormat(record.lastChildBirthDate) || ""} />
               </div>
             </CardContent>
           </Card>
@@ -198,14 +201,14 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
           {/* Banking Details */}
           <Card>
             <CardHeader>
-              <SectionTitle icon={CreditCard}>Banking Information</SectionTitle>
+              <SectionTitle icon={CreditCard}>{t('records.bankingInformation')}</SectionTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <InfoItem icon={CreditCard} label="Bank Account Number" value={<SensitiveValue field="bankAccountNumber" value={record.bankAccountNumber} />} />
-                <InfoItem icon={CreditCard} label="IFSC Code" value={<SensitiveValue field="ifscCode" value={record.ifscCode} />} />
-                <InfoItem icon={HomeIcon} label="Bank Name" value={record.bankName} />
-                <InfoItem icon={MapPin} label="Branch Name" value={record.branchName} />
+                <InfoItem icon={CreditCard} label={t('records.bankAccountNumber')} value={<SensitiveValue field="bankAccountNumber" value={record.bankAccountNumber} />} />
+                <InfoItem icon={CreditCard} label={t('records.ifscCode')} value={<SensitiveValue field="ifscCode" value={record.ifscCode} />} />
+                <InfoItem icon={HomeIcon} label={t('records.bankName')} value={record.bankName} />
+                <InfoItem icon={MapPin} label={t('records.branchName')} value={record.branchName} />
               </div>
             </CardContent>
           </Card>
@@ -214,7 +217,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
           {record.familyMembers && record.familyMembers.length > 0 && (
             <Card>
               <CardHeader>
-                <SectionTitle icon={Users}>Family Details</SectionTitle>
+                <SectionTitle icon={Users}>{t('records.familyDetails')}</SectionTitle>
               </CardHeader>
               <CardContent>
                 {/* Mobile: stacked cards (no horizontal scrolling) */}
@@ -222,24 +225,24 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
                   {record.familyMembers.map((member: FamilyMember, index: number) => (
                     <div key={index} className="rounded-lg border border-table-border p-3 bg-muted/20 space-y-2">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-medium">{member.relationship || `Member ${index + 1}`}</span>
+                        <span className="text-sm font-medium">{member.relationship || t('records.member', { value: index + 1 })}</span>
                         {member.health === "Good" ? (
-                          <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs">Good</Badge>
+                          <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs">{t('common.good')}</Badge>
                         ) : member.health === "Not Good" ? (
-                          <Badge className="bg-red-100 text-red-700 border border-red-200 text-xs">Not Good</Badge>
+                          <Badge className="bg-red-100 text-red-700 border border-red-200 text-xs">{t('common.notGood')}</Badge>
                         ) : null}
                       </div>
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
-                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Current Age</p>
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('records.currentAge')}</p>
                           <p className="mt-0.5">{member.currentAge || "-"}</p>
                         </div>
                         <div>
-                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Age at Death/Year</p>
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('records.ageAtDeathYear')}</p>
                           <p className="mt-0.5">{member.deathAge || "-"}</p>
                         </div>
                         <div className="col-span-2">
-                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Reason</p>
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('records.reason')}</p>
                           <p className="mt-0.5 break-words">{member.reason || "-"}</p>
                         </div>
                       </div>
@@ -252,11 +255,11 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
-                        <TableHead className="border border-table-border">Relationship</TableHead>
-                        <TableHead className="border border-table-border">Current Age</TableHead>
-                        <TableHead className="border border-table-border">Health Status</TableHead>
-                        <TableHead className="border border-table-border">Age at Death/Year</TableHead>
-                        <TableHead className="border border-table-border">Reason</TableHead>
+                        <TableHead className="border border-table-border">{t('records.relationship')}</TableHead>
+                        <TableHead className="border border-table-border">{t('records.currentAge')}</TableHead>
+                        <TableHead className="border border-table-border">{t('records.healthStatus')}</TableHead>
+                        <TableHead className="border border-table-border">{t('records.ageAtDeathYear')}</TableHead>
+                        <TableHead className="border border-table-border">{t('records.reason')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -270,9 +273,9 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
                           </TableCell>
                           <TableCell className="border border-table-border">
                             {member.health === "Good" ? (
-                              <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs">Good</Badge>
+                              <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs">{t('common.good')}</Badge>
                             ) : member.health === "Not Good" ? (
-                              <Badge className="bg-red-100 text-red-700 border border-red-200 text-xs">Not Good</Badge>
+                              <Badge className="bg-red-100 text-red-700 border border-red-200 text-xs">{t('common.notGood')}</Badge>
                             ) : "-"}
                           </TableCell>
                           <TableCell className="border border-table-border">
@@ -295,10 +298,10 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <SectionTitle icon={ShieldCheck}>Current Policy Details</SectionTitle>
+                  <SectionTitle icon={ShieldCheck}>{t('records.currentPolicyDetails')}</SectionTitle>
                   {!hidePaymentHistory && record.recordId && (
                     <Button variant="outline" size="sm" onClick={() => setPaymentHistoryOpen(true)}>
-                      <Receipt className="w-4 h-4 mr-1.5" /> Payment history
+                      <Receipt className="w-4 h-4 mr-1.5" /> {" "}{t('records.paymentHistory')}
                     </Button>
                   )}
                 </div>
@@ -316,19 +319,19 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Plan & Term</p>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('records.planTerm')}</p>
                       <p className="mt-0.5 break-words">{record.currentPolicy.planAndTerm || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Mode of Payment</p>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('records.modeOfPayment')}</p>
                       <p className="mt-0.5">{record.currentPolicy.modeOfPayment || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Branch</p>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('common.branch')}</p>
                       <p className="mt-0.5 break-words">{record.currentPolicy.branch || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Last Payment</p>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('records.lastPayment')}</p>
                       <p className="mt-0.5">{convertDateToIndianFormat(record.currentPolicy.lastPaymentDate) || "-"}</p>
                     </div>
                   </div>
@@ -339,12 +342,12 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
-                        <TableHead className="border border-table-border">Policy Number</TableHead>
-                        <TableHead className="border border-table-border">Plan & Term</TableHead>
-                        <TableHead className="border border-table-border">Sum Assured</TableHead>
-                        <TableHead className="border border-table-border">Mode of Payment</TableHead>
-                        <TableHead className="border border-table-border">Branch</TableHead>
-                        <TableHead className="border border-table-border">Last Payment</TableHead>
+                        <TableHead className="border border-table-border">{t('common.policyNumber')}</TableHead>
+                        <TableHead className="border border-table-border">{t('records.planTerm')}</TableHead>
+                        <TableHead className="border border-table-border">{t('common.sumAssured')}</TableHead>
+                        <TableHead className="border border-table-border">{t('records.modeOfPayment')}</TableHead>
+                        <TableHead className="border border-table-border">{t('common.branch')}</TableHead>
+                        <TableHead className="border border-table-border">{t('records.lastPayment')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -381,7 +384,7 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
           {record.previousPolicy && (
             <Card>
               <CardHeader>
-                <SectionTitle icon={History}>Previous Policy Details</SectionTitle>
+                <SectionTitle icon={History}>{t('records.previousPolicyDetails')}</SectionTitle>
               </CardHeader>
               <CardContent>
                 {/* Mobile: stacked card */}
@@ -396,19 +399,19 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Plan & Term</p>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('records.planTerm')}</p>
                       <p className="mt-0.5 break-words">{record.previousPolicy.planAndTerm || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Mode of Payment</p>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('records.modeOfPayment')}</p>
                       <p className="mt-0.5">{record.previousPolicy.modeOfPayment || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Branch</p>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('common.branch')}</p>
                       <p className="mt-0.5 break-words">{record.previousPolicy.branch || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Last Payment</p>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('records.lastPayment')}</p>
                       <p className="mt-0.5">{convertDateToIndianFormat(record.previousPolicy.lastPaymentDate) || "-"}</p>
                     </div>
                   </div>
@@ -419,12 +422,12 @@ const RecordDetailsModal = ({ record, isOpen, onClose, hidePaymentHistory = fals
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
-                        <TableHead className="border border-table-border">Policy Number</TableHead>
-                        <TableHead className="border border-table-border">Issue Date</TableHead>
-                        <TableHead className="border border-table-border">Sum Assured</TableHead>
-                        <TableHead className="border border-table-border">Mode of Payment</TableHead>
-                        <TableHead className="border border-table-border">Branch</TableHead>
-                        <TableHead className="border border-table-border">Last Payment</TableHead>
+                        <TableHead className="border border-table-border">{t('common.policyNumber')}</TableHead>
+                        <TableHead className="border border-table-border">{t('records.issueDate')}</TableHead>
+                        <TableHead className="border border-table-border">{t('common.sumAssured')}</TableHead>
+                        <TableHead className="border border-table-border">{t('records.modeOfPayment')}</TableHead>
+                        <TableHead className="border border-table-border">{t('common.branch')}</TableHead>
+                        <TableHead className="border border-table-border">{t('records.lastPayment')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

@@ -42,108 +42,106 @@ import {
 import siteConfig from "@/config/siteConfig";
 import { BUSINESS_HOURS_LABELS } from "@/config/businessHours";
 import { REFERRAL_PROGRAM_ENABLED } from "@/config/featureFlags";
+import Trans from "@/components/Trans";
 
 const About = () => {
   const { t } = useLanguage();
 
   const policyTypes = [
-    { label: "Life", icon: ShieldCheck, rotate: "-rotate-6", offset: "translate-y-2", bg: "bg-blue-50 dark:bg-blue-950/40", accent: "text-blue-600 dark:text-blue-400", chip: "Active" },
-    { label: "Health", icon: HeartPulse, rotate: "rotate-3", offset: "-translate-y-3", bg: "bg-emerald-50 dark:bg-emerald-950/40", accent: "text-emerald-600 dark:text-emerald-400", chip: "Due soon" },
-    { label: "Motor", icon: Car, rotate: "-rotate-2", offset: "translate-y-4", bg: "bg-amber-50 dark:bg-amber-950/40", accent: "text-amber-600 dark:text-amber-400", chip: "Active" },
-    { label: "All", icon: HomeIcon, rotate: "rotate-6", offset: "-translate-y-1", bg: "bg-violet-50 dark:bg-violet-950/40", accent: "text-violet-600 dark:text-violet-400", chip: "Renewed" },
+    { label: t('about.life'), icon: ShieldCheck, rotate: "-rotate-6", offset: "translate-y-2", bg: "bg-blue-50 dark:bg-blue-950/40", accent: "text-blue-600 dark:text-blue-400", chip: t('common.active') },
+    { label: t('about.health'), icon: HeartPulse, rotate: "rotate-3", offset: "-translate-y-3", bg: "bg-emerald-50 dark:bg-emerald-950/40", accent: "text-emerald-600 dark:text-emerald-400", chip: t('landing.dueSoon') },
+    { label: t('about.motor'), icon: Car, rotate: "-rotate-2", offset: "translate-y-4", bg: "bg-amber-50 dark:bg-amber-950/40", accent: "text-amber-600 dark:text-amber-400", chip: t('common.active') },
+    { label: t('about.all'), icon: HomeIcon, rotate: "rotate-6", offset: "-translate-y-1", bg: "bg-violet-50 dark:bg-violet-950/40", accent: "text-violet-600 dark:text-violet-400", chip: t('landing.renewed') },
   ];
 
   // The first two come from src/config/siteStats.ts (single source of truth — also used on the home page).
   const trustStats = [
-    ...SOCIAL_PROOF_STATS.map(({ value, label }) => ({ value, label })),
-    { value: "Daily", label: "Data backups" },
-    { value: "< few hrs", label: "Support response" },
-    { value: "0", label: "Queries pending overnight" },
-    { value: "Any", label: "Policy type supported" },
+    ...SOCIAL_PROOF_STATS.map(({ value, labelKey }) => ({ value, label: t(labelKey) })),
+    { value: "Daily", label: t('about.dataBackups') },
+    { value: "< few hrs", label: t('about.supportResponse') },
+    { value: "0", label: t('about.queriesPendingOvernight') },
+    { value: "Any", label: t('about.policyTypeSupported') },
   ];
 
   const capabilities = [
     {
       icon: FileText,
-      title: "End-to-end policy records",
+      title: t('about.endToEndPolicyRecords'),
       description:
-        "Capture full policyholder details, nominee information, and both current and previous policy terms in one place — then search, sort, and update them as circumstances change. Works for life, health, motor, and all insurance policies alike.",
+        t('about.captureFullPolicyholderDetailsNominee'),
     },
     {
       icon: BellRing,
-      title: "Due and lapse tracking",
+      title: t('about.dueAndLapseTracking'),
       description:
-        "Automatically surfaces policies with payments due this month, coming up next, or missed, so follow-ups happen before a policy lapses — whatever kind of policy it is. Reminders reach you through the in-app bell, phone or desktop push notifications, and email, and you choose which ones to receive. Update a payment date in a couple of taps, or call, WhatsApp, SMS, or email the policyholder straight from the list.",
+        t('about.automaticallySurfacesPoliciesWithPayments'),
     },
     ...(REFERRAL_PROGRAM_ENABLED
       ? [
           {
             icon: Wallet,
-            title: "Referrals and wallet",
+            title: t('about.referralsAndWallet'),
             description:
-              "A built-in referral wallet tracks direct and second-level referrals, and your wallet balance can be used toward plan renewals and upgrades.",
+              t('about.aBuiltInReferralWallet'),
           },
         ]
       : []),
     {
       icon: CreditCard,
-      title: "Flexible plans, secure payments",
+      title: t('about.flexiblePlansSecurePayments'),
       description:
-        "Start on a free trial, then move up through Starter, Basic, Standard, or Premium plans as your book of business grows. " +
-        (REFERRAL_PROGRAM_ENABLED
-          ? "Checkout runs through Razorpay, referral wallet balance can be applied toward renewals and upgrades, and UPI payments get an admin-verified manual fallback."
-          : "Checkout runs through Razorpay, and UPI payments get an admin-verified manual fallback."),
+        REFERRAL_PROGRAM_ENABLED ? t('landing.planDescriptionReferral') : t('landing.planDescription'),
     },
     {
       icon: UserCog,
-      title: "Role-based administration",
+      title: t('about.roleBasedAdministration'),
       description:
-        "Admins get dedicated tools to manage user accounts, handle support requests, and keep the platform running smoothly — without touching agents' day-to-day workspace.",
+        t('about.adminsGetDedicatedTools'),
     },
     {
       icon: Layers,
-      title: "Every kind of policy",
+      title: t('about.everyKindOfPolicy'),
       description:
-        "Life, term life, health, family health, vehicle, and travel policies each come with the fields that matter for that product — and an Other (Custom) type lets you name a policy type and design your own fields when none of them fit.",
+        t('about.lifeTermLifeHealthFamily'),
     },
     {
       icon: FileSpreadsheet,
-      title: "Import and export",
+      title: t('about.importAndExport'),
       description:
-        "Moving from spreadsheets? Import an Excel or CSV file with a preview that highlights every cell to fix before saving. When you need a copy, export your records — with any search or type filter applied — to PDF or CSV.",
+        t('about.movingFromSpreadsheetsImport'),
     },
     {
       icon: Search,
-      title: "Fast, precise search",
+      title: t('about.fastPreciseSearch'),
       description:
-        "Every record list — policies, due payments, and users — supports instant search and column sorting, so finding one record among thousands takes seconds.",
+        t('about.everyRecordListPoliciesDue'),
     },
     {
       icon: Languages,
-      title: "Built for Indian agents",
+      title: t('about.builtForIndianAgents'),
       description:
-        "Full English and Hindi language support, Indian date formats, and terminology tailored to the way insurance policies are discussed, understood, and handled in real-world field operations across India.",
+        t('about.fullEnglishAndHindiLanguage'),
     },
   ];
 
   const freeTools = [
-    { to: "/tools/age-calculator", icon: Calculator, title: "Age Calculator", accent: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-950/40" },
-    { to: "/tools/sip-calculator", icon: Calculator, title: "SIP Calculator", accent: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-950/40" },
-    { to: "/tools/lumpsum-calculator", icon: Calculator, title: "Lumpsum Calculator", accent: "text-indigo-600 dark:text-indigo-400", bg: "bg-indigo-50 dark:bg-indigo-950/40" },
-    { to: "/tools/rd-calculator", icon: Calculator, title: "RD Calculator", accent: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-950/40" },
-    { to: "/tools/fd-calculator", icon: Calculator, title: "FD Calculator", accent: "text-green-600 dark:text-green-400", bg: "bg-green-50 dark:bg-green-950/40" },
-    { to: "/tools/income-tax-calculator", icon: Calculator, title: "Income Tax Calculator", accent: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/40" },
-    { to: "/tools/home-loan-emi-calculator", icon: Calculator, title: "Home Loan EMI Calculator", accent: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/40" },
-    { to: "/tools/term-insurance-calculator", icon: Calculator, title: "Term Insurance Calculator", accent: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-950/40" },
-    { to: "/tools/inflation-calculator", icon: Calculator, title: "Inflation Calculator", accent: "text-cyan-600 dark:text-cyan-400", bg: "bg-cyan-50 dark:bg-cyan-950/40" },
-    { to: "/policy-niketan-info-hub", icon: BookOpenText, title: "Policy Niketan Info Hub", accent: "text-primary", bg: "bg-primary/10" },
+    { to: "/tools/age-calculator", icon: Calculator, title: t('about.ageCalculator'), accent: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-950/40" },
+    { to: "/tools/sip-calculator", icon: Calculator, title: t('about.sipCalculator'), accent: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-950/40" },
+    { to: "/tools/lumpsum-calculator", icon: Calculator, title: t('about.lumpsumCalculator'), accent: "text-indigo-600 dark:text-indigo-400", bg: "bg-indigo-50 dark:bg-indigo-950/40" },
+    { to: "/tools/rd-calculator", icon: Calculator, title: t('about.rdCalculator'), accent: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-950/40" },
+    { to: "/tools/fd-calculator", icon: Calculator, title: t('about.fdCalculator'), accent: "text-green-600 dark:text-green-400", bg: "bg-green-50 dark:bg-green-950/40" },
+    { to: "/tools/income-tax-calculator", icon: Calculator, title: t('about.incomeTaxCalculator'), accent: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/40" },
+    { to: "/tools/home-loan-emi-calculator", icon: Calculator, title: t('about.homeLoanEmiCalculator'), accent: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/40" },
+    { to: "/tools/term-insurance-calculator", icon: Calculator, title: t('about.termInsuranceCalculator'), accent: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-950/40" },
+    { to: "/tools/inflation-calculator", icon: Calculator, title: t('about.inflationCalculator'), accent: "text-cyan-600 dark:text-cyan-400", bg: "bg-cyan-50 dark:bg-cyan-950/40" },
+    { to: "/policy-niketan-info-hub", icon: BookOpenText, title: t('about.policyNiketanInfoHub'), accent: "text-primary", bg: "bg-primary/10" },
   ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
-        title="About Us"
-        description="Learn who builds Policy Niketan, why we built a dedicated record-keeping tool for all types of insurance agents, and how we keep client data secure."
+        title={t('about.aboutUs')}
+        description={t('about.learnWhoBuildsPolicyNiketan')}
         path="/about"
       />
       <Navigation />
@@ -163,21 +161,19 @@ const About = () => {
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider bg-white/10 text-primary-foreground/90 px-3 py-1.5 rounded-full backdrop-blur-sm">
                   <Sparkles className="w-3.5 h-3.5" />
-                  Trusted by policy agents every day
+                  {t('about.trustedByPolicyAgentsEvery')}
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
-                  One Platform For Every Policy You Manage.
+                  {t('about.onePlatformForEveryPolicy')}
                 </h1>
                 <p className="text-lg text-primary-foreground/80 leading-relaxed max-w-lg">
-                  {siteConfig.title} replaces spreadsheets and paper registers with a single, secure
-                  workspace — built for life, health, motor, and all insurance agents who want
-                  their entire book of business organized, backed up, and a search away.
+                  {t('about.replacesSpreadsheetsAndPaperRegisters', { title: siteConfig.title })}
                 </p>
                 <div className="flex flex-wrap gap-2 pt-1">
                   {[
-                    { icon: Moon, label: "Dark mode" },
-                    { icon: Compass, label: "Guided onboarding" },
-                    { icon: Languages, label: "English & Hindi" },
+                    { icon: Moon, label: t('about.darkMode') },
+                    { icon: Compass, label: t('about.guidedOnboarding') },
+                    { icon: Languages, label: t('about.englishHindi') },
                   ].map(({ icon: Icon, label }) => (
                     <span
                       key={label}
@@ -191,12 +187,12 @@ const About = () => {
                 <div className="flex flex-wrap gap-3 pt-2">
                   <Link to="/view-records">
                     <Button size="lg" className="bg-white text-[hsl(195,90%,15%)] hover:bg-white/90 font-medium">
-                      Manage your policies <ArrowRight className="w-4 h-4 ml-2" />
+                      {t('about.manageYourPolicies')}{" "} <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   </Link>
                   <Link to="/add-record">
                     <Button size="lg" variant="outline" className="border-primary-foreground/30 text-[hsl(195,90%,15%)] hover:bg-primary-foreground/10 hover:text-primary-foreground">
-                      Add a record
+                      {t('about.addARecord')}
                     </Button>
                   </Link>
                 </div>
@@ -222,8 +218,8 @@ const About = () => {
                         {chip}
                       </span>
                     </div>
-                    <p className="text-sm font-semibold text-form-header">{label} Policy</p>
-                    <p className="text-xs text-muted-foreground mt-1">Fully tracked & backed up</p>
+                    <p className="text-sm font-semibold text-form-header">{t('about.policy', { label })}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t('about.fullyTrackedBackedUp')}</p>
                   </div>
                 ))}
               </div>
@@ -256,22 +252,18 @@ const About = () => {
                       <div className="w-10 h-10 rounded-xl bg-white dark:bg-background flex items-center justify-center shadow-sm shrink-0">
                         <Icon className={`w-5 h-5 ${accent}`} />
                       </div>
-                      <span className="font-medium text-form-header text-sm">{label} Insurance</span>
+                      <span className="font-medium text-form-header text-sm">{t('about.insurance', { label })}</span>
                     </div>
                   ))}
                 </div>
               </div>
               <div className="space-y-4 order-1 lg:order-2">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary">Built for every agent</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary">{t('about.builtForEveryAgent')}</p>
                 <h2 className="text-3xl font-bold text-form-header leading-tight">
-                  Not built for one insurance line. Built for all of them.
+                  {t('about.notBuiltForOneInsurance')}
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  This platform was never designed around a single insurance category. Whether you
-                  sell life, health, motor, home, or all insurance, you manage every policy,
-                  every policyholder, and every due payment the same organized, dependable way.
-                  If your work is tracking policies and staying on top of renewals, this is the
-                  best tool to run that work from — no matter what you sell.
+                  {t('about.thisPlatformWasNeverDesigned')}
                 </p>
               </div>
             </div>
@@ -283,8 +275,8 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center max-w-xl mx-auto mb-14">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">What you get</p>
-                <h2 className="text-3xl font-bold text-form-header">Everything to run policy operations, day to day</h2>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('about.whatYouGet')}</p>
+                <h2 className="text-3xl font-bold text-form-header">{t('about.everythingToRunPolicyOperations')}</h2>
               </div>
 
               <div className="space-y-10">
@@ -314,11 +306,10 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center max-w-xl mx-auto mb-12">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Beyond record-keeping</p>
-                <h2 className="text-3xl font-bold text-form-header">Free tools, built right in</h2>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('about.beyondRecordKeeping')}</p>
+                <h2 className="text-3xl font-bold text-form-header">{t('about.freeToolsBuiltRight')}</h2>
                 <p className="text-muted-foreground mt-3 leading-relaxed">
-                  {SITE_STATS.freeTools} financial calculators agents actually need day to day, plus a searchable glossary
-                  of Insurance & Policy terms — no separate app, no sign-up wall.
+                  {t('about.financialCalculatorsAgentsActuallyNeed', { freeTools: SITE_STATS.freeTools })}
                 </p>
               </div>
 
@@ -346,12 +337,10 @@ const About = () => {
           <div className="container mx-auto px-4 relative">
             <div className="max-w-6xl mx-auto">
               <div className="max-w-xl mb-14">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary-foreground/60 mb-2">Security & reliability</p>
-                <h2 className="text-3xl font-bold mb-3">Your data is too safe to worry about.</h2>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary-foreground/60 mb-2">{t('about.securityReliability')}</p>
+                <h2 className="text-3xl font-bold mb-3">{t('about.yourDataIsTooSafe')}</h2>
                 <p className="text-primary-foreground/70 leading-relaxed">
-                  Policy and policyholder data is sensitive, and we treat it that way. Security
-                  isn't an afterthought here — it's built into how the platform stores, backs up,
-                  and protects every record you enter, day after day.
+                  {t('about.policyAndPolicyholderData')}
                 </p>
               </div>
 
@@ -359,21 +348,21 @@ const About = () => {
                 {[
                   {
                     icon: DatabaseBackup,
-                    title: "Backed up, every single day",
+                    title: t('about.backedUpEverySingleDay'),
                     description:
-                      "Your records are backed up day by day, without exception. If anything ever goes wrong on our end, your data can be restored quickly — nothing is ever left resting on a single copy.",
+                      t('about.yourRecordsAreBackedUp'),
                   },
                   {
                     icon: Lock,
-                    title: "Locked down by default",
+                    title: t('about.lockedDownByDefault'),
                     description:
-                      "Every account is authenticated before it can see a single record. Sensitive fields like Aadhaar, PAN, and bank details are encrypted before they are stored, and are only ever visible to the agent who owns them, or an admin acting within their role. A Hide button masks them on screen whenever you need privacy. You can also review your own activity log and sign out any active session yourself, any time.",
+                      t('about.everyAccountIsAuthenticatedBefore'),
                   },
                   {
                     icon: CloudCog,
-                    title: "Built for reliability",
+                    title: t('about.builtForReliability'),
                     description:
-                      (REFERRAL_PROGRAM_ENABLED ? "Records, policies, and wallet balances" : "Records and policies") + " are written and backed up in a way designed to survive the unexpected — a single failure was never meant to mean lost work.",
+                      REFERRAL_PROGRAM_ENABLED ? t('landing.reliabilityWithWallet') : t('landing.reliabilityNoWallet'),
                   },
                 ].map(({ icon: Icon, title, description }) => (
                   <div key={title} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/[0.08] transition-colors">
@@ -395,15 +384,14 @@ const About = () => {
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-10 items-start">
 
               <div className="lg:col-span-2 space-y-4">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary">Support you can rely on</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary">{t('about.supportYouCanRely')}</p>
                 <h2 className="text-3xl font-bold text-form-header leading-tight">
-                  Every query closed out — usually the same day.
+                  {t('about.everyQueryClosedOutUsually')}
                 </h2>
                 <div className="bg-primary/5 border-l-4 border-primary rounded-r-xl p-5 mt-6">
                   <Quote className="w-5 h-5 text-primary mb-2" />
                   <p className="text-form-header font-medium leading-relaxed">
-                    We don't let queries pile up. The goal is a clean queue at the end of every day —
-                    no agent waiting overnight for an answer that could've come sooner.
+                    {t('about.weDonTLetQueries')}
                   </p>
                 </div>
               </div>
@@ -412,23 +400,23 @@ const About = () => {
                 {[
                   {
                     icon: Timer,
-                    title: "Resolved within hours",
-                    description: "Questions and issues are typically closed out within a few hours of being raised — not days.",
+                    title: t('about.resolvedWithinHours'),
+                    description: t('about.questionsAndIssuesAreTypically'),
                   },
                   {
                     icon: CheckCircle2,
-                    title: "Nothing pending overnight",
-                    description: "No agent goes to sleep waiting on an answer. Every query gets handled the same day it comes in.",
+                    title: t('about.nothingPendingOvernight'),
+                    description: t('about.noAgentGoesToSleep'),
                   },
                   {
                     icon: LifeBuoy,
-                    title: "People who know the product",
-                    description: "Support isn't outsourced to a generic helpdesk — the team answering understands policy workflows.",
+                    title: t('about.peopleWhoKnowTheProduct'),
+                    description: t('about.supportIsnTOutsourced'),
                   },
                   {
                     icon: ShieldCheck,
-                    title: "A trusted platform",
-                    description: "Built and supported with the reliability agents need to run their business on, every single day.",
+                    title: t('about.aTrustedPlatform'),
+                    description: t('about.builtAndSupported'),
                   },
                 ].map(({ icon: Icon, title, description }) => (
                   <div key={title} className="rounded-2xl border border-border p-5 hover:border-primary/40 hover:shadow-sm transition-all">
@@ -448,12 +436,12 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-1">Ready to bring order to your policy book?</h2>
-                <p className="text-primary-foreground/90">Join agents already managing every policy type, safely, in one place.</p>
+                <h2 className="text-2xl md:text-3xl font-bold mb-1">{t('about.readyToBringOrder')}</h2>
+                <p className="text-primary-foreground/90">{t('about.joinAgentsAlreadyManagingEvery')}</p>
               </div>
               <Link to="/add-record" className="shrink-0">
                 <Button size="lg" className="bg-white text-[hsl(195,85%,25%)] hover:bg-white/90 font-medium">
-                  Add your first record <ArrowRight className="w-4 h-4 ml-2" />
+                  {t('about.addYourFirstRecord')}{" "} <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
@@ -466,14 +454,14 @@ const About = () => {
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
 
               <div className="bg-background rounded-2xl p-8 shadow-sm">
-                <h2 className="text-xl font-semibold text-form-header mb-6">Get in touch</h2>
+                <h2 className="text-xl font-semibold text-form-header mb-6">{t('about.getInTouch')}</h2>
                 <div className="space-y-5">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                       <Mail className="w-4.5 h-4.5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-form-header">Email</p>
+                      <p className="text-sm font-medium text-form-header">{t('common.email2')}</p>
                       <p className="text-sm text-muted-foreground">{siteConfig.supportEmail}</p>
                     </div>
                   </div>
@@ -482,10 +470,9 @@ const About = () => {
                       <Phone className="w-4.5 h-4.5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-form-header">Call back</p>
+                      <p className="text-sm font-medium text-form-header">{t('about.callBack')}</p>
                       <p className="text-sm text-muted-foreground">
-                        Prefer to talk? <Link to="/help-support#request-call" className="text-primary hover:underline">Request a call</Link> and
-                        our team will phone you during business hours.
+                        <Trans i18nKey="about.preferToTalkRequest" components={{ link: <Link to="/help-support#request-call" className="text-primary hover:underline" /> }} />
                       </p>
                     </div>
                   </div>
@@ -494,8 +481,8 @@ const About = () => {
                       <MapPin className="w-4.5 h-4.5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-form-header">Address</p>
-                      <p className="text-sm text-muted-foreground">{t("officeAddress")}</p>
+                      <p className="text-sm font-medium text-form-header">{t('about.address')}</p>
+                      <p className="text-sm text-muted-foreground">{t("nav.officeAddress")}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -503,7 +490,7 @@ const About = () => {
                       <Globe className="w-4.5 h-4.5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-form-header">Website</p>
+                      <p className="text-sm font-medium text-form-header">{t('about.website')}</p>
                       <p className="text-sm text-muted-foreground">{siteConfig.productionUrl}</p>
                     </div>
                   </div>
@@ -511,23 +498,23 @@ const About = () => {
               </div>
 
               <div className="bg-background rounded-2xl p-8 shadow-sm">
-                <h2 className="text-xl font-semibold text-form-header mb-6">Support hours</h2>
+                <h2 className="text-xl font-semibold text-form-header mb-6">{t('about.supportHours')}</h2>
                 <div className="space-y-3 mb-6">
                   {BUSINESS_HOURS_LABELS.map(({ days: day, hours }) => (
                     <div key={day} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                       <span className="text-sm text-muted-foreground flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-primary" /> {day}
+                        <Clock className="w-4 h-4 text-primary" /> {t(day)}
                       </span>
-                      <span className="text-sm font-medium text-form-header">{hours}</span>
+                      <span className="text-sm font-medium text-form-header">{t(hours)}</span>
                     </div>
                   ))}
                 </div>
                 <div className="flex items-start gap-4 bg-primary/5 rounded-xl p-4">
                   <LifeBuoy className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-form-header">Emergency support</p>
+                    <p className="text-sm font-medium text-form-header">{t('about.emergencySupport')}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Available around the clock for critical account or data issues.
+                      {t('about.availableAroundTheClock')}
                     </p>
                   </div>
                 </div>

@@ -32,68 +32,76 @@ import { createTicket, getMyTickets } from "../../services/supportService";
 import { createSuggestion, getMySuggestions } from "../../services/suggestionService";
 import { getMyCallRequests } from "../../services/callRequestService";
 import axios from "axios";
+import type { TranslationKey } from "@/types/i18n.types";
 import type { Ticket, Suggestion, FaqItem } from "@/types/pages/HelpSupport.types";
 import type { CallRequestSummary } from "@/types/components/RequestCallDialog.types";
 import { formatISTDate as fmt, formatISTDateTime } from "@/utils/dateFormat";
 import { SensitiveValue } from "@/components/SensitiveValue";
-const ALL_FAQS: FaqItem[] = [
-  { category: "Account & Billing", q: "How do I upgrade or change my plan?", a: "Go to Profile → Upgrade plan, or visit the Plans page directly. You can move between the Free trial, Starter, Basic, Standard, and Premium plans — checkout runs through Razorpay" + (REFERRAL_PROGRAM_ENABLED ? ", and you can apply your referral wallet balance toward the cost at checkout." : ".") },
-  { category: "Account & Billing", q: "What happens when my plan expires?", a: "Your records stay safe and backed up, but you'll need to renew to add new records or access due/missed payment tracking again." },
-  { category: "Account & Billing", q: "What is your cancellation and refund policy?", a: "Plans are one-time payments and never renew automatically. Fees are non-refundable once a plan is activated, except for duplicate charges or a payment taken without the plan being activated, which must be reported within 7 days. Full details are on the Cancellation & Refund Policy page." },
-  { category: "Account & Billing", q: "Can I change my registered name or Easy ID?", a: "No — your name and Easy ID are permanently assigned at signup for record integrity. Everything else on your profile (mobile number, address, email) can be updated any time." },
-  { category: "Account & Billing", q: "Can I switch between light and dark mode?", a: "Yes — use the theme toggle in the navigation bar to switch between light and dark mode. Your choice is remembered the next time you log in." },
-  { category: "Account & Billing", q: "Can I see my account activity or sign out of a session?", a: "Yes. My Activity shows a log of recent actions on your account, and Sessions lets you see every device currently signed in and sign any of them out yourself. You can also turn policy due-date and subscription reminders on or off individually from Notification Preferences." },
-  { category: "Policies & Records", q: "Can I manage policies other than life insurance?", a: "Yes. The platform isn't limited to one insurance category — life, health, motor, and all insurance policies can be tracked the same way." },
-  { category: "Policies & Records", q: "How does due-date and missed-payment tracking work?", a: "Every policy with a payment due this month, or one that missed its last payment, is automatically surfaced on dedicated pages — no manual tracking spreadsheet needed." },
-  { category: "Policies & Records", q: "Can I delete a policy record?", a: "Record deletion is currently disabled from the interface to prevent accidental data loss. Contact support if a record genuinely needs to be removed." },
-  { category: "Policies & Records", q: "Can I call or WhatsApp a policyholder directly from a record?", a: "Yes — open a record from the Missed, Due, or Upcoming payment pages and use the contact action to call or message the policyholder on WhatsApp without leaving the page." },
-  { category: "Policies & Records", q: "Can I update a payment date without opening the full edit form?", a: "Yes — from the Missed, Due, or Upcoming payment pages, use the update-payment action on a record to change the last payment date directly, without going through the full edit form." },
-  { category: "Payments & Referrals", q: "How does the referral wallet work?", a: "You earn rewards for direct (L1) and second-level (L2) referrals, and they're added to your referral wallet. Balances show as available or pending. For now, wallet balance can only be used toward renewing or upgrading your plan — tick \"Use my referral wallet\" on the Plans page at checkout." },
-  { category: "Payments & Referrals", q: "Can I withdraw my referral wallet balance to my bank account or UPI?", a: "Not at the moment. Withdrawals to a bank account or UPI ID are paused, and wallet balance can only be used for plan renewals and upgrades. We plan to offer transfers to your own account in the future — we'll let you know in the app and update this page when it's available." },
-  { category: "Payments & Referrals", q: "I requested a withdrawal before this change — what happens to it?", a: "Requests made before withdrawals were paused are still reviewed by our team, and you can follow the status on the Referral Program page. If one is declined, it always comes with a reason and the amount is returned to your wallet automatically." },
-  { category: "Tools & Calculators", q: "What free calculators are available?", a: "Nine calculators are available from the Tools menu — Age, SIP, Lumpsum, RD, FD, Income Tax, Home Loan EMI, Term Insurance, and Inflation. All are free to use, and no login is required." },
-  { category: "Tools & Calculators", q: "What's the Policy Niketan Info Hub?", a: "It's a searchable reference of insurance & Policy terms and abbreviations — DOC, SA, KYC, ULIP, and more — with a plain-language explanation for each one. Also free to use without logging in." },
-  { category: "Policies & Records", q: "Can I import my existing records from Excel or CSV?", a: "Yes — open Import Records, then drop in an .xlsx, .xls, or .csv file (up to 5 MB and 100 records per upload). You get a preview grid where every problem cell is highlighted so you can fix it before anything is saved. Core policyholder and policy fields are imported; add family members and previous-policy details afterwards from Edit." },
-  { category: "Policies & Records", q: "Can I export my records?", a: "Yes — View Records can export the records currently on screen, including any search or insurance-type filter you have applied, as a CSV file or a PDF." },
-  { category: "Policies & Records", q: "Which insurance types can I record?", a: "Life, Term Life, Health, Family Health, Vehicle (car and bike) and Travel policies each come with their own relevant fields. For anything else, choose Other (Custom) to name the type and build your own field list." },
-  { category: "Policies & Records", q: "Can I reach a policyholder straight from a record?", a: "Yes — the contact action on the Missed, Due, and Upcoming payment pages lets you call, WhatsApp, SMS, or email the policyholder in one tap, using the details already on the record." },
-  { category: "Security & Data", q: "How are Aadhaar, PAN and bank details protected?", a: "Those fields are encrypted before they are stored. On screen, the Hide / Show button on your Home page masks sensitive values — handy when a client is looking over your shoulder — and your choice is remembered on your account." },
-  { category: "Account & Billing", q: "What reminders will I get, and can I turn them off?", a: "The bell icon shows in-app alerts such as policies coming due and plan expiry. You can also turn on push notifications per device (phone or desktop), and choose whether to receive payment-due and subscription reminder emails — all from Notification preferences." },
-  { category: "Technical", q: "Can I install it on my phone or computer?", a: "Yes — it is an installable web app. Use your browser's Install or Add to Home Screen option to open it like a regular app. A banner also tells you right away if your internet connection drops." },
-  { category: "Security & Data", q: "Is there protection against someone guessing my password?", a: "Yes — after several wrong passwords your account is temporarily locked, and password-reset codes expire after a limited number of wrong guesses. You can also review every signed-in device under Sessions and sign any of them out." },
-  { category: "Security & Data", q: "Is my policyholder data backed up?", a: "Yes — records are backed up daily without exception, so a single failure never means lost work." },
-  { category: "Security & Data", q: "Who can see sensitive fields like Aadhaar or PAN?", a: "Only you and admins acting within their role can view sensitive fields. Access is authenticated and scoped by design, not open by default." },
-  { category: "Account & Billing", q: "Can I talk to someone on the phone?", a: "Yes — use \"Request a call\" on this page. Enter your mobile number and a short reason, and our team will call you back. We don't publish a direct number, and calls are placed only during business hours (Mon–Fri 9 AM – 9 PM, Sat–Sun 10 AM – 8 PM IST). Requests made outside those hours are queued and called at the next opening." },
-  { category: "Account & Billing", q: "When will I get the call after requesting one?", a: "If you request during business hours, expect a call shortly. Otherwise your request is queued and you'll be called when we next open — the confirmation shows the exact time. You can only have one open call request per number; logged-in users can track theirs under \"My requests\"." },
-  { category: "Technical", q: "The site isn't loading properly on my phone — what should I do?", a: "Try refreshing or clearing your browser cache first. If the issue continues, reach out via the contact form below with your device and browser details so we can investigate." },
-  { category: "Technical", q: "I saw a short walkthrough when I logged in — can I see it again?", a: "A short guided tour appears automatically the first time you log in, highlighting the main parts of the workspace. It won't reappear on its own after that — let us know via the contact form if you'd like it shown again." },
+import { useLanguage } from "@/hooks/useLanguage";
+import Trans from "@/components/Trans";
+import type { TFunction } from "@/types/i18n.types";
+const buildAllFaqs = (t: TFunction): FaqItem[] => [
+  { category: "Account & Billing", q: t('help.howDoIUpgrade'), a: REFERRAL_PROGRAM_ENABLED ? t('help.upgradeAnswerReferral') : t('help.upgradeAnswer') },
+  { category: "Account & Billing", q: t('help.whatHappensWhenMyPlan'), a: t('help.yourRecordsStaySafe') },
+  { category: "Account & Billing", q: t('help.whatIsYourCancellation'), a: t('help.plansAreOneTimePayments') },
+  { category: "Account & Billing", q: t('help.canIChangeMyRegistered'), a: t('help.noYourNameAndEasy') },
+  { category: "Account & Billing", q: t('help.canISwitchBetweenLight'), a: t('help.yesUseTheThemeToggle') },
+  { category: "Account & Billing", q: t('help.canISeeMyAccount'), a: t('help.yesMyActivityShows') },
+  { category: "Policies & Records", q: t('help.canIManagePoliciesOther'), a: t('help.yesThePlatformIsnT') },
+  { category: "Policies & Records", q: t('help.howDoesDueDate'), a: t('help.everyPolicyWithAPayment') },
+  { category: "Policies & Records", q: t('help.canIDeleteAPolicy'), a: t('help.recordDeletionIsCurrentlyDisabled') },
+  { category: "Policies & Records", q: t('help.canICallOrWhatsapp'), a: t('help.yesOpenARecordFrom') },
+  { category: "Policies & Records", q: t('help.canIUpdateAPayment'), a: t('help.yesFromTheMissedDue') },
+  { category: "Payments & Referrals", q: t('help.howDoesTheReferralWallet'), a: t('help.youEarnRewardsForDirect') },
+  { category: "Payments & Referrals", q: t('help.canIWithdrawMyReferral'), a: t('help.notAtTheMomentWithdrawals') },
+  { category: "Payments & Referrals", q: t('help.iRequestedAWithdrawalBefore'), a: t('help.requestsMadeBeforeWithdrawalsWere') },
+  { category: "Tools & Calculators", q: t('help.whatFreeCalculatorsAreAvailable'), a: t('help.nineCalculatorsAreAvailableFrom') },
+  { category: "Tools & Calculators", q: t('help.whatSThePolicyNiketan'), a: t('help.itSASearchableReference') },
+  { category: "Policies & Records", q: t('help.canIImportMyExisting'), a: t('help.yesOpenImportRecordsThen') },
+  { category: "Policies & Records", q: t('help.canIExportMyRecords'), a: t('help.yesViewRecordsCanExport') },
+  { category: "Policies & Records", q: t('help.whichInsuranceTypesCanI'), a: t('help.lifeTermLifeHealthFamily') },
+  { category: "Policies & Records", q: t('help.canIReachAPolicyholder'), a: t('help.yesTheContactAction') },
+  { category: "Security & Data", q: t('help.howAreAadhaarPan'), a: t('help.thoseFieldsAreEncryptedBefore') },
+  { category: "Account & Billing", q: t('help.whatRemindersWillIGet'), a: t('help.theBellIconShows') },
+  { category: "Technical", q: t('help.canIInstall'), a: t('help.yesItIsAnInstallable') },
+  { category: "Security & Data", q: t('help.isThereProtectionAgainstSomeone'), a: t('help.yesAfterSeveralWrongPasswords') },
+  { category: "Security & Data", q: t('help.isMyPolicyholderDataBacked'), a: t('help.yesRecordsAreBackedUp') },
+  { category: "Security & Data", q: t('help.whoCanSeeSensitiveFields'), a: t('help.onlyYouAndAdminsActing') },
+  { category: "Account & Billing", q: t('help.canITalkToSomeone'), a: t('help.yesUseRequestACall') },
+  { category: "Account & Billing", q: t('help.whenWillIGet'), a: t('help.ifYouRequestDuringBusiness') },
+  { category: "Technical", q: t('help.theSiteIsnTLoading'), a: t('help.tryRefreshingOrClearing') },
+  { category: "Technical", q: t('help.iSawAShortWalkthrough'), a: t('help.aShortGuidedTourAppears') },
 ];
 
 // While the referral program is off, its FAQs and category are hidden and a
 // single explanatory entry is shown instead (existing users may still have
 // a balance and wonder what happened to it).
 const REFERRAL_CATEGORY = "Payments & Referrals";
-const REFERRAL_OFF_FAQ: FaqItem = {
+const buildReferralOffFaq = (t: TFunction): FaqItem => ({
   category: "Account & Billing",
-  q: "Is there a referral program?",
-  a: "Not at the moment. Referral codes, referral discounts and referral rewards are currently unavailable. Any referral balance recorded on your account earlier stays on your account, and we'll let you know if anything changes. Questions? Contact us from this page.",
-};
-const faqs: FaqItem[] = [
-  ...ALL_FAQS.filter((f) => REFERRAL_PROGRAM_ENABLED || f.category !== REFERRAL_CATEGORY),
-  ...(REFERRAL_PROGRAM_ENABLED ? [] : [REFERRAL_OFF_FAQ]),
-];
+  q: t('help.isThereAReferralProgram'),
+  a: t('help.notAtTheMomentReferral'),
+});
 
-const ALL_CATEGORIES = [
-  { icon: UserCog, title: "Account & Billing", description: "Plans, upgrades, profile details, and login issues." },
-  { icon: FileText, title: "Policies & Records", description: "Adding, editing, and tracking policy records of any type." },
-  { icon: Wallet, title: "Payments & Referrals", description: "Referral wallet, rewards, and plan renewals." },
-  { icon: Calculator, title: "Tools & Calculators", description: "Free calculators and the Insurance & Policy terms reference." },
-  { icon: Lock, title: "Security & Data", description: "How your data is protected, backed up, and accessed." },
-  { icon: ShieldCheck, title: "Technical", description: "Bugs, loading issues, or anything not working as expected." },
+// `id` values are identifiers (stored on support tickets, compared with REFERRAL_CATEGORY): they stay
+// English in every language. Only the labels shown to the user are translated, via this map.
+const CATEGORY_LABEL: Record<string, TranslationKey> = {
+  "Account & Billing": "help.topicAccountBilling",
+  "Policies & Records": "help.topicPoliciesRecords",
+  "Payments & Referrals": "help.topicPaymentsReferrals",
+  "Tools & Calculators": "help.topicToolsCalculators",
+  "Security & Data": "help.topicSecurityData",
+  "Technical": "help.topicTechnical",
+};
+
+const buildAllCategories = (t: TFunction) => [
+  { icon: UserCog, id: "Account & Billing", description: t('help.plansUpgradesProfileDetails') },
+  { icon: FileText, id: "Policies & Records", description: t('help.addingEditingAndTrackingPolicy') },
+  { icon: Wallet, id: "Payments & Referrals", description: t('help.referralWalletRewardsAndPlan') },
+  { icon: Calculator, id: "Tools & Calculators", description: t('help.freeCalculatorsAndTheInsurance') },
+  { icon: Lock, id: "Security & Data", description: t('help.howYourDataIsProtected') },
+  { icon: ShieldCheck, id: "Technical", description: t('help.bugsLoadingIssuesOrAnything') },
 ];
-const categories = ALL_CATEGORIES.filter(
-  (c) => REFERRAL_PROGRAM_ENABLED || c.title !== REFERRAL_CATEGORY
-);
 
 const ticketStatusStyle: Record<string, string> = {
   open:        "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900",
@@ -110,16 +118,32 @@ const suggestionStatusStyle: Record<string, string> = {
   declined:     "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border",
 };
 
-const callStatusStyle: Record<CallRequestSummary["status"], { label: string; cls: string }> = {
-  pending:   { label: "Queued",             cls: "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900" },
-  no_answer: { label: "Tried — no answer",  cls: "bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900" },
-  completed: { label: "Called",             cls: "bg-green-100 text-green-700 border border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900" },
-  cancelled: { label: "Closed",             cls: "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border" },
-};
+const buildCallStatusStyle = (t: TFunction): Record<CallRequestSummary["status"], { label: string; cls: string }> => ({
+  pending:   { label: t('help.queued'),             cls: "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900" },
+  no_answer: { label: t('help.triedNoAnswer'),  cls: "bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900" },
+  completed: { label: t('help.called'),             cls: "bg-green-100 text-green-700 border border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900" },
+  cancelled: { label: t('help.closed'),             cls: "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border" },
+});
 
 // (date formatting now imported from dateFormat.ts as `fmt`)
 
 const HelpSupport = () => {
+  const { t } = useLanguage();
+  const ALL_FAQS = useMemo(() => buildAllFaqs(t), [t]);
+  const REFERRAL_OFF_FAQ = useMemo(() => buildReferralOffFaq(t), [t]);
+  const ALL_CATEGORIES = useMemo(() => buildAllCategories(t), [t]);
+  const catLabel = (id: string) => (CATEGORY_LABEL[id] ? t(CATEGORY_LABEL[id]) : id);
+  // While the referral program is off, its FAQs and category are hidden and a single explanatory
+  // entry is shown instead (existing users may still have a balance and wonder what happened to it).
+  const faqs: FaqItem[] = useMemo(() => [
+    ...ALL_FAQS.filter((f) => REFERRAL_PROGRAM_ENABLED || f.category !== REFERRAL_CATEGORY),
+    ...(REFERRAL_PROGRAM_ENABLED ? [] : [REFERRAL_OFF_FAQ]),
+  ], [ALL_FAQS, REFERRAL_OFF_FAQ]);
+  const categories = useMemo(
+    () => ALL_CATEGORIES.filter((c) => REFERRAL_PROGRAM_ENABLED || c.id !== REFERRAL_CATEGORY),
+    [ALL_CATEGORIES],
+  );
+  const callStatusStyle = useMemo(() => buildCallStatusStyle(t), [t]);
   const { toast } = useToast();
   const authenticated = isAuthenticated();
   const currentUser = getCurrentUser();
@@ -171,9 +195,9 @@ const HelpSupport = () => {
     if (!debouncedQuery.trim()) return faqs;
     const q = debouncedQuery.trim().toLowerCase();
     return faqs.filter(
-      (f) => f.q.toLowerCase().includes(q) || f.a.toLowerCase().includes(q) || f.category.toLowerCase().includes(q)
+      (f) => f.q.toLowerCase().includes(q) || f.a.toLowerCase().includes(q) || f.category.toLowerCase().includes(q) || catLabel(f.category).toLowerCase().includes(q)
     );
-  }, [debouncedQuery]);
+  }, [debouncedQuery, faqs, t]);
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -185,7 +209,7 @@ const HelpSupport = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
-      toast({ title: "Missing details", description: "Please fill in your name, email, and message.", variant: "destructive" });
+      toast({ title: t('help.missingDetails'), description: t('help.pleaseFillInYourName'), variant: "destructive" });
       return;
     }
     setConfirmOpen(true);
@@ -196,16 +220,16 @@ const HelpSupport = () => {
     setSubmitting(true);
     try {
       const res = await createTicket(form);
-      toast({ title: "Message sent", description: `Ticket ${res.data.ticketId} — our team will get back to you within a few hours.` });
+      toast({ title: t('help.messageSent'), description: t('help.ticketOurTeamWillGet', { ticketId: res.data.ticketId }) });
       setForm({ name: currentUser?.name ?? "", email: currentUser?.email ?? "", category: "Account & Billing", message: "" });
       if (authenticated) getMyTickets().then(setMyTickets).catch(() => {});
     } catch (err: unknown) {
       const message = axios.isAxiosError(err)
-        ? err.response?.data?.message || "Please try again, or email us directly."
-        : "Please try again, or email us directly.";
+        ? err.response?.data?.message || t('help.pleaseTryAgainOrEmail')
+        : t('help.pleaseTryAgainOrEmail');
 
       toast({
-        title: "Something went wrong",
+        title: t('help.somethingWentWrong'),
         description: message,
         variant: "destructive",
       });
@@ -217,22 +241,22 @@ const HelpSupport = () => {
   const handleSuggestionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!suggestForm.title.trim() || !suggestForm.message.trim()) {
-      toast({ title: "Missing details", description: "Please add a title and description.", variant: "destructive" });
+      toast({ title: t('help.missingDetails'), description: t('help.pleaseAddATitle'), variant: "destructive" });
       return;
     }
     setSubmittingSuggestion(true);
     try {
       await createSuggestion(suggestForm);
-      toast({ title: "Thanks for the suggestion!", description: "Our team will review it." });
+      toast({ title: t('help.thanksForTheSuggestion'), description: t('help.ourTeamWillReview') });
       setSuggestForm({ title: "", message: "" });
       getMySuggestions().then(setMySuggestions).catch(() => {});
     } catch (err: unknown) {
       const message = axios.isAxiosError(err)
-        ? err.response?.data?.message || "Please try again."
-        : "Please try again.";
+        ? err.response?.data?.message || t('help.pleaseTryAgain')
+        : t('help.pleaseTryAgain');
 
       toast({
-        title: "Something went wrong",
+        title: t('help.somethingWentWrong'),
         description: message,
         variant: "destructive",
       });
@@ -244,8 +268,8 @@ const HelpSupport = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
-        title="Help & Support"
-        description="Find answers to common questions, browse help topics, or contact our support team directly. Track your open tickets and suggestions in one place."
+        title={t('common.helpSupport')}
+        description={t('help.findAnswersToCommonQuestions')}
         path="/help-support"
       />
       <Navigation />
@@ -263,11 +287,10 @@ const HelpSupport = () => {
                 <LifeBuoy className="w-7 h-7 text-primary-foreground" />
               </div>
               <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
-                How can we help?
+                {t('help.howCanWeHelp')}
               </h1>
               <p className="text-lg text-primary-foreground/80 leading-relaxed max-w-xl mx-auto">
-                Search our help articles, browse frequently asked questions, or reach the support
-                team directly — most queries are answered within a few hours.
+                {t('help.searchOurHelpArticlesBrowse')}
               </p>
 
               {/* Search */}
@@ -276,7 +299,7 @@ const HelpSupport = () => {
                 <Input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search help articles…"
+                  placeholder={t('help.searchHelpArticles')}
                   className="pl-11 h-12 bg-white text-[hsl(195,90%,15%)] border-0 shadow-lg"
                 />
               </div>
@@ -289,10 +312,10 @@ const HelpSupport = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-primary-foreground/15">
               {[
-                { icon: Timer, value: "< few hrs", label: "Typical response time" },
-                { icon: CheckCircle2, value: "0", label: "Queries pending overnight" },
-                { icon: DatabaseBackup, value: "Daily", label: "Data backups" },
-                { icon: ShieldCheck, value: "Any", label: "Policy type supported" },
+                { icon: Timer, value: "< few hrs", label: t('help.typicalResponseTime') },
+                { icon: CheckCircle2, value: "0", label: t('help.queriesPendingOvernight') },
+                { icon: DatabaseBackup, value: "Daily", label: t('help.dataBackups') },
+                { icon: ShieldCheck, value: "Any", label: t('help.policyTypeSupported') },
               ].map(({ icon: Icon, value, label }) => (
                 <div key={label} className="px-4 py-6 text-center">
                   <Icon className="w-4 h-4 mx-auto mb-1.5 text-primary-foreground/70" />
@@ -309,8 +332,8 @@ const HelpSupport = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center max-w-xl mx-auto mb-12">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Reach us directly</p>
-                <h2 className="text-3xl font-bold text-form-header">Talk to a real person</h2>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('help.reachUsDirectly')}</p>
+                <h2 className="text-3xl font-bold text-form-header">{t('help.talkToARealPerson')}</h2>
               </div>
 
               <div className={`grid grid-cols-1 gap-5 ${siteConfig.features.liveChat ? "sm:grid-cols-3" : "sm:grid-cols-2 max-w-3xl mx-auto"}`}>
@@ -318,7 +341,7 @@ const HelpSupport = () => {
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                     <Mail className="w-5 h-5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-form-header mb-1">Email us</h3>
+                  <h3 className="font-semibold text-form-header mb-1">{t('help.emailUs')}</h3>
                   <p className="text-sm text-muted-foreground break-words">{siteConfig.supportEmail}</p>
                 </a>
 
@@ -336,8 +359,8 @@ const HelpSupport = () => {
                       <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                         <Phone className="w-5 h-5 text-primary" />
                       </div>
-                      <h3 className="font-semibold text-form-header mb-1">Request a call</h3>
-                      <p className="text-sm text-muted-foreground">We'll call you back in business hours</p>
+                      <h3 className="font-semibold text-form-header mb-1">{t('common.requestACall')}</h3>
+                      <p className="text-sm text-muted-foreground">{t('help.weLlCallYouBack')}</p>
                     </button>
                   }
                 />
@@ -349,8 +372,8 @@ const HelpSupport = () => {
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <MessageCircle className="w-5 h-5 text-primary" />
                     </div>
-                    <h3 className="font-semibold text-form-header mb-1">Live chat</h3>
-                    <p className="text-sm text-muted-foreground">Coming soon</p>
+                    <h3 className="font-semibold text-form-header mb-1">{t('help.liveChat')}</h3>
+                    <p className="text-sm text-muted-foreground">{t('help.comingSoon')}</p>
                   </div>
                 )}
               </div>
@@ -363,16 +386,16 @@ const HelpSupport = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center max-w-xl mx-auto mb-12">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Browse by topic</p>
-                <h2 className="text-3xl font-bold text-form-header">What do you need help with?</h2>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('help.browseByTopic')}</p>
+                <h2 className="text-3xl font-bold text-form-header">{t('help.whatDoYouNeedHelp')}</h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {categories.map(({ icon: Icon, title, description }) => (
+                {categories.map(({ icon: Icon, id, description }) => (
                   <button
-                    key={title}
+                    key={id}
                     onClick={() => {
-                      setQuery(title);
+                      setQuery(catLabel(id));
                       document.getElementById("faq")?.scrollIntoView({ behavior: "smooth", block: "start" });
                     }}
                     className="text-left bg-background border border-border rounded-2xl p-6 hover:shadow-md hover:border-primary/30 transition-all"
@@ -380,10 +403,10 @@ const HelpSupport = () => {
                     <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                       <Icon className="w-5 h-5 text-primary" />
                     </div>
-                    <h3 className="font-semibold text-form-header mb-1.5">{title}</h3>
+                    <h3 className="font-semibold text-form-header mb-1.5">{catLabel(id)}</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
                     <span className="inline-flex items-center gap-1 text-xs font-medium text-primary mt-3">
-                      View articles <ArrowRight className="w-3 h-3" />
+                      {t('help.viewArticles')}{" "} <ArrowRight className="w-3 h-3" />
                     </span>
                   </button>
                 ))}
@@ -397,19 +420,17 @@ const HelpSupport = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-10">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Frequently asked</p>
-                <h2 className="text-3xl font-bold text-form-header">Common questions</h2>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('help.frequentlyAsked')}</p>
+                <h2 className="text-3xl font-bold text-form-header">{t('help.commonQuestions')}</h2>
                 {query && (
                   <p className="text-sm text-muted-foreground mt-3">
-                    {filteredFaqs.length} result{filteredFaqs.length !== 1 ? "s" : ""} for "{query}"
-                    <button onClick={() => setQuery("")} className="text-primary hover:underline ml-2">Clear</button>
-                  </p>
+                    <Trans i18nKey="help.resultForClear" params={{ count: filteredFaqs.length, query }} components={{ button: <button onClick={() => setQuery("")} className="text-primary hover:underline ml-2" /> }} /></p>
                 )}
               </div>
 
               {filteredFaqs.length === 0 ? (
                 <p className="text-center text-sm text-muted-foreground py-12">
-                  No FAQs match "{query}". Try a different term, or send us a message below.
+                  {t('help.noFaqsMatchTry', { query })}
                 </p>
               ) : (
                 <div className="space-y-2.5">
@@ -422,7 +443,7 @@ const HelpSupport = () => {
                           className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-muted/40 transition-colors"
                         >
                           <div>
-                            <span className="text-[10px] font-medium uppercase tracking-wide text-primary block mb-1">{faq.category}</span>
+                            <span className="text-[10px] font-medium uppercase tracking-wide text-primary block mb-1">{catLabel(faq.category)}</span>
                             <span className="font-medium text-form-header text-sm">{faq.q}</span>
                           </div>
                           <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
@@ -447,55 +468,50 @@ const HelpSupport = () => {
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-10 items-start">
 
               <div className="lg:col-span-2 space-y-4">
-                <p className="text-xs font-medium uppercase tracking-wider text-primary">Still stuck?</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-primary">{t('help.stillStuck')}</p>
                 <h2 className="text-3xl font-bold text-form-header leading-tight">
-                  Send us a message.
+                  {t('help.sendUsAMessage')}
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  Tell us what's going on and we'll get back to you — usually within a few hours,
-                  never left pending overnight.
+                  {t('help.tellUsWhatSGoing')}
                 </p>
                 <div className="flex items-start gap-3 bg-background rounded-xl p-4 border border-border">
                   <Clock className="w-4.5 h-4.5 text-primary mt-0.5 shrink-0" />
                   <div className="text-sm">
-                    <p className="text-form-header font-medium mb-2">Support hours</p>
+                    <p className="text-form-header font-medium mb-2">{t('help.supportHours')}</p>
                     {BUSINESS_HOURS_LABELS.map((l) => (
-                      <p key={l.days} className="text-muted-foreground mb-1 last:mb-0">{l.days} {l.hours}</p>
+                      <p key={l.days} className="text-muted-foreground mb-1 last:mb-0">{t(l.days)} {t(l.hours)}</p>
                     ))}
-                    <p className="text-xs text-muted-foreground mt-2">All times IST. Callbacks are placed only within these hours.</p>
+                    <p className="text-xs text-muted-foreground mt-2">{t('help.allTimesIstCallbacks')}</p>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Prefer email? Write to <a href={`mailto:${siteConfig.supportEmail}`} className="text-primary hover:underline">{siteConfig.supportEmail}</a> directly.
+                  <Trans i18nKey="help.preferEmailWriteToDirectly" params={{ supportEmail: siteConfig.supportEmail }} components={{ link: <a href={`mailto:${siteConfig.supportEmail}`} className="text-primary hover:underline" /> }} />
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Rather talk it through?{" "}
-                  <button type="button" onClick={() => setCallOpen(true)} className="text-primary hover:underline">
-                    Request a call back
-                  </button>{" "}
-                  — we call only during business hours.
+                  <Trans i18nKey="help.ratherTalkItThroughRequest" components={{ button: <button type="button" onClick={() => setCallOpen(true)} className="text-primary hover:underline" /> }} />
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="lg:col-span-3 bg-background rounded-2xl border border-border p-6 md:p-8 space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="name" className="text-xs text-muted-foreground">Name</Label>
-                    <Input id="name" name="name" value={form.name} onChange={handleFormChange} placeholder="Your name" />
+                    <Label htmlFor="name" className="text-xs text-muted-foreground">{t('common.name')}</Label>
+                    <Input id="name" name="name" value={form.name} onChange={handleFormChange} placeholder={t('help.yourName')} />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="email" className="text-xs text-muted-foreground">Email</Label>
+                    <Label htmlFor="email" className="text-xs text-muted-foreground">{t('common.email2')}</Label>
                     <Input id="email" name="email" type="email" value={form.email} onChange={handleFormChange} placeholder="you@example.com" />
                     {!authenticated && (
                       <p className="text-xs text-muted-foreground">
-                        Already registered on the platform? Use your registered email for faster replies and priority support.
+                        {t('help.alreadyRegisteredOnThePlatform')}
                       </p>
                     )}
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="category" className="text-xs text-muted-foreground">What's this about?</Label>
+                  <Label htmlFor="category" className="text-xs text-muted-foreground">{t('help.whatSThisAbout')}</Label>
                   <select
                     id="category"
                     name="category"
@@ -504,33 +520,33 @@ const HelpSupport = () => {
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                   >
                     {categories.map((c) => (
-                      <option key={c.title} value={c.title}>{c.title}</option>
+                      <option key={c.id} value={c.id}>{catLabel(c.id)}</option>
                     ))}
-                    <option value="Other">Other</option>
+                    <option value="Other">{t('help.topicOther')}</option>
                   </select>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="message" className="text-xs text-muted-foreground">Message</Label>
+                  <Label htmlFor="message" className="text-xs text-muted-foreground">{t('help.message')}</Label>
                   <Textarea
                     id="message"
                     name="message"
                     value={form.message}
                     onChange={handleFormChange}
                     rows={5}
-                    placeholder="Describe the issue or question in detail…"
+                    placeholder={t('help.describeTheIssueOrQuestion')}
                     className="resize-none"
                   />
                 </div>
 
                 <Button type="submit" disabled={submitting} className="bg-primary hover:bg-primary-light w-full sm:w-auto">
                   <Send className="w-4 h-4 mr-2" />
-                  {submitting ? "Sending…" : "Send message"}
+                  {submitting ? t('help.sending') : t('help.sendMessage')}
                 </Button>
 
                 {!authenticated && (
                   <p className="text-xs text-muted-foreground">
-                    Already have an account? <Link to="/login" className="text-primary hover:underline">Log in</Link> to track this request from your profile.
+                    <Trans i18nKey="help.alreadyHaveAnAccountLog" components={{ link: <Link to="/login" className="text-primary hover:underline" /> }} />
                   </p>
                 )}
               </form>
@@ -538,21 +554,19 @@ const HelpSupport = () => {
               <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Please confirm your details before sending</AlertDialogTitle>
+                    <AlertDialogTitle>{t('help.pleaseConfirmYourDetailsBefore')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Double-check that your email address is correct and your message is clear.
-                      We reply to the email you provide — if it's mistyped or incorrect, you'll miss
-                      our follow-up and we won't be able to reach you.
+                      {t('help.doubleCheckThatYourEmail')}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <div className="rounded-lg bg-muted/50 border border-border px-4 py-3 text-sm space-y-1">
-                    <p><span className="text-muted-foreground">Name:</span> <span className="font-medium text-form-header">{form.name || "—"}</span></p>
-                    <p><span className="text-muted-foreground">Email:</span> <span className="font-medium text-form-header"><SensitiveValue field="email" value={form.email} /></span></p>
+                    <p><span className="text-muted-foreground">{t('help.name')}</span> <span className="font-medium text-form-header">{form.name || "—"}</span></p>
+                    <p><span className="text-muted-foreground">{t('help.email')}</span> <span className="font-medium text-form-header"><SensitiveValue field="email" value={form.email} /></span></p>
                   </div>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Let me check again</AlertDialogCancel>
+                    <AlertDialogCancel>{t('help.letMeCheckAgain')}</AlertDialogCancel>
                     <AlertDialogAction onClick={confirmAndSend} className="bg-primary hover:bg-primary-light">
-                      Looks good, send it
+                      {t('help.looksGoodSend')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -567,37 +581,37 @@ const HelpSupport = () => {
             <div className="container mx-auto px-4">
               <div className="max-w-3xl mx-auto">
                 <div className="text-center max-w-xl mx-auto mb-10">
-                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Your history</p>
-                  <h2 className="text-3xl font-bold text-form-header">My requests</h2>
-                  <p className="text-muted-foreground mt-2">Track every message you've sent us and its current status.</p>
+                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('help.yourHistory')}</p>
+                  <h2 className="text-3xl font-bold text-form-header">{t('help.myRequests')}</h2>
+                  <p className="text-muted-foreground mt-2">{t('help.trackEveryMessageYouVe')}</p>
                 </div>
 
                 {loadingTickets ? (
-                  <p className="text-center text-sm text-muted-foreground py-8">Loading…</p>
+                  <p className="text-center text-sm text-muted-foreground py-8">{t('common.loading2')}</p>
                 ) : !myTickets.length ? (
                   <p className="text-center text-sm text-muted-foreground py-8">
                     <Inbox className="w-6 h-6 mx-auto mb-2 text-muted-foreground/60" />
-                    No requests yet — send us a message below if you need help.
+                    {t('help.noRequestsYetSendUs')}
                   </p>
                 ) : (
                   <div className="space-y-3">
-                    {myTickets.map((t) => (
-                      <Card key={t.ticketId}>
+                    {myTickets.map((tk) => (
+                      <Card key={tk.ticketId}>
                         <CardHeader className="pb-2">
                           <div className="flex items-start justify-between flex-wrap gap-2">
                             <div>
-                              <CardTitle className="text-sm font-mono">{t.ticketId}</CardTitle>
-                              <p className="text-xs text-muted-foreground mt-1">{t.category} · {fmt(t.createdAt)}</p>
+                              <CardTitle className="text-sm font-mono">{tk.ticketId}</CardTitle>
+                              <p className="text-xs text-muted-foreground mt-1">{tk.category} · {fmt(tk.createdAt)}</p>
                             </div>
-                            <Badge className={`text-xs ${ticketStatusStyle[t.status]}`}>{t.status.replace("_", " ")}</Badge>
+                            <Badge className={`text-xs ${ticketStatusStyle[tk.status]}`}>{tk.status.replace("_", " ")}</Badge>
                           </div>
                         </CardHeader>
                         <CardContent className="space-y-2">
-                          <p className="text-sm text-foreground">{t.message}</p>
-                          {t.adminReply && (
+                          <p className="text-sm text-foreground">{tk.message}</p>
+                          {tk.adminReply && (
                             <div className="bg-blue-50 border-l-2 border-blue-400 rounded px-3 py-2 mt-2">
-                              <p className="text-[10px] uppercase text-blue-600 mb-1">Support reply</p>
-                              <p className="text-sm text-blue-900 whitespace-pre-wrap">{t.adminReply}</p>
+                              <p className="text-[10px] uppercase text-blue-600 mb-1">{t('help.supportReply')}</p>
+                              <p className="text-sm text-blue-900 whitespace-pre-wrap">{tk.adminReply}</p>
                             </div>
                           )}
                         </CardContent>
@@ -616,8 +630,8 @@ const HelpSupport = () => {
             <div className="container mx-auto px-4">
               <div className="max-w-3xl mx-auto">
                 <div className="text-center max-w-xl mx-auto mb-8">
-                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Callbacks</p>
-                  <h2 className="text-2xl font-bold text-form-header">My call requests</h2>
+                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('help.callbacks')}</p>
+                  <h2 className="text-2xl font-bold text-form-header">{t('help.myCallRequests')}</h2>
                 </div>
                 <div className="space-y-3">
                   {myCalls.map((c) => (
@@ -637,7 +651,7 @@ const HelpSupport = () => {
                         <p className="text-sm text-foreground">{c.reason}</p>
                         {(c.status === "pending" || c.status === "no_answer") && c.expectedCallFrom && (
                           <p className="text-xs text-muted-foreground">
-                            Expected call from {formatISTDateTime(c.expectedCallFrom)} (during business hours)
+                            {t('help.expectedCallFromDuringBusiness', { value: formatISTDateTime(c.expectedCallFrom) })}
                           </p>
                         )}
                       </CardContent>
@@ -655,41 +669,41 @@ const HelpSupport = () => {
             <div className="container mx-auto px-4">
               <div className="max-w-3xl mx-auto">
                 <div className="text-center max-w-xl mx-auto mb-10">
-                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">Have an idea?</p>
-                  <h2 className="text-3xl font-bold text-form-header">Suggest a feature</h2>
-                  <p className="text-muted-foreground mt-2">Tell us what would make the platform better for you.</p>
+                  <p className="text-xs font-medium uppercase tracking-wider text-primary mb-2">{t('help.haveAnIdea')}</p>
+                  <h2 className="text-3xl font-bold text-form-header">{t('help.suggestAFeature')}</h2>
+                  <p className="text-muted-foreground mt-2">{t('help.tellUsWhatWouldMake')}</p>
                 </div>
 
                 <form onSubmit={handleSuggestionSubmit} className="bg-background rounded-2xl border border-border p-6 md:p-8 space-y-4 mb-8">
                   <div className="space-y-1.5">
-                    <Label htmlFor="suggestTitle" className="text-xs text-muted-foreground">Title</Label>
+                    <Label htmlFor="suggestTitle" className="text-xs text-muted-foreground">{t('help.title')}</Label>
                     <Input
                       id="suggestTitle"
                       value={suggestForm.title}
                       onChange={(e) => setSuggestForm(p => ({ ...p, title: e.target.value }))}
-                      placeholder="e.g. Dark mode for the dashboard"
+                      placeholder={t('help.eGDarkMode')}
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="suggestMessage" className="text-xs text-muted-foreground">Details</Label>
+                    <Label htmlFor="suggestMessage" className="text-xs text-muted-foreground">{t('common.details')}</Label>
                     <Textarea
                       id="suggestMessage"
                       rows={4}
                       value={suggestForm.message}
                       onChange={(e) => setSuggestForm(p => ({ ...p, message: e.target.value }))}
-                      placeholder="What would this help you do?"
+                      placeholder={t('help.whatWouldThisHelp')}
                       className="resize-none"
                     />
                   </div>
                   <Button type="submit" disabled={submittingSuggestion} className="bg-primary hover:bg-primary-light w-full sm:w-auto">
                     <Lightbulb className="w-4 h-4 mr-2" />
-                    {submittingSuggestion ? "Sending…" : "Send suggestion"}
+                    {submittingSuggestion ? t('help.sending') : t('help.sendSuggestion')}
                   </Button>
                 </form>
 
                 {!loadingSuggestions && mySuggestions.length > 0 && (
                   <div className="space-y-3">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Your suggestions</p>
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t('help.yourSuggestions')}</p>
                     {mySuggestions.map((s) => (
                       <Card key={s._id}>
                         <CardHeader className="pb-2">
@@ -715,13 +729,13 @@ const HelpSupport = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-1">Looking for policy terms & codes?</h2>
-                <p className="text-primary-foreground/90">Check the Insurance Abbreviations & Codes reference for quick lookups.</p>
+                <h2 className="text-2xl md:text-3xl font-bold mb-1">{t('help.lookingForPolicyTermsCodes')}</h2>
+                <p className="text-primary-foreground/90">{t('help.checkTheInsuranceAbbreviationsCodes')}</p>
               </div>
               <Link to="/policy-niketan-info-hub" className="shrink-0">
                 <Button size="lg" className="bg-white text-[hsl(195,85%,25%)] hover:bg-white/90 font-medium">
                   <BookOpenText className="w-4 h-4 mr-2" />
-                  Open reference
+                  {t('help.openReference')}
                 </Button>
               </Link>
             </div>

@@ -1,0 +1,21 @@
+{
+  "contactUs": "Contact Us",
+  "contactEmailOurSupportTeam": "Contact {{companyName}}: email our support team, raise a support ticket, request a call back, or find our business details.",
+  "questionsAboutYourAccountPayments": "Questions about your account, payments, or the product? We're here to help.",
+  "emailSupport": "Email support",
+  "forAccountBillingRefund": "For account, billing, refund and general questions.",
+  "raiseASupportTicket": "Raise a support ticket",
+  "sendUsAMessageFrom": "Send us a message from the app and track it with a ticket ID.",
+  "goToHelpSupport": "Go to Help & Support",
+  "shareYourMobileNumber": "Share your mobile number and a short reason — our team calls you back. We call only during business hours.",
+  "businessHoursResponseTime": "Business hours & response time",
+  "ist": "(IST)",
+  "mostEmailQueriesAreAnswered": "Most email queries are answered within a few hours.",
+  "phone": "Phone",
+  "aboutTheBusiness": "About the business",
+  "isASoftwareSubscriptionTool": "<strong>{{companyName}}</strong> is a software subscription tool that helps insurance agents manage their own client records, reminders, and follow-ups. Website: <link>{{productionUrl}}</link>",
+  "companyLinkedinPage": "Company LinkedIn Page:",
+  "linkedinPageUrl": "LinkedIn Page URL",
+  "operated": "Operated by:",
+  "seeAlsoOurCancellationRefund": "See also our <link>Cancellation & Refund Policy</link>, <link2>Terms of Service</link2> and <link3>Privacy Policy</link3>."
+}

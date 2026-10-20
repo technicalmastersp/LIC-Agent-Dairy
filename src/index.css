@@ -152,3 +152,26 @@
   -webkit-text-security: disc;
   text-security: disc;
 }
+
+/* ── Indic scripts (Hindi today; Marathi/Bengali/Tamil… later) ─────────────────
+   Devanagari has tall ascenders and stacked matras. Tailwind's tight leadings
+   (leading-none / -tight / -snug, used on headings and buttons across the app)
+   clip them, and the system "sans" stack may pick a Latin-only font first. These
+   rules only apply while <html lang> is an Indic language (LanguageProvider sets
+   it), so English layout is untouched. To add a language that needs different
+   treatment, add its code to the :lang(...) lists below. */
+:lang(hi), :lang(mr), :lang(ne) {
+  font-family: ui-sans-serif, system-ui, "Nirmala UI", "Noto Sans Devanagari", "Kohinoor Devanagari", Mangal, sans-serif;
+  /* Never split a conjunct/word mid-way; break only at spaces. */
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+:lang(hi) .leading-none, :lang(mr) .leading-none, :lang(ne) .leading-none { line-height: 1.35; }
+:lang(hi) .leading-tight, :lang(mr) .leading-tight, :lang(ne) .leading-tight { line-height: 1.4; }
+:lang(hi) .leading-snug, :lang(mr) .leading-snug, :lang(ne) .leading-snug { line-height: 1.5; }
+:lang(hi) h1, :lang(hi) h2, :lang(hi) h3, :lang(mr) h1, :lang(mr) h2, :lang(mr) h3 { line-height: 1.35; }
+/* Uppercase/tracking utilities are meaningless for Devanagari (no case) and the wide
+   tracking pulls conjuncts apart. */
+:lang(hi) .uppercase, :lang(mr) .uppercase { text-transform: none; }
+:lang(hi) .tracking-wide, :lang(hi) .tracking-wider, :lang(hi) .tracking-widest,
+:lang(mr) .tracking-wide, :lang(mr) .tracking-wider, :lang(mr) .tracking-widest { letter-spacing: normal; }

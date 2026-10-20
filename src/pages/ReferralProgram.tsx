@@ -28,6 +28,8 @@ import type { Dashboard, WithdrawalRowProps, ReferralRowProps } from "@/types/pa
 import { formatISTDate as fmt } from "@/utils/dateFormat";
 import { SensitiveValue } from "@/components/SensitiveValue";
 import { useSensitiveMask } from "@/hooks/useSensitiveMask";
+import { useLanguage } from "@/hooks/useLanguage";
+import Trans from "@/components/Trans";
 
 // ── types ─────────────────────────────────────────────────────────────────────
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -50,7 +52,7 @@ const TIERS = [
 ] as const;
 
 const getTier = (totalL1: number) => {
-  const current = [...TIERS].reverse().find(t => totalL1 >= t.min) ?? TIERS[0];
+  const current = [...TIERS].reverse().find(tk => totalL1 >= tk.min) ?? TIERS[0];
   const idx = TIERS.indexOf(current);
   const next = TIERS[idx + 1] ?? null;
   return { current, next, toNext: next ? next.min - totalL1 : 0 };
@@ -99,7 +101,9 @@ const Rs = ({ n, pre = "" }: { n: number | string; pre?: string }) => (
   <SensitiveValue field="walletAmount" value={n} render={(v) => `${pre}₹${v}`} />
 );
 
-const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: WithdrawalRowProps) => (
+const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: WithdrawalRowProps) => {
+  const { t } = useLanguage();
+  return (
   <div className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
     <div className="flex-1">
       <div className="flex items-center gap-2 flex-wrap">
@@ -107,12 +111,10 @@ const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: WithdrawalRowProps) => (
         <Badge className={`text-xs ${withdrawStatusStyle[w.status]}`}>
           {w.status.charAt(0).toUpperCase() + w.status.slice(1)}
         </Badge>
-        <span className="text-xs text-muted-foreground">via {w.method}</span>
+        <span className="text-xs text-muted-foreground">{t('referral.via', { method: w.method })}</span>
       </div>
       <p className="text-xs text-muted-foreground mt-0.5">
-        Requested: {fmt(w.requestedAt)}
-        {w.processedAt && ` · Processed: ${fmt(w.processedAt)}`}
-      </p>
+        {w.processedAt ? t('referral.requestedProcessed', { date: fmt(w.requestedAt), processed: fmt(w.processedAt) }) : t('referral.requested', { date: fmt(w.requestedAt) })}</p>
       {w.upiId && <p className="text-xs text-muted-foreground"><SensitiveValue value={w.upiId} /></p>}
       {w.accountNumber && (
         <p className="text-xs text-muted-foreground">
@@ -122,13 +124,15 @@ const WithdrawalRow = ({ w, fmt, withdrawStatusStyle }: WithdrawalRowProps) => (
       )}
       {(w.status === "failed") && (
         <p className="text-xs text-red-700 mt-0.5">
-          Note : {w.adminNote || "No reason provided."}
-        </p>
+          {t('referral.note', { value: w.adminNote || "No reason provided." })}</p>
       )}
     </div>
   </div>
 );
-const ReferralRow = ({ u, fmt, initials, statusStyle }: ReferralRowProps) => (
+};
+const ReferralRow = ({ u, fmt, initials, statusStyle }: ReferralRowProps) => {
+  const { t } = useLanguage();
+  return (
   <div className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
     <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium shrink-0 ${
       u.level === 1 ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
@@ -145,29 +149,29 @@ const ReferralRow = ({ u, fmt, initials, statusStyle }: ReferralRowProps) => (
         }`}>L{u.level}</Badge>
       </div>
       <p className="text-xs text-muted-foreground mt-0.5">
-        {u.planType} · Joined {fmt(u.joinedAt)}
-        {u.level === 2 && u.referredBy && ` · via ${u.referredBy}`}
-      </p>
+        {u.level === 2 && u.referredBy ? t('referral.joinedVia', { planType: u.planType, date: fmt(u.joinedAt), referrer: u.referredBy }) : t('referral.joined', { planType: u.planType, date: fmt(u.joinedAt) })}</p>
     </div>
     <div className="flex items-center gap-3 py-1">
       <span className={`text-sm font-medium ${u.earning > 0 ? "text-green-600" : "text-muted-foreground"}`}>
         {u.earning > 0 ? <Rs n={u.earning} pre="+" /> : <Rs n={0} />}
       </span>
-      {u.rewardPaid && (<Badge className="text-xs bg-green-100 text-green-700 border border-green-200">Paid</Badge>)}
-      {u.rewardExpired && !u.rewardPaid && (<Badge className="text-xs bg-red-100 text-red-700 border border-red-200">Expired</Badge>)}
+      {u.rewardPaid && (<Badge className="text-xs bg-green-100 text-green-700 border border-green-200">{t('referral.paid')}</Badge>)}
+      {u.rewardExpired && !u.rewardPaid && (<Badge className="text-xs bg-red-100 text-red-700 border border-red-200">{t('common.expired')}</Badge>)}
       {!u.rewardPaid && !u.rewardExpired && u.daysLeft !== null && u.daysLeft !== undefined && (
-        <Badge className="text-xs bg-yellow-100 text-yellow-700 border border-yellow-200">{u.daysLeft}d left</Badge>
+        <Badge className="text-xs bg-yellow-100 text-yellow-700 border border-yellow-200">{t('referral.dLeft', { daysLeft: u.daysLeft })}</Badge>
       )}
     </div>
     <Badge className={`text-xs shrink-0 ${statusStyle[u.rewardExpired ? "expired" : u.status]}`}>
-      {u.rewardExpired ? "Expired" : u.status}
+      {u.rewardExpired ? t('common.expired') : u.status}
     </Badge>
   </div>
 );
+};
 
 
 // ── component ─────────────────────────────────────────────────────────────────
 const ReferralProgram = () => {
+  const { t } = useLanguage();
   const { hidden } = useSensitiveMask(); // charts can't use <SensitiveValue>
   const navigate      = useNavigate();
   const { toast }     = useToast();
@@ -239,16 +243,16 @@ const ReferralProgram = () => {
   const copyCode = async () => {
     if (!currentUser?.referralCode) return;
     await navigator.clipboard.writeText(currentUser?.referralCode);
-    toast({ title: "Code Copied!", description: "Referral code copied." });
+    toast({ title: t('referral.codeCopied'), description: t('referral.referralCodeCopied') });
   };
   const copyLink = async () => {
     await navigator.clipboard.writeText(referralUrl);
-    toast({ title: "Link Copied!", description: "Referral link copied." });
+    toast({ title: t('referral.linkCopied'), description: t('referral.referralLinkCopied') });
   };
 
   const shareLink = async () => {
     if (navigator.share) {
-      try { await navigator.share({ title: "Join Policy Niketan", url: referralUrl }); }
+      try { await navigator.share({ title: t('referral.joinPolicyNiketan'), url: referralUrl }); }
       catch { copyLink(); }
     } else { copyLink(); }
   };
@@ -277,23 +281,23 @@ const ReferralProgram = () => {
 
   const handleSaveBank = async () => {
     if (!bankForm.upiId && !bankForm.accountNumber) {
-      toast({ title: "Required", description: "Add at least a UPI ID or bank account.", variant: "destructive" });
+      toast({ title: t('referral.required'), description: t('referral.addAtLeastAUpi'), variant: "destructive" });
       return;
     }
     if (bankForm.upiId && !validateUpiId(bankForm.upiId)) {
-      toast({ title: "Invalid UPI ID", description: "Expected a format like name@bank.", variant: "destructive" });
+      toast({ title: t('referral.invalidUpiId'), description: t('referral.expectedAFormatLikeName'), variant: "destructive" });
       return;
     }
     if (bankForm.accountNumber && (!bankForm.ifscCode || !bankForm.accountHolder)) {
-      toast({ title: "Incomplete", description: "Fill account number, IFSC, and account holder name.", variant: "destructive" });
+      toast({ title: t('referral.incomplete'), description: t('referral.fillAccountNumberIfsc'), variant: "destructive" });
       return;
     }
     if (bankForm.accountNumber && !validateAccountNumber(bankForm.accountNumber)) {
-      toast({ title: "Invalid account number", description: "Expected 9–18 digits.", variant: "destructive" });
+      toast({ title: t('referral.invalidAccountNumber'), description: t('referral.expected918Digits'), variant: "destructive" });
       return;
     }
     if (bankForm.accountNumber && ifscLookupState.status !== "found") {
-      toast({ title: "Verify IFSC first", description: "Enter a valid IFSC code and let it resolve to a bank before saving.", variant: "destructive" });
+      toast({ title: t('referral.verifyIfscFirst'), description: t('referral.enterAValidIfscCode'), variant: "destructive" });
       return;
     }
     setSavingBank(true);
@@ -301,12 +305,12 @@ const ReferralProgram = () => {
       // bankName is resolved server-side from IFSC too — sending it here is
       // just for optimistic UI; the backend derives its own authoritative value.
       await updatePaymentDetails(bankForm);
-      toast({ title: "Saved!", description: "Payment details updated." });
+      toast({ title: t('referral.saved'), description: t('referral.paymentDetailsUpdated') });
       setEditingBank(false);
       fetchDashboard();
     } catch (err: unknown) {
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
-      toast({ title: "Error", description: message, variant: "destructive" });
+      toast({ title: t('referral.error'), description: message, variant: "destructive" });
     } finally { setSavingBank(false); }
   };
 
@@ -315,33 +319,33 @@ const ReferralProgram = () => {
     // WITHDRAWALS_DISABLED); this is just a friendlier early exit.
     if (dashboard?.withdrawalsEnabled !== true) {
       toast({
-        title:       "Withdrawals unavailable",
-        description: "Your wallet balance can be used to renew or upgrade your plan.",
+        title:       t('referral.withdrawalsUnavailable'),
+        description: t('referral.yourWalletBalanceCan'),
         variant:     "destructive",
       });
       return;
     }
     if (!dashboard?.hasPaymentDetails) {
       toast({
-        title:       "Bank details required",
-        description: "Please add your UPI ID or bank account before withdrawing.",
+        title:       t('referral.bankDetailsRequired'),
+        description: t('referral.pleaseAddYourUpiId'),
         variant:     "destructive",
       });
       setEditingBank(true);
       return;
     }
     if ((dashboard?.availableBalance ?? 0) < config.MIN_WITHDRAWAL) {
-      toast({ title: "Minimum not met", description: `You need at least ₹${config.MIN_WITHDRAWAL} to withdraw.`, variant: "destructive" });
+      toast({ title: t('referral.minimumNotMet'), description: t('referral.youNeedAtLeast', { MIN_WITHDRAWAL: config.MIN_WITHDRAWAL }), variant: "destructive" });
       return;
     }
     setWithdrawing(true);
     try {
       await withdrawEarnings();
-      toast({ title: "Requested!", description: "Withdrawal will be processed in 3–5 business days." });
+      toast({ title: t('referral.requested2'), description: t('referral.withdrawalWillBeProcessed') });
       fetchDashboard();
     } catch (err: unknown) {
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
-      toast({ title: "Failed", description: message, variant: "destructive" });
+      toast({ title: t('referral.failed'), description: message, variant: "destructive" });
     } finally { setWithdrawing(false); }
   };
 
@@ -352,7 +356,7 @@ const ReferralProgram = () => {
       <Navigation />
       <main className="flex-1 min-h-[60vh] flex flex-col items-center justify-center gap-3 py-16">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        <p className="text-muted-foreground text-sm">Loading referral dashboard…</p>
+        <p className="text-muted-foreground text-sm">{t('referral.loadingReferralDashboard')}</p>
       </main>
       <Footer />
     </div>
@@ -393,23 +397,22 @@ const ReferralProgram = () => {
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-xl md:text-2xl font-medium">Referral program</h1>
+                    <h1 className="text-xl md:text-2xl font-medium">{t('referral.referralProgram')}</h1>
                     <Badge className={`text-xs border-0 bg-white/15 backdrop-blur-sm text-primary-foreground`}>
                       <tier.current.icon className="w-3 h-3 mr-1" />
                       {tier.current.name}
                     </Badge>
                   </div>
                   <p className="text-sm text-primary-foreground/80 mt-1 max-w-md">
-                    Earn {config.L1_COMMISSION_PCT}% on direct referrals and {config.L2_COMMISSION_PCT}% on theirs — within {config.REWARD_WINDOW_DAYS} days of signup.
+                    {t('referral.earnOnDirectReferrals', { L1_COMMISSION_PCT: config.L1_COMMISSION_PCT, L2_COMMISSION_PCT: config.L2_COMMISSION_PCT, REWARD_WINDOW_DAYS: config.REWARD_WINDOW_DAYS })}
                   </p>
                   {tier.next && (
                     <p className="text-xs text-primary-foreground/70 mt-2">
-                      {tier.toNext} more direct referral{tier.toNext === 1 ? "" : "s"} to reach <span className="font-medium">{tier.next.name}</span>
-                    </p>
+                      <Trans i18nKey="referral.moreDirectReferralToReach" params={{ count: tier.toNext, name: tier.next.name }} components={{ span: <span className="font-medium" /> }} /></p>
                   )}
                 </div>
                 <div className="text-left sm:text-right w-full sm:w-auto shrink-0">
-                  <p className="text-[11px] uppercase tracking-wide text-primary-foreground/60">Your code</p>
+                  <p className="text-[11px] uppercase tracking-wide text-primary-foreground/60">{t('referral.yourCode')}</p>
                   <div className="flex items-center gap-2 mt-1 justify-start sm:justify-end">
                     <span className="text-2xl font-mono font-medium tracking-widest">{currentUser.referralCode}</span>
                     <Button size="sm" variant="outline"
@@ -426,10 +429,10 @@ const ReferralProgram = () => {
           {/* ── Stats ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { icon: <Users className="w-5 h-5 text-blue-600" />,       label: "Direct referrals",  val: d.totalL1,                    color: "text-blue-600"   },
-              { icon: <Gift  className="w-5 h-5 text-purple-600" />,     label: "Level 2 referrals", val: d.totalL2,                    color: "text-purple-600" },
-              { icon: <TrendingUp className="w-5 h-5 text-green-600" />, label: "Total earned",      val: <Rs n={d.totalEarned} />,          color: "text-green-600"  },
-              { icon: <Clock className="w-5 h-5 text-yellow-600" />,     label: "Pending",           val: <Rs n={d.pendingEarnings} />,      color: "text-yellow-600" },
+              { icon: <Users className="w-5 h-5 text-blue-600" />,       label: t('referral.directReferrals'),  val: d.totalL1,                    color: "text-blue-600"   },
+              { icon: <Gift  className="w-5 h-5 text-purple-600" />,     label: t('referral.level2Referrals'), val: d.totalL2,                    color: "text-purple-600" },
+              { icon: <TrendingUp className="w-5 h-5 text-green-600" />, label: t('referral.totalEarned'),      val: <Rs n={d.totalEarned} />,          color: "text-green-600"  },
+              { icon: <Clock className="w-5 h-5 text-yellow-600" />,     label: t('common.pending'),           val: <Rs n={d.pendingEarnings} />,      color: "text-yellow-600" },
             ].map(({ icon, label, val, color }) => (
               <Card key={label}>
                 <CardContent className="p-4 text-center">
@@ -445,7 +448,7 @@ const ReferralProgram = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" /> Earnings trend
+                <TrendingUp className="w-4 h-4" /> {" "}{t('referral.earningsTrend')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -454,7 +457,7 @@ const ReferralProgram = () => {
                   <div className="flex flex-col items-center justify-center text-center py-10 px-4">
                     <TrendingUp className="w-8 h-8 text-muted-foreground/40 mb-3" />
                     <p className="text-sm text-muted-foreground">
-                      Your monthly earnings will show up here once a referral's plan is credited.
+                      {t('referral.yourMonthlyEarningsWillShow')}
                     </p>
                   </div>
                 ) : (
@@ -463,7 +466,7 @@ const ReferralProgram = () => {
                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
                       <XAxis dataKey="label" tick={{ fontSize: 12 }} />
                       <YAxis tick={{ fontSize: 12 }} allowDecimals={false} width={36} tickFormatter={hidden ? () => "" : undefined} />
-                      <Tooltip formatter={(v: number) => [hidden ? "₹ ••••••" : `₹${v}`, "Earned"]} />
+                      <Tooltip formatter={(v: number) => [hidden ? "₹ ••••••" : `₹${v}`, t('referral.earned')]} />
                       <Bar dataKey="earned" radius={[4, 4, 0, 0]}>
                         {monthlyTrend.map((m, i) => (
                           <Cell key={m.key} fill={i === monthlyTrend.length - 1 ? "hsl(195,85%,25%)" : "hsl(195,60%,70%)"} />
@@ -475,14 +478,14 @@ const ReferralProgram = () => {
 
                 {/* L1 vs L2 contribution split */}
                 <div className="flex flex-col justify-center">
-                  <p className="text-xs font-medium text-muted-foreground mb-3">Where it came from</p>
+                  <p className="text-xs font-medium text-muted-foreground mb-3">{t('referral.whereItCameFrom')}</p>
                   {splitTotal === 0 ? (
-                    <p className="text-xs text-muted-foreground">No credited earnings yet.</p>
+                    <p className="text-xs text-muted-foreground">{t('referral.noCreditedEarningsYet')}</p>
                   ) : (
                     <div className="space-y-3">
                       <div>
                         <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="font-medium text-blue-700">Direct (L1)</span>
+                          <span className="font-medium text-blue-700">{t('referral.directL1')}</span>
                           <span className="text-muted-foreground"><Rs n={l1Earned} /></span>
                         </div>
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -491,7 +494,7 @@ const ReferralProgram = () => {
                       </div>
                       <div>
                         <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="font-medium text-purple-700">Indirect (L2)</span>
+                          <span className="font-medium text-purple-700">{t('referral.indirectL2')}</span>
                           <span className="text-muted-foreground"><Rs n={l2Earned} /></span>
                         </div>
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -509,24 +512,24 @@ const ReferralProgram = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <Wallet className="w-4 h-4" /> Wallet
+                <Wallet className="w-4 h-4" /> {" "}{t('referral.wallet')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="text-xs font-medium text-green-700 mb-1">Available balance</p>
+                  <p className="text-xs font-medium text-green-700 mb-1">{t('referral.availableBalance')}</p>
                   <p className="text-3xl font-medium text-green-700"><Rs n={d.availableBalance} /></p>
                   {withdrawalsEnabled ? (
                     <>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Withdrawn: <Rs n={d.totalWithdrawn} /> · Min: ₹{config.MIN_WITHDRAWAL}
+                        <Trans i18nKey="referral.withdrawnMin" params={{ min: config.MIN_WITHDRAWAL }} components={{ rs: <Rs n={d.totalWithdrawn} /> }} />
                       </p>
                       {/* Bank details warning */}
                       {!d.hasPaymentDetails && (
                         <div className="flex items-center gap-1.5 mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
                           <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                          Add bank details to withdraw
+                          {t('referral.addBankDetailsToWithdraw')}
                         </div>
                       )}
                       <Button
@@ -536,20 +539,20 @@ const ReferralProgram = () => {
                         disabled={withdrawing || d.availableBalance < config.MIN_WITHDRAWAL}
                       >
                         <ArrowDownToLine className="w-3.5 h-3.5 mr-1.5" />
-                        {withdrawing ? "Processing…" : "Withdraw earnings"}
+                        {withdrawing ? t('referral.processing') : t('referral.withdrawEarnings')}
                       </Button>
                     </>
                   ) : (
                     <>
                       {/* WALLET-TRANSFER-PAUSED */}
                       <p className="text-xs text-muted-foreground mt-1">
-                        Use it to renew or upgrade your plan
-                        {d.totalWithdrawn > 0 && <> · Previously withdrawn: <Rs n={d.totalWithdrawn} /></>}
+                        {t('referral.renewOrUpgrade')}
+                        {d.totalWithdrawn > 0 && <> {" "}{t('referral.previouslyWithdrawn')}{" "} <Rs n={d.totalWithdrawn} /></>}
                       </p>
                       <div className="flex items-start gap-1.5 mt-2 text-xs text-blue-800 bg-blue-50 border border-blue-200 rounded px-2 py-1.5">
                         <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                         <span>
-                          Transfers to your bank account or UPI aren't available right now. Wallet balance can only be used for plan renewals and upgrades.
+                          {t('referral.transfersToYourBankAccount')}
                         </span>
                       </div>
                       <Button
@@ -559,21 +562,21 @@ const ReferralProgram = () => {
                         disabled={d.availableBalance <= 0}
                       >
                         <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-                        Use wallet on renewal or upgrade
+                        {t('referral.useWalletOnRenewal')}
                       </Button>
                     </>
                   )}
                 </div>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-xs font-medium text-yellow-700 mb-1">Pending rewards</p>
+                  <p className="text-xs font-medium text-yellow-700 mb-1">{t('referral.pendingRewards')}</p>
                   <p className="text-3xl font-medium text-yellow-700"><Rs n={d.pendingEarnings} /></p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Credited when referral activates a paid plan within {config.REWARD_WINDOW_DAYS} days
+                    {t('referral.creditedWhenReferralActivates', { REWARD_WINDOW_DAYS: config.REWARD_WINDOW_DAYS })}
                   </p>
                   {/* Last withdrawal summary */}
                   {d.lastWithdrawal && (
                     <div className="mt-3 text-xs text-muted-foreground border-t border-yellow-200 pt-2">
-                      Last: <Rs n={d.lastWithdrawal.amount} /> ·{" "}
+                      <Trans i18nKey="referral.lastWithdrawal" components={{ rs: <Rs n={d.lastWithdrawal.amount} /> }} />{" "}
                       <Badge className={`text-xs ${withdrawStatusStyle[d.lastWithdrawal.status]}`}>
                         {d.lastWithdrawal.status}
                       </Badge>
@@ -592,10 +595,10 @@ const ReferralProgram = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center justify-between">
                 <span className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4" /> Payment details
+                  <Building2 className="w-4 h-4" /> {t('referral.paymentDetails')}
                   {d.hasPaymentDetails
-                    ? <Badge className="text-xs bg-green-100 text-green-700 border border-green-200 ml-1"><CheckCircle2 className="w-3 h-3 mr-1" />Added</Badge>
-                    : <Badge className="text-xs bg-red-100 text-red-700 border border-red-200 ml-1"><AlertCircle className="w-3 h-3 mr-1" />Required for withdrawal</Badge>
+                    ? <Badge className="text-xs bg-green-100 text-green-700 border border-green-200 ml-1"><CheckCircle2 className="w-3 h-3 mr-1" />{t('referral.added')}</Badge>
+                    : <Badge className="text-xs bg-red-100 text-red-700 border border-red-200 ml-1"><AlertCircle className="w-3 h-3 mr-1" />{t('referral.requiredForWithdrawal')}</Badge>
                   }
                 </span>
                 <Button
@@ -604,8 +607,8 @@ const ReferralProgram = () => {
                   onClick={() => setEditingBank(!editingBank)}
                 >
                   {editingBank
-                    ? <><X className="w-3 h-3 mr-1" />Cancel</>
-                    : <><Edit className="w-3 h-3 mr-1" />{d.hasPaymentDetails ? "Edit" : "Add"}</>
+                    ? <><X className="w-3 h-3 mr-1" />{t('common.cancel')}</>
+                    : <><Edit className="w-3 h-3 mr-1" />{d.hasPaymentDetails ? t('common.edit') : t('referral.add')}</>
                   }
                 </Button>
               </CardTitle>
@@ -624,11 +627,11 @@ const ReferralProgram = () => {
                         <Building2 className="w-7 h-7 opacity-90" />
                         {d.paymentDetails.bankVerified ? (
                           <Badge className="bg-white/15 text-primary-foreground border-0 text-[10px] backdrop-blur-sm">
-                            <CheckCircle2 className="w-3 h-3 mr-1" /> Verified
+                            <CheckCircle2 className="w-3 h-3 mr-1" /> {" "}{t('common.verified')}
                           </Badge>
                         ) : (
                           <Badge className="bg-amber-400/90 text-amber-950 border-0 text-[10px]">
-                            <Clock className="w-3 h-3 mr-1" /> Pending
+                            <Clock className="w-3 h-3 mr-1" /> {" "}{t('common.pending')}
                           </Badge>
                         )}
                       </div>
@@ -637,16 +640,16 @@ const ReferralProgram = () => {
                       </p>
                       <div className="flex items-end justify-between">
                         <div>
-                          <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60 mb-0.5">Account holder</p>
+                          <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60 mb-0.5">{t('referral.accountHolder')}</p>
                           <p className="text-sm font-medium uppercase">{d.paymentDetails.accountHolder || "—"}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60 mb-0.5">{d.paymentDetails.bankName || "Bank"}</p>
+                          <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60 mb-0.5">{d.paymentDetails.bankName || t('referral.bank')}</p>
                           <p className="text-xs text-primary-foreground/80"><SensitiveValue value={d.paymentDetails.ifscCode} /></p>
                         </div>
                       </div>
                       {d.paymentDetails.branchName && (
-                        <p className="text-[10px] text-primary-foreground/50 mt-2">{d.paymentDetails.branchName} branch</p>
+                        <p className="text-[10px] text-primary-foreground/50 mt-2">{t('referral.branch', { branchName: d.paymentDetails.branchName })}</p>
                       )}
                     </div>
                   )}
@@ -659,22 +662,22 @@ const ReferralProgram = () => {
                         <Smartphone className="w-7 h-7 opacity-90" />
                         {d.paymentDetails.upiVerified ? (
                           <Badge className="bg-white/15 text-primary-foreground border-0 text-[10px] backdrop-blur-sm">
-                            <CheckCircle2 className="w-3 h-3 mr-1" /> Verified
+                            <CheckCircle2 className="w-3 h-3 mr-1" /> {" "}{t('common.verified')}
                           </Badge>
                         ) : d.paymentDetails.upiRejectionReason ? (
                           <Badge className="bg-red-400/90 text-red-950 border-0 text-[10px]">
-                            <AlertCircle className="w-3 h-3 mr-1" /> Rejected
+                            <AlertCircle className="w-3 h-3 mr-1" /> {" "}{t('referral.rejected')}
                           </Badge>
                         ) : (
                           <Badge className="bg-amber-400/90 text-amber-950 border-0 text-[10px]">
-                            <Clock className="w-3 h-3 mr-1" /> Under review
+                            <Clock className="w-3 h-3 mr-1" /> {" "}{t('referral.underReview')}
                           </Badge>
                         )}
                       </div>
                       <p className="font-mono text-lg mb-1">
                         <SensitiveValue field="upiId" value={d.paymentDetails.upiId} render={(v) => `••••••${v.slice(6)}`} />
                       </p>
-                      <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60">UPI ID</p>
+                      <p className="text-[10px] uppercase tracking-wide text-primary-foreground/60">{t('referral.upiId')}</p>
                       {d.paymentDetails.upiRejectionReason && (
                         <p className="text-xs text-red-100 mt-2 bg-red-950/30 rounded px-2 py-1">
                           {d.paymentDetails.upiRejectionReason}
@@ -682,15 +685,14 @@ const ReferralProgram = () => {
                       )}
                       {!d.paymentDetails.upiVerified && !d.paymentDetails.upiRejectionReason && (
                         <p className="text-[10px] text-primary-foreground/60 mt-2">
-                          Validated within 24 hours by admin. Must be your own UPI ID.
+                          {t('referral.validatedWithin24Hours')}
                         </p>
                       )}
                     </div>
                   )}
 
                   <p className="text-[11px] text-muted-foreground text-right">
-                    Last updated {fmt(d.paymentDetails?.updatedAt)}
-                  </p>
+                    {t('referral.lastUpdated', { value: fmt(d.paymentDetails?.updatedAt) })}</p>
                 </div>
               )}
 
@@ -699,10 +701,10 @@ const ReferralProgram = () => {
                 <div className="text-center py-6">
                   <AlertCircle className="w-8 h-8 text-amber-500 mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground mb-3">
-                    No payment details added yet. Add your UPI ID or bank account to receive withdrawals.
+                    {t('referral.noPaymentDetailsAddedYet')}
                   </p>
                   <Button size="sm" onClick={() => setEditingBank(true)}>
-                    <Building2 className="w-3.5 h-3.5 mr-1.5" /> Add payment details
+                    <Building2 className="w-3.5 h-3.5 mr-1.5" /> {" "}{t('referral.addPaymentDetails')}
                   </Button>
                 </div>
               )}
@@ -713,19 +715,19 @@ const ReferralProgram = () => {
                   {/* UPI */}
                   <div className="bg-muted rounded-lg p-4 space-y-3">
                     <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                      <Smartphone className="w-3.5 h-3.5" /> UPI ID
+                      <Smartphone className="w-3.5 h-3.5" /> {" "}{t('referral.upiId')}
                     </p>
                     <div className="space-y-1.5">
-                      <Label className="text-xs">UPI ID</Label>
+                      <Label className="text-xs">{t('referral.upiId')}</Label>
                       <Input
                         placeholder="yourname@upi"
                         value={bankForm.upiId}
                         onChange={e => setBankForm(p => ({ ...p, upiId: e.target.value }))}
                       />
                       <p className="text-xs text-muted-foreground">
-                        This UPI ID will be validated within 24 hours by admin. Must use your own UPI ID.
+                        {t('referral.thisUpiIdWill')}
                       </p>
-                      <p className="text-xs text-muted-foreground">Pending manual verification before first withdrawal.</p>
+                      <p className="text-xs text-muted-foreground">{t('referral.pendingManualVerificationBeforeFirst')}</p>
                     </div>
                   </div>
 
@@ -738,29 +740,29 @@ const ReferralProgram = () => {
                   {/* Bank account */}
                   <div className="bg-muted rounded-lg p-4 space-y-3">
                     <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                      <Building2 className="w-3.5 h-3.5" /> Bank account
+                      <Building2 className="w-3.5 h-3.5" /> {" "}{t('referral.bankAccount')}
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <Label className="text-xs">Account holder name</Label>
+                        <Label className="text-xs">{t('referral.accountHolderName')}</Label>
                         <Input
-                          placeholder="Full name as per bank"
+                          placeholder={t('referral.fullNameAsPerBank')}
                           value={bankForm.accountHolder}
                           onChange={e => setBankForm(p => ({ ...p, accountHolder: e.target.value }))}
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">Account number</Label>
+                        <Label className="text-xs">{t('referral.accountNumber')}</Label>
                         <Input
-                          placeholder="Account number"
+                          placeholder={t('referral.accountNumber')}
                           value={bankForm.accountNumber}
                           onChange={e => setBankForm(p => ({ ...p, accountNumber: e.target.value }))}
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">IFSC code</Label>
+                        <Label className="text-xs">{t('referral.ifscCode')}</Label>
                         <Input
-                          placeholder="SBIN0001234"
+                          placeholder={t('referral.sbin0001234')}
                           value={bankForm.ifscCode}
                           onChange={e => {
                             setBankForm(p => ({ ...p, ifscCode: e.target.value.toUpperCase() }));
@@ -770,9 +772,9 @@ const ReferralProgram = () => {
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">Bank name</Label>
+                        <Label className="text-xs">{t('referral.bankName')}</Label>
                         {ifscLookupState.status === "loading" && (
-                          <p className="text-xs text-muted-foreground py-2">Looking up bank…</p>
+                          <p className="text-xs text-muted-foreground py-2">{t('common.lookingUpBank')}</p>
                         )}
                         {ifscLookupState.status === "found" && (
                           <div className="flex items-center gap-1.5 text-sm py-2">
@@ -783,11 +785,11 @@ const ReferralProgram = () => {
                         {ifscLookupState.status === "not_found" && (
                           <div className="flex items-center gap-1.5 text-sm text-destructive py-2">
                             <AlertCircle className="w-3.5 h-3.5" />
-                            <span>IFSC not found — check the code</span>
+                            <span>{t('common.ifscNotFoundCheck')}</span>
                           </div>
                         )}
                         {ifscLookupState.status === "idle" && (
-                          <p className="text-xs text-muted-foreground py-2">Enter a valid IFSC above to auto-fill</p>
+                          <p className="text-xs text-muted-foreground py-2">{t('referral.enterAValidIfscAbove')}</p>
                         )}
                       </div>
                     </div>
@@ -795,7 +797,7 @@ const ReferralProgram = () => {
 
                   <Button className="w-full" onClick={handleSaveBank} disabled={savingBank}>
                     <Save className="w-4 h-4 mr-1.5" />
-                    {savingBank ? "Saving…" : "Save payment details"}
+                    {savingBank ? t('referral.saving') : t('referral.savePaymentDetails')}
                   </Button>
                 </div>
               )}
@@ -807,20 +809,20 @@ const ReferralProgram = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <Share className="w-4 h-4" /> Your referral link
+                <Share className="w-4 h-4" /> {" "}{t('referral.yourReferralLink')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="bg-muted rounded-lg p-3">
-                <p className="text-xs text-muted-foreground mb-1">Referral URL</p>
+                <p className="text-xs text-muted-foreground mb-1">{t('referral.referralUrl')}</p>
                 <p className="text-xs font-mono text-muted-foreground break-all">{referralUrl}</p>
               </div>
               <div className="flex gap-2 flex-wrap">
-                <Button size="sm" onClick={copyLink}><Copy className="w-3.5 h-3.5 mr-1.5" />Copy URL</Button>
-                <Button size="sm" variant="outline" onClick={shareLink}><Share className="w-3.5 h-3.5 mr-1.5" />Share</Button>
+                <Button size="sm" onClick={copyLink}><Copy className="w-3.5 h-3.5 mr-1.5" />{t('referral.copyUrl')}</Button>
+                <Button size="sm" variant="outline" onClick={shareLink}><Share className="w-3.5 h-3.5 mr-1.5" />{t('referral.share')}</Button>
                 <Button size="sm" variant="outline"
                   className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
-                  onClick={shareWhatsApp}>WhatsApp</Button>
+                  onClick={shareWhatsApp}>{t('referral.whatsapp')}</Button>
               </div>
             </CardContent>
           </Card>
@@ -829,14 +831,14 @@ const ReferralProgram = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <Crown className="w-4 h-4" /> Reward structure
+                <Crown className="w-4 h-4" /> {" "}{t('referral.rewardStructure')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
-                  { level: "Level 1 — direct",   pct: config.L1_COMMISSION_PCT, color: "text-green-600",  pctColor: "bg-green-100 text-green-700 border-green-200"   },
-                  { level: "Level 2 — indirect",  pct: config.L2_COMMISSION_PCT, color: "text-purple-600", pctColor: "bg-purple-100 text-purple-700 border-purple-200" },
+                  { level: t('referral.level1Direct'),   pct: config.L1_COMMISSION_PCT, color: "text-green-600",  pctColor: "bg-green-100 text-green-700 border-green-200"   },
+                  { level: t('referral.level2Indirect'),  pct: config.L2_COMMISSION_PCT, color: "text-purple-600", pctColor: "bg-purple-100 text-purple-700 border-purple-200" },
                 ].map(({ level, pct, color, pctColor }) => (
                   <div key={level} className="bg-muted rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
@@ -858,13 +860,7 @@ const ReferralProgram = () => {
                 ))}
               </div>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
-                Referred users get ₹{config.SIGNUP_DISCOUNT_AMOUNT} off at signup.
-                You earn {config.L1_COMMISSION_PCT}% on their plan (L1) and {config.L2_COMMISSION_PCT}% on their referrals (L2).
-                One-time reward per user within {config.REWARD_WINDOW_DAYS} days.{" "}
-                {withdrawalsEnabled
-                  ? `Min withdrawal ₹${config.MIN_WITHDRAWAL || 500}.`
-                  : "Rewards go to your wallet and can be used to renew or upgrade your plan."}
-              </div>
+                {t('referral.referredUsersGetOff', { SIGNUP_DISCOUNT_AMOUNT: config.SIGNUP_DISCOUNT_AMOUNT, L1_COMMISSION_PCT: config.L1_COMMISSION_PCT, L2_COMMISSION_PCT: config.L2_COMMISSION_PCT, REWARD_WINDOW_DAYS: config.REWARD_WINDOW_DAYS })}{" "}{withdrawalsEnabled ? t('referral.noteMinWithdrawal', { min: config.MIN_WITHDRAWAL || 500 }) : t('referral.noteWalletOnly')}</div>
             </CardContent>
           </Card>
 
@@ -872,15 +868,15 @@ const ReferralProgram = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <Route className="w-4 h-4" /> How it works
+                <Route className="w-4 h-4" /> {" "}{t('referral.howItWorks')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  { step: "1", title: "Share your link",  desc: "Send your referral URL to agents or friends" },
-                  { step: "2", title: "They sign up",     desc: `They register with your link and get ₹${config.SIGNUP_DISCOUNT_AMOUNT} off any paid plan` },
-                  { step: "3", title: "Earn commission",  desc: `Get ${config.L1_COMMISSION_PCT}% on their plan once, ${config.L2_COMMISSION_PCT}% on their referrals once — added to your wallet for renewals & upgrades` },
+                  { step: "1", title: t('referral.shareYourLink'),  desc: t('referral.sendYourReferralUrl') },
+                  { step: "2", title: t('referral.theySignUp'),     desc: t('referral.stepSignUpDesc', { amount: config.SIGNUP_DISCOUNT_AMOUNT }) },
+                  { step: "3", title: t('referral.earnCommission'),  desc: t('referral.stepEarnDesc', { l1: config.L1_COMMISSION_PCT, l2: config.L2_COMMISSION_PCT }) },
                 ].map(({ step, title, desc }) => (
                   <div key={step} className="text-center p-4 bg-muted rounded-lg">
                     <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-medium text-sm mx-auto mb-3">
@@ -899,7 +895,7 @@ const ReferralProgram = () => {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                  <GitBranch className="w-4 h-4" /> Referral chain
+                  <GitBranch className="w-4 h-4" /> {" "}{t('referral.referralChain')}
                 </CardTitle>
                 {(d.referredUsers?.length ?? 0) > 0 && (
                   <Select value={referralFilter} onValueChange={(v) => setReferralFilter(v as typeof referralFilter)}>
@@ -907,10 +903,10 @@ const ReferralProgram = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="expired">Expired</SelectItem>
+                      <SelectItem value="all">{t('referral.all')}</SelectItem>
+                      <SelectItem value="active">{t('common.active')}</SelectItem>
+                      <SelectItem value="pending">{t('common.pending')}</SelectItem>
+                      <SelectItem value="expired">{t('common.expired')}</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -919,11 +915,11 @@ const ReferralProgram = () => {
             <CardContent>
               {!d.referredUsers?.length ? (
                 <p className="text-center text-sm text-muted-foreground py-8">
-                  No referrals yet. Share your link to get started.
+                  {t('referral.noReferralsYetShare')}
                 </p>
               ) : !filteredReferrals.length ? (
                 <p className="text-center text-sm text-muted-foreground py-8">
-                  No {referralFilter} referrals.
+                  {t('referral.noReferrals', { referralFilter: referralFilter === 'all' ? '' : t(referralFilter === 'active' ? 'referral.filterActive' : referralFilter === 'pending' ? 'referral.filterPending' : 'referral.filterExpired') })}
                 </p>
               ) : (
                 <div>
@@ -933,7 +929,7 @@ const ReferralProgram = () => {
                   {filteredReferrals.length > 5 && (
                     <Button variant="outline" size="sm" className="w-full mt-3"
                       onClick={() => setShowAllReferrals(true)}>
-                      See all {filteredReferrals.length} referrals
+                      {t('referral.seeAllReferrals', { length: filteredReferrals.length })}
                     </Button>
                   )}
                 </div>
@@ -943,7 +939,7 @@ const ReferralProgram = () => {
 
           <Dialog open={showAllReferrals} onOpenChange={setShowAllReferrals}>
             <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-              <DialogHeader><DialogTitle>All referrals ({filteredReferrals.length})</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{t('referral.allReferrals', { length: filteredReferrals.length })}</DialogTitle></DialogHeader>
               <div>
                 {filteredReferrals.map((u, i) => (
                   <ReferralRow key={i} u={u} fmt={fmt} initials={initials} statusStyle={statusStyle} />
@@ -956,12 +952,12 @@ const ReferralProgram = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <Receipt className="w-4 h-4" /> Earnings history
+                <Receipt className="w-4 h-4" /> {" "}{t('referral.earningsHistory')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {!d.earningsHistory?.length ? (
-                <p className="text-center text-sm text-muted-foreground py-8">No earnings yet.</p>
+                <p className="text-center text-sm text-muted-foreground py-8">{t('referral.noEarningsYet')}</p>
               ) : (
                 <div>
                   {d.earningsHistory.slice(0, 5).map((e, i) => (
@@ -976,7 +972,7 @@ const ReferralProgram = () => {
                   {d.earningsHistory.length > 5 && (
                     <Button variant="outline" size="sm" className="w-full mt-3"
                       onClick={() => setShowAllEarnings(true)}>
-                      See all {d.earningsHistory.length} entries
+                      {t('referral.seeAllEntries', { length: d.earningsHistory.length })}
                     </Button>
                   )}
                 </div>
@@ -986,7 +982,7 @@ const ReferralProgram = () => {
 
           <Dialog open={showAllEarnings} onOpenChange={setShowAllEarnings}>
             <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-              <DialogHeader><DialogTitle>All earnings ({d.earningsHistory?.length ?? 0})</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{t('referral.allEarnings', { value: d.earningsHistory?.length ?? 0 })}</DialogTitle></DialogHeader>
               <div>
                 {d.earningsHistory?.map((e, i) => (
                   <div key={i} className="grid grid-cols-[80px_1fr_80px] items-center gap-3 py-2.5 border-b border-border last:border-0">
@@ -1007,12 +1003,12 @@ const ReferralProgram = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-                <History className="w-4 h-4" /> Withdrawal history
+                <History className="w-4 h-4" /> {" "}{t('referral.withdrawalHistory')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {!d.withdrawalHistory?.length ? (
-                <p className="text-center text-sm text-muted-foreground py-6">No withdrawals yet.</p>
+                <p className="text-center text-sm text-muted-foreground py-6">{t('referral.noWithdrawalsYet')}</p>
               ) : (
                 <div>
                   {d.withdrawalHistory.slice(0, 5).map((w, i) => (
@@ -1021,7 +1017,7 @@ const ReferralProgram = () => {
                   {d.withdrawalHistory.length > 5 && (
                     <Button variant="outline" size="sm" className="w-full mt-3"
                       onClick={() => setShowAllWithdrawals(true)}>
-                      See all {d.withdrawalHistory.length} withdrawals
+                      {t('referral.seeAllWithdrawals', { length: d.withdrawalHistory.length })}
                     </Button>
                   )}
                 </div>
@@ -1032,7 +1028,7 @@ const ReferralProgram = () => {
 
           <Dialog open={showAllWithdrawals} onOpenChange={setShowAllWithdrawals}>
             <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-              <DialogHeader><DialogTitle>All withdrawals ({d.withdrawalHistory?.length ?? 0})</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{t('referral.allWithdrawals', { value: d.withdrawalHistory?.length ?? 0 })}</DialogTitle></DialogHeader>
               <div>
                 {d.withdrawalHistory?.map((w, i) => (
                   <WithdrawalRow key={i} w={w} fmt={fmt} withdrawStatusStyle={withdrawStatusStyle} />

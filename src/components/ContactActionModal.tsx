@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Phone, MessageCircle, MessageSquare, Mail } from "lucide-react";
 import type { ContactActionModalProps } from "@/types/components/ContactActionModal.types";
 import { SensitiveValue } from "@/components/SensitiveValue";
+import { useLanguage } from "@/hooks/useLanguage";
 // The stored number (aadhaarLinkedMobileNumber) has no enforced format
 // beyond a max length — see policyRecordSchema.ts — so it's typically a
 // bare 10-digit Indian mobile number with no country code. wa.me needs a
@@ -26,6 +27,7 @@ const toSmsNumber = (raw: string) => `+${toWhatsAppNumber(raw)}`;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const ContactActionModal = ({ phone, email, name, isOpen, onClose }: ContactActionModalProps) => {
+  const { t } = useLanguage();
   const hasPhone = !!phone && phone.replace(/\D/g, "").length >= 10;
   const cleanEmail = (email ?? "").trim();
   const hasEmail = EMAIL_RE.test(cleanEmail);
@@ -67,10 +69,9 @@ const ContactActionModal = ({ phone, email, name, isOpen, onClose }: ContactActi
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle className="text-form-header">
-            Contact{name ? ` — ${name}` : ""}
-          </DialogTitle>
+            {name ? t('nav.contactNamed', { name }) : t('nav.contact')}</DialogTitle>
           <DialogDescription>
-            {hasPhone ? <SensitiveValue field="mobileNumber" value={phone} /> : "No mobile number on file for this record."}
+            {hasPhone ? <SensitiveValue field="mobileNumber" value={phone} /> : t('records.noMobileNumberOnFile')}
             {hasEmail && (<> · <SensitiveValue field="email" value={cleanEmail} /></>)}
           </DialogDescription>
         </DialogHeader>
@@ -83,7 +84,7 @@ const ContactActionModal = ({ phone, email, name, isOpen, onClose }: ContactActi
             disabled={!hasPhone}
           >
             <Phone className="w-5 h-5 text-blue-600" />
-            <span className="text-sm font-medium">Call</span>
+            <span className="text-sm font-medium">{t('nav.call')}</span>
           </Button>
           <Button
             variant="outline"
@@ -101,7 +102,7 @@ const ContactActionModal = ({ phone, email, name, isOpen, onClose }: ContactActi
             disabled={!hasEmail}
           >
             <Mail className="w-5 h-5 text-emerald-600" />
-            <span className="text-sm font-medium">E-Mail</span>
+            <span className="text-sm font-medium">{t('nav.eMail')}</span>
           </Button>
           <Button
             variant="outline"
@@ -110,7 +111,7 @@ const ContactActionModal = ({ phone, email, name, isOpen, onClose }: ContactActi
             disabled={!hasPhone}
           >
             <MessageCircle className="w-5 h-5 text-emerald-600" />
-            <span className="text-sm font-medium">WhatsApp</span>
+            <span className="text-sm font-medium">{t('nav.whatsapp')}</span>
           </Button>
         </div>
       </DialogContent>

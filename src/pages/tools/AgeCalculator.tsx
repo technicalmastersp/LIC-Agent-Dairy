@@ -4,8 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Cake, Calendar, Gift } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const AgeCalculator = () => {
+  const { t } = useLanguage();
   const [dob, setDob] = useState("");
 
   const result = useMemo(() => {
@@ -40,14 +42,14 @@ const AgeCalculator = () => {
   return (
     <ToolPageLayout
       icon={Cake}
-      title="Age Calculator"
-      description="Free age calculator: enter a date of birth to get the exact age in years, months and days, plus the time left until the next birthday."
+      title={t('tools.ageCalculator')}
+      description={t('tools.freeAgeCalculatorEnter')}
       accent="blue"
     >
       <Card className="rounded-2xl mt-3">
         <CardContent className="p-6 md:p-8 space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="dob">Date of birth</Label>
+            <Label htmlFor="dob">{t('tools.dateOfBirth')}</Label>
             <Input
               id="dob"
               type="date"
@@ -62,9 +64,9 @@ const AgeCalculator = () => {
             <div className="space-y-5 pt-2">
               <div className="grid grid-cols-3 gap-4">
                 {[
-                  { label: "Years", val: result.years },
-                  { label: "Months", val: result.months },
-                  { label: "Days", val: result.days },
+                  { label: t('tools.years'), val: result.years },
+                  { label: t('tools.months'), val: result.months },
+                  { label: t('tools.days'), val: result.days },
                 ].map(({ label, val }) => (
                   <div key={label} className="bg-blue-50 rounded-xl p-4 text-center">
                     <p className="text-3xl font-bold text-blue-700">{val}</p>
@@ -77,15 +79,15 @@ const AgeCalculator = () => {
                 <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-4">
                   <Calendar className="w-5 h-5 text-primary shrink-0" />
                   <div>
-                    <p className="text-sm font-medium text-form-header">{result.totalDays.toLocaleString("en-IN")} days lived</p>
-                    <p className="text-xs text-muted-foreground">Since your date of birth</p>
+                    <p className="text-sm font-medium text-form-header">{t('tools.daysLived', { totalDays: result.totalDays.toLocaleString("en-IN") })}</p>
+                    <p className="text-xs text-muted-foreground">{t('tools.sinceYourDateOfBirth')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-4">
                   <Gift className="w-5 h-5 text-primary shrink-0" />
                   <div>
-                    <p className="text-sm font-medium text-form-header">{result.daysToNextBirthday} days to go</p>
-                    <p className="text-xs text-muted-foreground">Until your next birthday</p>
+                    <p className="text-sm font-medium text-form-header">{t('tools.daysToGo', { daysToNextBirthday: result.daysToNextBirthday })}</p>
+                    <p className="text-xs text-muted-foreground">{t('tools.untilYourNextBirthday')}</p>
                   </div>
                 </div>
               </div>

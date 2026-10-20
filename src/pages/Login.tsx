@@ -13,6 +13,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { login, getProfile } from "../../services/userService";
+import Trans from "@/components/Trans";
 
 const Login = () => {
   const [userId, setUserId] = useState("");
@@ -43,25 +44,25 @@ const Login = () => {
         user = await getProfile()
         setCurrentUser(user);
         toast({
-          title: t('loginSuccess'),
-          description: `${t('welcome')}, ${user.name}!`,
+          title: t('auth.loginSuccess'),
+          description: `${t('common.welcome')}, ${user.name}!`,
         });
         navigate("/");
         window.location.reload();
       } else {
-        setError(t('invalidCredentials'));
+        setError(t('auth.invalidCredentials'));
       }
     } catch (err) {
       // Don't blame the password for an outage or a timeout.
       if (axios.isAxiosError(err) && (!err.response || err.response.status >= 500)) {
-        setError(t('loginServerError'));
+        setError(t('auth.loginServerError'));
       } else if (axios.isAxiosError(err) && err.response?.status === 429) {
         // Account temporarily locked after repeated wrong passwords (or the IP rate limit).
         const data = err.response.data;
         if (data?.code === "LOGIN_LOCKED" && typeof data.retryAfterSeconds === "number") {
-          setError(t('accountLocked').replace('{n}', String(Math.max(1, Math.ceil(data.retryAfterSeconds / 60)))));
+          setError(t('auth.accountLocked', { n: Math.max(1, Math.ceil(data.retryAfterSeconds / 60)) }));
         } else {
-          setError(data?.message || t('accountLocked').replace('{n}', '15'));
+          setError(data?.message || t('auth.accountLocked', { n: 15 }));
         }
       } else if (axios.isAxiosError(err) && err.response?.status === 403 && err.response.data?.message) {
         setError(err.response.data.message); // e.g. email not verified / account disabled
@@ -69,9 +70,9 @@ const Login = () => {
         // Wrong password: warn when the account is about to lock (server sends attemptsLeft).
         const left = (err as { attemptsLeft?: number })?.attemptsLeft;
         const hint = typeof left === "number" && left > 0 && left <= 2
-          ? ` ${t(left === 1 ? 'attemptsLeftOne' : 'attemptsLeftMany').replace('{n}', String(left))}`
+          ? ` ${t('auth.attemptsLeft', { count: left })}`
           : "";
-        setError(t('invalidCredentials') + hint);
+        setError(t('auth.invalidCredentials') + hint);
       }
     } finally {
       setIsLoading(false);
@@ -88,8 +89,8 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
       <SEO
-        title="Log In"
-        description="Log in to your Policy Niketan account to manage client policy records, track due dates, and monitor payments."
+        title={t('auth.log')}
+        description={t('auth.logInToYourPolicy')}
         path="/login"
       />
       <div className="w-full max-w-md space-y-6">
@@ -128,7 +129,7 @@ const Login = () => {
               navigate("/");
             }}
           >
-            <Home className="w-4 h-4" />Back to Home
+            <Home className="w-4 h-4" />{t('auth.backToHome')}
           </div>
           <div className="flex">
             <LanguageSwitcher />
@@ -140,24 +141,24 @@ const Login = () => {
             <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
               <LogIn className="w-8 h-8 text-primary-foreground" />
             </div>
-            <h1 className="text-2xl font-semibold leading-none tracking-tight text-form-header">{t('loginTitle')}</h1>
+            <h1 className="text-2xl font-semibold leading-none tracking-tight text-form-header">{t('auth.loginTitle')}</h1>
             <CardDescription>
-              {t('welcome')}{' '} {userNamelocaStorage != null ? `${userNamelocaStorage} Ji` : ''}
+              {t('common.welcome')}{' '} {userNamelocaStorage != null ? t('auth.ji', { name: userNamelocaStorage }) : ''}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {reason === "session_ended" && (
               <div className="bg-orange-50 border border-orange-200 text-orange-700 text-sm rounded-lg px-4 py-3 text-center">
-                Your session was ended by an administrator. Please login again.
+                {t('auth.yourSessionWasEnded')}
               </div>
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="userId">{t('userIdOrEmailId')}</Label>
+                <Label htmlFor="userId">{t('auth.userIdOrEmailId')}</Label>
                 <Input
                   id="userId"
                   type="text"
-                  placeholder={t('enterUserIdOrEmailId')}
+                  placeholder={t('auth.enterUserIdOrEmailId')}
                   value={userId}
                   onChange={(e) => setUserId(e.target.value.trim())}
                   required
@@ -165,12 +166,12 @@ const Login = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">{t('password')}</Label>
+                <Label htmlFor="password">{t('common.password')}</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showCur ? "text" : "password"}
-                    placeholder={t('password')}
+                    placeholder={t('common.password')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -186,28 +187,24 @@ const Login = () => {
               )}
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? t('loading') : t('login')}
+                {isLoading ? t('common.loading') : t('nav.login')}
               </Button>
             </form>
 
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                {t('dontHaveAccount')}{" "}
+                {t('auth.dontHaveAccount')}{" "}
                 <Link to="/signup" className="text-primary hover:underline">
-                  {t('signupFree')}
+                  {t('nav.signupFree')}
                 </Link>
               </p>
               <p className="text-sm text-muted-foreground py-1">
                 <Link to="/forgot-password" className="text-primary hover:underline">
-                  Forgot password?
+                  {t('auth.forgotPassword')}
                 </Link>
               </p>
               <p className="text-sm text-muted-foreground">
-                {/* {t('dontHaveAccount')}{" "} */}Explore &nbsp;  
-                <Link to="/our-plans" className="text-primary hover:underline">
-                  Our Plans
-                </Link>
-              </p>
+                <Trans i18nKey="auth.exploreOurPlans" components={{ link: <Link to="/our-plans" className="text-primary hover:underline" /> }} /></p>
             </div>
           </CardContent>
         </Card>

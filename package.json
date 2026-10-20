@@ -18,7 +18,11 @@
     "prepare": "husky",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "i18n:sync": "node scripts/i18n.mjs sync",
+    "i18n:check": "node scripts/i18n.mjs check",
+    "i18n:add": "node scripts/i18n.mjs add",
+    "i18n:audit": "node scripts/i18n.mjs audit"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

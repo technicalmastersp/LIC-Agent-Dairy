@@ -1,15 +1,19 @@
 import { Input } from "@/components/ui/input";
+import { makeInsuranceText } from "@/i18n/insuranceText";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getInsuranceTypeDef } from "@/config/insuranceTypes";
 import type { InsuranceFieldDef } from "@/types/config/insuranceTypes.types";
 import type { TypeSpecificFieldsFormProps } from "@/types/components/TypeSpecificFieldsForm.types";
+import { useLanguage } from "@/hooks/useLanguage";
 // Renders the extra fields particular to the selected built-in insurance
 // type (e.g. IDV + registration number for Vehicle Insurance, trip dates
 // for Travel Insurance) — driven entirely by src/config/insuranceTypes.ts,
 // so adding a field to a type only ever means editing that config file.
 const TypeSpecificFieldsForm = ({ insuranceType, values, onChange }: TypeSpecificFieldsFormProps) => {
+  const { t, tOr } = useLanguage();
+  const ins = makeInsuranceText(tOr);
   const def = getInsuranceTypeDef(insuranceType);
   if (!def || def.fields.length === 0) return null;
 
@@ -21,11 +25,11 @@ const TypeSpecificFieldsForm = ({ insuranceType, values, onChange }: TypeSpecifi
       return (
         <Select value={value} onValueChange={(v) => onChange(field.key, v)}>
           <SelectTrigger id={id} className="mt-1">
-            <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+            <SelectValue placeholder={t('records.select', { label: ins.fieldLabel(def.id, field).toLowerCase() })} />
           </SelectTrigger>
           <SelectContent>
             {(field.options || []).map((opt) => (
-              <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+              <SelectItem key={opt} value={opt}>{ins.option(opt)}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -50,7 +54,7 @@ const TypeSpecificFieldsForm = ({ insuranceType, values, onChange }: TypeSpecifi
         type={field.type === "number" ? "number" : field.type === "date" ? "date" : "text"}
         value={value}
         onChange={(e) => onChange(field.key, e.target.value)}
-        placeholder={field.placeholder}
+        placeholder={ins.fieldPlaceholder(def.id, field)}
         className="mt-1"
       />
     );
@@ -61,7 +65,7 @@ const TypeSpecificFieldsForm = ({ insuranceType, values, onChange }: TypeSpecifi
       {def.fields.map((field) => (
         <div key={field.key}>
           <Label htmlFor={`type-field-${field.key}`}>
-            {field.label}{field.unit ? <span className="text-muted-foreground font-normal"> ({field.unit})</span> : null}
+            {ins.fieldLabel(def.id, field)}{field.unit ? <span className="text-muted-foreground font-normal"> ({ins.unit(field.unit)})</span> : null}
           </Label>
           {renderField(field)}
         </div>

@@ -27,6 +27,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Translations (parity, placeholders, rich-text tags)
+        # Fails on stray/mismatched keys or broken {{placeholders}}/<tags>. Untranslated keys
+        # only warn (they fall back to English); add --strict to require 100% once a language is complete.
+        run: npm run i18n:check
+
       - name: Type-check
         # -p is required: the root tsconfig.json only has "references" and
         # no "files"/"include" of its own, so `tsc --noEmit` with no -p

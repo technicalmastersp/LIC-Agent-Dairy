@@ -8,6 +8,7 @@ import { getMyActivity } from "../../services/userService";
 import { ChevronLeft, ChevronRight, History } from "lucide-react";
 import type { ActivityLog, Pagination } from "@/types/pages/MyActivity.types";
 import { formatISTDateTime as fmt } from "@/utils/dateFormat";
+import { useLanguage } from "@/hooks/useLanguage";
 
 // Same palette AdminLogs.tsx uses, plus the self-service actions this
 // page can now show (PASSWORD_CHANGED, PROFILE_UPDATED, RECORD_*) that
@@ -59,6 +60,7 @@ const summarize = (action: string, details: unknown): string | null => {
   }
 };
 const MyActivity = () => {
+  const { t } = useLanguage();
   const [logs,       setLogs]       = useState<ActivityLog[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading,    setLoading]    = useState(true);
@@ -87,9 +89,9 @@ const MyActivity = () => {
           <div className="flex items-center gap-2">
             <History className="w-5 h-5 text-primary" />
             <div>
-              <h1 className="text-xl font-medium">My activity</h1>
+              <h1 className="text-xl font-medium">{t('profile.myActivity')}</h1>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Actions on your account — {pagination?.total ?? 0} total
+                {t('profile.actionsOnYourAccountTotal', { value: pagination?.total ?? 0 })}
               </p>
             </div>
           </div>
@@ -97,9 +99,9 @@ const MyActivity = () => {
           <Card>
             <CardContent className="p-0">
               {loading ? (
-                <p className="text-center text-sm text-muted-foreground py-10">Loading…</p>
+                <p className="text-center text-sm text-muted-foreground py-10">{t('common.loading2')}</p>
               ) : !logs.length ? (
-                <p className="text-center text-sm text-muted-foreground py-10">No activity yet.</p>
+                <p className="text-center text-sm text-muted-foreground py-10">{t('common.noActivityYet')}</p>
               ) : (
                 <div>
                   {logs.map((log) => {
@@ -127,7 +129,7 @@ const MyActivity = () => {
 
           {pagination && pagination.totalPages > 1 && (
             <div className="flex items-center justify-between text-sm">
-              <p className="text-muted-foreground">Page {pagination.page} of {pagination.totalPages}</p>
+              <p className="text-muted-foreground">{t('profile.page', { page: pagination.page, totalPages: pagination.totalPages })}</p>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}>

@@ -21,6 +21,7 @@ import { useSensitiveInputClass } from "@/hooks/useSensitiveMask";
 import {
   formatMonthKey, todayInputIST, fallbackMonthOptions, formatRupees, STATUS_CHIP, STATUS_LABEL,
 } from "@/utils/paymentMonths";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const NOTES_MAX = 500;
 const num = (s: string) => Number(String(s).replace(/[,₹\s]/g, ""));
@@ -31,6 +32,7 @@ const num = (s: string) => Number(String(s).replace(/[,₹\s]/g, ""));
 // fee). Stored in the payment ledger (backend: policyPaymentsController); the
 // server also moves currentPolicy.lastPaymentDate, so due/missed lists follow.
 const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate, editingPayment = null }: PaymentUpdateModalProps) => {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const amountMask = useSensitiveInputClass("paymentAmount");
 
@@ -61,7 +63,7 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate, editingPayment 
       .catch((e) => {
         if (cancelled) return;
         setData(null);
-        setLoadError(axios.isAxiosError(e) ? e.response?.data?.message || "Couldn't load payment details." : "Couldn't load payment details.");
+        setLoadError(axios.isAxiosError(e) ? e.response?.data?.message || t('records.couldnTLoadPaymentDetails') : t('records.couldnTLoadPaymentDetails'));
       })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
@@ -116,11 +118,11 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate, editingPayment 
   const total = (num(amount) || 0) + (hasExtra ? num(extraAmount) || 0 : 0);
 
   const validate = (): string | null => {
-    if (!paidOn) return "Choose the date the payment was made.";
-    if (paidOn > todayInputIST()) return "Payment date can't be in the future.";
-    if (months.length === 0) return "Choose at least one due month this payment covers.";
-    if (!(num(amount) > 0)) return "Enter the amount paid (greater than 0).";
-    if (hasExtra && !(num(extraAmount) > 0)) return "Enter the additional charge, or switch it off.";
+    if (!paidOn) return t('records.chooseTheDateThePayment');
+    if (paidOn > todayInputIST()) return t('records.paymentDateCanT');
+    if (months.length === 0) return t('records.chooseAtLeastOneDue');
+    if (!(num(amount) > 0)) return t('records.enterTheAmountPaidGreater');
+    if (hasExtra && !(num(extraAmount) > 0)) return t('records.enterTheAdditionalCharge');
     if (notes.length > NOTES_MAX) return `Notes can be at most ${NOTES_MAX} characters.`;
     return null;
   };
@@ -129,7 +131,7 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate, editingPayment 
     if (!record.recordId) return;
     const problem = validate();
     if (problem) {
-      toast({ title: "Check the details", description: problem, variant: "destructive" });
+      toast({ title: t('records.checkTheDetails'), description: problem, variant: "destructive" });
       return;
     }
     const body = {
@@ -145,7 +147,7 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate, editingPayment 
       if (editingPayment) await updateRecordPayment(record.recordId, editingPayment.id, body);
       else await addRecordPayment(record.recordId, body);
       toast({
-        title: editingPayment ? "Payment updated" : "Payment recorded",
+        title: editingPayment ? t('records.paymentUpdated') : t('records.paymentRecorded'),
         description: `${months.length > 1 ? `${months.length} months` : formatMonthKey(months[0])} saved.`,
       });
       onUpdate();
@@ -154,8 +156,8 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate, editingPayment 
       console.error(error);
       const message = axios.isAxiosError(error) ? error.response?.data?.message : undefined;
       toast({
-        title: "Couldn't save payment",
-        description: message || "Please try again.",
+        title: t('records.couldnTSavePayment'),
+        description: message || t('records.pleaseTryAgain'),
         variant: "destructive",
       });
     } finally {
@@ -169,26 +171,26 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate, editingPayment 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-form-header">
             <CalendarCheck2 className="w-5 h-5" />
-            <span>{isEdit ? "Edit Payment" : "Record Payment"}{record.name ? ` — ${record.name}` : ""}</span>
+            <span>{isEdit ? t('records.editPayment2') : t('records.recordPayment2')}{record.name ? ` — ${record.name}` : ""}</span>
           </DialogTitle>
           <DialogDescription>
-            One payment can settle more than one due month — for example a missed month paid together with the next one, plus any late fee.
+            {t('records.onePaymentCanSettleMore')}
           </DialogDescription>
         </DialogHeader>
 
         {/* Read-only policy context */}
         <div className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg border border-table-border bg-muted/20 p-3 text-sm">
-          <div><p className="text-xs text-muted-foreground">Policy number</p>
+          <div><p className="text-xs text-muted-foreground">{t('records.policyNumber')}</p>
             <Badge variant="outline" className="font-mono mt-0.5"><SensitiveValue field="policyNumber" value={policy?.policyNumber} placeholder="N/A" /></Badge></div>
-          <div><p className="text-xs text-muted-foreground">Mode of payment</p><p className="font-medium">{policy?.modeOfPayment || "-"}</p></div>
-          <div><p className="text-xs text-muted-foreground">Plan &amp; term</p><p>{policy?.planAndTerm || "-"}</p></div>
-          <div><p className="text-xs text-muted-foreground">Last payment date</p>
+          <div><p className="text-xs text-muted-foreground">{t('records.modeOfPayment2')}</p><p className="font-medium">{policy?.modeOfPayment || "-"}</p></div>
+          <div><p className="text-xs text-muted-foreground">{t('records.planTerm2')}</p><p>{policy?.planAndTerm || "-"}</p></div>
+          <div><p className="text-xs text-muted-foreground">{t('records.lastPaymentDate2')}</p>
             <p>{policy?.lastPaymentDate ? convertDateToIndianFormat(policy.lastPaymentDate) : "-"}</p></div>
         </div>
 
         {loading && (
           <div role="status" aria-live="polite" className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
-            <Loader2 className="w-4 h-4 animate-spin" /> Loading payment details…
+            <Loader2 className="w-4 h-4 animate-spin" /> {" "}{t('records.loadingPaymentDetails')}
           </div>
         )}
 
@@ -202,7 +204,7 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate, editingPayment 
           <div className="space-y-4">
             {/* Which months this payment settles */}
             <fieldset className="space-y-2">
-              <legend className="text-sm font-medium text-form-header">Due months covered by this payment</legend>
+              <legend className="text-sm font-medium text-form-header">{t('records.dueMonthsCovered')}</legend>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {options.map((o) => {
                   const checked = months.includes(o.month);
@@ -215,42 +217,42 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate, editingPayment 
                       <span className="flex flex-col leading-tight">
                         <span className="font-medium">{formatMonthKey(o.month)}</span>
                         <span className={`mt-0.5 inline-block rounded border px-1 text-[10px] ${STATUS_CHIP[o.status]}`}>
-                          {data.schedule.length ? STATUS_LABEL[o.status] : "Choose"}
+                          {data.schedule.length ? STATUS_LABEL[o.status] : t('records.choose')}
                         </span>
                       </span>
                     </label>
                   );
                 })}
               </div>
-              {options.length === 0 && <p className="text-sm text-muted-foreground">Every due month is already paid.</p>}
+              {options.length === 0 && <p className="text-sm text-muted-foreground">{t('records.everyDueMonthIsAlready')}</p>}
             </fieldset>
 
             <div className="grid sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="paidOn">Payment date</Label>
+                <Label htmlFor="paidOn">{t('records.paymentDate')}</Label>
                 <Input id="paidOn" type="date" value={paidOn} max={todayInputIST()}
                   onChange={(e) => setPaidOn(e.target.value)} disabled={saving} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="payAmount">Amount paid (₹)</Label>
+                <Label htmlFor="payAmount">{t('records.amountPaid')}</Label>
                 <Input id="payAmount" type="text" inputMode="decimal" autoComplete="off" placeholder="e.g. 2400"
                   value={amount} disabled={saving} className={amountMask}
                   onChange={(e) => { setAmountTouched(true); setAmount(e.target.value.replace(/[^\d.,]/g, "")); }} />
-                {months.length > 1 && <p className="text-xs text-muted-foreground">Total for {months.length} months, excluding any additional charge.</p>}
+                {months.length > 1 && <p className="text-xs text-muted-foreground">{t('records.totalForMonthsExcludingAny', { length: months.length })}</p>}
               </div>
             </div>
 
             <div className="rounded-lg border border-table-border p-3 space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <Label htmlFor="hasExtra" className="font-medium">Additional charge</Label>
-                  <p className="text-xs text-muted-foreground">Late fee, interest or any extra amount paid on top.</p>
+                  <Label htmlFor="hasExtra" className="font-medium">{t('records.additionalCharge')}</Label>
+                  <p className="text-xs text-muted-foreground">{t('records.lateFeeInterestOrAny')}</p>
                 </div>
                 <Switch id="hasExtra" checked={hasExtra} onCheckedChange={setHasExtra} disabled={saving} />
               </div>
               {hasExtra && (
                 <div className="space-y-1.5">
-                  <Label htmlFor="extraAmount">Additional charge amount (₹)</Label>
+                  <Label htmlFor="extraAmount">{t('records.additionalChargeAmount')}</Label>
                   <Input id="extraAmount" type="text" inputMode="decimal" autoComplete="off" placeholder="e.g. 60"
                     value={extraAmount} disabled={saving} className={amountMask}
                     onChange={(e) => setExtraAmount(e.target.value.replace(/[^\d.,]/g, ""))} />
@@ -260,16 +262,16 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate, editingPayment 
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="payNotes">Notes (optional)</Label>
+                <Label htmlFor="payNotes">{t('records.notesOptional')}</Label>
                 <span className="text-xs text-muted-foreground">{notes.length}/{NOTES_MAX}</span>
               </div>
               <Textarea id="payNotes" rows={2} maxLength={NOTES_MAX} value={notes} disabled={saving}
-                placeholder="e.g. Couldn't pay in September — paid double in October"
+                placeholder={t('records.eGCouldnTPay')}
                 onChange={(e) => setNotes(e.target.value)} className="resize-none" />
             </div>
 
             <div className="flex items-center justify-between rounded-lg bg-primary/5 px-3 py-2 text-sm">
-              <span className="text-muted-foreground">Total paid</span>
+              <span className="text-muted-foreground">{t('records.totalPaid')}</span>
               <span className="font-semibold text-form-header">
                 <SensitiveValue field="paymentAmount" value={total} render={(v) => formatRupees(Number(v))} placeholder="₹0" />
               </span>
@@ -278,10 +280,10 @@ const PaymentUpdateModal = ({ record, isOpen, onClose, onUpdate, editingPayment 
         )}
 
         <div className="flex justify-end gap-2 pt-1">
-          <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
+          <Button variant="outline" onClick={onClose} disabled={saving}>{t('common.cancel')}</Button>
           <Button onClick={handleSave} disabled={saving || loading || !data}>
-            {saving ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>)
-              : (<><Save className="w-4 h-4 mr-2" /> {isEdit ? "Save changes" : "Save payment"}</>)}
+            {saving ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {" "}{t('records.saving2')}</>)
+              : (<><Save className="w-4 h-4 mr-2" /> {isEdit ? t('records.saveChanges2') : t('records.savePayment')}</>)}
           </Button>
         </div>
       </DialogContent>

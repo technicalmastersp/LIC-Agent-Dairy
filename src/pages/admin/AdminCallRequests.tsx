@@ -1,3 +1,4 @@
+import { useLanguage } from "@/hooks/useLanguage";
 import AdminLayout from "./AdminLayout";
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
@@ -28,6 +29,7 @@ const FILTERS: { key: CallRequestFilter; label: string }[] = [
 ];
 
 const AdminCallRequests = () => {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [filter, setFilter] = useState<CallRequestFilter>("open");
   const [rows, setRows] = useState<AdminCallRequest[]>([]);
@@ -104,7 +106,7 @@ const AdminCallRequests = () => {
               <div>
                 <p className="font-medium text-form-header">{open ? "Call window is open now" : "Outside call hours — calls start at the next opening"}</p>
                 <p className="text-muted-foreground">
-                  {BUSINESS_HOURS_LABELS.map((l) => `${l.days}: ${l.hours}`).join(" · ")} (IST)
+                  {BUSINESS_HOURS_LABELS.map((l) => `${t(l.days)}: ${t(l.hours)}`).join(" · ")} (IST)
                 </p>
               </div>
             </div>

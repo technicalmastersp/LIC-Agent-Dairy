@@ -25,10 +25,12 @@ import {
 import { validateImportRow, type ImportRowValidation } from "@/schemas/importRecordSchema";
 import { createRecordsBulk } from "../../services/recordService";
 import axios from "axios";
+import { useLanguage } from "@/hooks/useLanguage";
 
 type Step = "upload" | "preview" | "done";
 
 const ImportRecords = () => {
+  const { t, tOr } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -73,7 +75,7 @@ const ImportRecords = () => {
       setExcludedRows(new Set());
       setStep("preview");
     } catch (err) {
-      setParseError(err instanceof Error ? err.message : "Failed to read this file.");
+      setParseError(err instanceof Error ? err.message : t('records.failedToReadThisFile'));
     } finally {
       setIsParsing(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -123,7 +125,7 @@ const ImportRecords = () => {
 
     const toImport = includedRows.filter((r) => validations.get(r._rowNumber)?.valid);
     if (toImport.length === 0) {
-      toast({ title: "Nothing to import", description: "Fix or exclude the rows with errors first.", variant: "destructive" });
+      toast({ title: t('records.nothingToImport'), description: t('records.fixOrExcludeTheRows'), variant: "destructive" });
       return;
     }
 
@@ -160,11 +162,11 @@ const ImportRecords = () => {
       setStep("done");
     } catch (err: unknown) {
       const message = axios.isAxiosError(err)
-        ? err.response?.data?.message || "Import failed. Please check your connection and try again."
-        : "Import failed. Please check your connection and try again.";
+        ? err.response?.data?.message || t('records.importFailedPleaseCheck')
+        : t('records.importFailedPleaseCheck');
 
       toast({
-        title: "Import failed",
+        title: t('records.importFailed'),
         description: message,
         variant: "destructive",
       });
@@ -175,24 +177,24 @@ const ImportRecords = () => {
 
   const CONFIRM_COPY: Record<NonNullable<typeof pendingAction>, { title: string; description: string; confirmLabel: string }> = {
     back: {
-      title: "Leave this page?",
-      description: "You'll lose the file you've reviewed so far — if it hasn't been saved yet.",
-      confirmLabel: "Leave",
+      title: t('records.leaveThisPage'),
+      description: t('records.youLlLoseTheFile'),
+      confirmLabel: t('records.leave'),
     },
     startOver: {
-      title: "Start over?",
-      description: "This discards everything you've reviewed and edited on this file. You'll need to re-upload it.",
-      confirmLabel: "Start over",
+      title: t('records.startOver'),
+      description: t('records.thisDiscardsEverythingYouVe'),
+      confirmLabel: t('records.startOver2'),
     },
     cancel: {
-      title: "Cancel this import?",
-      description: "This discards everything you've reviewed and edited on this file. Nothing will be saved.",
-      confirmLabel: "Discard",
+      title: t('records.cancelThisImport'),
+      description: t('records.thisDiscardsEverythingYouVe2'),
+      confirmLabel: t('records.discard'),
     },
     import: {
       title: `Import ${validCount} record${validCount === 1 ? "" : "s"}?`,
-      description: "This adds them to your policy records right away. Excluded and error rows will be skipped.",
-      confirmLabel: "Import",
+      description: t('records.thisAddsThem'),
+      confirmLabel: t('records.import'),
     },
   };
 
@@ -223,7 +225,7 @@ const ImportRecords = () => {
         <div className="flex items-center justify-between mb-6">
           <Button variant="outline" size="sm" className="gap-2" onClick={() => confirmOrRun("back")}>
             <ArrowLeft className="w-4 h-4" />
-            Back to Records
+            {t('records.backToRecords')}
           </Button>
         </div>
 
@@ -233,16 +235,15 @@ const ImportRecords = () => {
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
                 <FileUp className="w-7 h-7 text-primary" />
               </div>
-              <CardTitle className="text-2xl text-form-header">Import Records</CardTitle>
+              <CardTitle className="text-2xl text-form-header">{t('records.importRecords')}</CardTitle>
               <CardDescription>
-                Upload a spreadsheet of policy records — you'll be able to review and fix any issues
-                before anything is saved. Up to {MAX_IMPORT_ROWS} records per file.
+                {t('records.uploadASpreadsheetOfPolicy', { MAX_IMPORT_ROWS })}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Button variant="outline" className="w-full gap-2" onClick={() => downloadImportTemplate()}>
                 <Download className="w-4 h-4" />
-                Download blank template
+                {t('records.downloadBlankTemplate')}
               </Button>
 
               <label
@@ -257,15 +258,15 @@ const ImportRecords = () => {
                 {isParsing ? (
                   <>
                     <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                    <p className="text-sm text-muted-foreground">Reading your file…</p>
+                    <p className="text-sm text-muted-foreground">{t('records.readingYourFile')}</p>
                   </>
                 ) : (
                   <>
                     <FileSpreadsheet className={`w-8 h-8 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
                     <p className="text-sm font-medium text-form-header">
-                      {isDragging ? "Drop your file here" : "Drag & drop a file here, or click to browse"}
+                      {isDragging ? t('records.dropYourFileHere') : t('records.dragDropAFileHere')}
                     </p>
-                    <p className="text-xs text-muted-foreground">.xlsx, .xls, or .csv — max 5MB, {MAX_IMPORT_ROWS} rows</p>
+                    <p className="text-xs text-muted-foreground">{t('records.xlsxXlsOrCsvMax', { MAX_IMPORT_ROWS })}</p>
                   </>
                 )}
                 <input
@@ -287,8 +288,7 @@ const ImportRecords = () => {
               )}
 
               <p className="text-xs text-muted-foreground text-center">
-                Only "Name" is required. Family member details and previous-policy history aren't
-                covered by import yet — add those afterward from the record's Edit screen.
+                {t('records.onlyNameIsRequiredFamily')}
               </p>
             </CardContent>
           </Card>
@@ -300,21 +300,21 @@ const ImportRecords = () => {
               <CardContent className="pt-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-3">
-                    <Badge variant="secondary" className="text-sm">{rows.length} rows read</Badge>
+                    <Badge variant="secondary" className="text-sm">{t('records.rowsRead', { length: rows.length })}</Badge>
                     <Badge className="bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 text-sm">
-                      <CheckCircle2 className="w-3.5 h-3.5 mr-1" />{validCount} ready
+                      <CheckCircle2 className="w-3.5 h-3.5 mr-1" />{t('records.rowsReady', { count: validCount })}
                     </Badge>
                     {errorCount > 0 && (
                       <Badge variant="destructive" className="text-sm">
-                        <AlertTriangle className="w-3.5 h-3.5 mr-1" />{errorCount} need fixing
+                        <AlertTriangle className="w-3.5 h-3.5 mr-1" />{t('records.rowsNeedFixing', { count: errorCount })}
                       </Badge>
                     )}
                     {excludedRows.size > 0 && (
-                      <Badge variant="outline" className="text-sm">{excludedRows.size} excluded</Badge>
+                      <Badge variant="outline" className="text-sm">{t('records.excluded', { size: excludedRows.size })}</Badge>
                     )}
                   </div>
                   <Button variant="ghost" size="sm" onClick={() => confirmOrRun("startOver")}>
-                    Start over
+                    {t('records.startOver2')}
                   </Button>
                 </div>
               </CardContent>
@@ -329,9 +329,9 @@ const ImportRecords = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-table-header">
-                        <TableHead className="w-12 border border-table-border">Row</TableHead>
-                        <TableHead className="w-12 border border-table-border">Include</TableHead>
-                        <TableHead className="w-28 border border-table-border">Status</TableHead>
+                        <TableHead className="w-12 border border-table-border">{t('records.row')}</TableHead>
+                        <TableHead className="w-12 border border-table-border">{t('records.include')}</TableHead>
+                        <TableHead className="w-28 border border-table-border">{t('common.status')}</TableHead>
                         {IMPORT_COLUMNS.map((col) => (
                           <TableHead key={col.key} className="border border-table-border whitespace-nowrap">
                             {col.header}{col.required && <span className="text-destructive"> *</span>}
@@ -354,23 +354,23 @@ const ImportRecords = () => {
                             <TableCell className="border border-table-border align-top">
                               {validation?.valid ? (
                                 <Badge className="bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 text-xs">
-                                  Ready
+                                  {t('records.ready')}
                                 </Badge>
                               ) : (
                                 <div className="space-y-1">
                                   <Badge variant="destructive" className="text-xs">
-                                    {validation?.errors.length} error{validation && validation.errors.length > 1 ? "s" : ""}
-                                  </Badge>
+                                    {t('records.error2', { count: validation?.errors.length ?? 0 })}</Badge>
                                   <ul className="text-xs text-destructive space-y-0.5 max-w-[220px]">
                                     {validation?.errors.map((msg, i) => (
-                                      <li key={i}>{msg}</li>
+                                      <li key={i}>{tOr(`validation.${msg}`, msg)}</li>
                                     ))}
                                   </ul>
                                 </div>
                               )}
                             </TableCell>
                             {IMPORT_COLUMNS.map((col) => {
-                              const fieldError = validation?.fieldErrors[col.key];
+                              const rawFieldError = validation?.fieldErrors[col.key];
+                              const fieldError = rawFieldError ? tOr(`validation.${rawFieldError}`, rawFieldError) : rawFieldError;
                               return (
                                 <TableCell key={col.key} className="border border-table-border p-1">
                                   <Input
@@ -397,11 +397,11 @@ const ImportRecords = () => {
 
             <div className="flex justify-end gap-3">
               <Button variant="outline" onClick={() => confirmOrRun("cancel")} disabled={isSubmitting}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button onClick={() => confirmOrRun("import")} disabled={isSubmitting || validCount === 0} className="gap-2">
                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                {isSubmitting ? "Importing…" : `Import ${validCount} record${validCount === 1 ? "" : "s"}`}
+                {isSubmitting ? t('records.importing') : t('records.importRecord', { count: validCount })}
               </Button>
             </div>
           </div>
@@ -414,20 +414,19 @@ const ImportRecords = () => {
                 <PartyPopper className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
               </div>
               <h2 className="text-xl font-semibold text-form-header">
-                {importedCount} record{importedCount === 1 ? "" : "s"} imported
+                {t('records.recordImported', { count: importedCount })}
               </h2>
               <p className="text-sm text-muted-foreground">
-                They're now in your records list. You can add family details or previous-policy
-                history to any of them from the Edit screen.
+                {t('records.theyReNow')}
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
                 <Button variant="outline" onClick={resetToUpload} className="gap-2">
                   <FileUp className="w-4 h-4" />
-                  Import more
+                  {t('records.importMore')}
                 </Button>
                 <Button onClick={() => navigate("/view-records")} className="gap-2">
                   <Home className="w-4 h-4" />
-                  Go to Records
+                  {t('records.goToRecords')}
                 </Button>
               </div>
             </CardContent>
@@ -444,7 +443,7 @@ const ImportRecords = () => {
                 <AlertDialogDescription>{CONFIRM_COPY[pendingAction].description}</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Go back</AlertDialogCancel>
+                <AlertDialogCancel>{t('records.goBack')}</AlertDialogCancel>
                 <AlertDialogAction onClick={runConfirmedAction}>
                   {CONFIRM_COPY[pendingAction].confirmLabel}
                 </AlertDialogAction>
